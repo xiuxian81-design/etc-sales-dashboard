@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>íì¬ë°ì´ì¤íë§ ETC ë§¤ì¶ë¶ì ëìë³´ë</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<!-- JSONP ë°©ì ì¬ì© - PapaParse ë¶íì -->
+<style>
+:root { --primary:#1a365d; --accent:#2b6cb0; --success:#38a169; --danger:#e53e3e; --warning:#d69e2e; --bg:#f7fafc; --card:#fff; --text:#2d3748; --muted:#718096; --border:#e2e8f0; }
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI','Malgun Gothic',sans-serif;background:var(--bg);color:var(--text);}
+.header{background:linear-gradient(135deg,#1a365d,#2b6cb0);color:#fff;padding:24px 32px;display:flex;justify-content:space-between;align-items:center;}
+.header h1{font-size:22px;font-weight:700;}
+.header .sub{font-size:13px;opacity:.85;margin-top:4px;}
+.header .badge{background:rgba(255,255,255,.2);padding:6px 14px;border-radius:20px;font-size:13px;}
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;padding:20px 32px;}
+.kpi{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.08);text-align:center;border-top:3px solid var(--accent);}
+.kpi .label{font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600;}
+.kpi .value{font-size:26px;font-weight:800;color:var(--primary);}
+.kpi .unit{font-size:12px;color:var(--muted);}
+.kpi .change{font-size:11px;margin-top:3px;font-weight:600;}
+.kpi .change.up{color:var(--success);} .kpi .change.down{color:var(--danger);}
+.kpi.green{border-top-color:var(--success);} .kpi.red{border-top-color:var(--danger);} .kpi.yellow{border-top-color:var(--warning);}
+.content{padding:0 32px 32px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.section{margin-top:20px;}
+.card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+.card h3{font-size:14px;color:var(--primary);margin-bottom:12px;font-weight:700;}
+canvas{max-height:300px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{background:#edf2f7;padding:8px 6px;text-align:center;font-weight:700;color:var(--primary);border-bottom:2px solid var(--border);white-space:nowrap;}
+td{padding:7px 6px;border-bottom:1px solid var(--border);text-align:right;}
+td:first-child{text-align:left;font-weight:600;}
+tr:hover{background:#f7fafc;}
+.tag{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;}
+.tag-green{background:#c6f6d5;color:#22543d;} .tag-red{background:#fed7d7;color:#9b2c2c;}
+.tag-yellow{background:#fefcbf;color:#744210;} .tag-blue{background:#bee3f8;color:#2a4365;}
+.pct-up{color:var(--success);font-weight:700;} .pct-down{color:var(--danger);font-weight:700;}
+.filter-bar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;}
+.filter-bar select,.filter-bar input{padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;}
+.tab-bar{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--border);}
+.tab{padding:10px 20px;cursor:pointer;font-size:14px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab:hover{color:var(--accent);}
+.panel{display:none;} .panel.active{display:block;}
+.fc-summary{background:linear-gradient(135deg,#ebf8ff,#e2efda);border-radius:12px;padding:20px;margin-bottom:20px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.fc-item{text-align:center;}
+.fc-item .fc-label{font-size:11px;color:var(--muted);font-weight:600;}
+.fc-item .fc-val{font-size:22px;font-weight:800;color:var(--primary);}
+.fc-item .fc-sub{font-size:11px;color:var(--muted);}
+.loading-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(247,250,252,0.95);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;}
+.loading-overlay .spinner{width:48px;height:48px;border:4px solid #e2e8f0;border-top-color:#2b6cb0;border-radius:50%;animation:spin 1s linear infinite;}
+.loading-overlay .msg{margin-top:16px;font-size:16px;color:var(--primary);font-weight:600;}
+.loading-overlay .sub-msg{margin-top:8px;font-size:13px;color:var(--muted);}
+.error-box{max-width:600px;margin:40px auto;padding:32px;background:#fff;border-radius:12px;border:2px solid #e53e3e;text-align:center;}
+.error-box h2{color:#e53e3e;margin-bottom:12px;}
+.config-bar{background:#ebf8ff;padding:8px 32px;font-size:12px;color:var(--accent);display:flex;justify-content:space-between;align-items:center;}
+.config-bar a{color:var(--accent);text-decoration:underline;cursor:pointer;}
+.refresh-btn{background:var(--accent);color:#fff;border:none;padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer;}
+.refresh-btn:hover{background:var(--primary);}
+@keyframes spin{to{transform:rotate(360deg);}}
+@media(max-width:1200px){.kpi-row{grid-template-columns:repeat(3,1fr);}.grid-2{grid-template-columns:1fr;}.fc-summary{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+
+<!-- ===== ì¤ì : ì¬ê¸°ì êµ¬ê¸ìí¸ IDë¥¼ ìë ¥íì¸ì ===== -->
+<script>
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// â  êµ¬ê¸ìí¸ ì¤ì                                             â
+// â  1. êµ¬ê¸ìí¸ URLìì /d/ ì /edit ì¬ì´ì IDë¥¼ ë³µì¬         â
+// â     ì: https://docs.google.com/spreadsheets/d/ABC123.../edit â
+// â     â SHEET_ID = 'ABC123...'                              â
+// â  2. ë§ê°ìì ìë°ì´í¸íì¸ì                                 â
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+const CONFIG = {
+  SHEET_ID: '1eYmkY9G2JtpqIIeJPaImEmrnZHz76Zi2iByHdha9wV8',  // êµ¬ê¸ìí¸ ì°ë ìë£
+  CLOSING_MONTH: 3,                 // â ë§ê° ìë£ë ì (1~12)
+  YEAR: 2026,                       // â ê¸°ì¤ ì°ë
+  // ìí¸ ì´ë¦ (êµ¬ê¸ìí¸ì í­ ì´ë¦ê³¼ ì íí ì¼ì¹í´ì¼ í©ëë¤)
+  SHEET_SALES: 'ì¤ì ë°ì´í°',
+  SHEET_SF: 'SFëª©í',
+  SHEET_GROUP: 'ììµêµ°ë§¤í',
+};
+
+// ë°ëª¨ ëª¨ë: êµ¬ê¸ìí¸ IDê° ì¤ì ëì§ ìì¼ë©´ ë´ì¥ ë°ëª¨ ë°ì´í° ì¬ì©
+const IS_DEMO = CONFIG.SHEET_ID === 'YOUR_SHEET_ID_HERE';
+</script>
+
+<!-- ë¡ë© íë©´ -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="msg">ë°ì´í°ë¥¼ ë¶ë¬ì¤ë ì¤...</div>
+  <div class="sub-msg" id="loadingStatus">êµ¬ê¸ìí¸ìì ë°ì´í°ë¥¼ ê°ì ¸ìµëë¤</div>
+</div>
+
+<!-- ë°ì´í° ìì¤ íì ë° -->
+<div class="config-bar" id="configBar" style="display:none;">
+  <span id="dataSource"></span>
+  <span>
+    <span id="lastUpdate"></span>
+    <button class="refresh-btn" onclick="location.reload()">ð ìë¡ê³ ì¹¨</button>
+  </span>
+</div>
+
+<!-- í¤ë -->
+<div class="header">
+  <div>
+    <h1>íì¬ë°ì´ì¤íë§ ETC ë§¤ì¶ë¶ì ëìë³´ë</h1>
+    <div class="sub" id="headerSub">ë°ì´í° ë¡ë© ì¤...</div>
+  </div>
+  <div><span class="badge" id="headerBadge">-</span></div>
+</div>
+<div class="kpi-row" id="kpiRow"></div>
+<div class="content">
+  <div class="tab-bar" id="tabBar">
+    <div class="tab active" data-tab="overview">ì¢í© íí©</div>
+    <div class="tab" data-tab="products">ì£¼ë ¥íëª© ë¶ì</div>
+    <div class="tab" data-tab="forecast">ë§¤ì¶ ìì¸¡</div>
+    <div class="tab" data-tab="risk">ë¦¬ì¤í¬/ê¸°í</div>
+    <div class="tab" data-tab="all">ì ì²´ íëª©</div>
+  </div>
+
+  <div class="panel active" id="panel-overview">
+    <div class="grid-2">
+      <div class="card"><h3>ìë³ ë§¤ì¶ ì¶ì´ (24~26ë)</h3><canvas id="chartMonthly"></canvas></div>
+      <div class="card"><h3>26ë ìë³ ì¤ì  vs ëª©í(SF)</h3><canvas id="chartVsSF"></canvas></div>
+    </div>
+    <div class="grid-2 section">
+      <div class="card"><h3>ì£¼ë ¥íëª© Q1 ë§¤ì¶ êµ¬ì±</h3><canvas id="chartPie"></canvas></div>
+      <div class="card"><h3>ì£¼ë ¥íëª© ë¬ì±ì¨</h3><canvas id="chartAch"></canvas></div>
+    </div>
+    <div class="section">
+      <div class="card">
+        <h3>ë§¤ì¶ êµ¬ì¡° ë¶ì: ì ì²´ / ê³ ììµêµ° / ì ì í</h3>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">ê³ ììµêµ° = ê°êµ°+ëêµ°+ë¤êµ° | ì ì í = ë°ë§¤ 3ë ì´ë´ (2024~2026 ì¶ì)</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+          <div><canvas id="chartStructure"></canvas></div>
+          <div><canvas id="chartGroupBar"></canvas></div>
+        </div>
+        <div style="margin-top:16px;">
+          <table id="structureTable"><thead><tr>
+            <th>ê¶¼ë¶</th><th>ì¤ì </th><th>ëª©í</th><th>ë¬ì±ì¨</th><th>ì ëëê¸°</th><th>YoY</th><th>ì°ê°SF</th><th>ë¹ì¤</th>
+          </tr></thead><tbody></tbody></table>
+        </div>
+        <div style="margin-top:16px;">
+          <h3 style="font-size:13px;color:var(--primary);margin-bottom:8px;">ì ì í ìì¸ íí©</h3>
+          <table id="newProdTable"><thead><tr>
+            <th>íëª©</th><th>ì¶ìì°ë</th><th>ì¤ì </th><th>ëª©í</th><th>ë¬ì±ì¨</th><th>ì°ê°SF</th>
+          </tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-products">
+    <div class="filter-bar">
+      <select id="prodSelect"><option value="all">ì ì²´ ì£¼ë ¥íëª©</option></select>
+    </div>
+    <div class="grid-2">
+      <div class="card"><h3>ì í íëª© ìë³ í¸ë ë</h3><canvas id="chartProdTrend"></canvas></div>
+      <div class="card"><h3>ì£¼ë ¥íëª© YoY ì±ì¥ì¨</h3><canvas id="chartYoY"></canvas></div>
+    </div>
+    <div class="section"><div class="card">
+      <h3>ì£¼ë ¥íëª© ìì¸ íí© (ìµì)</h3>
+      <table id="prodTable"><thead><tr id="prodTableHeader">
+      </tr></thead><tbody></tbody></table>
+    </div></div>
+  </div>
+
+  <div class="panel" id="panel-forecast">
+    <div class="fc-summary" id="fcSummary"></div>
+    <div class="grid-2">
+      <div class="card"><h3>ì£¼ë ¥íëª© ì°ê° ìì¸¡ ë¹êµ (3ê°ì§ ë°©ë²)</h3><canvas id="chartForecast"></canvas></div>
+      <div class="card"><h3>ìì¸¡ íê·  vs SF ëª©í</h3><canvas id="chartFcVsSF"></canvas></div>
+    </div>
+    <div class="section"><div class="card">
+      <h3>ë§¤ì¶ ìì¸¡ ìì¸ (ìµì)</h3>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">ìì¸¡â  ë¨ìì°íì° | ìì¸¡â¡ ì ë ê³ì ì± ë°ì | ìì¸¡â¢ ì¤ì +ìì¬SFëª©í</p>
+      <table id="fcTable"><thead><tr>
+        <th>íëª©</th><th>ì¤ì </th><th>ìì¸¡â </th><th>ìì¸¡â¡</th><th>ìì¸¡â¢</th><th>ìì¸¡íê· </th><th>SFëª©í</th><th>SFëë¹</th><th>ì ëëë¹</th>
+      </tr></thead><tbody></tbody></table>
+    </div></div>
+  </div>
+
+  <div class="panel" id="panel-risk">
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="color:var(--success);">â² ê¸°í íëª© (ê³ ì±ì¥)</h3>
+        <table id="oppTable"><thead><tr><th>íëª©</th><th>ì¤ì </th><th>ì¦ê°ì¡</th><th>ë¬ì±ì¨</th><th>ìì¬ì </th></tr></thead><tbody></tbody></table>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--danger);">â¼ ë¦¬ì¤í¬ íëª© (ëª©íë¯¸ë¬/ì­ì±ì¥)</h3>
+        <table id="riskTable"><thead><tr><th>íëª©</th><th>ì¤ì </th><th>ë¬ì±ì¨</th><th>ì¦ê°ì¡</th><th>ì´ì</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+    <div class="section"><div class="card">
+      <h3 style="color:#d69e2e;">â¡ ì´ìë³ë (MoM Â±30% ì´ì)</h3>
+      <table id="anomalyTable"><thead><tr><th>íëª©</th><th>ì ì ì</th><th>ì ì</th><th>MoM</th><th>ì¤ì </th><th>YoY</th><th>ì í</th></tr></thead><tbody></tbody></table>
+    </div></div>
+  </div>
+
+  <div class="panel" id="panel-all">
+    <div class="filter-bar">
+      <input type="text" id="searchAll" placeholder="íëª©ëª ê²ì...">
+      <select id="sortAll">
+        <option value="qtd_26">ë§¤ì¶ì</option>
+        <option value="qtd_yoy">YoY ì±ì¥ì¨ì</option>
+        <option value="qtd_ach">ë¬ì±ì¨ì</option>
+        <option value="last_mom">MoMì</option>
+        <option value="remaining_monthly">ìì¬ìëª©íì</option>
+      </select>
+      <label style="font-size:12px;color:var(--muted);"><input type="checkbox" id="keyOnly"> ì£¼ë ¥íëª©ë§</label>
+    </div>
+    <div class="card">
+      <table id="allTable"><thead><tr id="allTableHeader">
+      </tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========================================
+// 1. êµ¬ê¸ìí¸ ë°ì´í° ë¡ë© í¨ì (JSONP - CORS ì°í)
+// ========================================
+let _gvizCallbackId = 0;
+function fetchSheetCSV(sheetName) {
+  return new Promise((resolve, reject) => {
+    const cbName = '_gvizCb' + (++_gvizCallbackId);
+    const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=responseHandler:${cbName}&sheet=${encodeURIComponent(sheetName)}`;
+    const script = document.createElement('script');
+    const timeout = setTimeout(() => { cleanup(); reject(new Error(`ìí¸ "${sheetName}" ë¡ë© ìê° ì´ê³¼`)); }, 15000);
+    function cleanup() { clearTimeout(timeout); delete window[cbName]; if(script.parentNode) script.parentNode.removeChild(script); }
+    window[cbName] = function(response) {
+      cleanup();
+      try {
+        if (response.status === 'error') { reject(new Error(response.errors.map(e=>e.message).join(', '))); return; }
+        const cols = response.table.cols.map(c => c.label);
+        const rows = response.table.rows.map(row => {
+          const obj = {};
+          row.c.forEach((cell, i) => {
+            const val = cell ? cell.v : null;
+            obj[cols[i]] = (typeof val === 'number') ? val : (val || '');
+          });
+          return obj;
+        });
+        resolve(rows);
+      } catch(e) { reject(e); }
+    };
+    script.onerror = () => { cleanup(); reject(new Error(`ìí¸ "${sheetName}" ì¤í¬ë¦½í¸ ë¡ë© ì¤í¨`)); };
+    script.src = url;
+    document.head.appendChild(script);
+  });
+}
+
+// ========================================
+// 2. CSV â D ê°ì²´ ë³í
+// ========================================
+function transformData(salesData, sfData, groupData) {
+  const CM = CONFIG.CLOSING_MONTH; // ë§ê°ì
+  const monthCols24 = Array.from({length:12}, (_,i) => `24.${i+1}ì`);
+  const monthCols25 = Array.from({length:12}, (_,i) => `25.${i+1}ì`);
+  const monthCols26 = Array.from({length:12}, (_,i) => `26.${i+1}ì`);
+  const sfMonthCols = Array.from({length:12}, (_,i) => `${i+1}ì`);
+
+  // SF ëª©í ë§µ ìì±
+  const sfMap = {};
+  sfData.forEach(row => {
+    const name = row['íëª©ëª'];
+    if (!name) return;
+    sfMap[name] = {
+      monthly: sfMonthCols.map(c => parseFloat(row[c]) || 0),
+      annual: parseFloat(row['ì°ê°SF']) || 0
+    };
+  });
+
+  // ììµêµ° ë§µ ìì±
+  const groupMap = {};
+  if (groupData) {
+    groupData.forEach(row => {
+      if (row['íëª©ëª'] && row['ììµêµ°']) groupMap[row['íëª©ëª']] = row['ììµêµ°'];
+    });
+  }
+
+  // ì ì²´ íëª© ë°ì´í° ë³í
+  const allProducts = [];
+  const total_26 = new Array(12).fill(0);
+  const total_25 = new Array(12).fill(0);
+  const total_24 = new Array(12).fill(0);
+  const total_sf = new Array(12).fill(0);
+
+  salesData.forEach(row => {
+    const name = row['íëª©ëª'];
+    if (!name) return;
+
+    const m26 = monthCols26.map(c => parseFloat(row[c]) || 0);
+    const m25 = monthCols25.map(c => parseFloat(row[c]) || 0);
+    const m24 = monthCols24.map(c => parseFloat(row[c]) || 0);
+    const isKey = (row['ì£¼ë ¥'] || '').toUpperCase() === 'Y';
+    const isDemkt = (row['ëë§ì¼í'] || '').toUpperCase() === 'Y';
+    const newYear = parseInt(row['ì ì íì°ë']) || null;
+    const sf = sfMap[name] || { monthly: new Array(12).fill(0), annual: 0 };
+    const group = groupMap[name] || row['ììµêµ°'] || '';
+
+    // ëì  í©ê³
+    const qtd_26 = m26.slice(0, CM).reduce((a,b) => a+b, 0);
+    const qtd_25 = m25.slice(0, CM).reduce((a,b) => a+b, 0);
+    const qtd_sf = sf.monthly.slice(0, CM).reduce((a,b) => a+b, 0);
+    const ann_25 = m25.reduce((a,b) => a+b, 0);
+    const ann_24 = m24.reduce((a,b) => a+b, 0);
+
+    // ë¬ì±ì¨, YoY
+    const qtd_ach = qtd_sf > 0 ? (qtd_26 / qtd_sf * 100) : null;
+    const qtd_yoy = qtd_25 > 0 ? ((qtd_26 / qtd_25 - 1) * 100) : null;
+
+    // MoM (ìµê·¼ì vs ì ì)
+    const lastM = CM >= 1 ? m26[CM-1] : 0;
+    const prevM = CM >= 2 ? m26[CM-2] : 0;
+    const last_mom = prevM > 0 ? ((lastM / prevM - 1) * 100) : null;
+
+    // ìì¬ì íê·° ëª©í
+    const remaining_sf = sf.monthly.slice(CM).reduce((a,b) => a+b, 0);
+    const remaining_months = 12 - CM;
+    const remaining_monthly = remaining_months > 0 ? remaining_sf / remaining_months : 0;
+    const next_sf = CM < 12 ? sf.monthly[CM] : 0;
+
+    // ìì¸¡
+    const fc1 = qtd_26 * (12 / CM); // ë¨ìì°íì°
+    const q1_ratio_25 = ann_25 > 0 ? (qtd_25 / ann_25) : (CM / 12);
+    const fc2 = q1_ratio_25 > 0 ? (qtd_26 / q1_ratio_25) : fc1; // ê³ì ì± ë°ì
+    const fc3 = qtd_26 + remaining_sf; // ì¤ì  + ìì¬SF
+    const fc_avg = (fc1 + fc2 + fc3) / 3;
+
+    // ì¦ê°ì¡
+    const qtd_diff = qtd_26 - qtd_25;
+
+    const product = {
+      name, is_key: isKey, group, is_demarketing: isDemkt, new_year: newYear,
+      monthly_26: m26, monthly_25: m25, monthly_24: m24,
+      sf_monthly: sf.monthly, ann_sf: sf.annual, ann_25, ann_24,
+      qtd_26, qtd_25, qtd_sf, qtd_ach, qtd_yoy,
+      jan: m26[0], feb: m26[1], mar: m26[2],
+      lastM, prevM, last_mom,
+      remaining_monthly, next_sf,
+      fc1, fc2, fc3, fc_avg, qtd_diff
+    };
+
+    // ìë³ í¤ ëì  ìì± (ë§ê°ì ê¸°ì¤)
+    for (let i = 0; i < CM; i++) {
+      product[`m${i+1}`] = m26[i];
+    }
+
+    allProducts.push(product);
+
+    // ì ì²´ í©ê³
+    m26.forEach((v,i) => total_26[i] += v);
+    m25.forEach((v,i) => total_25[i] += v);
+    m24.forEach((v,i) => total_24[i] += v);
+    sf.monthly.forEach((v,i) => total_sf[i] += v);
+  });
+
+  // ì ì²´ í©ê³ ê³ì°
+  const total_qtd_26 = total_26.slice(0, CM).reduce((a,b) => a+b, 0);
+  const total_qtd_25 = total_25.slice(0, CM).reduce((a,b) => a+b, 0);
+  const total_qtd_sf = total_sf.slice(0, CM).reduce((a,b) => a+b, 0);
+  const total_ann_sf = total_sf.reduce((a,b) => a+b, 0);
+  const total_ann_25 = total_25.reduce((a,b) => a+b, 0);
+  const total_ann_24 = total_24.reduce((a,b) => a+b, 0);
+
+  // ì£¼ë ¥íëª©
+  const products = allProducts.filter(p => p.is_key).sort((a,b) => b.qtd_26 - a.qtd_26);
+
+  // ììµêµ° ì§ê³
+  const profit_groups = {};
+  const grpNames = ['ê°êµ°','ëêµ°','ë¤êµ°','ë¼êµ°','ë§êµ°'];
+  grpNames.forEach(g => {
+    const items = allProducts.filter(p => p.group === g);
+    if (items.length === 0) return;
+    const m26 = items.reduce((a,p) => a.map((v,i) => v + p.monthly_26[i]), new Array(12).fill(0));
+    const m25 = items.reduce((a,p) => a.map((v,i) => v + p.monthly_25[i]), new Array(12).fill(0));
+    const q26 = m26.slice(0, CM).reduce((a,b) => a+b, 0);
+    const q25 = m25.slice(0, CM).reduce((a,b) => a+b, 0);
+    const sf_q = items.reduce((s,p) => s + p.sf_monthly.slice(0, CM).reduce((a,b) => a+b, 0), 0);
+    const ann = items.reduce((s,p) => s + p.ann_sf, 0);
+    profit_groups[g] = {
+      monthly_26: m26.slice(0, CM), monthly_25: m25.slice(0, CM),
+      q1_26: q26, q1_25: q25, q1_sf: sf_q, ann_sf: ann,
+      ach: sf_q > 0 ? (q26/sf_q*100) : null,
+      yoy: q25 > 0 ? ((q26/q25-1)*100) : null
+    };
+  });
+  // ê³ ììµêµ°
+  const hiGrps = ['ê°êµ°','ëêµ°','ë¤êµ°'];
+  const hiItems = allProducts.filter(p => hiGrps.includes(p.group));
+  if (hiItems.length > 0) {
+    const hm26 = hiItems.reduce((a,p) => a.map((v,i) => v + p.monthly_26[i]), new Array(12).fill(0));
+    const hm25 = hiItems.reduce((a,p) => a.map((v,i) => v + p.monthly_25[i]), new Array(12).fill(0));
+    const hq26 = hm26.slice(0, CM).reduce((a,b) => a+b, 0);
+    const hq25 = hm25.slice(0, CM).reduce((a,b) => a+b, 0);
+    const hsf = hiItems.reduce((s,p) => s + p.sf_monthly.slice(0, CM).reduce((a,b) => a+b, 0), 0);
+    const hann = hiItems.reduce((s,p) => s + p.ann_sf, 0);
+    profit_groups['ê³ ììµêµ°'] = {
+      monthly_26: hm26.slice(0, CM), monthly_25: hm25.slice(0, CM),
+      q1_26: hq26, q1_25: hq25, q1_sf: hsf, ann_sf: hann,
+      ach: hsf > 0 ? (hq26/hsf*100) : null,
+      yoy: hq25 > 0 ? ((hq26/hq25-1)*100) : null
+    };
+  }
+
+  // ì ì í ì§ê³
+  const currentYear = CONFIG.YEAR;
+  const newProds = allProducts.filter(p => p.new_year && p.new_year >= currentYear - 2);
+  const npm26 = newProds.length > 0 ? newProds.reduce((a,p) => a.map((v,i) => v + p.monthly_26[i]), new Array(12).fill(0)) : new Array(12).fill(0);
+  const npm25 = newProds.length > 0 ? newProds.reduce((a,p) => a.map((v,i) => v + p.monthly_25[i]), new Array(12).fill(0)) : new Array(12).fill(0);
+  const npq26 = npm26.slice(0, CM).reduce((a,b) => a+b, 0);
+  const npq25 = npm25.slice(0, CM).reduce((a,b) => a+b, 0);
+  const npsf = newProds.reduce((s,p) => s + p.sf_monthly.slice(0, CM).reduce((a,b) => a+b, 0), 0);
+  const npann = newProds.reduce((s,p) => s + p.ann_sf, 0);
+
+  const new_products_summary = {
+    monthly_26: npm26.slice(0, CM), monthly_25: npm25.slice(0, CM),
+    q1_26: npq26, q1_25: npq25, q1_sf: npsf, ann_sf: npann,
+    ach: npsf > 0 ? (npq26/npsf*100) : null,
+    yoy: npq25 > 0 ? ((npq26/npq25-1)*100) : null
+  };
+
+  const new_product_details = newProds.map(p => ({
+    name: p.name, year: p.new_year,
+    q1_26: p.qtd_26, q1_sf: p.qtd_sf, ann_sf: p.ann_sf,
+    ach: p.qtd_ach
+  })).sort((a,b) => b.q1_26 - a.q1_26);
+
+  // ì ì²´ ìì¸¡
+  const total_fc1 = allProducts.reduce((s,p) => s + p.fc1, 0);
+  const total_fc2 = allProducts.reduce((s,p) => s + p.fc2, 0);
+  const total_fc3 = allProducts.reduce((s,p) => s + p.fc3, 0);
+
+  return {
+    CM,
+    total: {
+      act_26: total_26, act_25: total_25, act_24: total_24, sf_26: total_sf,
+      qtd_26: total_qtd_26, qtd_sf: total_qtd_sf, ann_sf: total_ann_sf, ann_25: total_ann_25, ann_24: total_ann_24
+    },
+    products,
+    all_products: allProducts,
+    total_forecast: { fc1: total_fc1, fc2: total_fc2, fc3: total_fc3, fc_avg: (total_fc1+total_fc2+total_fc3)/3 },
+    profit_groups,
+    new_products_summary,
+    new_product_details
+  };
+}
+
+// ========================================
+// 3. ëìë³´ë ë ëë§
+// ========================================
+function renderDashboard(D) {
+  const CM = D.CM;
+  const monthNames = ['1ì','2ì','3ì','4ì','5ì','6ì','7ì','8ì','9ì','10ì','11ì','12ì'];
+  const periodLabel = CM <= 3 ? `Q1(1~${CM}ì)` : CM <= 6 ? `H1(1~${CM}ì)` : `1~${CM}ì`;
+
+  // í¤ë ìë°ì´í¸
+  document.getElementById('headerSub').textContent = `${CONFIG.YEAR}ë ${periodLabel} ì¤ì  ê¸°ë° | SAP ë§ê°ìë£ ê¸°ì¤ | ë¨ì: ìµì`;
+  document.getElementById('headerBadge').textContent = `${CONFIG.YEAR}.${String(CM).padStart(2,'0')} ë§ê° ê¸°ì¤`;
+
+  // ëì  íì´ë¸ í¤ë ìì±
+  const prodHeaders = ['íëª©'];
+  for (let i = 0; i < CM; i++) prodHeaders.push(monthNames[i]);
+  prodHeaders.push('ì¤ì ','ëª©í','ë¬ì±ì¨','YoY',`${CM}ìMoM`,'ìì¬ìëª©í',`${CM+1<=12?monthNames[CM]:''}ëª©í`);
+  document.getElementById('prodTableHeader').innerHTML = prodHeaders.map(h => `<th>${h}</th>`).join('');
+
+  const allHeaders = ['#','íëª©'];
+  for (let i = 0; i < CM; i++) allHeaders.push(monthNames[i]);
+  allHeaders.push('ì¤ì ','ëª©í','ë¬ì±ì¨','YoY',`${CM}ìMoM`,'ì°ê°SF','ìì¬ìëª©í',`${CM+1<=12?monthNames[CM]:''}ëª©í`);
+  document.getElementById('allTableHeader').innerHTML = allHeaders.map(h => `<th>${h}</th>`).join('');
+
+  // ì í¸
+  const fmt=(v,d=1)=>v!=null?v.toFixed(d):'-';
+  const fmtP=(v)=>v!=null?(v>=0?'+':'')+v.toFixed(1)+'%':'-';
+  const pctC=(v)=>v!=null?(v>=0?'pct-up':'pct-down'):'';
+  const tagA=(v)=>{
+    if(v==null)return'<span class="tag tag-yellow">N/A</span>';
+    if(v>=100)return`<span class="tag tag-green">${v.toFixed(1)}%</span>`;
+    if(v>=90)return`<span class="tag tag-yellow">${v.toFixed(1)}%</span>`;
+    return`<span class="tag tag-red">${v.toFixed(1)}%</span>`;
+  };
+
+  // KPIs
+  const qtdA=D.total.qtd_26, qtdS=D.total.qtd_sf, aS=D.total.ann_sf, a25=D.total.ann_25;
+  const qtdAch=(qtdA/qtdS*100).toFixed(1);
+  const qtdY25=D.total.act_25.slice(0,CM).reduce((a,b)=>a+b,0);
+  const lastMonthVal = D.total.act_26[CM-1];
+  const prevMonthVal = CM >= 2 ? D.total.act_26[CM-2] : 0;
+
+  document.getElementById('kpiRow').innerHTML=`
+    <div class="kpi"><div class="label">${periodLabel} ë§¤ì¶ ì¤ì </div><div class="value">${fmt(qtdA,1)}</div><div class="unit">ìµì</div>
+      <div class="change up">ì ëëê¸° +${((qtdA/qtdY25-1)*100).toFixed(1)}%</div></div>
+    <div class="kpi ${parseFloat(qtdAch)>=95?'green':parseFloat(qtdAch)>=85?'yellow':'red'}"><div class="label">${periodLabel} ëª©í ë¬ì±ì¨</div><div class="value">${qtdAch}<span style="font-size:14px">%</span></div>
+      <div class="change">${fmt(qtdA,1)} / ${fmt(qtdS,1)}</div></div>
+    <div class="kpi"><div class="label">ì°ê° SF ëª©í</div><div class="value">${fmt(aS,0)}</div><div class="unit">ìµì</div>
+      <div class="change">ì ë ${fmt(a25,0)}ìµ ëë¹ +${((aS/a25-1)*100).toFixed(1)}%</div></div>
+    <div class="kpi ${D.total_forecast.fc_avg/aS>=0.9?'green':'yellow'}"><div class="label">ìì¸¡ íê·  (3ê°ì§)</div><div class="value">${fmt(D.total_forecast.fc_avg,1)}</div><div class="unit">ìµì</div>
+      <div class="change">SFëë¹ ${(D.total_forecast.fc_avg/aS*100).toFixed(1)}%</div></div>
+    <div class="kpi ${lastMonthVal>=prevMonthVal?'':'red'}"><div class="label">${monthNames[CM-1]} ë§¤ì¶</div><div class="value">${fmt(lastMonthVal,1)}</div><div class="unit">ìµì</div>
+      <div class="change ${lastMonthVal>=prevMonthVal?'up':'down'}">${CM>=2?'ì ì '+((lastMonthVal/prevMonthVal-1)*100).toFixed(1)+'%':''}</div></div>`;
+
+  // Tabs
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');document.getElementById('panel-'+t.dataset.tab).classList.add('active');
+  }));
+
+  const C={blue:'#2b6cb0',lb:'#90cdf4',red:'#e53e3e',green:'#38a169',orange:'#dd6b20',gray:'#a0aec0',purple:'#805ad5',teal:'#319795'};
+
+  // === ì¢í© íí©: ìë³ ì¶ì´ ===
+  new Chart(document.getElementById('chartMonthly'),{type:'line',data:{labels:monthNames,datasets:[
+    {label:'24ë',data:D.total.act_24,borderColor:C.gray,borderDash:[5,5],pointRadius:2,tension:.3},
+    {label:'25ë',data:D.total.act_25,borderColor:C.lb,pointRadius:3,tension:.3},
+    {label:'26ëì¤ì ',data:D.total.act_26.map((v,i)=>i<CM?v:null),borderColor:C.blue,borderWidth:3,pointRadius:5,tension:.3},
+    {label:'26ëSF',data:D.total.sf_26,borderColor:C.orange,borderDash:[3,3],pointRadius:2,tension:.3}
+  ]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},scales:{y:{title:{display:true,text:'ìµì'},beginAtZero:false}}}});
+
+  // === ëª©íëë¹ ì¤ì  + ë¬ì±ì¨ ===
+  const closedMonths = monthNames.slice(0, CM);
+  const achRates = D.total.act_26.slice(0,CM).map((v,i)=>(v/D.total.sf_26[i]*100));
+  new Chart(document.getElementById('chartVsSF'),{type:'bar',data:{labels:closedMonths,datasets:[
+    {label:'ì¤ì ',data:D.total.act_26.slice(0,CM),backgroundColor:C.blue,order:2},
+    {label:'SFëª©í',data:D.total.sf_26.slice(0,CM),backgroundColor:C.orange+'40',borderColor:C.orange,borderWidth:2,order:2},
+    {label:'ë¬ì±ì¨(%)',data:achRates,type:'line',borderColor:'#805ad5',backgroundColor:'#805ad540',pointRadius:6,pointStyle:'rectRot',borderWidth:2.5,yAxisID:'y2',order:1}
+  ]},options:{responsive:true,plugins:{legend:{position:'bottom'},
+    tooltip:{callbacks:{label:function(ctx){
+      if(ctx.dataset.yAxisID==='y2') return 'ë¬ì±ì¨: '+ctx.parsed.y.toFixed(1)+'%';
+      return ctx.dataset.label+': '+ctx.parsed.y.toFixed(1)+'ìµì';
+    }}}},
+    scales:{
+      y:{title:{display:true,text:'ìµì'},beginAtZero:false,position:'left'},
+      y2:{title:{display:true,text:'ë¬ì±ì¨(%)'},position:'right',min:85,max:110,grid:{drawOnChartArea:false},ticks:{callback:v=>v+'%'}}
+    }
+  }});
+
+  // === ì£¼ë ¥íëª© ë§¤ì¶ ë¹ì¤ ===
+  const totalQtd = D.total.qtd_26;
+  const keyQtd = D.products.reduce((s,p)=>s+p.qtd_26, 0);
+  const etcQtd = totalQtd - keyQtd;
+  const allPieD = [...D.products.map(p=>p.qtd_26), etcQtd];
+  const allPieL = [...D.products.map(p=>p.name), 'ê¸°í'];
+  const pieColors = ['#2b6cb0','#38a169','#e53e3e','#d69e2e','#805ad5','#319795','#dd6b20','#e53e3e80','#38a16980','#2b6cb080','#80808080','#d69e2e80','#31979580','#cbd5e0'];
+  new Chart(document.getElementById('chartPie'),{type:'doughnut',data:{labels:allPieL,datasets:[{data:allPieD,backgroundColor:pieColors}]},
+    options:{responsive:true,plugins:{
+      legend:{position:'right',labels:{font:{size:11},generateLabels:function(chart){
+        const ds=chart.data.datasets[0];
+        return chart.data.labels.map((l,i)=>{
+          const v=ds.data[i];const pct=(v/totalQtd*100).toFixed(1);
+          return{text:l+' '+pct+'%',fillStyle:ds.backgroundColor[i],hidden:false,index:i};
+        });
+      }}},
+      tooltip:{callbacks:{label:ctx=>{
+        const pct=(ctx.parsed/totalQtd*100).toFixed(1);
+        return ctx.label+': '+ctx.parsed.toFixed(1)+'ìµì ('+pct+'%)';
+      }}}
+    }}
+  });
+
+  // === ë¬ì±ì¨ ===
+  const achP=D.products.filter(p=>p.qtd_ach!=null).sort((a,b)=>b.qtd_ach-a.qtd_ach);
+  new Chart(document.getElementById('chartAch'),{type:'bar',data:{labels:achP.map(p=>p.name),datasets:[{
+    data:achP.map(p=>p.qtd_ach),
+    backgroundColor:achP.map(p=>p.qtd_ach>=100?C.green:p.qtd_ach>=90?C.orange:C.red),
+    barPercentage:0.7
+  }]},
+    options:{indexAxis:'y',responsive:true,
+      plugins:{
+        legend:{display:false},
+        subtitle:{display:true,text:'â  100%ì´ì: ì´ê³¼ë¬ì±(ë¹ì)  â  90~100%: ìí¸(ì£¼í©)  â  90%ë¯¼ë§: ë¶ì§(ë°¨ê°)',
+          font:{size:11,weight:'normal'},color:'#718096',align:'start',padding:{bottom:8}},
+        tooltip:{callbacks:{label:ctx=>ctx.parsed.x.toFixed(1)+'%'}}
+      },
+      scales:{x:{min:0,max:Math.max(130,...achP.map(p=>p.qtd_ach)+10),title:{display:true,text:'ë¬ì±ì¨(%)'},
+        grid:{color:ctx=>ctx.tick.value===100?'#2d3748':'#e2e8f0',lineWidth:ctx=>ctx.tick.value===100?2:1}
+      },y:{ticks:{font:{size:11}}}}
+    },
+    plugins:[{
+      afterDatasetsDraw(chart){
+        const ctx2=chart.ctx;
+        chart.data.datasets[0].data.forEach((v,i)=>{
+          const meta=chart.getDatasetMeta(0);
+          const bar=meta.data[i];
+          ctx2.save();ctx2.fillStyle='#2d3748';
+          ctx2.font='bold 11px Segoe UI, Malgun Gothic, sans-serif';
+          ctx2.textAlign='left';ctx2.textBaseline='middle';
+          ctx2.fillText(v.toFixed(1)+'%', bar.x+4, bar.y);
+          ctx2.restore();
+        });
+      }
+    }]
+  });
+
+  // === ë§¤ì¶ êµ¬ì¡° ë¶ì ===
+  const pg = D.profit_groups;
+  const np = D.new_products_summary;
+  const grpNames = ['ê°êµ°','ëêµ°','ë¤êµ°','ë¼êµ°','ë§êµ°'];
+  const grpQ1 = grpNames.map(g => pg[g] ? pg[g].q1_26 : 0);
+  const grpColors = ['#2b6cb0','#38a169','#d69e2e','#a0aec0','#cbd5e0'];
+
+  new Chart(document.getElementById('chartStructure'),{type:'bar',data:{
+    labels:grpNames,
+    datasets:[
+      {label:`26ë ${periodLabel}`,data:grpQ1,backgroundColor:grpColors},
+      {label:`25ë ${periodLabel}`,data:grpNames.map(g=>pg[g]?pg[g].q1_25:0),backgroundColor:grpColors.map(c=>c+'60')}
+    ]},options:{responsive:true,plugins:{legend:{position:'bottom'},title:{display:true,text:`ììµêµ°ë³ ${periodLabel} ë§¤ì¶ ë¹êµ (ìµì)`,font:{size:13}}},scales:{y:{title:{display:true,text:'ìµì'}}}}});
+
+  if (pg['ê³ ììµêµ°']) {
+    new Chart(document.getElementById('chartGroupBar'),{type:'bar',data:{
+      labels:['ì ì²´','ê³ ììµêµ°(ê°~ë¤)','ì ì í'],
+      datasets:[
+        {label:'ì¤ì ',data:[totalQtd, pg['ê³ ììµêµ°'].q1_26, np.q1_26],backgroundColor:['#2b6cb0','#38a169','#805ad5']},
+        {label:'ëª©í',data:[D.total.qtd_sf, pg['ê³ ììµêµ°'].q1_sf, np.q1_sf],backgroundColor:['#2b6cb060','#38a16960','#805ad560'],borderColor:['#2b6cb0','#38a169','#805ad5'],borderWidth:1}
+      ]},options:{responsive:true,plugins:{legend:{position:'bottom'},title:{display:true,text:`ë§¤ì¶ êµ¬ì¡° ${periodLabel} ë¹êµ (ìµì)`,font:{size:13}}},scales:{y:{title:{display:true,text:'ìµì'}}}}});
+  }
+
+  // êµ¬ì¡° íì´ë¸
+  const stb = document.querySelector('#structureTable tbody');
+  const qtdY25All = D.total.act_25.slice(0,CM).reduce((a,b)=>a+b,0);
+  const structRows = [
+    {name:'ETC ì ì²´', q1:totalQtd, sf_q1:D.total.qtd_sf, q1_25:qtdY25All, ann_sf:D.total.ann_sf, pct:100},
+    ...(pg['ê³ ììµêµ°'] ? [{name:'  ê³ ììµêµ°(ê°~ë¤)', ...pg['ê³ ììµêµ°'], pct:pg['ê³ ììµêµ°'].q1_26/totalQtd*100}] : []),
+    ...grpNames.filter(g=>pg[g]).map(g=>({name:'    '+g, ...pg[g], pct:pg[g].q1_26/totalQtd*100})),
+    {name:'  ì ì í(3ëì´ë´)', ...np, pct:np.q1_26/totalQtd*100}
+  ];
+  structRows.forEach(r => {
+    const q1 = r.q1_26 ?? r.q1 ?? 0;
+    const sf = r.q1_sf ?? r.sf_q1 ?? 0;
+    const q25 = r.q1_25 ?? 0;
+    const ann = r.ann_sf ?? 0;
+    const ach = sf > 0 ? (q1/sf*100) : null;
+    const yoy = q25 > 0 ? ((q1/q25-1)*100) : null;
+    const pct = r.pct ?? 0;
+    const isHeader = !r.name.startsWith('  ');
+    const isSub = r.name.startsWith('    ');
+    stb.innerHTML += `<tr style="${isHeader?'background:#ebf8ff;font-weight:700':isSub?'':'font-weight:600'}">
+      <td style="text-align:left;padding-left:${isSub?'24px':r.name.startsWith('  ')?'12px':'4px'}">${r.name.trim()}</td>
+      <td style="font-weight:700">${fmt(q1)}</td><td>${fmt(sf)}</td><td>${tagA(ach)}</td>
+      <td>${fmt(q25)}</td><td class="${pctC(yoy)}">${yoy!=null?fmtP(yoy):'-'}</td>
+      <td>${fmt(ann)}</td><td>${pct.toFixed(1)}%</td></tr>`;
+  });
+
+  // ì ì í ìì¸
+  const npt = document.querySelector('#newProdTable tbody');
+  D.new_product_details.forEach(p => {
+    npt.innerHTML += `<tr><td>${p.name}</td><td style="text-align:center">${p.year}</td>
+      <td style="font-weight:700">${fmt(p.q1_26)}</td><td>${fmt(p.q1_sf)}</td>
+      <td>${tagA(p.ach)}</td><td>${fmt(p.ann_sf)}</td></tr>`;
+  });
+
+  // === ì£¼ë ¥íëª© í­ ===
+  const sel=document.getElementById('prodSelect');
+  D.products.forEach(p=>{const o=document.createElement('option');o.value=p.name;o.textContent=p.name;sel.appendChild(o);});
+  let prodChart;
+  function drawPT(name){
+    let ds;
+    if(name==='all'){ds=D.products.slice(0,6).map((p,i)=>{const cs=[C.blue,C.green,C.red,C.orange,C.purple,C.teal];return{label:p.name,data:p.monthly_26.map((v,j)=>j<CM?v:null),borderColor:cs[i],pointRadius:4,tension:.3};});}
+    else{const p=D.products.find(x=>x.name===name);ds=[
+      {label:'24ë',data:p.monthly_24,borderColor:C.gray,borderDash:[5,5],pointRadius:2,tension:.3},
+      {label:'25ë',data:p.monthly_25,borderColor:C.lb,pointRadius:3,tension:.3},
+      {label:'26ë',data:p.monthly_26.map((v,i)=>i<CM?v:null),borderColor:C.blue,borderWidth:3,pointRadius:5,tension:.3},
+      {label:'26ëSF',data:p.sf_monthly,borderColor:C.orange,borderDash:[3,3],pointRadius:2,tension:.3}];}
+    if(prodChart)prodChart.destroy();
+    prodChart=new Chart(document.getElementById('chartProdTrend'),{type:'line',data:{labels:monthNames,datasets:ds},options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{title:{display:true,text:'ìµì'}}}}});
+  }
+  sel.addEventListener('change',()=>drawPT(sel.value));drawPT('all');
+
+  const yoyP=D.products.filter(p=>p.qtd_yoy!=null).sort((a,b)=>b.qtd_yoy-a.qtd_yoy);
+  new Chart(document.getElementById('chartYoY'),{type:'bar',data:{labels:yoyP.map(p=>p.name),datasets:[{data:yoyP.map(p=>p.qtd_yoy),backgroundColor:yoyP.map(p=>p.qtd_yoy>=0?C.green:C.red)}]},
+    options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'YoY(%)'}},y:{ticks:{font:{size:11}}}}}});
+
+  const ptb=document.querySelector('#prodTable tbody');
+  D.products.forEach(p=>{
+    let row = `<tr><td>${p.name}</td>`;
+    for(let i=0;i<CM;i++) row += `<td>${fmt(p.monthly_26[i])}</td>`;
+    row += `<td style="font-weight:700">${fmt(p.qtd_26)}</td><td>${fmt(p.qtd_sf)}</td>
+      <td>${tagA(p.qtd_ach)}</td><td class="${pctC(p.qtd_yoy)}">${fmtP(p.qtd_yoy)}</td>
+      <td class="${pctC(p.last_mom)}">${fmtP(p.last_mom)}</td>
+      <td style="color:var(--accent);font-weight:700">${fmt(p.remaining_monthly)}</td>
+      <td>${fmt(p.next_sf)}</td></tr>`;
+    ptb.innerHTML+=row;
+  });
+
+  // === ìì¸¡ í­ ===
+  const tf=D.total_forecast;
+  const annFactor = 12/CM;
+  document.getElementById('fcSummary').innerHTML=`
+    <div class="fc-item"><div class="fc-label">ìì¸¡â  ë¨ìì°íì°</div><div class="fc-val">${fmt(tf.fc1,1)}</div><div class="fc-sub">ìµì (ì¤ì Ã${annFactor.toFixed(1)})</div></div>
+    <div class="fc-item"><div class="fc-label">ìì¸¡â¡ ê³ì ì±ë°ì</div><div class="fc-val">${fmt(tf.fc2,1)}</div><div class="fc-sub">ìµì (25ëë¹ì¤)</div></div>
+    <div class="fc-item"><div class="fc-label">ìì¸¡â¢ ì¤ì +ìì¬SF</div><div class="fc-val">${fmt(tf.fc3,1)}</div><div class="fc-sub">ìµì</div></div>
+    <div class="fc-item"><div class="fc-label">ìì¸¡ íê· </div><div class="fc-val" style="color:var(--success)">${fmt(tf.fc_avg,1)}</div><div class="fc-sub">ìµì | SFëë¹ ${(tf.fc_avg/D.total.ann_sf*100).toFixed(1)}%</div></div>`;
+
+  const fcP=D.products;
+  new Chart(document.getElementById('chartForecast'),{type:'bar',data:{labels:fcP.map(p=>p.name),datasets:[
+    {label:'ìì¸¡â  ë¨ìì°íì°',data:fcP.map(p=>p.fc1),backgroundColor:C.blue+'80'},
+    {label:'ìì¸¡â¡ ê³ì ì±ë°ì',data:fcP.map(p=>p.fc2),backgroundColor:C.green+'80'},
+    {label:'ìì¸¡â¢ ì¤ì +SFìì¬',data:fcP.map(p=>p.fc3),backgroundColor:C.orange+'80'}
+  ]},options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{title:{display:true,text:'ìµì'}}}}});
+
+  new Chart(document.getElementById('chartFcVsSF'),{type:'bar',data:{labels:fcP.map(p=>p.name),datasets:[
+    {label:'ìì¸¡íê· ',data:fcP.map(p=>p.fc_avg),backgroundColor:C.blue},
+    {label:'SFì°ê°ëª©í',data:fcP.map(p=>p.ann_sf),backgroundColor:C.orange+'40',borderColor:C.orange,borderWidth:2}
+  ]},options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{title:{display:true,text:'ìµì'}}}}});
+
+  const ftb=document.querySelector('#fcTable tbody');
+  ftb.innerHTML+=`<tr style="background:#ebf8ff;font-weight:700">
+    <td>ETC ì ì²´</td><td>${fmt(D.total.qtd_26)}</td><td>${fmt(tf.fc1)}</td><td>${fmt(tf.fc2)}</td><td>${fmt(tf.fc3)}</td>
+    <td style="color:var(--success)">${fmt(tf.fc_avg)}</td><td>${fmt(D.total.ann_sf)}</td>
+    <td>${tagA(tf.fc_avg/D.total.ann_sf*100)}</td>
+    <td class="pct-up">+${((tf.fc_avg/D.total.ann_25-1)*100).toFixed(1)}%</td></tr>`;
+  fcP.forEach(p=>{
+    const sfP=p.ann_sf>0?(p.fc_avg/p.ann_sf*100):null;
+    const yoyP2=p.ann_25>0?((p.fc_avg/p.ann_25-1)*100):null;
+    ftb.innerHTML+=`<tr><td>${p.name}</td><td>${fmt(p.qtd_26)}</td>
+      <td>${fmt(p.fc1)}</td><td>${fmt(p.fc2)}</td><td>${fmt(p.fc3)}</td>
+      <td style="color:var(--success);font-weight:700">${fmt(p.fc_avg)}</td><td>${fmt(p.ann_sf)}</td>
+      <td>${tagA(sfP)}</td>
+      <td class="${pctC(yoyP2)}">${yoyP2!=null?fmtP(yoyP2):'-'}</td></tr>`;
+  });
+
+  // === ë¦¬ì¤í¬/ê¸°í ===
+  const opps=D.all_products
+    .filter(p=>!p.is_demarketing && p.qtd_diff!=null && p.qtd_diff>2 && p.qtd_26>=3)
+    .sort((a,b)=>b.qtd_diff-a.qtd_diff).slice(0,10);
+  const otb=document.querySelector('#oppTable tbody');
+  opps.forEach(p=>{
+    let ins=p.qtd_ach&&p.qtd_ach>105?'ëª©íì´ê³¼, ìí¥ê²í°':p.qtd_diff>5?'ê³ ì±ì¥ ì§ì':'ìì ì  ì±ì¥ì¸';
+    otb.innerHTML+=`<tr><td>${p.name}</td><td>${fmt(p.qtd_26)}</td>
+      <td class="pct-up">+${fmt(p.qtd_diff)}ìµ</td>
+      <td>${tagA(p.qtd_ach)}</td><td>${ins}</td></tr>`;
+  });
+
+  const risks=D.all_products
+    .filter(p=>!p.is_demarketing && (
+      (p.qtd_ach!=null && p.qtd_ach<85 && p.qtd_sf>=3) ||
+      (p.qtd_diff!=null && p.qtd_diff<-1 && p.qtd_25>=2)
+    ))
+    .sort((a,b)=>(a.qtd_diff||0)-(b.qtd_diff||0)).slice(0,10);
+  const rtb=document.querySelector('#riskTable tbody');
+  risks.forEach(p=>{
+    let iss=p.qtd_ach&&p.qtd_ach<70?'ëª©í í¬ë¯¸ë¬':p.qtd_diff<-3?'ë§¤ì¶ í° í­ ê°ì':'ëª©íëë¹ ë¶ì§';
+    rtb.innerHTML+=`<tr><td>${p.name}</td><td>${fmt(p.qtd_26)}</td><td>${tagA(p.qtd_ach)}</td>
+      <td class="pct-down">${fmt(p.qtd_diff)}ìµ</td><td>${iss}</td></tr>`;
+  });
+
+  const anoms=D.all_products
+    .filter(p=>!p.is_demarketing && p.last_mom!=null && Math.abs(p.last_mom)>30 && Math.max(p.lastM||0,p.prevM||0)>=0.5)
+    .sort((a,b)=>Math.abs(b.last_mom)-Math.abs(a.last_mom)).slice(0,10);
+  const atb=document.querySelector('#anomalyTable tbody');
+  anoms.forEach(p=>{
+    const typ=p.last_mom>0?'<span class="tag tag-green">ê¸ë±</span>':'<span class="tag tag-red">ê¸ë½</span>';
+    atb.innerHTML+=`<tr><td>${p.name}</td><td>${fmt(p.prevM)}</td><td>${fmt(p.lastM)}</td>
+      <td class="${pctC(p.last_mom)}">${fmtP(p.last_mom)}</td><td>${fmt(p.qtd_26)}</td>
+      <td class="${pctC(p.qtd_yoy)}">${fmtP(p.qtd_yoy)}</td><td>${typ}</td></tr>`;
+  });
+
+  // === ì ì²´ íëª© í­ ===
+  let allD=[...D.all_products];
+  function renderAll(){
+    const s=document.getElementById('searchAll').value.toLowerCase();
+    const sort=document.getElementById('sortAll').value;
+    const keyOnly=document.getElementById('keyOnly').checked;
+    let f=allD.filter(p=>p.name.toLowerCase().includes(s));
+    if(keyOnly)f=f.filter(p=>p.is_key);
+    f.sort((a,b)=>{const av=a[sort]??-9999,bv=b[sort]??-9999;return bv-av;});
+    const tb=document.querySelector('#allTable tbody');tb.innerHTML='';
+    f.forEach((p,i)=>{
+      let row = `<tr${p.is_key?' style="background:#ebf8ff"':''}>
+        <td style="text-align:center">${i+1}</td>
+        <td>${p.name}${p.is_key?' <span class="tag tag-blue">ì£¼ë ¥</span>':''}</td>`;
+      for(let m=0;m<CM;m++) row += `<td>${fmt(p.monthly_26[m])}</td>`;
+      row += `<td style="font-weight:700">${fmt(p.qtd_26)}</td><td>${fmt(p.qtd_sf)}</td>
+        <td>${tagA(p.qtd_ach)}</td>
+        <td class="${pctC(p.qtd_yoy)}">${fmtP(p.qtd_yoy)}</td>
+        <td class="${pctC(p.last_mom)}">${fmtP(p.last_mom)}</td>
+        <td>${fmt(p.ann_sf)}</td>
+        <td style="color:var(--accent);font-weight:700">${fmt(p.remaining_monthly)}</td>
+        <td>${fmt(p.next_sf)}</td></tr>`;
+      tb.innerHTML+=row;
+    });
+  }
+  document.getElementById('searchAll').addEventListener('input',renderAll);
+  document.getElementById('sortAll').addEventListener('change',renderAll);
+  document.getElementById('keyOnly').addEventListener('change',renderAll);
+  renderAll();
+}
+
+// ========================================
+// 4. ë©ì¸ ì¤í
+// ========================================
+async function main() {
+  const overlay = document.getElementById('loadingOverlay');
+  const statusEl = document.getElementById('loadingStatus');
+
+  try {
+    let D;
+
+    if (IS_DEMO) {
+      // ë°ëª¨ ëª¨ë: êµ¬ê¸ìí¸ ë¯¸ì ì  ì ìë´ ë©ìì§
+      statusEl.textContent = 'êµ¬ê¸ìí¸ê° ì°ê²°ëì§ ìììµëë¤. ë°ëª¨ ë°ì´í°ë¥¼ ì¬ì©í©ëë¤.';
+
+      // ë°ëª¨ì© ë´ì¥ ë°ì´í° (ê¸°ì¡´ ëìë³´ë ë°ì´í° ì¶ì¸ë³¸)
+      // ì¤ì  ì´ì ììë ì´ ë¶ë¶ì´ êµ¬ê¸ìí¸ìì ë¡ëë©ëë¤
+      const demoResponse = await fetch(window.location.href.replace(/[^/]*$/, '') + '26ë_ì¤ì¶ë¶ì_ëìë³´ë.html');
+      if (demoResponse.ok) {
+        const html = await demoResponse.text();
+        const match = html.match(/const D = ({[\s\S]*?});\s*\nconst fmt/);
+        if (match) {
+          D = JSON.parse(match[1]);
+          // ê¸°ì¡´ íì â ì íì í¸í
+          D.CM = CONFIG.CLOSING_MONTH;
+          D.total.qtd_26 = D.total.q1_26;
+          D.total.qtd_sf = D.total.q1_sf;
+          D.products.forEach(p => {
+            p.qtd_26 = p.q1_26; p.qtd_25 = p.q1_25; p.qtd_sf = p.q1_sf;
+            p.qtd_ach = p.q1_ach; p.qtd_yoy = p.q1_yoy;
+            p.lastM = p.mar; p.prevM = p.feb; p.last_mom = p.mar_mom;
+            p.next_sf = p.apr_sf;
+            p.qtd_diff = p.q1_26 - p.q1_25;
+          });
+          D.all_products.forEach(p => {
+            p.qtd_26 = p.q1_26; p.qtd_25 = p.q1_25; p.qtd_sf = p.q1_sf;
+            p.qtd_ach = p.q1_ach; p.qtd_yoy = p.q1_yoy;
+            p.lastM = p.mar; p.prevM = p.feb; p.last_mom = p.mar_mom;
+            p.next_sf = p.apr_sf;
+            p.qtd_diff = p.q1_diff ?? (p.q1_26 - p.q1_25);
+          });
+        }
+      }
+
+      if (!D) {
+        // ë°ëª¨ ë°ì´í°ë ìì¼ë© ìë¬ íì
+        overlay.innerHTML = `<div class="error-box">
+          <h2>êµ¬ê¸ìí¸ ì°ê²° íì</h2>
+          <p style="margin:12px 0;color:var(--muted);">ëìë³´ëë¥¼ ì¬ì©íë ¤ë©´ êµ¬ê¸ìí¸ IDë¥¼ ì¤ì í´ì£¼ì¸ì.</p>
+          <div style="text-align:left;background:#f7fafc;padding:16px;border-radius:8px;font-size:13px;">
+            <p><b>ì¤ì  ë°©ë²:</b></p>
+            <ol style="margin:8px 0 0 20px;line-height:2;">
+              <li>êµ¬ê¸ìí¸ì ííë¦¿ ë°ì´í°ë¥¼ ìë¡ë</li>
+              <li>íì¼ â ê³µì  â ì¹ì ê²ì â CSV ì í â ê²ì</li>
+              <li>ì´ HTML íì¼ì <code>CONFIG.SHEET_ID</code>ì ìí¸ ID ìë ¥</li>
+              <li>íì´ì§ ìë¡ê³ ì¹¨</li>
+            </ol>
+          </div>
+        </div>`;
+        return;
+      }
+
+      document.getElementById('dataSource').innerHTML = 'â ï¸ <b>ë°ëª¨ ëª¨ë</b> - êµ¬ê¸ìí¸ë¥¼ ì°ê²°íë©´ ì¤ìê° ë°ì´í°ë¡ ì íë©ëë¤';
+
+    } else {
+      // ì¤ì  ëª¨ë: êµ¬ê¸ìí¸ìì ë°ì´í° ë¡ë
+      statusEl.textContent = 'ì¤ì ë°ì´í° ìí¸ë¥¼ ë¶ë¬ì¤ë ì¤...';
+      const salesData = await fetchSheetCSV(CONFIG.SHEET_SALES);
+
+      statusEl.textContent = 'SFëª©í ìí¸ë¥¼ ë¶ë¬ì¤ë ì¤...';
+      const sfData = await fetchSheetCSV(CONFIG.SHEET_SF);
+
+      let groupData = null;
+      try {
+        statusEl.textContent = 'ììµêµ°ë§¤í ìí¸ë¥¼ ë¶ë¬ì¤ë ì¤...';
+        groupData = await fetchSheetCSV(CONFIG.SHEET_GROUP);
+      } catch(e) { /* ììµêµ° ë§¤í ìí¸ê° ìì´ë ì§í */ }
+
+      statusEl.textContent = 'ë°ì´í° ë³í ì¤...';
+      D = transformData(salesData, sfData, groupData);
+
+      document.getElementById('dataSource').innerHTML = `ð <b>êµ¬ê¸ìí¸ ì°ë</b> | ìí¸ ID: ${CONFIG.SHEET_ID.substring(0,12)}...`;
+    }
+
+    document.getElementById('lastUpdate').textContent = `ë§ì§ë§ ìë°ì´í¸: ${new Date().toLocaleString('ko-KR')}  `;
+    document.getElementById('configBar').style.display = 'flex';
+
+    statusEl.textContent = 'ëìë³´ëë¥¼ ë ëë§ ì¤...';
+    renderDashboard(D);
+
+    overlay.style.display = 'none';
+
+  } catch (err) {
+    console.error('Dashboard Error:', err);
+    overlay.innerHTML = `<div class="error-box">
+      <h2>ë°ì´í° ë¡ë© ì¤í¨</h2>
+      <p style="margin:12px 0;color:var(--muted);">${err.message || 'êµ¬ê¸ìí¸ ì ê·¼ì ë¬¸ì ê° ë°ìíìµëë¤.'}</p>
+      <div style="text-align:left;background:#f7fafc;padding:16px;border-radius:8px;font-size:13px;margin-top:16px;">
+        <p><b>íì¸ ì¬í­:</b></p>
+        <ol style="margin:8px 0 0 20px;line-height:2;">
+          <li>êµ¬ê¸ìí¸ IDê° ì¬ë°ë¥¸ì§ íì¸</li>
+          <li>ìí¸ê° 'ì¹ì ê²ì'ëìëì§ íì¸</li>
+          <li>ìí¸ í­ ì´ë¦ì´ ì ííì§ íì¸ (ì¤ì ë°ì´í°, SFëª©í, ììµêµ°ë§¤í)</li>
+          <li>ì¸í°ë· ì°ê²° ìí íì¸</li>
+        </ol>
+      </div>
+      <button onclick="location.reload()" style="margin-top:16px;padding:10px 24px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;">ë¤ì ìë</button>
+    </div>`;
+  }
+}
+
+// ì¤í
+main();
+</script>
+</body>
+</html>
