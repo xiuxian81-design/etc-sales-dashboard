@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>íì¬ë°ì´ì¤íë§ ETC ë§¤ì¶ë¶ì ëìë³´ë</title>
+<title>한올바이오파마 ETC 매출분석 대시보드</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<!-- JSONP ë°©ì ì¬ì© - PapaParse ë¶íì -->
+<!-- JSONP 방식 사용 - PapaParse 불필요 -->
 <style>
 :root { --primary:#1a365d; --accent:#2b6cb0; --success:#38a169; --danger:#e53e3e; --warning:#d69e2e; --bg:#f7fafc; --card:#fff; --text:#2d3748; --muted:#718096; --border:#e2e8f0; }
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -65,89 +65,89 @@ tr:hover{background:#f7fafc;}
 </head>
 <body>
 
-<!-- ===== ì¤ì : ì¬ê¸°ì êµ¬ê¸ìí¸ IDë¥¼ ìë ¥íì¸ì ===== -->
+<!-- ===== 설정: 여기에 구글시트 ID를 입력하세요 ===== -->
 <script>
-// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-// â  êµ¬ê¸ìí¸ ì¤ì                                             â
-// â  1. êµ¬ê¸ìí¸ URLìì /d/ ì /edit ì¬ì´ì IDë¥¼ ë³µì¬         â
-// â     ì: https://docs.google.com/spreadsheets/d/ABC123.../edit â
-// â     â SHEET_ID = 'ABC123...'                              â
-// â  2. ë§ê°ìì ìë°ì´í¸íì¸ì                                 â
-// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ┌──────────────────────────────────────────────────────────┐
+// │  구글시트 설정                                            │
+// │  1. 구글시트 URL에서 /d/ 와 /edit 사이의 ID를 복사         │
+// │     예: https://docs.google.com/spreadsheets/d/ABC123.../edit │
+// │     → SHEET_ID = 'ABC123...'                              │
+// │  2. 마감월을 업데이트하세요                                 │
+// └──────────────────────────────────────────────────────────┘
 const CONFIG = {
-  SHEET_ID: '1eYmkY9G2JtpqIIeJPaImEmrnZHz76Zi2iByHdha9wV8',  // êµ¬ê¸ìí¸ ì°ë ìë£
-  CLOSING_MONTH: 3,                 // â ë§ê° ìë£ë ì (1~12)
-  YEAR: 2026,                       // â ê¸°ì¤ ì°ë
-  // ìí¸ ì´ë¦ (êµ¬ê¸ìí¸ì í­ ì´ë¦ê³¼ ì íí ì¼ì¹í´ì¼ í©ëë¤)
-  SHEET_SALES: 'ì¤ì ë°ì´í°',
-  SHEET_SF: 'SFëª©í',
-  SHEET_GROUP: 'ììµêµ°ë§¤í',
+  SHEET_ID: '1eYmkY9G2JtpqIIeJPaImEmrnZHz76Zi2iByHdha9wV8',  // 구글시트 연동 완료
+  CLOSING_MONTH: 3,                 // ← 마감 완료된 월 (1~12)
+  YEAR: 2026,                       // ← 기준 연도
+  // 시트 이름 (구글시트의 탭 이름과 정확히 일치해야 합니다)
+  SHEET_SALES: '실적데이터',
+  SHEET_SF: 'SF목표',
+  SHEET_GROUP: '수익군매핑',
 };
 
-// ë°ëª¨ ëª¨ë: êµ¬ê¸ìí¸ IDê° ì¤ì ëì§ ìì¼ë©´ ë´ì¥ ë°ëª¨ ë°ì´í° ì¬ì©
+// 데모 모드: 구글시트 ID가 설정되지 않으면 내장 데모 데이터 사용
 const IS_DEMO = CONFIG.SHEET_ID === 'YOUR_SHEET_ID_HERE';
 </script>
 
-<!-- ë¡ë© íë©´ -->
+<!-- 로딩 화면 -->
 <div class="loading-overlay" id="loadingOverlay">
   <div class="spinner"></div>
-  <div class="msg">ë°ì´í°ë¥¼ ë¶ë¬ì¤ë ì¤...</div>
-  <div class="sub-msg" id="loadingStatus">êµ¬ê¸ìí¸ìì ë°ì´í°ë¥¼ ê°ì ¸ìµëë¤</div>
+  <div class="msg">데이터를 불러오는 중...</div>
+  <div class="sub-msg" id="loadingStatus">구글시트에서 데이터를 가져옵니다</div>
 </div>
 
-<!-- ë°ì´í° ìì¤ íì ë° -->
+<!-- 데이터 소스 표시 바 -->
 <div class="config-bar" id="configBar" style="display:none;">
   <span id="dataSource"></span>
   <span>
     <span id="lastUpdate"></span>
-    <button class="refresh-btn" onclick="location.reload()">ð ìë¡ê³ ì¹¨</button>
+    <button class="refresh-btn" onclick="location.reload()">🔄 새로고침</button>
   </span>
 </div>
 
-<!-- í¤ë -->
+<!-- 헤더 -->
 <div class="header">
   <div>
-    <h1>íì¬ë°ì´ì¤íë§ ETC ë§¤ì¶ë¶ì ëìë³´ë</h1>
-    <div class="sub" id="headerSub">ë°ì´í° ë¡ë© ì¤...</div>
+    <h1>한올바이오파마 ETC 매출분석 대시보드</h1>
+    <div class="sub" id="headerSub">데이터 로딩 중...</div>
   </div>
   <div><span class="badge" id="headerBadge">-</span></div>
 </div>
 <div class="kpi-row" id="kpiRow"></div>
 <div class="content">
   <div class="tab-bar" id="tabBar">
-    <div class="tab active" data-tab="overview">ì¢í© íí©</div>
-    <div class="tab" data-tab="products">ì£¼ë ¥íëª© ë¶ì</div>
-    <div class="tab" data-tab="forecast">ë§¤ì¶ ìì¸¡</div>
-    <div class="tab" data-tab="risk">ë¦¬ì¤í¬/ê¸°í</div>
-    <div class="tab" data-tab="all">ì ì²´ íëª©</div>
+    <div class="tab active" data-tab="overview">종합 현황</div>
+    <div class="tab" data-tab="products">주력품목 분석</div>
+    <div class="tab" data-tab="forecast">매출 예측</div>
+    <div class="tab" data-tab="risk">리스크/기회</div>
+    <div class="tab" data-tab="all">전체 품목</div>
   </div>
 
   <div class="panel active" id="panel-overview">
     <div class="grid-2">
-      <div class="card"><h3>ìë³ ë§¤ì¶ ì¶ì´ (24~26ë)</h3><canvas id="chartMonthly"></canvas></div>
-      <div class="card"><h3>26ë ìë³ ì¤ì  vs ëª©í(SF)</h3><canvas id="chartVsSF"></canvas></div>
+      <div class="card"><h3>월별 매출 추이 (24~26년)</h3><canvas id="chartMonthly"></canvas></div>
+      <div class="card"><h3>26년 월별 실적 vs 목표(SF)</h3><canvas id="chartVsSF"></canvas></div>
     </div>
     <div class="grid-2 section">
-      <div class="card"><h3>ì£¼ë ¥íëª© Q1 ë§¤ì¶ êµ¬ì±</h3><canvas id="chartPie"></canvas></div>
-      <div class="card"><h3>ì£¼ë ¥íëª© ë¬ì±ì¨</h3><canvas id="chartAch"></canvas></div>
+      <div class="card"><h3>주력품목 Q1 매출 구성</h3><canvas id="chartPie"></canvas></div>
+      <div class="card"><h3>주력품목 달성율</h3><canvas id="chartAch"></canvas></div>
     </div>
     <div class="section">
       <div class="card">
-        <h3>ë§¤ì¶ êµ¬ì¡° ë¶ì: ì ì²´ / ê³ ììµêµ° / ì ì í</h3>
-        <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">ê³ ììµêµ° = ê°êµ°+ëêµ°+ë¤êµ° | ì ì í = ë°ë§¤ 3ë ì´ë´ (2024~2026 ì¶ì)</p>
+        <h3>매출 구조 분석: 전체 / 고수익군 / 신제품</h3>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">고수익군 = 가군+나군+다군 | 신제품 = 발매 3년 이내 (2024~2026 출시)</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
           <div><canvas id="chartStructure"></canvas></div>
           <div><canvas id="chartGroupBar"></canvas></div>
         </div>
         <div style="margin-top:16px;">
           <table id="structureTable"><thead><tr>
-            <th>ê¶¼ë¶</th><th>ì¤ì </th><th>ëª©í</th><th>ë¬ì±ì¨</th><th>ì ëëê¸°</th><th>YoY</th><th>ì°ê°SF</th><th>ë¹ì¤</th>
+            <th>구분</th><th>실적</th><th>목표</th><th>달성율</th><th>전년동기</th><th>YoY</th><th>연간SF</th><th>비중</th>
           </tr></thead><tbody></tbody></table>
         </div>
         <div style="margin-top:16px;">
-          <h3 style="font-size:13px;color:var(--primary);margin-bottom:8px;">ì ì í ìì¸ íí©</h3>
+          <h3 style="font-size:13px;color:var(--primary);margin-bottom:8px;">신제품 상세 현황</h3>
           <table id="newProdTable"><thead><tr>
-            <th>íëª©</th><th>ì¶ìì°ë</th><th>ì¤ì </th><th>ëª©í</th><th>ë¬ì±ì¨</th><th>ì°ê°SF</th>
+            <th>품목</th><th>출시연도</th><th>실적</th><th>목표</th><th>달성율</th><th>연간SF</th>
           </tr></thead><tbody></tbody></table>
         </div>
       </div>
@@ -156,14 +156,14 @@ const IS_DEMO = CONFIG.SHEET_ID === 'YOUR_SHEET_ID_HERE';
 
   <div class="panel" id="panel-products">
     <div class="filter-bar">
-      <select id="prodSelect"><option value="all">ì ì²´ ì£¼ë ¥íëª©</option></select>
+      <select id="prodSelect"><option value="all">전체 주력품목</option></select>
     </div>
     <div class="grid-2">
-      <div class="card"><h3>ì í íëª© ìë³ í¸ë ë</h3><canvas id="chartProdTrend"></canvas></div>
-      <div class="card"><h3>ì£¼ë ¥íëª© YoY ì±ì¥ì¨</h3><canvas id="chartYoY"></canvas></div>
+      <div class="card"><h3>선택 품목 월별 트렌드</h3><canvas id="chartProdTrend"></canvas></div>
+      <div class="card"><h3>주력품목 YoY 성장율</h3><canvas id="chartYoY"></canvas></div>
     </div>
     <div class="section"><div class="card">
-      <h3>ì£¼ë ¥íëª© ìì¸ íí© (ìµì)</h3>
+      <h3>주력품목 상세 현황 (억원)</h3>
       <table id="prodTable"><thead><tr id="prodTableHeader">
       </tr></thead><tbody></tbody></table>
     </div></div>
@@ -172,14 +172,14 @@ const IS_DEMO = CONFIG.SHEET_ID === 'YOUR_SHEET_ID_HERE';
   <div class="panel" id="panel-forecast">
     <div class="fc-summary" id="fcSummary"></div>
     <div class="grid-2">
-      <div class="card"><h3>ì£¼ë ¥íëª© ì°ê° ìì¸¡ ë¹êµ (3ê°ì§ ë°©ë²)</h3><canvas id="chartForecast"></canvas></div>
-      <div class="card"><h3>ìì¸¡ íê·  vs SF ëª©í</h3><canvas id="chartFcVsSF"></canvas></div>
+      <div class="card"><h3>주력품목 연간 예측 비교 (3가지 방법)</h3><canvas id="chartForecast"></canvas></div>
+      <div class="card"><h3>예측 평균 vs SF 목표</h3><canvas id="chartFcVsSF"></canvas></div>
     </div>
     <div class="section"><div class="card">
-      <h3>ë§¤ì¶ ìì¸¡ ìì¸ (ìµì)</h3>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">ìì¸¡â  ë¨ìì°íì° | ìì¸¡â¡ ì ë ê³ì ì± ë°ì | ìì¸¡â¢ ì¤ì +ìì¬SFëª©í</p>
+      <h3>매출 예측 상세 (억원)</h3>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">예측① 단순연환산 | 예측② 전년 계절성 반영 | 예측③ 실적+잔여SF목표</p>
       <table id="fcTable"><thead><tr>
-        <th>íëª©</th><th>ì¤ì </th><th>ìì¸¡â </th><th>ìì¸¡â¡</th><th>ìì¸¡â¢</th><th>ìì¸¡íê· </th><th>SFëª©í</th><th>SFëë¹</th><th>ì ëëë¹</th>
+        <th>품목</th><th>실적</th><th>예측①</th><th>예측②</th><th>예측③</th><th>예측평균</th><th>SF목표</th><th>SF대비</th><th>전년대비</th>
       </tr></thead><tbody></tbody></table>
     </div></div>
   </div>
@@ -187,31 +187,31 @@ const IS_DEMO = CONFIG.SHEET_ID === 'YOUR_SHEET_ID_HERE';
   <div class="panel" id="panel-risk">
     <div class="grid-2">
       <div class="card">
-        <h3 style="color:var(--success);">â² ê¸°í íëª© (ê³ ì±ì¥)</h3>
-        <table id="oppTable"><thead><tr><th>íëª©</th><th>ì¤ì </th><th>ì¦ê°ì¡</th><th>ë¬ì±ì¨</th><th>ìì¬ì </th></tr></thead><tbody></tbody></table>
+        <h3 style="color:var(--success);">▲ 기회 품목 (고성장)</h3>
+        <table id="oppTable"><thead><tr><th>품목</th><th>실적</th><th>증감액</th><th>달성율</th><th>시사점</th></tr></thead><tbody></tbody></table>
       </div>
       <div class="card">
-        <h3 style="color:var(--danger);">â¼ ë¦¬ì¤í¬ íëª© (ëª©íë¯¸ë¬/ì­ì±ì¥)</h3>
-        <table id="riskTable"><thead><tr><th>íëª©</th><th>ì¤ì </th><th>ë¬ì±ì¨</th><th>ì¦ê°ì¡</th><th>ì´ì</th></tr></thead><tbody></tbody></table>
+        <h3 style="color:var(--danger);">▼ 리스크 품목 (목표미달/역성장)</h3>
+        <table id="riskTable"><thead><tr><th>품목</th><th>실적</th><th>달성율</th><th>증감액</th><th>이슈</th></tr></thead><tbody></tbody></table>
       </div>
     </div>
     <div class="section"><div class="card">
-      <h3 style="color:#d69e2e;">â¡ ì´ìë³ë (MoM Â±30% ì´ì)</h3>
-      <table id="anomalyTable"><thead><tr><th>íëª©</th><th>ì ì ì</th><th>ì ì</th><th>MoM</th><th>ì¤ì </th><th>YoY</th><th>ì í</th></tr></thead><tbody></tbody></table>
+      <h3 style="color:#d69e2e;">⚡ 이상변동 (MoM ±30% 이상)</h3>
+      <table id="anomalyTable"><thead><tr><th>품목</th><th>전전월</th><th>전월</th><th>MoM</th><th>실적</th><th>YoY</th><th>유형</th></tr></thead><tbody></tbody></table>
     </div></div>
   </div>
 
   <div class="panel" id="panel-all">
     <div class="filter-bar">
-      <input type="text" id="searchAll" placeholder="íëª©ëª ê²ì...">
+      <input type="text" id="searchAll" placeholder="품목명 검색...">
       <select id="sortAll">
-        <option value="qtd_26">ë§¤ì¶ì</option>
-        <option value="qtd_yoy">YoY ì±ì¥ì¨ì</option>
-        <option value="qtd_ach">ë¬ì±ì¨ì</option>
-        <option value="last_mom">MoMì</option>
-        <option value="remaining_monthly">ìì¬ìëª©íì</option>
+        <option value="qtd_26">매출순</option>
+        <option value="qtd_yoy">YoY 성장율순</option>
+        <option value="qtd_ach">달성율순</option>
+        <option value="last_mom">MoM순</option>
+        <option value="remaining_monthly">잔여월목표순</option>
       </select>
-      <label style="font-size:12px;color:var(--muted);"><input type="checkbox" id="keyOnly"> ì£¼ë ¥íëª©ë§</label>
+      <label style="font-size:12px;color:var(--muted);"><input type="checkbox" id="keyOnly"> 주력품목만</label>
     </div>
     <div class="card">
       <table id="allTable"><thead><tr id="allTableHeader">
@@ -222,7 +222,7 @@ const IS_DEMO = CONFIG.SHEET_ID === 'YOUR_SHEET_ID_HERE';
 
 <script>
 // ========================================
-// 1. êµ¬ê¸ìí¸ ë°ì´í° ë¡ë© í¨ì (JSONP - CORS ì°í)
+// 1. 구글시트 데이터 로딩 함수 (JSONP - CORS 우회)
 // ========================================
 let _gvizCallbackId = 0;
 function fetchSheetCSV(sheetName) {
@@ -230,7 +230,7 @@ function fetchSheetCSV(sheetName) {
     const cbName = '_gvizCb' + (++_gvizCallbackId);
     const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=responseHandler:${cbName}&sheet=${encodeURIComponent(sheetName)}`;
     const script = document.createElement('script');
-    const timeout = setTimeout(() => { cleanup(); reject(new Error(`ìí¸ "${sheetName}" ë¡ë© ìê° ì´ê³¼`)); }, 15000);
+    const timeout = setTimeout(() => { cleanup(); reject(new Error(`시트 "${sheetName}" 로딩 시간 초과`)); }, 15000);
     function cleanup() { clearTimeout(timeout); delete window[cbName]; if(script.parentNode) script.parentNode.removeChild(script); }
     window[cbName] = function(response) {
       cleanup();
@@ -248,42 +248,42 @@ function fetchSheetCSV(sheetName) {
         resolve(rows);
       } catch(e) { reject(e); }
     };
-    script.onerror = () => { cleanup(); reject(new Error(`ìí¸ "${sheetName}" ì¤í¬ë¦½í¸ ë¡ë© ì¤í¨`)); };
+    script.onerror = () => { cleanup(); reject(new Error(`시트 "${sheetName}" 스크립트 로딩 실패`)); };
     script.src = url;
     document.head.appendChild(script);
   });
 }
 
 // ========================================
-// 2. CSV â D ê°ì²´ ë³í
+// 2. CSV → D 객체 변환
 // ========================================
 function transformData(salesData, sfData, groupData) {
-  const CM = CONFIG.CLOSING_MONTH; // ë§ê°ì
-  const monthCols24 = Array.from({length:12}, (_,i) => `24.${i+1}ì`);
-  const monthCols25 = Array.from({length:12}, (_,i) => `25.${i+1}ì`);
-  const monthCols26 = Array.from({length:12}, (_,i) => `26.${i+1}ì`);
-  const sfMonthCols = Array.from({length:12}, (_,i) => `${i+1}ì`);
+  const CM = CONFIG.CLOSING_MONTH; // 마감월
+  const monthCols24 = Array.from({length:12}, (_,i) => `24.${i+1}월`);
+  const monthCols25 = Array.from({length:12}, (_,i) => `25.${i+1}월`);
+  const monthCols26 = Array.from({length:12}, (_,i) => `26.${i+1}월`);
+  const sfMonthCols = Array.from({length:12}, (_,i) => `${i+1}월`);
 
-  // SF ëª©í ë§µ ìì±
+  // SF 목표 맵 생성
   const sfMap = {};
   sfData.forEach(row => {
-    const name = row['íëª©ëª'];
+    const name = row['품목명'];
     if (!name) return;
     sfMap[name] = {
       monthly: sfMonthCols.map(c => parseFloat(row[c]) || 0),
-      annual: parseFloat(row['ì°ê°SF']) || 0
+      annual: parseFloat(row['연간SF']) || 0
     };
   });
 
-  // ììµêµ° ë§µ ìì±
+  // 수익군 맵 생성
   const groupMap = {};
   if (groupData) {
     groupData.forEach(row => {
-      if (row['íëª©ëª'] && row['ììµêµ°']) groupMap[row['íëª©ëª']] = row['ììµêµ°'];
+      if (row['품목명'] && row['수익군']) groupMap[row['품목명']] = row['수익군'];
     });
   }
 
-  // ì ì²´ íëª© ë°ì´í° ë³í
+  // 전체 품목 데이터 변환
   const allProducts = [];
   const total_26 = new Array(12).fill(0);
   const total_25 = new Array(12).fill(0);
@@ -291,48 +291,48 @@ function transformData(salesData, sfData, groupData) {
   const total_sf = new Array(12).fill(0);
 
   salesData.forEach(row => {
-    const name = row['íëª©ëª'];
+    const name = row['품목명'];
     if (!name) return;
 
     const m26 = monthCols26.map(c => parseFloat(row[c]) || 0);
     const m25 = monthCols25.map(c => parseFloat(row[c]) || 0);
     const m24 = monthCols24.map(c => parseFloat(row[c]) || 0);
-    const isKey = (row['ì£¼ë ¥'] || '').toUpperCase() === 'Y';
-    const isDemkt = (row['ëë§ì¼í'] || '').toUpperCase() === 'Y';
-    const newYear = parseInt(row['ì ì íì°ë']) || null;
+    const isKey = (row['주력'] || '').toUpperCase() === 'Y';
+    const isDemkt = (row['디마케팅'] || '').toUpperCase() === 'Y';
+    const newYear = parseInt(row['신제품연도']) || null;
     const sf = sfMap[name] || { monthly: new Array(12).fill(0), annual: 0 };
-    const group = groupMap[name] || row['ììµêµ°'] || '';
+    const group = groupMap[name] || row['수익군'] || '';
 
-    // ëì  í©ê³
+    // 누적 합계
     const qtd_26 = m26.slice(0, CM).reduce((a,b) => a+b, 0);
     const qtd_25 = m25.slice(0, CM).reduce((a,b) => a+b, 0);
     const qtd_sf = sf.monthly.slice(0, CM).reduce((a,b) => a+b, 0);
     const ann_25 = m25.reduce((a,b) => a+b, 0);
     const ann_24 = m24.reduce((a,b) => a+b, 0);
 
-    // ë¬ì±ì¨, YoY
+    // 달성율, YoY
     const qtd_ach = qtd_sf > 0 ? (qtd_26 / qtd_sf * 100) : null;
     const qtd_yoy = qtd_25 > 0 ? ((qtd_26 / qtd_25 - 1) * 100) : null;
 
-    // MoM (ìµê·¼ì vs ì ì)
+    // MoM (최근월 vs 전월)
     const lastM = CM >= 1 ? m26[CM-1] : 0;
     const prevM = CM >= 2 ? m26[CM-2] : 0;
     const last_mom = prevM > 0 ? ((lastM / prevM - 1) * 100) : null;
 
-    // ìì¬ì íê·° ëª©í
+    // 잔여월 평균 목표
     const remaining_sf = sf.monthly.slice(CM).reduce((a,b) => a+b, 0);
     const remaining_months = 12 - CM;
     const remaining_monthly = remaining_months > 0 ? remaining_sf / remaining_months : 0;
     const next_sf = CM < 12 ? sf.monthly[CM] : 0;
 
-    // ìì¸¡
-    const fc1 = qtd_26 * (12 / CM); // ë¨ìì°íì°
+    // 예측
+    const fc1 = qtd_26 * (12 / CM); // 단순연환산
     const q1_ratio_25 = ann_25 > 0 ? (qtd_25 / ann_25) : (CM / 12);
-    const fc2 = q1_ratio_25 > 0 ? (qtd_26 / q1_ratio_25) : fc1; // ê³ì ì± ë°ì
-    const fc3 = qtd_26 + remaining_sf; // ì¤ì  + ìì¬SF
+    const fc2 = q1_ratio_25 > 0 ? (qtd_26 / q1_ratio_25) : fc1; // 계절성 반영
+    const fc3 = qtd_26 + remaining_sf; // 실적 + 잔여SF
     const fc_avg = (fc1 + fc2 + fc3) / 3;
 
-    // ì¦ê°ì¡
+    // 증감액
     const qtd_diff = qtd_26 - qtd_25;
 
     const product = {
@@ -346,21 +346,21 @@ function transformData(salesData, sfData, groupData) {
       fc1, fc2, fc3, fc_avg, qtd_diff
     };
 
-    // ìë³ í¤ ëì  ìì± (ë§ê°ì ê¸°ì¤)
+    // 월별 키 동적 생성 (마감월 기준)
     for (let i = 0; i < CM; i++) {
       product[`m${i+1}`] = m26[i];
     }
 
     allProducts.push(product);
 
-    // ì ì²´ í©ê³
+    // 전체 합계
     m26.forEach((v,i) => total_26[i] += v);
     m25.forEach((v,i) => total_25[i] += v);
     m24.forEach((v,i) => total_24[i] += v);
     sf.monthly.forEach((v,i) => total_sf[i] += v);
   });
 
-  // ì ì²´ í©ê³ ê³ì°
+  // 전체 합계 계산
   const total_qtd_26 = total_26.slice(0, CM).reduce((a,b) => a+b, 0);
   const total_qtd_25 = total_25.slice(0, CM).reduce((a,b) => a+b, 0);
   const total_qtd_sf = total_sf.slice(0, CM).reduce((a,b) => a+b, 0);
@@ -368,12 +368,12 @@ function transformData(salesData, sfData, groupData) {
   const total_ann_25 = total_25.reduce((a,b) => a+b, 0);
   const total_ann_24 = total_24.reduce((a,b) => a+b, 0);
 
-  // ì£¼ë ¥íëª©
+  // 주력품목
   const products = allProducts.filter(p => p.is_key).sort((a,b) => b.qtd_26 - a.qtd_26);
 
-  // ììµêµ° ì§ê³
+  // 수익군 집계
   const profit_groups = {};
-  const grpNames = ['ê°êµ°','ëêµ°','ë¤êµ°','ë¼êµ°','ë§êµ°'];
+  const grpNames = ['가군','나군','다군','라군','마군'];
   grpNames.forEach(g => {
     const items = allProducts.filter(p => p.group === g);
     if (items.length === 0) return;
@@ -390,8 +390,8 @@ function transformData(salesData, sfData, groupData) {
       yoy: q25 > 0 ? ((q26/q25-1)*100) : null
     };
   });
-  // ê³ ììµêµ°
-  const hiGrps = ['ê°êµ°','ëêµ°','ë¤êµ°'];
+  // 고수익군
+  const hiGrps = ['가군','나군','다군'];
   const hiItems = allProducts.filter(p => hiGrps.includes(p.group));
   if (hiItems.length > 0) {
     const hm26 = hiItems.reduce((a,p) => a.map((v,i) => v + p.monthly_26[i]), new Array(12).fill(0));
@@ -400,7 +400,7 @@ function transformData(salesData, sfData, groupData) {
     const hq25 = hm25.slice(0, CM).reduce((a,b) => a+b, 0);
     const hsf = hiItems.reduce((s,p) => s + p.sf_monthly.slice(0, CM).reduce((a,b) => a+b, 0), 0);
     const hann = hiItems.reduce((s,p) => s + p.ann_sf, 0);
-    profit_groups['ê³ ììµêµ°'] = {
+    profit_groups['고수익군'] = {
       monthly_26: hm26.slice(0, CM), monthly_25: hm25.slice(0, CM),
       q1_26: hq26, q1_25: hq25, q1_sf: hsf, ann_sf: hann,
       ach: hsf > 0 ? (hq26/hsf*100) : null,
@@ -408,7 +408,7 @@ function transformData(salesData, sfData, groupData) {
     };
   }
 
-  // ì ì í ì§ê³
+  // 신제품 집계
   const currentYear = CONFIG.YEAR;
   const newProds = allProducts.filter(p => p.new_year && p.new_year >= currentYear - 2);
   const npm26 = newProds.length > 0 ? newProds.reduce((a,p) => a.map((v,i) => v + p.monthly_26[i]), new Array(12).fill(0)) : new Array(12).fill(0);
@@ -431,7 +431,7 @@ function transformData(salesData, sfData, groupData) {
     ach: p.qtd_ach
   })).sort((a,b) => b.q1_26 - a.q1_26);
 
-  // ì ì²´ ìì¸¡
+  // 전체 예측
   const total_fc1 = allProducts.reduce((s,p) => s + p.fc1, 0);
   const total_fc2 = allProducts.reduce((s,p) => s + p.fc2, 0);
   const total_fc3 = allProducts.reduce((s,p) => s + p.fc3, 0);
@@ -452,29 +452,29 @@ function transformData(salesData, sfData, groupData) {
 }
 
 // ========================================
-// 3. ëìë³´ë ë ëë§
+// 3. 대시보드 렌더링
 // ========================================
 function renderDashboard(D) {
   const CM = D.CM;
-  const monthNames = ['1ì','2ì','3ì','4ì','5ì','6ì','7ì','8ì','9ì','10ì','11ì','12ì'];
-  const periodLabel = CM <= 3 ? `Q1(1~${CM}ì)` : CM <= 6 ? `H1(1~${CM}ì)` : `1~${CM}ì`;
+  const monthNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  const periodLabel = CM <= 3 ? `Q1(1~${CM}월)` : CM <= 6 ? `H1(1~${CM}월)` : `1~${CM}월`;
 
-  // í¤ë ìë°ì´í¸
-  document.getElementById('headerSub').textContent = `${CONFIG.YEAR}ë ${periodLabel} ì¤ì  ê¸°ë° | SAP ë§ê°ìë£ ê¸°ì¤ | ë¨ì: ìµì`;
-  document.getElementById('headerBadge').textContent = `${CONFIG.YEAR}.${String(CM).padStart(2,'0')} ë§ê° ê¸°ì¤`;
+  // 헤더 업데이트
+  document.getElementById('headerSub').textContent = `${CONFIG.YEAR}년 ${periodLabel} 실적 기반 | SAP 마감자료 기준 | 단위: 억원`;
+  document.getElementById('headerBadge').textContent = `${CONFIG.YEAR}.${String(CM).padStart(2,'0')} 마감 기준`;
 
-  // ëì  íì´ë¸ í¤ë ìì±
-  const prodHeaders = ['íëª©'];
+  // 동적 테이블 헤더 생성
+  const prodHeaders = ['품목'];
   for (let i = 0; i < CM; i++) prodHeaders.push(monthNames[i]);
-  prodHeaders.push('ì¤ì ','ëª©í','ë¬ì±ì¨','YoY',`${CM}ìMoM`,'ìì¬ìëª©í',`${CM+1<=12?monthNames[CM]:''}ëª©í`);
+  prodHeaders.push('실적','목표','달성율','YoY',`${CM}월MoM`,'잔여월목표',`${CM+1<=12?monthNames[CM]:''}목표`);
   document.getElementById('prodTableHeader').innerHTML = prodHeaders.map(h => `<th>${h}</th>`).join('');
 
-  const allHeaders = ['#','íëª©'];
+  const allHeaders = ['#','품목'];
   for (let i = 0; i < CM; i++) allHeaders.push(monthNames[i]);
-  allHeaders.push('ì¤ì ','ëª©í','ë¬ì±ì¨','YoY',`${CM}ìMoM`,'ì°ê°SF','ìì¬ìëª©í',`${CM+1<=12?monthNames[CM]:''}ëª©í`);
+  allHeaders.push('실적','목표','달성율','YoY',`${CM}월MoM`,'연간SF','잔여월목표',`${CM+1<=12?monthNames[CM]:''}목표`);
   document.getElementById('allTableHeader').innerHTML = allHeaders.map(h => `<th>${h}</th>`).join('');
 
-  // ì í¸
+  // 유틸
   const fmt=(v,d=1)=>v!=null?v.toFixed(d):'-';
   const fmtP=(v)=>v!=null?(v>=0?'+':'')+v.toFixed(1)+'%':'-';
   const pctC=(v)=>v!=null?(v>=0?'pct-up':'pct-down'):'';
@@ -493,16 +493,16 @@ function renderDashboard(D) {
   const prevMonthVal = CM >= 2 ? D.total.act_26[CM-2] : 0;
 
   document.getElementById('kpiRow').innerHTML=`
-    <div class="kpi"><div class="label">${periodLabel} ë§¤ì¶ ì¤ì </div><div class="value">${fmt(qtdA,1)}</div><div class="unit">ìµì</div>
-      <div class="change up">ì ëëê¸° +${((qtdA/qtdY25-1)*100).toFixed(1)}%</div></div>
-    <div class="kpi ${parseFloat(qtdAch)>=95?'green':parseFloat(qtdAch)>=85?'yellow':'red'}"><div class="label">${periodLabel} ëª©í ë¬ì±ì¨</div><div class="value">${qtdAch}<span style="font-size:14px">%</span></div>
+    <div class="kpi"><div class="label">${periodLabel} 매출 실적</div><div class="value">${fmt(qtdA,1)}</div><div class="unit">억원</div>
+      <div class="change up">전년동기 +${((qtdA/qtdY25-1)*100).toFixed(1)}%</div></div>
+    <div class="kpi ${parseFloat(qtdAch)>=95?'green':parseFloat(qtdAch)>=85?'yellow':'red'}"><div class="label">${periodLabel} 목표 달성율</div><div class="value">${qtdAch}<span style="font-size:14px">%</span></div>
       <div class="change">${fmt(qtdA,1)} / ${fmt(qtdS,1)}</div></div>
-    <div class="kpi"><div class="label">ì°ê° SF ëª©í</div><div class="value">${fmt(aS,0)}</div><div class="unit">ìµì</div>
-      <div class="change">ì ë ${fmt(a25,0)}ìµ ëë¹ +${((aS/a25-1)*100).toFixed(1)}%</div></div>
-    <div class="kpi ${D.total_forecast.fc_avg/aS>=0.9?'green':'yellow'}"><div class="label">ìì¸¡ íê·  (3ê°ì§)</div><div class="value">${fmt(D.total_forecast.fc_avg,1)}</div><div class="unit">ìµì</div>
-      <div class="change">SFëë¹ ${(D.total_forecast.fc_avg/aS*100).toFixed(1)}%</div></div>
-    <div class="kpi ${lastMonthVal>=prevMonthVal?'':'red'}"><div class="label">${monthNames[CM-1]} ë§¤ì¶</div><div class="value">${fmt(lastMonthVal,1)}</div><div class="unit">ìµì</div>
-      <div class="change ${lastMonthVal>=prevMonthVal?'up':'down'}">${CM>=2?'ì ì '+((lastMonthVal/prevMonthVal-1)*100).toFixed(1)+'%':''}</div></div>`;
+    <div class="kpi"><div class="label">연간 SF 목표</div><div class="value">${fmt(aS,0)}</div><div class="unit">억원</div>
+      <div class="change">전년 ${fmt(a25,0)}억 대비 +${((aS/a25-1)*100).toFixed(1)}%</div></div>
+    <div class="kpi ${D.total_forecast.fc_avg/aS>=0.9?'green':'yellow'}"><div class="label">예측 평균 (3가지)</div><div class="value">${fmt(D.total_forecast.fc_avg,1)}</div><div class="unit">억원</div>
+      <div class="change">SF대비 ${(D.total_forecast.fc_avg/aS*100).toFixed(1)}%</div></div>
+    <div class="kpi ${lastMonthVal>=prevMonthVal?'':'red'}"><div class="label">${monthNames[CM-1]} 매출</div><div class="value">${fmt(lastMonthVal,1)}</div><div class="unit">억원</div>
+      <div class="change ${lastMonthVal>=prevMonthVal?'up':'down'}">${CM>=2?'전월 '+((lastMonthVal/prevMonthVal-1)*100).toFixed(1)+'%':''}</div></div>`;
 
   // Tabs
   document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
@@ -513,38 +513,38 @@ function renderDashboard(D) {
 
   const C={blue:'#2b6cb0',lb:'#90cdf4',red:'#e53e3e',green:'#38a169',orange:'#dd6b20',gray:'#a0aec0',purple:'#805ad5',teal:'#319795'};
 
-  // === ì¢í© íí©: ìë³ ì¶ì´ ===
+  // === 종합 현황: 월별 추이 ===
   new Chart(document.getElementById('chartMonthly'),{type:'line',data:{labels:monthNames,datasets:[
-    {label:'24ë',data:D.total.act_24,borderColor:C.gray,borderDash:[5,5],pointRadius:2,tension:.3},
-    {label:'25ë',data:D.total.act_25,borderColor:C.lb,pointRadius:3,tension:.3},
-    {label:'26ëì¤ì ',data:D.total.act_26.map((v,i)=>i<CM?v:null),borderColor:C.blue,borderWidth:3,pointRadius:5,tension:.3},
-    {label:'26ëSF',data:D.total.sf_26,borderColor:C.orange,borderDash:[3,3],pointRadius:2,tension:.3}
-  ]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},scales:{y:{title:{display:true,text:'ìµì'},beginAtZero:false}}}});
+    {label:'24년',data:D.total.act_24,borderColor:C.gray,borderDash:[5,5],pointRadius:2,tension:.3},
+    {label:'25년',data:D.total.act_25,borderColor:C.lb,pointRadius:3,tension:.3},
+    {label:'26년실적',data:D.total.act_26.map((v,i)=>i<CM?v:null),borderColor:C.blue,borderWidth:3,pointRadius:5,tension:.3},
+    {label:'26년SF',data:D.total.sf_26,borderColor:C.orange,borderDash:[3,3],pointRadius:2,tension:.3}
+  ]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},scales:{y:{title:{display:true,text:'억원'},beginAtZero:false}}}});
 
-  // === ëª©íëë¹ ì¤ì  + ë¬ì±ì¨ ===
+  // === 목표대비 실적 + 달성율 ===
   const closedMonths = monthNames.slice(0, CM);
   const achRates = D.total.act_26.slice(0,CM).map((v,i)=>(v/D.total.sf_26[i]*100));
   new Chart(document.getElementById('chartVsSF'),{type:'bar',data:{labels:closedMonths,datasets:[
-    {label:'ì¤ì ',data:D.total.act_26.slice(0,CM),backgroundColor:C.blue,order:2},
-    {label:'SFëª©í',data:D.total.sf_26.slice(0,CM),backgroundColor:C.orange+'40',borderColor:C.orange,borderWidth:2,order:2},
-    {label:'ë¬ì±ì¨(%)',data:achRates,type:'line',borderColor:'#805ad5',backgroundColor:'#805ad540',pointRadius:6,pointStyle:'rectRot',borderWidth:2.5,yAxisID:'y2',order:1}
+    {label:'실적',data:D.total.act_26.slice(0,CM),backgroundColor:C.blue,order:2},
+    {label:'SF목표',data:D.total.sf_26.slice(0,CM),backgroundColor:C.orange+'40',borderColor:C.orange,borderWidth:2,order:2},
+    {label:'달성율(%)',data:achRates,type:'line',borderColor:'#805ad5',backgroundColor:'#805ad540',pointRadius:6,pointStyle:'rectRot',borderWidth:2.5,yAxisID:'y2',order:1}
   ]},options:{responsive:true,plugins:{legend:{position:'bottom'},
     tooltip:{callbacks:{label:function(ctx){
-      if(ctx.dataset.yAxisID==='y2') return 'ë¬ì±ì¨: '+ctx.parsed.y.toFixed(1)+'%';
-      return ctx.dataset.label+': '+ctx.parsed.y.toFixed(1)+'ìµì';
+      if(ctx.dataset.yAxisID==='y2') return '달성율: '+ctx.parsed.y.toFixed(1)+'%';
+      return ctx.dataset.label+': '+ctx.parsed.y.toFixed(1)+'억원';
     }}}},
     scales:{
-      y:{title:{display:true,text:'ìµì'},beginAtZero:false,position:'left'},
-      y2:{title:{display:true,text:'ë¬ì±ì¨(%)'},position:'right',min:85,max:110,grid:{drawOnChartArea:false},ticks:{callback:v=>v+'%'}}
+      y:{title:{display:true,text:'억원'},beginAtZero:false,position:'left'},
+      y2:{title:{display:true,text:'달성율(%)'},position:'right',min:85,max:110,grid:{drawOnChartArea:false},ticks:{callback:v=>v+'%'}}
     }
   }});
 
-  // === ì£¼ë ¥íëª© ë§¤ì¶ ë¹ì¤ ===
+  // === 주력품목 매출 비중 ===
   const totalQtd = D.total.qtd_26;
   const keyQtd = D.products.reduce((s,p)=>s+p.qtd_26, 0);
   const etcQtd = totalQtd - keyQtd;
   const allPieD = [...D.products.map(p=>p.qtd_26), etcQtd];
-  const allPieL = [...D.products.map(p=>p.name), 'ê¸°í'];
+  const allPieL = [...D.products.map(p=>p.name), '기타'];
   const pieColors = ['#2b6cb0','#38a169','#e53e3e','#d69e2e','#805ad5','#319795','#dd6b20','#e53e3e80','#38a16980','#2b6cb080','#80808080','#d69e2e80','#31979580','#cbd5e0'];
   new Chart(document.getElementById('chartPie'),{type:'doughnut',data:{labels:allPieL,datasets:[{data:allPieD,backgroundColor:pieColors}]},
     options:{responsive:true,plugins:{
@@ -557,12 +557,12 @@ function renderDashboard(D) {
       }}},
       tooltip:{callbacks:{label:ctx=>{
         const pct=(ctx.parsed/totalQtd*100).toFixed(1);
-        return ctx.label+': '+ctx.parsed.toFixed(1)+'ìµì ('+pct+'%)';
+        return ctx.label+': '+ctx.parsed.toFixed(1)+'억원 ('+pct+'%)';
       }}}
     }}
   });
 
-  // === ë¬ì±ì¨ ===
+  // === 달성율 ===
   const achP=D.products.filter(p=>p.qtd_ach!=null).sort((a,b)=>b.qtd_ach-a.qtd_ach);
   new Chart(document.getElementById('chartAch'),{type:'bar',data:{labels:achP.map(p=>p.name),datasets:[{
     data:achP.map(p=>p.qtd_ach),
@@ -572,11 +572,11 @@ function renderDashboard(D) {
     options:{indexAxis:'y',responsive:true,
       plugins:{
         legend:{display:false},
-        subtitle:{display:true,text:'â  100%ì´ì: ì´ê³¼ë¬ì±(ë¹ì)  â  90~100%: ìí¸(ì£¼í©)  â  90%ë¯¼ë§: ë¶ì§(ë°¨ê°)',
+        subtitle:{display:true,text:'■ 100%이상: 초과달성(녹색)  ■ 90~100%: 양호(주황)  ■ 90%미만: 부진(빨강)',
           font:{size:11,weight:'normal'},color:'#718096',align:'start',padding:{bottom:8}},
         tooltip:{callbacks:{label:ctx=>ctx.parsed.x.toFixed(1)+'%'}}
       },
-      scales:{x:{min:0,max:Math.max(130,...achP.map(p=>p.qtd_ach)+10),title:{display:true,text:'ë¬ì±ì¨(%)'},
+      scales:{x:{min:0,max:Math.max(130,...achP.map(p=>p.qtd_ach)+10),title:{display:true,text:'달성율(%)'},
         grid:{color:ctx=>ctx.tick.value===100?'#2d3748':'#e2e8f0',lineWidth:ctx=>ctx.tick.value===100?2:1}
       },y:{ticks:{font:{size:11}}}}
     },
@@ -596,37 +596,37 @@ function renderDashboard(D) {
     }]
   });
 
-  // === ë§¤ì¶ êµ¬ì¡° ë¶ì ===
+  // === 매출 구조 분석 ===
   const pg = D.profit_groups;
   const np = D.new_products_summary;
-  const grpNames = ['ê°êµ°','ëêµ°','ë¤êµ°','ë¼êµ°','ë§êµ°'];
+  const grpNames = ['가군','나군','다군','라군','마군'];
   const grpQ1 = grpNames.map(g => pg[g] ? pg[g].q1_26 : 0);
   const grpColors = ['#2b6cb0','#38a169','#d69e2e','#a0aec0','#cbd5e0'];
 
   new Chart(document.getElementById('chartStructure'),{type:'bar',data:{
     labels:grpNames,
     datasets:[
-      {label:`26ë ${periodLabel}`,data:grpQ1,backgroundColor:grpColors},
-      {label:`25ë ${periodLabel}`,data:grpNames.map(g=>pg[g]?pg[g].q1_25:0),backgroundColor:grpColors.map(c=>c+'60')}
-    ]},options:{responsive:true,plugins:{legend:{position:'bottom'},title:{display:true,text:`ììµêµ°ë³ ${periodLabel} ë§¤ì¶ ë¹êµ (ìµì)`,font:{size:13}}},scales:{y:{title:{display:true,text:'ìµì'}}}}});
+      {label:`26년 ${periodLabel}`,data:grpQ1,backgroundColor:grpColors},
+      {label:`25년 ${periodLabel}`,data:grpNames.map(g=>pg[g]?pg[g].q1_25:0),backgroundColor:grpColors.map(c=>c+'60')}
+    ]},options:{responsive:true,plugins:{legend:{position:'bottom'},title:{display:true,text:`수익군별 ${periodLabel} 매출 비교 (억원)`,font:{size:13}}},scales:{y:{title:{display:true,text:'억원'}}}}});
 
-  if (pg['ê³ ììµêµ°']) {
+  if (pg['고수익군']) {
     new Chart(document.getElementById('chartGroupBar'),{type:'bar',data:{
-      labels:['ì ì²´','ê³ ììµêµ°(ê°~ë¤)','ì ì í'],
+      labels:['전체','고수익군(가~다)','신제품'],
       datasets:[
-        {label:'ì¤ì ',data:[totalQtd, pg['ê³ ììµêµ°'].q1_26, np.q1_26],backgroundColor:['#2b6cb0','#38a169','#805ad5']},
-        {label:'ëª©í',data:[D.total.qtd_sf, pg['ê³ ììµêµ°'].q1_sf, np.q1_sf],backgroundColor:['#2b6cb060','#38a16960','#805ad560'],borderColor:['#2b6cb0','#38a169','#805ad5'],borderWidth:1}
-      ]},options:{responsive:true,plugins:{legend:{position:'bottom'},title:{display:true,text:`ë§¤ì¶ êµ¬ì¡° ${periodLabel} ë¹êµ (ìµì)`,font:{size:13}}},scales:{y:{title:{display:true,text:'ìµì'}}}}});
+        {label:'실적',data:[totalQtd, pg['고수익군'].q1_26, np.q1_26],backgroundColor:['#2b6cb0','#38a169','#805ad5']},
+        {label:'목표',data:[D.total.qtd_sf, pg['고수익군'].q1_sf, np.q1_sf],backgroundColor:['#2b6cb060','#38a16960','#805ad560'],borderColor:['#2b6cb0','#38a169','#805ad5'],borderWidth:1}
+      ]},options:{responsive:true,plugins:{legend:{position:'bottom'},title:{display:true,text:`매출 구조 ${periodLabel} 비교 (억원)`,font:{size:13}}},scales:{y:{title:{display:true,text:'억원'}}}}});
   }
 
-  // êµ¬ì¡° íì´ë¸
+  // 구조 테이블
   const stb = document.querySelector('#structureTable tbody');
   const qtdY25All = D.total.act_25.slice(0,CM).reduce((a,b)=>a+b,0);
   const structRows = [
-    {name:'ETC ì ì²´', q1:totalQtd, sf_q1:D.total.qtd_sf, q1_25:qtdY25All, ann_sf:D.total.ann_sf, pct:100},
-    ...(pg['ê³ ììµêµ°'] ? [{name:'  ê³ ììµêµ°(ê°~ë¤)', ...pg['ê³ ììµêµ°'], pct:pg['ê³ ììµêµ°'].q1_26/totalQtd*100}] : []),
+    {name:'ETC 전체', q1:totalQtd, sf_q1:D.total.qtd_sf, q1_25:qtdY25All, ann_sf:D.total.ann_sf, pct:100},
+    ...(pg['고수익군'] ? [{name:'  고수익군(가~다)', ...pg['고수익군'], pct:pg['고수익군'].q1_26/totalQtd*100}] : []),
     ...grpNames.filter(g=>pg[g]).map(g=>({name:'    '+g, ...pg[g], pct:pg[g].q1_26/totalQtd*100})),
-    {name:'  ì ì í(3ëì´ë´)', ...np, pct:np.q1_26/totalQtd*100}
+    {name:'  신제품(3년이내)', ...np, pct:np.q1_26/totalQtd*100}
   ];
   structRows.forEach(r => {
     const q1 = r.q1_26 ?? r.q1 ?? 0;
@@ -645,7 +645,7 @@ function renderDashboard(D) {
       <td>${fmt(ann)}</td><td>${pct.toFixed(1)}%</td></tr>`;
   });
 
-  // ì ì í ìì¸
+  // 신제품 상세
   const npt = document.querySelector('#newProdTable tbody');
   D.new_product_details.forEach(p => {
     npt.innerHTML += `<tr><td>${p.name}</td><td style="text-align:center">${p.year}</td>
@@ -653,7 +653,7 @@ function renderDashboard(D) {
       <td>${tagA(p.ach)}</td><td>${fmt(p.ann_sf)}</td></tr>`;
   });
 
-  // === ì£¼ë ¥íëª© í­ ===
+  // === 주력품목 탭 ===
   const sel=document.getElementById('prodSelect');
   D.products.forEach(p=>{const o=document.createElement('option');o.value=p.name;o.textContent=p.name;sel.appendChild(o);});
   let prodChart;
@@ -661,12 +661,12 @@ function renderDashboard(D) {
     let ds;
     if(name==='all'){ds=D.products.slice(0,6).map((p,i)=>{const cs=[C.blue,C.green,C.red,C.orange,C.purple,C.teal];return{label:p.name,data:p.monthly_26.map((v,j)=>j<CM?v:null),borderColor:cs[i],pointRadius:4,tension:.3};});}
     else{const p=D.products.find(x=>x.name===name);ds=[
-      {label:'24ë',data:p.monthly_24,borderColor:C.gray,borderDash:[5,5],pointRadius:2,tension:.3},
-      {label:'25ë',data:p.monthly_25,borderColor:C.lb,pointRadius:3,tension:.3},
-      {label:'26ë',data:p.monthly_26.map((v,i)=>i<CM?v:null),borderColor:C.blue,borderWidth:3,pointRadius:5,tension:.3},
-      {label:'26ëSF',data:p.sf_monthly,borderColor:C.orange,borderDash:[3,3],pointRadius:2,tension:.3}];}
+      {label:'24년',data:p.monthly_24,borderColor:C.gray,borderDash:[5,5],pointRadius:2,tension:.3},
+      {label:'25년',data:p.monthly_25,borderColor:C.lb,pointRadius:3,tension:.3},
+      {label:'26년',data:p.monthly_26.map((v,i)=>i<CM?v:null),borderColor:C.blue,borderWidth:3,pointRadius:5,tension:.3},
+      {label:'26년SF',data:p.sf_monthly,borderColor:C.orange,borderDash:[3,3],pointRadius:2,tension:.3}];}
     if(prodChart)prodChart.destroy();
-    prodChart=new Chart(document.getElementById('chartProdTrend'),{type:'line',data:{labels:monthNames,datasets:ds},options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{title:{display:true,text:'ìµì'}}}}});
+    prodChart=new Chart(document.getElementById('chartProdTrend'),{type:'line',data:{labels:monthNames,datasets:ds},options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{title:{display:true,text:'억원'}}}}});
   }
   sel.addEventListener('change',()=>drawPT(sel.value));drawPT('all');
 
@@ -686,30 +686,30 @@ function renderDashboard(D) {
     ptb.innerHTML+=row;
   });
 
-  // === ìì¸¡ í­ ===
+  // === 예측 탭 ===
   const tf=D.total_forecast;
   const annFactor = 12/CM;
   document.getElementById('fcSummary').innerHTML=`
-    <div class="fc-item"><div class="fc-label">ìì¸¡â  ë¨ìì°íì°</div><div class="fc-val">${fmt(tf.fc1,1)}</div><div class="fc-sub">ìµì (ì¤ì Ã${annFactor.toFixed(1)})</div></div>
-    <div class="fc-item"><div class="fc-label">ìì¸¡â¡ ê³ì ì±ë°ì</div><div class="fc-val">${fmt(tf.fc2,1)}</div><div class="fc-sub">ìµì (25ëë¹ì¤)</div></div>
-    <div class="fc-item"><div class="fc-label">ìì¸¡â¢ ì¤ì +ìì¬SF</div><div class="fc-val">${fmt(tf.fc3,1)}</div><div class="fc-sub">ìµì</div></div>
-    <div class="fc-item"><div class="fc-label">ìì¸¡ íê· </div><div class="fc-val" style="color:var(--success)">${fmt(tf.fc_avg,1)}</div><div class="fc-sub">ìµì | SFëë¹ ${(tf.fc_avg/D.total.ann_sf*100).toFixed(1)}%</div></div>`;
+    <div class="fc-item"><div class="fc-label">예측① 단순연환산</div><div class="fc-val">${fmt(tf.fc1,1)}</div><div class="fc-sub">억원 (실적×${annFactor.toFixed(1)})</div></div>
+    <div class="fc-item"><div class="fc-label">예측② 계절성반영</div><div class="fc-val">${fmt(tf.fc2,1)}</div><div class="fc-sub">억원 (25년비중)</div></div>
+    <div class="fc-item"><div class="fc-label">예측③ 실적+잔여SF</div><div class="fc-val">${fmt(tf.fc3,1)}</div><div class="fc-sub">억원</div></div>
+    <div class="fc-item"><div class="fc-label">예측 평균</div><div class="fc-val" style="color:var(--success)">${fmt(tf.fc_avg,1)}</div><div class="fc-sub">억원 | SF대비 ${(tf.fc_avg/D.total.ann_sf*100).toFixed(1)}%</div></div>`;
 
   const fcP=D.products;
   new Chart(document.getElementById('chartForecast'),{type:'bar',data:{labels:fcP.map(p=>p.name),datasets:[
-    {label:'ìì¸¡â  ë¨ìì°íì°',data:fcP.map(p=>p.fc1),backgroundColor:C.blue+'80'},
-    {label:'ìì¸¡â¡ ê³ì ì±ë°ì',data:fcP.map(p=>p.fc2),backgroundColor:C.green+'80'},
-    {label:'ìì¸¡â¢ ì¤ì +SFìì¬',data:fcP.map(p=>p.fc3),backgroundColor:C.orange+'80'}
-  ]},options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{title:{display:true,text:'ìµì'}}}}});
+    {label:'예측① 단순연환산',data:fcP.map(p=>p.fc1),backgroundColor:C.blue+'80'},
+    {label:'예측② 계절성반영',data:fcP.map(p=>p.fc2),backgroundColor:C.green+'80'},
+    {label:'예측③ 실적+SF잔여',data:fcP.map(p=>p.fc3),backgroundColor:C.orange+'80'}
+  ]},options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{title:{display:true,text:'억원'}}}}});
 
   new Chart(document.getElementById('chartFcVsSF'),{type:'bar',data:{labels:fcP.map(p=>p.name),datasets:[
-    {label:'ìì¸¡íê· ',data:fcP.map(p=>p.fc_avg),backgroundColor:C.blue},
-    {label:'SFì°ê°ëª©í',data:fcP.map(p=>p.ann_sf),backgroundColor:C.orange+'40',borderColor:C.orange,borderWidth:2}
-  ]},options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{title:{display:true,text:'ìµì'}}}}});
+    {label:'예측평균',data:fcP.map(p=>p.fc_avg),backgroundColor:C.blue},
+    {label:'SF연간목표',data:fcP.map(p=>p.ann_sf),backgroundColor:C.orange+'40',borderColor:C.orange,borderWidth:2}
+  ]},options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{title:{display:true,text:'억원'}}}}});
 
   const ftb=document.querySelector('#fcTable tbody');
   ftb.innerHTML+=`<tr style="background:#ebf8ff;font-weight:700">
-    <td>ETC ì ì²´</td><td>${fmt(D.total.qtd_26)}</td><td>${fmt(tf.fc1)}</td><td>${fmt(tf.fc2)}</td><td>${fmt(tf.fc3)}</td>
+    <td>ETC 전체</td><td>${fmt(D.total.qtd_26)}</td><td>${fmt(tf.fc1)}</td><td>${fmt(tf.fc2)}</td><td>${fmt(tf.fc3)}</td>
     <td style="color:var(--success)">${fmt(tf.fc_avg)}</td><td>${fmt(D.total.ann_sf)}</td>
     <td>${tagA(tf.fc_avg/D.total.ann_sf*100)}</td>
     <td class="pct-up">+${((tf.fc_avg/D.total.ann_25-1)*100).toFixed(1)}%</td></tr>`;
@@ -723,15 +723,15 @@ function renderDashboard(D) {
       <td class="${pctC(yoyP2)}">${yoyP2!=null?fmtP(yoyP2):'-'}</td></tr>`;
   });
 
-  // === ë¦¬ì¤í¬/ê¸°í ===
+  // === 리스크/기회 ===
   const opps=D.all_products
     .filter(p=>!p.is_demarketing && p.qtd_diff!=null && p.qtd_diff>2 && p.qtd_26>=3)
     .sort((a,b)=>b.qtd_diff-a.qtd_diff).slice(0,10);
   const otb=document.querySelector('#oppTable tbody');
   opps.forEach(p=>{
-    let ins=p.qtd_ach&&p.qtd_ach>105?'ëª©íì´ê³¼, ìí¥ê²í°':p.qtd_diff>5?'ê³ ì±ì¥ ì§ì':'ìì ì  ì±ì¥ì¸';
+    let ins=p.qtd_ach&&p.qtd_ach>105?'목표초과, 상향검토':p.qtd_diff>5?'고성장 지속':'안정적 성장세';
     otb.innerHTML+=`<tr><td>${p.name}</td><td>${fmt(p.qtd_26)}</td>
-      <td class="pct-up">+${fmt(p.qtd_diff)}ìµ</td>
+      <td class="pct-up">+${fmt(p.qtd_diff)}억</td>
       <td>${tagA(p.qtd_ach)}</td><td>${ins}</td></tr>`;
   });
 
@@ -743,9 +743,9 @@ function renderDashboard(D) {
     .sort((a,b)=>(a.qtd_diff||0)-(b.qtd_diff||0)).slice(0,10);
   const rtb=document.querySelector('#riskTable tbody');
   risks.forEach(p=>{
-    let iss=p.qtd_ach&&p.qtd_ach<70?'ëª©í í¬ë¯¸ë¬':p.qtd_diff<-3?'ë§¤ì¶ í° í­ ê°ì':'ëª©íëë¹ ë¶ì§';
+    let iss=p.qtd_ach&&p.qtd_ach<70?'심각 목표미달':p.qtd_diff<-3?'매출 큰 폭 감소':'목표대비 부진';
     rtb.innerHTML+=`<tr><td>${p.name}</td><td>${fmt(p.qtd_26)}</td><td>${tagA(p.qtd_ach)}</td>
-      <td class="pct-down">${fmt(p.qtd_diff)}ìµ</td><td>${iss}</td></tr>`;
+      <td class="pct-down">${fmt(p.qtd_diff)}억</td><td>${iss}</td></tr>`;
   });
 
   const anoms=D.all_products
@@ -753,13 +753,13 @@ function renderDashboard(D) {
     .sort((a,b)=>Math.abs(b.last_mom)-Math.abs(a.last_mom)).slice(0,10);
   const atb=document.querySelector('#anomalyTable tbody');
   anoms.forEach(p=>{
-    const typ=p.last_mom>0?'<span class="tag tag-green">ê¸ë±</span>':'<span class="tag tag-red">ê¸ë½</span>';
+    const typ=p.last_mom>0?'<span class="tag tag-green">급등</span>':'<span class="tag tag-red">급락</span>';
     atb.innerHTML+=`<tr><td>${p.name}</td><td>${fmt(p.prevM)}</td><td>${fmt(p.lastM)}</td>
       <td class="${pctC(p.last_mom)}">${fmtP(p.last_mom)}</td><td>${fmt(p.qtd_26)}</td>
       <td class="${pctC(p.qtd_yoy)}">${fmtP(p.qtd_yoy)}</td><td>${typ}</td></tr>`;
   });
 
-  // === ì ì²´ íëª© í­ ===
+  // === 전체 품목 탭 ===
   let allD=[...D.all_products];
   function renderAll(){
     const s=document.getElementById('searchAll').value.toLowerCase();
@@ -772,7 +772,7 @@ function renderDashboard(D) {
     f.forEach((p,i)=>{
       let row = `<tr${p.is_key?' style="background:#ebf8ff"':''}>
         <td style="text-align:center">${i+1}</td>
-        <td>${p.name}${p.is_key?' <span class="tag tag-blue">ì£¼ë ¥</span>':''}</td>`;
+        <td>${p.name}${p.is_key?' <span class="tag tag-blue">주력</span>':''}</td>`;
       for(let m=0;m<CM;m++) row += `<td>${fmt(p.monthly_26[m])}</td>`;
       row += `<td style="font-weight:700">${fmt(p.qtd_26)}</td><td>${fmt(p.qtd_sf)}</td>
         <td>${tagA(p.qtd_ach)}</td>
@@ -791,7 +791,7 @@ function renderDashboard(D) {
 }
 
 // ========================================
-// 4. ë©ì¸ ì¤í
+// 4. 메인 실행
 // ========================================
 async function main() {
   const overlay = document.getElementById('loadingOverlay');
@@ -801,18 +801,18 @@ async function main() {
     let D;
 
     if (IS_DEMO) {
-      // ë°ëª¨ ëª¨ë: êµ¬ê¸ìí¸ ë¯¸ì ì  ì ìë´ ë©ìì§
-      statusEl.textContent = 'êµ¬ê¸ìí¸ê° ì°ê²°ëì§ ìììµëë¤. ë°ëª¨ ë°ì´í°ë¥¼ ì¬ì©í©ëë¤.';
+      // 데모 모드: 구글시트 미설정 시 안내 메시지
+      statusEl.textContent = '구글시트가 연결되지 않았습니다. 데모 데이터를 사용합니다.';
 
-      // ë°ëª¨ì© ë´ì¥ ë°ì´í° (ê¸°ì¡´ ëìë³´ë ë°ì´í° ì¶ì¸ë³¸)
-      // ì¤ì  ì´ì ììë ì´ ë¶ë¶ì´ êµ¬ê¸ìí¸ìì ë¡ëë©ëë¤
-      const demoResponse = await fetch(window.location.href.replace(/[^/]*$/, '') + '26ë_ì¤ì¶ë¶ì_ëìë³´ë.html');
+      // 데모용 내장 데이터 (기존 대시보드 데이터 축약본)
+      // 실제 운영 시에는 이 부분이 구글시트에서 로드됩니다
+      const demoResponse = await fetch(window.location.href.replace(/[^/]*$/, '') + '26년_매출분석_대시보드.html');
       if (demoResponse.ok) {
         const html = await demoResponse.text();
         const match = html.match(/const D = ({[\s\S]*?});\s*\nconst fmt/);
         if (match) {
           D = JSON.parse(match[1]);
-          // ê¸°ì¡´ íì â ì íì í¸í
+          // 기존 형식 → 새 형식 호환
           D.CM = CONFIG.CLOSING_MONTH;
           D.total.qtd_26 = D.total.q1_26;
           D.total.qtd_sf = D.total.q1_sf;
@@ -834,49 +834,49 @@ async function main() {
       }
 
       if (!D) {
-        // ë°ëª¨ ë°ì´í°ë ìì¼ë© ìë¬ íì
+        // 데모 데이터도 없으면 에러 표시
         overlay.innerHTML = `<div class="error-box">
-          <h2>êµ¬ê¸ìí¸ ì°ê²° íì</h2>
-          <p style="margin:12px 0;color:var(--muted);">ëìë³´ëë¥¼ ì¬ì©íë ¤ë©´ êµ¬ê¸ìí¸ IDë¥¼ ì¤ì í´ì£¼ì¸ì.</p>
+          <h2>구글시트 연결 필요</h2>
+          <p style="margin:12px 0;color:var(--muted);">대시보드를 사용하려면 구글시트 ID를 설정해주세요.</p>
           <div style="text-align:left;background:#f7fafc;padding:16px;border-radius:8px;font-size:13px;">
-            <p><b>ì¤ì  ë°©ë²:</b></p>
+            <p><b>설정 방법:</b></p>
             <ol style="margin:8px 0 0 20px;line-height:2;">
-              <li>êµ¬ê¸ìí¸ì ííë¦¿ ë°ì´í°ë¥¼ ìë¡ë</li>
-              <li>íì¼ â ê³µì  â ì¹ì ê²ì â CSV ì í â ê²ì</li>
-              <li>ì´ HTML íì¼ì <code>CONFIG.SHEET_ID</code>ì ìí¸ ID ìë ¥</li>
-              <li>íì´ì§ ìë¡ê³ ì¹¨</li>
+              <li>구글시트에 템플릿 데이터를 업로드</li>
+              <li>파일 → 공유 → 웹에 게시 → CSV 선택 → 게시</li>
+              <li>이 HTML 파일의 <code>CONFIG.SHEET_ID</code>에 시트 ID 입력</li>
+              <li>페이지 새로고침</li>
             </ol>
           </div>
         </div>`;
         return;
       }
 
-      document.getElementById('dataSource').innerHTML = 'â ï¸ <b>ë°ëª¨ ëª¨ë</b> - êµ¬ê¸ìí¸ë¥¼ ì°ê²°íë©´ ì¤ìê° ë°ì´í°ë¡ ì íë©ëë¤';
+      document.getElementById('dataSource').innerHTML = '⚠️ <b>데모 모드</b> - 구글시트를 연결하면 실시간 데이터로 전환됩니다';
 
     } else {
-      // ì¤ì  ëª¨ë: êµ¬ê¸ìí¸ìì ë°ì´í° ë¡ë
-      statusEl.textContent = 'ì¤ì ë°ì´í° ìí¸ë¥¼ ë¶ë¬ì¤ë ì¤...';
+      // 실제 모드: 구글시트에서 데이터 로드
+      statusEl.textContent = '실적데이터 시트를 불러오는 중...';
       const salesData = await fetchSheetCSV(CONFIG.SHEET_SALES);
 
-      statusEl.textContent = 'SFëª©í ìí¸ë¥¼ ë¶ë¬ì¤ë ì¤...';
+      statusEl.textContent = 'SF목표 시트를 불러오는 중...';
       const sfData = await fetchSheetCSV(CONFIG.SHEET_SF);
 
       let groupData = null;
       try {
-        statusEl.textContent = 'ììµêµ°ë§¤í ìí¸ë¥¼ ë¶ë¬ì¤ë ì¤...';
+        statusEl.textContent = '수익군매핑 시트를 불러오는 중...';
         groupData = await fetchSheetCSV(CONFIG.SHEET_GROUP);
-      } catch(e) { /* ììµêµ° ë§¤í ìí¸ê° ìì´ë ì§í */ }
+      } catch(e) { /* 수익군 매핑 시트가 없어도 진행 */ }
 
-      statusEl.textContent = 'ë°ì´í° ë³í ì¤...';
+      statusEl.textContent = '데이터 변환 중...';
       D = transformData(salesData, sfData, groupData);
 
-      document.getElementById('dataSource').innerHTML = `ð <b>êµ¬ê¸ìí¸ ì°ë</b> | ìí¸ ID: ${CONFIG.SHEET_ID.substring(0,12)}...`;
+      document.getElementById('dataSource').innerHTML = `📊 <b>구글시트 연동</b> | 시트 ID: ${CONFIG.SHEET_ID.substring(0,12)}...`;
     }
 
-    document.getElementById('lastUpdate').textContent = `ë§ì§ë§ ìë°ì´í¸: ${new Date().toLocaleString('ko-KR')}  `;
+    document.getElementById('lastUpdate').textContent = `마지막 업데이트: ${new Date().toLocaleString('ko-KR')}  `;
     document.getElementById('configBar').style.display = 'flex';
 
-    statusEl.textContent = 'ëìë³´ëë¥¼ ë ëë§ ì¤...';
+    statusEl.textContent = '대시보드를 렌더링 중...';
     renderDashboard(D);
 
     overlay.style.display = 'none';
@@ -884,23 +884,23 @@ async function main() {
   } catch (err) {
     console.error('Dashboard Error:', err);
     overlay.innerHTML = `<div class="error-box">
-      <h2>ë°ì´í° ë¡ë© ì¤í¨</h2>
-      <p style="margin:12px 0;color:var(--muted);">${err.message || 'êµ¬ê¸ìí¸ ì ê·¼ì ë¬¸ì ê° ë°ìíìµëë¤.'}</p>
+      <h2>데이터 로딩 실패</h2>
+      <p style="margin:12px 0;color:var(--muted);">${err.message || '구글시트 접근에 문제가 발생했습니다.'}</p>
       <div style="text-align:left;background:#f7fafc;padding:16px;border-radius:8px;font-size:13px;margin-top:16px;">
-        <p><b>íì¸ ì¬í­:</b></p>
+        <p><b>확인 사항:</b></p>
         <ol style="margin:8px 0 0 20px;line-height:2;">
-          <li>êµ¬ê¸ìí¸ IDê° ì¬ë°ë¥¸ì§ íì¸</li>
-          <li>ìí¸ê° 'ì¹ì ê²ì'ëìëì§ íì¸</li>
-          <li>ìí¸ í­ ì´ë¦ì´ ì ííì§ íì¸ (ì¤ì ë°ì´í°, SFëª©í, ììµêµ°ë§¤í)</li>
-          <li>ì¸í°ë· ì°ê²° ìí íì¸</li>
+          <li>구글시트 ID가 올바른지 확인</li>
+          <li>시트가 '웹에 게시'되었는지 확인</li>
+          <li>시트 탭 이름이 정확한지 확인 (실적데이터, SF목표, 수익군매핑)</li>
+          <li>인터넷 연결 상태 확인</li>
         </ol>
       </div>
-      <button onclick="location.reload()" style="margin-top:16px;padding:10px 24px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;">ë¤ì ìë</button>
+      <button onclick="location.reload()" style="margin-top:16px;padding:10px 24px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;">다시 시도</button>
     </div>`;
   }
 }
 
-// ì¤í
+// 실행
 main();
 </script>
 </body>
