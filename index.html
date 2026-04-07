@@ -185,14 +185,24 @@ const IS_DEMO = CONFIG.SHEET_ID === 'YOUR_SHEET_ID_HERE';
   </div>
 
   <div class="panel" id="panel-risk">
+    <div class="card" style="margin-bottom:16px;background:linear-gradient(135deg,#ebf8ff,#f0fff4);border-left:4px solid var(--accent);">
+      <h3 style="margin-bottom:8px;">선정 기준 안내</h3>
+      <div style="font-size:12px;color:var(--text);line-height:1.8;">
+        <b>비교 기준:</b> <span id="criteriaMonth" style="color:var(--accent);font-weight:700;">마감월</span> 매출 vs 직전 3개월 평균매출<br>
+        <b>성장금액</b> = 마감월 매출 - 직전 3개월 평균매출 &nbsp;|&nbsp; <b>성장율</b> = (마감월 매출 ÷ 직전 3개월 평균매출 - 1) × 100<br>
+        <span style="color:var(--success);font-weight:600;">▲ 기회 품목:</span> 성장금액 > 0 (마감월 매출이 직전 3개월 평균보다 증가한 품목) &nbsp;|&nbsp;
+        <span style="color:var(--danger);font-weight:600;">▼ 리스크 품목:</span> 성장금액 < 0 (마감월 매출이 직전 3개월 평균보다 감소한 품목)<br>
+        <span style="color:var(--muted);font-size:11px;">※ 디마케팅 품목 제외 | 마감월 또는 직전 3개월 평균이 0.3억 이상인 품목만 표시 | 성장금액 절대값 순 정렬</span>
+      </div>
+    </div>
     <div class="grid-2">
       <div class="card">
-        <h3 style="color:var(--success);">▲ 기회 품목 (고성장)</h3>
-        <table id="oppTable"><thead><tr><th>품목</th><th>실적</th><th>증감액</th><th>달성율</th><th>시사점</th></tr></thead><tbody></tbody></table>
+        <h3 style="color:var(--success);">▲ 기회 품목 (직전 3개월 평균 대비 성장)</h3>
+        <table id="oppTable"><thead><tr><th>품목</th><th>전월매출</th><th>3개월평균</th><th>성장금액</th><th>성장율</th><th>시사점</th></tr></thead><tbody></tbody></table>
       </div>
       <div class="card">
-        <h3 style="color:var(--danger);">▼ 리스크 품목 (목표미달/역성장)</h3>
-        <table id="riskTable"><thead><tr><th>품목</th><th>실적</th><th>달성율</th><th>증감액</th><th>이슈</th></tr></thead><tbody></tbody></table>
+        <h3 style="color:var(--danger);">▼ 리스크 품목 (직전 3개월 평균 대비 하락)</h3>
+        <table id="riskTable"><thead><tr><th>품목</th><th>전월매출</th><th>3개월평균</th><th>감소금액</th><th>감소율</th><th>이슈</th></tr></thead><tbody></tbody></table>
       </div>
     </div>
     <div class="section"><div class="card">
@@ -335,6 +345,17 @@ function transformData(salesData, sfData, groupData) {
     // 증감액
     const qtd_diff = qtd_26 - qtd_25;
 
+    // 직전 3개월 평균매출 대비 전월 성장금액 분석
+    // 전월매출 = 마감월 매출, 직전3개월 = 마감월 이전 3개월 평균
+    const prev3vals = [];
+    for (let mi = CM - 2; mi >= CM - 4; mi--) {
+      if (mi >= 0) prev3vals.push(m26[mi]);
+      else prev3vals.push(m25[12 + mi]); // 전년도 데이터 활용
+    }
+    const prev3avg = prev3vals.length > 0 ? prev3vals.reduce((a,b) => a+b, 0) / prev3vals.length : 0;
+    const growthAmt = lastM - prev3avg;                                   // 성장금액 (억원)
+    const growthPct = prev3avg > 0 ? ((lastM / prev3avg - 1) * 100) : null; // 성장율 (%)
+
     const product = {
       name, is_key: isKey, group, is_demarketing: isDemkt, new_year: newYear,
       monthly_26: m26, monthly_25: m25, monthly_24: m24,
@@ -343,7 +364,8 @@ function transformData(salesData, sfData, groupData) {
       jan: m26[0], feb: m26[1], mar: m26[2],
       lastM, prevM, last_mom,
       remaining_monthly, next_sf,
-      fc1, fc2, fc3, fc_avg, qtd_diff
+      fc1, fc2, fc3, fc_avg, qtd_diff,
+      prev3avg, growthAmt, growthPct, prev3vals
     };
 
     // 월별 키 동적 생성 (마감월 기준)
@@ -723,29 +745,30 @@ function renderDashboard(D) {
       <td class="${pctC(yoyP2)}">${yoyP2!=null?fmtP(yoyP2):'-'}</td></tr>`;
   });
 
-  // === 리스크/기회 ===
+  // === 리스크/기회 (직전 3개월 평균 대비 전월 성장금액 기준) ===
+  const monthNames2=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  document.getElementById('criteriaMonth').textContent = monthNames2[CM-1];
+
   const opps=D.all_products
-    .filter(p=>!p.is_demarketing && p.qtd_diff!=null && p.qtd_diff>2 && p.qtd_26>=3)
-    .sort((a,b)=>b.qtd_diff-a.qtd_diff).slice(0,10);
+    .filter(p=>!p.is_demarketing && p.growthAmt>0 && (p.lastM>=0.3 || p.prev3avg>=0.3))
+    .sort((a,b)=>b.growthAmt-a.growthAmt).slice(0,12);
   const otb=document.querySelector('#oppTable tbody');
   opps.forEach(p=>{
-    let ins=p.qtd_ach&&p.qtd_ach>105?'목표초과, 상향검토':p.qtd_diff>5?'고성장 지속':'안정적 성장세';
-    otb.innerHTML+=`<tr><td>${p.name}</td><td>${fmt(p.qtd_26)}</td>
-      <td class="pct-up">+${fmt(p.qtd_diff)}억</td>
-      <td>${tagA(p.qtd_ach)}</td><td>${ins}</td></tr>`;
+    let ins=p.growthPct>50?'급성장, 추세확인 필요':p.growthPct>20?'뚜렷한 성장세':p.growthPct>0?'안정적 성장':'소폭 개선';
+    otb.innerHTML+=`<tr><td>${p.name}</td><td>${fmt(p.lastM)}</td><td>${fmt(p.prev3avg)}</td>
+      <td class="pct-up">+${fmt(p.growthAmt)}억</td>
+      <td class="pct-up">+${p.growthPct!=null?p.growthPct.toFixed(1):'‑'}%</td><td>${ins}</td></tr>`;
   });
 
   const risks=D.all_products
-    .filter(p=>!p.is_demarketing && (
-      (p.qtd_ach!=null && p.qtd_ach<85 && p.qtd_sf>=3) ||
-      (p.qtd_diff!=null && p.qtd_diff<-1 && p.qtd_25>=2)
-    ))
-    .sort((a,b)=>(a.qtd_diff||0)-(b.qtd_diff||0)).slice(0,10);
+    .filter(p=>!p.is_demarketing && p.growthAmt<0 && (p.lastM>=0.3 || p.prev3avg>=0.3))
+    .sort((a,b)=>a.growthAmt-b.growthAmt).slice(0,12);
   const rtb=document.querySelector('#riskTable tbody');
   risks.forEach(p=>{
-    let iss=p.qtd_ach&&p.qtd_ach<70?'심각 목표미달':p.qtd_diff<-3?'매출 큰 폭 감소':'목표대비 부진';
-    rtb.innerHTML+=`<tr><td>${p.name}</td><td>${fmt(p.qtd_26)}</td><td>${tagA(p.qtd_ach)}</td>
-      <td class="pct-down">${fmt(p.qtd_diff)}억</td><td>${iss}</td></tr>`;
+    let iss=p.growthPct<-30?'매출 급감, 긴급점검':p.growthPct<-15?'하락폭 확대 주의':'소폭 하락, 모니터링';
+    rtb.innerHTML+=`<tr><td>${p.name}</td><td>${fmt(p.lastM)}</td><td>${fmt(p.prev3avg)}</td>
+      <td class="pct-down">${fmt(p.growthAmt)}억</td>
+      <td class="pct-down">${p.growthPct!=null?p.growthPct.toFixed(1):'‑'}%</td><td>${iss}</td></tr>`;
   });
 
   const anoms=D.all_products
