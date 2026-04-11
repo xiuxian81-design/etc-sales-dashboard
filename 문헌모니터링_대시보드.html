@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETC 문헌모니터링 | 한올바이오파마</title>
+<style>
+/* ─── 기본 리셋 & 변수 ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy  : #003366;
+  --navy2 : #1a4a7a;
+  --orange: #E87722;
+  --blue  : #1A5276;
+  --green : #1e7e34;
+  --red   : #CC0000;
+  --gray1 : #f8f9fa;
+  --gray2 : #e9ecef;
+  --gray3 : #dee2e6;
+  --gray4 : #6c757d;
+  --white : #ffffff;
+  --shadow: 0 2px 8px rgba(0,0,0,.10);
+  --radius: 10px;
+}
+body { font-family: 'Apple SD Gothic Neo','Malgun Gothic',sans-serif; background:#f0f4f8; color:#222; font-size:14px; }
+
+/* ─── 헤더 ─── */
+header {
+  background: var(--navy);
+  color: var(--white);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  position: sticky; top: 0; z-index: 100;
+}
+.header-left { display: flex; align-items: center; gap: 14px; }
+.logo-badge {
+  background: var(--orange);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: .5px;
+}
+header h1 { font-size: 17px; font-weight: 700; letter-spacing: -.3px; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.month-select {
+  background: rgba(255,255,255,.15);
+  color: var(--white);
+  border: 1px solid rgba(255,255,255,.3);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+}
+.month-select option { background: var(--navy); color: var(--white); }
+.total-badge {
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: #cde;
+}
+
+/* ─── 세션 탭 ─── */
+.tabs-wrap {
+  background: var(--white);
+  border-bottom: 1px solid var(--gray3);
+  padding: 0 32px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.tabs { display: inline-flex; gap: 0; }
+.tab-btn {
+  padding: 14px 22px;
+  border: none;
+  background: none;
+  color: var(--gray4);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: var(--navy); background: var(--gray1); }
+.tab-btn.active { color: var(--navy); border-bottom-color: var(--orange); font-weight: 700; }
+.tab-new-dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  background: var(--orange);
+  border-radius: 50%;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+/* ─── 메인 컨테이너 ─── */
+main { max-width: 960px; margin: 28px auto; padding: 0 16px; }
+
+/* ─── 세션 요약 카드 ─── */
+.session-summary {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 16px 22px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.session-title { font-size: 16px; font-weight: 700; color: var(--navy); }
+.session-pm { font-size: 12px; color: var(--gray4); margin-top: 2px; }
+.session-stats { display: flex; gap: 12px; flex-shrink: 0; }
+.stat-box { text-align: center; }
+.stat-num { font-size: 22px; font-weight: 700; color: var(--navy); line-height: 1; }
+.stat-label { font-size: 10px; color: var(--gray4); margin-top: 2px; }
+.stat-new .stat-num { color: var(--orange); }
+
+/* ─── 로딩 & 빈 상태 ─── */
+.loading { text-align: center; padding: 60px; color: var(--gray4); }
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--gray3);
+  border-top-color: var(--navy);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+  margin: 0 auto 14px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty { text-align: center; padding: 50px; color: var(--gray4); font-size: 13px; }
+
+/* ─── 논문 카드 ─── */
+.paper-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+  overflow: hidden;
+  border-left: 4px solid var(--gray3);
+  transition: box-shadow .2s;
+}
+.paper-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.13); }
+.paper-card.star3 { border-left-color: var(--orange); }
+.paper-card.star2 { border-left-color: var(--blue); }
+.paper-card.star1 { border-left-color: var(--gray3); }
+
+.paper-header {
+  padding: 14px 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.paper-header:hover { background: var(--gray1); }
+
+.paper-meta { flex: 1; min-width: 0; }
+.paper-badges { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; align-items: center; }
+
+/* 배지 스타일 */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+.badge-new    { background: #fff3e0; color: var(--orange); border: 1px solid var(--orange); }
+.badge-direct { background: #e8f4fd; color: var(--blue);   border: 1px solid var(--blue); }
+.badge-ref    { background: #f3f3f3; color: #555;          border: 1px solid #ccc; }
+.badge-rct    { background: #e8f5e9; color: var(--green);  border: 1px solid var(--green); }
+.badge-meta   { background: #e8f5e9; color: var(--green);  border: 1px solid var(--green); }
+.badge-design { background: #f3f3f3; color: #555;          border: 1px solid #ccc; }
+
+/* 중요도 별 */
+.stars { font-size: 13px; letter-spacing: 1px; }
+.star-filled  { color: #f5a623; }
+.star-empty   { color: #ddd; }
+
+.paper-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  line-height: 1.5;
+  word-break: break-word;
+}
+.paper-journal {
+  font-size: 12px;
+  color: var(--gray4);
+  margin-top: 4px;
+}
+
+.expand-icon {
+  color: var(--gray4);
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: transform .2s;
+}
+.paper-card.open .expand-icon { transform: rotate(180deg); }
+
+/* ─── 논문 상세 (아코디언) ─── */
+.paper-body {
+  display: none;
+  padding: 0 18px 18px;
+  border-top: 1px solid var(--gray2);
+}
+.paper-card.open .paper-body { display: block; }
+
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray4);
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  margin: 14px 0 6px;
+}
+.section-content {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: #333;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.key-point-box {
+  background: #fff8f0;
+  border-left: 3px solid var(--orange);
+  border-radius: 0 6px 6px 0;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: #333;
+  white-space: pre-wrap;
+}
+
+/* ─── 하단 액션 버튼 ─── */
+.paper-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  transition: all .15s;
+}
+.btn-primary { background: var(--navy); color: var(--white); }
+.btn-primary:hover { background: var(--navy2); }
+.btn-outline {
+  background: var(--white);
+  color: var(--navy);
+  border: 1px solid var(--gray3);
+}
+.btn-outline:hover { background: var(--gray1); }
+.btn-bd {
+  background: var(--white);
+  color: var(--orange);
+  border: 1px solid var(--orange);
+}
+.btn-bd:hover   { background: #fff3e0; }
+.btn-bd.done    { background: #fff3e0; color: var(--orange); cursor: default; }
+.btn-bd.loading { opacity: .6; cursor: wait; }
+.btn-drive { background: #e8f4fd; color: var(--blue); border: 1px solid var(--blue); }
+
+/* ─── 에러 알림 ─── */
+.toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: #333;
+  color: var(--white);
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  opacity: 0;
+  transition: opacity .3s;
+  z-index: 999;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+/* ─── 반응형 ─── */
+@media (max-width: 600px) {
+  header { padding: 0 16px; }
+  header h1 { font-size: 15px; }
+  main { padding: 0 8px; margin: 16px auto; }
+  .tabs-wrap { padding: 0 8px; }
+  .tab-btn { padding: 12px 14px; font-size: 12px; }
+  .session-summary { flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<!-- ──────────── 헤더 ──────────── -->
+<header>
+  <div class="header-left">
+    <span class="logo-badge">한올바이오파마</span>
+    <h1>ETC 문헌모니터링</h1>
+  </div>
+  <div class="header-right">
+    <select class="month-select" id="monthSelect" onchange="onMonthChange()">
+      <option value="">전체 보기</option>
+    </select>
+    <span class="total-badge" id="totalBadge">— 편</span>
+  </div>
+</header>
+
+<!-- ──────────── 세션 탭 ──────────── -->
+<div class="tabs-wrap">
+  <div class="tabs" id="tabContainer"></div>
+</div>
+
+<!-- ──────────── 메인 ──────────── -->
+<main id="mainContent">
+  <div class="loading" id="loadingEl">
+    <div class="spinner"></div>
+    <div>데이터를 불러오는 중입니다…</div>
+  </div>
+</main>
+
+<!-- ──────────── 토스트 ──────────── -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════
+   ★ 설정값 — 여기만 수정하면 됩니다 ★
+══════════════════════════════════════════ */
+const CONFIG = {
+  SHEET_ID      : '1TrG81tjb_8iakCm5IwwFH5EFoNUNienhyPT9aE8ya-Q',
+  SHEET_NAME    : '논문DB',
+  SCRIPT_URL    : 'https://script.google.com/macros/s/AKfycbzowQMXLavFOx-6hXYn2ESwHVc6nmsFOlEx4JOyTDpONBrr4FQNaK3TRAfqi5gR2v6S/exec',
+  DEFAULT_FORMAT: 'CLB'   // 기본 BD 포맷 (CLB 또는 BT)
+};
+
+/* ──────────── 세션 정의 ──────────── */
+const SESSIONS = [
+  { key: '장내미생물',      label: '🦠 장내미생물',       pm: '임범성·박지현' },
+  { key: 'Gut-Liver Axis', label: '🫁 Gut-Liver Axis',  pm: '임범성·박지현' },
+  { key: '탈모치료',        label: '💇 탈모치료',         pm: '강태석' },
+  { key: '비뇨기·종양·CPP', label: '🏥 비뇨기·종양·CPP', pm: '김지완' },
+  { key: '골대사·신경',     label: '🦴 골대사·신경',      pm: '최우열·임범성' }
+];
+
+/* ──────────── 전역 상태 ──────────── */
+let allPapers   = [];
+let activeMonth = '';
+let activeTab   = SESSIONS[0].key;
+
+/* ══════════════════════════════════════════
+   데이터 로딩 (Google Sheets gviz/tq)
+══════════════════════════════════════════ */
+function loadData() {
+  const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(CONFIG.SHEET_NAME)}`;
+  const script = document.createElement('script');
+
+  // gviz 기본 콜백
+  window.google = window.google || {};
+  window.google.visualization = window.google.visualization || {};
+  window.google.visualization.Query = window.google.visualization.Query || {};
+  window.google.visualization.Query.setResponse = function(resp) {
+    if (resp.status !== 'ok') {
+      showError('시트 데이터를 불러오지 못했습니다. SHEET_ID를 확인해주세요.');
+      return;
+    }
+    parseGvizData(resp.table);
+  };
+
+  script.onerror = () => showError('Google Sheets 연결 실패. 시트 공유 설정을 확인해주세요.');
+  script.src = url;
+  document.head.appendChild(script);
+}
+
+function parseGvizData(table) {
+  const cols = table.cols.map(c => c.label);
+  allPapers  = table.rows
+    .filter(r => r.c && r.c[0] && r.c[0].v)
+    .map(r => {
+      const g = (i) => (r.c[i] && r.c[i].v !== null && r.c[i].v !== undefined) ? String(r.c[i].v) : '';
+      return {
+        title    : g(0),
+        isNew    : g(1) === 'NEW',
+        session  : g(2),
+        stars    : g(3),
+        evidence : g(4),
+        journal  : g(5),
+        pubDate  : g(6),
+        design   : g(7),
+        url      : g(8),
+        pm       : g(9),
+        month    : g(10),
+        summary  : g(11),
+        keyPoint : g(12),
+        bdReq    : g(13).toLowerCase() === 'true',
+        bdDone   : g(14).toLowerCase() === 'true',
+        bdFormat : g(15),
+        driveLink: g(16)
+      };
+    });
+
+  initMonthFilter();
+  buildTabs();
+  renderSession();
+  document.getElementById('loadingEl').style.display = 'none';
+}
+
+/* ══════════════════════════════════════════
+   월 필터 초기화
+══════════════════════════════════════════ */
+function initMonthFilter() {
+  const months = [...new Set(allPapers.map(p => p.month).filter(Boolean))].sort().reverse();
+  const sel    = document.getElementById('monthSelect');
+  months.forEach(m => {
+    const opt  = document.createElement('option');
+    opt.value  = m;
+    opt.text   = m;
+    sel.appendChild(opt);
+  });
+  // 최신 월 자동 선택
+  if (months.length) {
+    activeMonth   = months[0];
+    sel.value     = activeMonth;
+  }
+}
+
+function onMonthChange() {
+  activeMonth = document.getElementById('monthSelect').value;
+  buildTabs();
+  renderSession();
+}
+
+/* ══════════════════════════════════════════
+   세션 탭 렌더링
+══════════════════════════════════════════ */
+function buildTabs() {
+  const filtered = getFiltered();
+  const wrap = document.getElementById('tabContainer');
+  wrap.innerHTML = '';
+
+  SESSIONS.forEach(s => {
+    const papers   = filtered.filter(p => p.session === s.key);
+    const hasNew   = papers.some(p => p.isNew);
+    const btn      = document.createElement('button');
+    btn.className  = 'tab-btn' + (s.key === activeTab ? ' active' : '');
+    btn.innerHTML  = s.label + (hasNew ? '<span class="tab-new-dot"></span>' : '') +
+                     ` <span style="font-size:11px;color:#aaa;font-weight:400">(${papers.length})</span>`;
+    btn.onclick    = () => { activeTab = s.key; buildTabs(); renderSession(); };
+    wrap.appendChild(btn);
+  });
+}
+
+/* ══════════════════════════════════════════
+   메인 렌더링
+══════════════════════════════════════════ */
+function getFiltered() {
+  return allPapers.filter(p => !activeMonth || p.month === activeMonth);
+}
+
+function renderSession() {
+  const filtered = getFiltered();
+  const main     = document.getElementById('mainContent');
+  const session  = SESSIONS.find(s => s.key === activeTab);
+  const papers   = filtered.filter(p => p.session === activeTab);
+  const newCount = papers.filter(p => p.isNew).length;
+  const total    = getFiltered().length;
+
+  document.getElementById('totalBadge').textContent = `총 ${total}편`;
+
+  // 세션 요약 카드
+  let html = `
+    <div class="session-summary">
+      <div>
+        <div class="session-title">${session.label}</div>
+        <div class="session-pm">담당 PM : ${session.pm}</div>
+      </div>
+      <div class="session-stats">
+        <div class="stat-box stat-new">
+          <div class="stat-num">${newCount}</div>
+          <div class="stat-label">NEW</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">${papers.length}</div>
+          <div class="stat-label">전체</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">${papers.filter(p => p.bdReq).length}</div>
+          <div class="stat-label">BD신청</div>
+        </div>
+      </div>
+    </div>`;
+
+  if (!papers.length) {
+    html += `<div class="empty">📭 해당 기간에 수록된 논문이 없습니다.</div>`;
+  } else {
+    // NEW 논문 먼저, 나머지는 중요도 순
+    const sorted = [...papers].sort((a, b) => {
+      if (a.isNew !== b.isNew) return a.isNew ? -1 : 1;
+      const s = { '★★★': 3, '★★☆': 2, '★☆☆': 1 };
+      return (s[b.stars] || 0) - (s[a.stars] || 0);
+    });
+    sorted.forEach((p, i) => { html += renderCard(p, i); });
+  }
+
+  main.innerHTML = html;
+}
+
+/* ══════════════════════════════════════════
+   논문 카드 HTML
+══════════════════════════════════════════ */
+function renderCard(p, idx) {
+  const starClass = p.stars === '★★★' ? 'star3' : p.stars === '★★☆' ? 'star2' : 'star1';
+  const starsHtml = renderStars(p.stars);
+
+  const evBadge = p.evidence === '직접근거'
+    ? `<span class="badge badge-direct">🔵 직접근거</span>`
+    : `<span class="badge badge-ref">◎ 참고근거</span>`;
+
+  const designBadge = p.design
+    ? `<span class="badge badge-design">${p.design}</span>` : '';
+
+  const newBadge  = p.isNew ? `<span class="badge badge-new">✦ NEW</span>` : '';
+
+  // BD 버튼 텍스트/상태
+  let bdBtn = '';
+  if (p.bdDone && p.driveLink) {
+    bdBtn = `<a class="btn btn-drive" href="${p.driveLink}" target="_blank">📂 BD자료 보기</a>`;
+  } else if (p.bdDone) {
+    bdBtn = `<span class="btn btn-bd done">✅ BD 생성완료</span>`;
+  } else if (p.bdReq) {
+    bdBtn = `<span class="btn btn-bd done">✅ BD 신청됨</span>`;
+  } else {
+    bdBtn = `<button class="btn btn-bd" onclick="requestBD(event, '${escHtml(p.title)}')">📌 BD 신청</button>`;
+  }
+
+  const urlBtn = p.url
+    ? `<a class="btn btn-outline" href="${p.url}" target="_blank">📄 논문 보기 ↗</a>` : '';
+
+  return `
+  <div class="paper-card ${starClass}" id="card-${idx}">
+    <div class="paper-header" onclick="toggleCard(${idx})">
+      <div class="paper-meta">
+        <div class="paper-badges">
+          ${newBadge}
+          <span class="stars">${starsHtml}</span>
+          ${evBadge}
+          ${designBadge}
+        </div>
+        <div class="paper-title">${escHtml(p.title)}</div>
+        <div class="paper-journal">${escHtml(p.journal)}${p.pubDate ? ' · ' + escHtml(p.pubDate) : ''}</div>
+      </div>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="paper-body">
+      ${p.summary ? `
+        <div class="section-label">📋 논문 요약</div>
+        <div class="section-content">${escHtml(p.summary)}</div>` : ''}
+      ${p.keyPoint ? `
+        <div class="section-label">💡 활용 포인트</div>
+        <div class="key-point-box">${escHtml(p.keyPoint)}</div>` : ''}
+      <div class="paper-actions">
+        ${urlBtn}
+        ${bdBtn}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderStars(s) {
+  const map = { '★★★': 3, '★★☆': 2, '★☆☆': 1 };
+  const n   = map[s] || 0;
+  return [1,2,3].map(i =>
+    `<span class="${i <= n ? 'star-filled' : 'star-empty'}">★</span>`
+  ).join('');
+}
+
+function toggleCard(idx) {
+  const card = document.getElementById('card-' + idx);
+  if (card) card.classList.toggle('open');
+}
+
+/* ══════════════════════════════════════════
+   BD 신청 처리
+══════════════════════════════════════════ */
+function requestBD(evt, title) {
+  evt.stopPropagation();
+  const btn = evt.target;
+  if (!CONFIG.SCRIPT_URL || CONFIG.SCRIPT_URL.includes('YOUR_')) {
+    showToast('⚠️ Apps Script URL이 설정되지 않았습니다. HTML 파일의 CONFIG를 수정해주세요.');
+    return;
+  }
+
+  btn.textContent = '신청 중…';
+  btn.classList.add('loading');
+
+  const cbName = '_bdCb_' + Date.now();
+  window[cbName] = function(data) {
+    if (data.status === 'ok') {
+      btn.textContent  = '✅ BD 신청됨';
+      btn.classList.remove('loading');
+      btn.classList.add('done');
+      btn.disabled     = true;
+      showToast('✅ BD 신청이 완료되었습니다!');
+    } else {
+      btn.textContent = '📌 BD 신청';
+      btn.classList.remove('loading');
+      showToast('⚠️ 오류: ' + (data.message || '알 수 없는 오류'));
+    }
+    delete window[cbName];
+  };
+
+  const sc = document.createElement('script');
+  sc.src   = `${CONFIG.SCRIPT_URL}?action=requestBD&title=${encodeURIComponent(title)}&format=${CONFIG.DEFAULT_FORMAT}&callback=${cbName}`;
+  sc.onerror = () => {
+    btn.textContent = '📌 BD 신청';
+    btn.classList.remove('loading');
+    showToast('⚠️ 네트워크 오류. 다시 시도해주세요.');
+  };
+  document.head.appendChild(sc);
+}
+
+/* ══════════════════════════════════════════
+   유틸
+══════════════════════════════════════════ */
+function escHtml(str) {
+  return String(str || '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+function showError(msg) {
+  document.getElementById('loadingEl').innerHTML =
+    `<div style="color:#c00;font-size:14px;padding:40px">${msg}</div>`;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ──────────── 초기 실행 ──────────── */
+loadData();
+</script>
+</body>
+</html>
