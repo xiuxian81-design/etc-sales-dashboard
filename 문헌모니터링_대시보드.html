@@ -299,6 +299,43 @@ main { max-width: 960px; margin: 28px auto; padding: 0 16px; }
   .tab-btn { padding: 12px 14px; font-size: 12px; }
   .session-summary { flex-direction: column; align-items: flex-start; }
 }
+
+/* ── BD 신청 모달 ── */
+.bd-modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.45); z-index: 2000;
+  align-items: center; justify-content: center;
+}
+.bd-modal-overlay.show { display: flex; }
+.bd-modal {
+  background: #fff; border-radius: 12px; padding: 28px 28px 22px;
+  min-width: 320px; max-width: 440px; width: 90%;
+  box-shadow: 0 8px 40px rgba(0,0,0,.2);
+}
+.bd-modal h3 { font-size: 16px; color: var(--navy); margin: 0 0 4px; }
+.bd-modal .modal-sub { font-size: 12px; color: #888; margin: 0 0 18px; }
+.bd-modal label { display: block; font-size: 12px; color: #555; margin: 14px 0 7px; font-weight: 700; letter-spacing: .3px; }
+.bd-color-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.color-chip {
+  padding: 6px 16px; border-radius: 20px; border: 2px solid transparent;
+  cursor: pointer; font-size: 12px; font-weight: 600; transition: border-color .15s;
+  user-select: none;
+}
+.color-chip.selected { border-color: var(--navy) !important; }
+.bd-modal textarea {
+  width: 100%; box-sizing: border-box; border: 1px solid #ddd; border-radius: 8px;
+  padding: 10px 12px; font-size: 13px; resize: vertical; min-height: 72px;
+  font-family: inherit; color: #333; outline: none;
+}
+.bd-modal textarea:focus { border-color: var(--navy); }
+.bd-modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; }
+.bd-format-row { display: flex; gap: 8px; }
+.format-chip {
+  padding: 6px 16px; border-radius: 20px; border: 2px solid #ddd;
+  cursor: pointer; font-size: 12px; font-weight: 600; background: #f5f5f5; color: #555;
+  transition: all .15s;
+}
+.format-chip.selected { border-color: var(--navy); background: var(--navy); color: #fff; }
 </style>
 </head>
 <body>
@@ -334,13 +371,17 @@ main { max-width: 960px; margin: 28px auto; padding: 0 16px; }
 <div class="toast" id="toast"></div>
 
 <script>
+/* ══════════════════════════════════════════
+   ★ 설정값 — 여기만 수정하면 됩니다 ★
+══════════════════════════════════════════ */
 const CONFIG = {
   SHEET_ID      : '1TrG81tjb_8iakCm5IwwFH5EFoNUNienhyPT9aE8ya-Q',
   SHEET_NAME    : '논문DB',
   SCRIPT_URL    : 'https://script.google.com/macros/s/AKfycbzowQMXLavFOx-6hXYn2ESwHVc6nmsFOlEx4JOyTDpONBrr4FQNaK3TRAfqi5gR2v6S/exec',
-  DEFAULT_FORMAT: 'CLB'
+  DEFAULT_FORMAT: 'CLB'   // 기본 BD 포맷 (CLB 또는 BT)
 };
 
+/* ──────────── 세션 정의 ──────────── */
 const SESSIONS = [
   { key: '장내미생물',      label: '🦠 장내미생물',       pm: '임범성·박지현' },
   { key: 'Gut-Liver Axis', label: '🫁 Gut-Liver Axis',  pm: '임범성·박지현' },
@@ -349,46 +390,63 @@ const SESSIONS = [
   { key: '골대사·신경',     label: '🦴 골대사·신경',      pm: '최우열·임범성' }
 ];
 
+/* ──────────── 전역 상태 ──────────── */
 let allPapers   = [];
 let activeMonth = '';
 let activeTab   = SESSIONS[0].key;
 
+/* ══════════════════════════════════════════
+   데이터 로딩 (Google Sheets gviz/tq)
+══════════════════════════════════════════ */
 function loadData() {
   const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(CONFIG.SHEET_NAME)}`;
   const script = document.createElement('script');
+
+  // gviz 기본 콜백
   window.google = window.google || {};
   window.google.visualization = window.google.visualization || {};
   window.google.visualization.Query = window.google.visualization.Query || {};
   window.google.visualization.Query.setResponse = function(resp) {
-    if (resp.status !== 'ok') { showError('시트 데이터를 불러오지 못했습니다.'); return; }
+    if (resp.status !== 'ok') {
+      showError('시트 데이터를 불러오지 못했습니다. SHEET_ID를 확인해주세요.');
+      return;
+    }
     parseGvizData(resp.table);
   };
-  script.onerror = () => showError('Google Sheets 연결 실패.');
+
+  script.onerror = () => showError('Google Sheets 연결 실패. 시트 공유 설정을 확인해주세요.');
   script.src = url;
   document.head.appendChild(script);
 }
 
+/* gviz 날짜 형식 변환: Date(YYYY,M,D) → "YYYY년 M+1월" (월은 0-indexed) */
 function formatGvizMonth(val) {
   if (!val) return '';
   const m = val.match(/^Date\((\d+),(\d+),\d+\)$/);
-  if (m) return `${parseInt(m[1])}년 ${parseInt(m[2])+1}월`;
+  if (m) {
+    const year  = parseInt(m[1]);
+    const month = parseInt(m[2]) + 1; // gviz는 0-indexed
+    return `${year}년 ${month}월`;
+  }
   return val;
 }
 
+/* gviz 발행일 형식 변환: Date(YYYY,M,D) → "YYYY-MM-DD" (월은 0-indexed) */
 function formatGvizDate(val) {
   if (!val) return '';
   const m = val.match(/^Date\((\d+),(\d+),(\d+)\)$/);
   if (m) {
     const year  = parseInt(m[1]);
-    const month = String(parseInt(m[2])+1).padStart(2,'0');
-    const day   = String(parseInt(m[3])).padStart(2,'0');
+    const month = String(parseInt(m[2]) + 1).padStart(2, '0'); // gviz는 0-indexed
+    const day   = String(parseInt(m[3])).padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
   return val;
 }
 
 function parseGvizData(table) {
-  allPapers = table.rows
+  const cols = table.cols.map(c => c.label);
+  allPapers  = table.rows
     .filter(r => r.c && r.c[0] && r.c[0].v)
     .map(r => {
       const g = (i) => (r.c[i] && r.c[i].v !== null && r.c[i].v !== undefined) ? String(r.c[i].v) : '';
@@ -412,27 +470,44 @@ function parseGvizData(table) {
         driveLink: g(16)
       };
     });
+
   initMonthFilter();
   buildTabs();
-  renderSession();
+  renderSession(); // main.innerHTML을 덮어씀 → loadingEl이 DOM에서 제거됨
   const loadingEl = document.getElementById('loadingEl');
-  if (loadingEl) loadingEl.style.display = 'none';
+  if (loadingEl) loadingEl.style.display = 'none'; // null 체크 추가
 }
 
+/* ══════════════════════════════════════════
+   월 필터 초기화
+══════════════════════════════════════════ */
 function initMonthFilter() {
   const months = [...new Set(allPapers.map(p => p.month).filter(Boolean))].sort((a, b) => {
+    // "YYYY년 M월" 형식을 숫자로 변환해 정렬
     const parse = s => { const m = s.match(/(\d+)년\s*(\d+)월/); return m ? parseInt(m[1])*100+parseInt(m[2]) : 0; };
-    return parse(b) - parse(a);
+    return parse(b) - parse(a); // 최신순
   });
   const sel = document.getElementById('monthSelect');
-  sel.innerHTML = '';
+  sel.innerHTML = ''; // 기존 옵션 초기화
+
+  // "전체" 옵션 추가
   const allOpt = document.createElement('option');
-  allOpt.value = ''; allOpt.text = '전체'; sel.appendChild(allOpt);
+  allOpt.value = '';
+  allOpt.text  = '전체';
+  sel.appendChild(allOpt);
+
   months.forEach(m => {
-    const opt = document.createElement('option');
-    opt.value = m; opt.text = m; sel.appendChild(opt);
+    const opt  = document.createElement('option');
+    opt.value  = m;
+    opt.text   = m;
+    sel.appendChild(opt);
   });
-  if (months.length) { activeMonth = months[0]; sel.value = activeMonth; }
+
+  // 가장 최신 월 자동 선택
+  if (months.length) {
+    activeMonth = months[0];
+    sel.value   = activeMonth;
+  }
 }
 
 function onMonthChange() {
@@ -441,35 +516,44 @@ function onMonthChange() {
   renderSession();
 }
 
+/* ══════════════════════════════════════════
+   세션 탭 렌더링
+══════════════════════════════════════════ */
 function buildTabs() {
   const filtered = getFiltered();
   const wrap = document.getElementById('tabContainer');
   wrap.innerHTML = '';
+
   SESSIONS.forEach(s => {
-    const papers = filtered.filter(p => p.session === s.key);
-    const hasNew = papers.some(p => p.isNew);
-    const btn = document.createElement('button');
-    btn.className = 'tab-btn' + (s.key === activeTab ? ' active' : '');
-    btn.innerHTML = s.label + (hasNew ? '<span class="tab-new-dot"></span>' : '') +
-                    ` <span style="font-size:11px;color:#aaa;font-weight:400">(${papers.length})</span>`;
-    btn.onclick = () => { activeTab = s.key; buildTabs(); renderSession(); };
+    const papers   = filtered.filter(p => p.session === s.key);
+    const hasNew   = papers.some(p => p.isNew);
+    const btn      = document.createElement('button');
+    btn.className  = 'tab-btn' + (s.key === activeTab ? ' active' : '');
+    btn.innerHTML  = s.label + (hasNew ? '<span class="tab-new-dot"></span>' : '') +
+                     ` <span style="font-size:11px;color:#aaa;font-weight:400">(${papers.length})</span>`;
+    btn.onclick    = () => { activeTab = s.key; buildTabs(); renderSession(); };
     wrap.appendChild(btn);
   });
 }
 
+/* ══════════════════════════════════════════
+   메인 렌더링
+══════════════════════════════════════════ */
 function getFiltered() {
   return allPapers.filter(p => !activeMonth || p.month === activeMonth);
 }
 
 function renderSession() {
   const filtered = getFiltered();
-  const main = document.getElementById('mainContent');
-  const session = SESSIONS.find(s => s.key === activeTab);
-  const papers = filtered.filter(p => p.session === activeTab);
+  const main     = document.getElementById('mainContent');
+  const session  = SESSIONS.find(s => s.key === activeTab);
+  const papers   = filtered.filter(p => p.session === activeTab);
   const newCount = papers.filter(p => p.isNew).length;
-  const total = getFiltered().length;
+  const total    = getFiltered().length;
+
   document.getElementById('totalBadge').textContent = `총 ${total}편`;
 
+  // 세션 요약 카드
   let html = `
     <div class="session-summary">
       <div>
@@ -477,33 +561,53 @@ function renderSession() {
         <div class="session-pm">담당 PM : ${session.pm}</div>
       </div>
       <div class="session-stats">
-        <div class="stat-box stat-new"><div class="stat-num">${newCount}</div><div class="stat-label">NEW</div></div>
-        <div class="stat-box"><div class="stat-num">${papers.length}</div><div class="stat-label">전체</div></div>
-        <div class="stat-box"><div class="stat-num">${papers.filter(p=>p.bdReq).length}</div><div class="stat-label">BD신청</div></div>
+        <div class="stat-box stat-new">
+          <div class="stat-num">${newCount}</div>
+          <div class="stat-label">NEW</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">${papers.length}</div>
+          <div class="stat-label">전체</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">${papers.filter(p => p.bdReq).length}</div>
+          <div class="stat-label">BD신청</div>
+        </div>
       </div>
     </div>`;
 
   if (!papers.length) {
     html += `<div class="empty">📭 해당 기간에 수록된 논문이 없습니다.</div>`;
   } else {
-    const sorted = [...papers].sort((a,b) => {
+    // NEW 논문 먼저, 나머지는 중요도 순
+    const sorted = [...papers].sort((a, b) => {
       if (a.isNew !== b.isNew) return a.isNew ? -1 : 1;
-      const s = {'★★★':3,'★★☆':2,'★☆☆':1};
-      return (s[b.stars]||0) - (s[a.stars]||0);
+      const s = { '★★★': 3, '★★☆': 2, '★☆☆': 1 };
+      return (s[b.stars] || 0) - (s[a.stars] || 0);
     });
-    sorted.forEach((p,i) => { html += renderCard(p,i); });
+    sorted.forEach((p, i) => { html += renderCard(p, i); });
   }
+
   main.innerHTML = html;
 }
 
+/* ══════════════════════════════════════════
+   논문 카드 HTML
+══════════════════════════════════════════ */
 function renderCard(p, idx) {
-  const starClass = p.stars==='★★★'?'star3':p.stars==='★★☆'?'star2':'star1';
+  const starClass = p.stars === '★★★' ? 'star3' : p.stars === '★★☆' ? 'star2' : 'star1';
   const starsHtml = renderStars(p.stars);
-  const evBadge = p.evidence==='직접근거'
-    ?`<span class="badge badge-direct">🔵 직접근거</span>`
-    :`<span class="badge badge-ref">◎ 참고근거</span>`;
-  const designBadge = p.design?`<span class="badge badge-design">${p.design}</span>`:'';
-  const newBadge = p.isNew?`<span class="badge badge-new">✦ NEW</span>`:'';
+
+  const evBadge = p.evidence === '직접근거'
+    ? `<span class="badge badge-direct">🔵 직접근거</span>`
+    : `<span class="badge badge-ref">◎ 참고근거</span>`;
+
+  const designBadge = p.design
+    ? `<span class="badge badge-design">${p.design}</span>` : '';
+
+  const newBadge  = p.isNew ? `<span class="badge badge-new">✦ NEW</span>` : '';
+
+  // BD 버튼 텍스트/상태
   let bdBtn = '';
   if (p.bdDone && p.driveLink) {
     bdBtn = `<a class="btn btn-drive" href="${p.driveLink}" target="_blank">📂 BD자료 보기</a>`;
@@ -512,47 +616,96 @@ function renderCard(p, idx) {
   } else if (p.bdReq) {
     bdBtn = `<span class="btn btn-bd done">✅ BD 신청됨</span>`;
   } else {
-    bdBtn = `<button class="btn btn-bd" onclick="requestBD(event,'${escHtml(p.title)}')"> 📌 BD 신청</button>`;
+    bdBtn = `<button class="btn btn-bd" onclick="requestBD(event, '${escHtml(p.title)}')">📌 BD 신청</button>`;
   }
-  const urlBtn = p.url?`<a class="btn btn-outline" href="${p.url}" target="_blank">📄 논문 보기 ↗</a>`:'';
+
+  const urlBtn = p.url
+    ? `<a class="btn btn-outline" href="${p.url}" target="_blank">📄 논문 보기 ↗</a>` : '';
+
   return `
   <div class="paper-card ${starClass}" id="card-${idx}">
     <div class="paper-header" onclick="toggleCard(${idx})">
       <div class="paper-meta">
-        <div class="paper-badges">${newBadge}<span class="stars">${starsHtml}</span>${evBadge}${designBadge}</div>
+        <div class="paper-badges">
+          ${newBadge}
+          <span class="stars">${starsHtml}</span>
+          ${evBadge}
+          ${designBadge}
+        </div>
         <div class="paper-title">${escHtml(p.title)}</div>
-        <div class="paper-journal">${escHtml(p.journal)}${p.pubDate?' · '+escHtml(p.pubDate):''}</div>
+        <div class="paper-journal">${escHtml(p.journal)}${p.pubDate ? ' · ' + escHtml(p.pubDate) : ''}</div>
       </div>
       <span class="expand-icon">▾</span>
     </div>
     <div class="paper-body">
-      ${p.summary?`<div class="section-label">📋 논문 요약</div><div class="section-content">${escHtml(p.summary)}</div>`:''}
-      ${p.keyPoint?`<div class="section-label">💡 활용 포인트</div><div class="key-point-box">${escHtml(p.keyPoint)}</div>`:''}
-      <div class="paper-actions">${urlBtn}${bdBtn}</div>
+      ${p.summary ? `
+        <div class="section-label">📋 논문 요약</div>
+        <div class="section-content">${escHtml(p.summary)}</div>` : ''}
+      ${p.keyPoint ? `
+        <div class="section-label">💡 활용 포인트</div>
+        <div class="key-point-box">${escHtml(p.keyPoint)}</div>` : ''}
+      <div class="paper-actions">
+        ${urlBtn}
+        ${bdBtn}
+      </div>
     </div>
   </div>`;
 }
 
 function renderStars(s) {
-  const map={'★★★':3,'★★☆':2,'★☆☆':1};
-  const n=map[s]||0;
-  return [1,2,3].map(i=>`<span class="${i<=n?'star-filled':'star-empty'}">★</span>`).join('');
+  const map = { '★★★': 3, '★★☆': 2, '★☆☆': 1 };
+  const n   = map[s] || 0;
+  return [1,2,3].map(i =>
+    `<span class="${i <= n ? 'star-filled' : 'star-empty'}">★</span>`
+  ).join('');
 }
 
 function toggleCard(idx) {
-  const card = document.getElementById('card-'+idx);
+  const card = document.getElementById('card-' + idx);
   if (card) card.classList.toggle('open');
 }
 
+/* ══════════════════════════════════════════
+   BD 신청 처리 (모달 팝업)
+══════════════════════════════════════════ */
+let _bdTitle = '';
+let _bdBtn   = null;
+
 function requestBD(evt, title) {
   evt.stopPropagation();
-  const btn = evt.target;
+  _bdTitle = title;
+  _bdBtn   = evt.target;
+  // 모달 초기화
+  document.querySelectorAll('.color-chip').forEach(c => c.classList.remove('selected'));
+  document.querySelector('.color-chip[data-color="기본"]').classList.add('selected');
+  document.querySelectorAll('.format-chip').forEach(c => c.classList.remove('selected'));
+  document.querySelector('.format-chip[data-fmt="CLB"]').classList.add('selected');
+  document.getElementById('bdPmRequest').value = '';
+  document.getElementById('bdModalTitle').textContent = title.length > 60 ? title.substring(0,60)+'…' : title;
+  document.getElementById('bdModal').classList.add('show');
+}
+
+function closeBDModal() {
+  document.getElementById('bdModal').classList.remove('show');
+}
+
+function submitBDModal() {
+  const colorTheme = document.querySelector('.color-chip.selected')?.dataset.color || '기본';
+  const fmt        = document.querySelector('.format-chip.selected')?.dataset.fmt  || 'CLB';
+  const pmRequest  = document.getElementById('bdPmRequest').value.trim();
+  const btn        = _bdBtn;
+  const title      = _bdTitle;
+
+  closeBDModal();
+
   if (!CONFIG.SCRIPT_URL || CONFIG.SCRIPT_URL.includes('YOUR_')) {
-    showToast('⚠️ Apps Script URL이 설정되지 않았습니다.');
+    showToast('⚠️ Apps Script URL이 설정되지 않았습니다. HTML 파일의 CONFIG를 수정해주세요.');
     return;
   }
+
   btn.textContent = '신청 중…';
   btn.classList.add('loading');
+
   const cbName = '_bdCb_' + Date.now();
   window[cbName] = function(data) {
     if (data.status === 'ok') {
@@ -560,28 +713,46 @@ function requestBD(evt, title) {
       btn.classList.remove('loading');
       btn.classList.add('done');
       btn.disabled = true;
-      showToast('✅ BD 신청이 완료되었습니다!');
+      showToast('✅ BD 신청 완료! 색상: ' + colorTheme + (pmRequest ? ' / 요청: ' + pmRequest.substring(0,20) : ''));
     } else {
       btn.textContent = '📌 BD 신청';
       btn.classList.remove('loading');
-      showToast('⚠️ 오류: ' + (data.message||'알 수 없는 오류'));
+      showToast('⚠️ 오류: ' + (data.message || '알 수 없는 오류'));
     }
     delete window[cbName];
   };
+
   const sc = document.createElement('script');
-  sc.src = `${CONFIG.SCRIPT_URL}?action=requestBD&title=${encodeURIComponent(title)}&format=${CONFIG.DEFAULT_FORMAT}&callback=${cbName}`;
-  sc.onerror = () => { btn.textContent='📌 BD 신청'; btn.classList.remove('loading'); showToast('⚠️ 네트워크 오류.'); };
+  sc.src = `${CONFIG.SCRIPT_URL}?action=requestBD` +
+            `&title=${encodeURIComponent(title)}` +
+            `&format=${encodeURIComponent(fmt)}` +
+            `&colorTheme=${encodeURIComponent(colorTheme)}` +
+            `&pmRequest=${encodeURIComponent(pmRequest)}` +
+            `&callback=${cbName}`;
+  sc.onerror = () => {
+    btn.textContent = '📌 BD 신청';
+    btn.classList.remove('loading');
+    showToast('⚠️ 네트워크 오류. 다시 시도해주세요.');
+  };
   document.head.appendChild(sc);
 }
 
+/* ══════════════════════════════════════════
+   유틸
+══════════════════════════════════════════ */
 function escHtml(str) {
-  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(str || '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
 }
 
 function showError(msg) {
   const loadingEl = document.getElementById('loadingEl');
   const container = loadingEl || document.getElementById('mainContent');
-  if (container) container.innerHTML = `<div style="color:#c00;font-size:14px;padding:40px">${msg}</div>`;
+  if (container) container.innerHTML =
+    `<div style="color:#c00;font-size:14px;padding:40px">${msg}</div>`;
 }
 
 function showToast(msg) {
@@ -591,7 +762,62 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
+/* ──────────── 초기 실행 ──────────── */
 loadData();
+
+// 색상 칩 & 포맷 칩 선택 이벤트
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('bdColorChips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.color-chip');
+    if (!chip) return;
+    document.querySelectorAll('.color-chip').forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+  });
+  document.getElementById('bdFormatChips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.format-chip');
+    if (!chip) return;
+    document.querySelectorAll('.format-chip').forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+  });
+  document.getElementById('bdModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('bdModal')) closeBDModal();
+  });
+});
 </script>
+
+<!-- ── BD 신청 모달 ── -->
+<div class="bd-modal-overlay" id="bdModal">
+  <div class="bd-modal">
+    <h3>📌 BD 소재 신청</h3>
+    <p class="modal-sub" id="bdModalTitle"></p>
+
+    <label>색상 테마</label>
+    <div class="bd-color-chips" id="bdColorChips">
+      <span class="color-chip selected" data-color="기본"
+        style="background:#e8eaf6;color:#003366">기본 (Navy)</span>
+      <span class="color-chip" data-color="레드"
+        style="background:#fce4e4;color:#cc0000">레드</span>
+      <span class="color-chip" data-color="블루"
+        style="background:#e3f0fb;color:#1a5276">블루</span>
+      <span class="color-chip" data-color="그린"
+        style="background:#e8f5e9;color:#2e7d32">그린</span>
+    </div>
+
+    <label>포맷</label>
+    <div class="bd-format-row" id="bdFormatChips">
+      <span class="format-chip selected" data-fmt="CLB">CLB 학술브리프</span>
+      <span class="format-chip" data-fmt="BT">BT 바이오톡</span>
+    </div>
+
+    <label>요청사항 <span style="font-weight:400;color:#aaa">(선택)</span></label>
+    <textarea id="bdPmRequest"
+      placeholder="예) 3페이지로 확장 / 특정 수치 강조 / 그림 추가 / 한글 번역본 필요..."></textarea>
+
+    <div class="bd-modal-actions">
+      <button class="btn btn-outline" onclick="closeBDModal()">취소</button>
+      <button class="btn btn-primary" onclick="submitBDModal()">신청하기</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
