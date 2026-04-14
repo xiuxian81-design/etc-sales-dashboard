@@ -241,6 +241,61 @@ main { max-width: 960px; margin: 28px auto; padding: 0 16px; }
   white-space: pre-wrap;
 }
 
+/* ─── 5-파트 구조화 요약 ─── */
+.summary-grid { display: flex; flex-direction: column; gap: 0; margin: 4px 0 8px; }
+.summary-row {
+  display: flex; gap: 0;
+  border-top: 1px solid var(--gray2);
+  padding: 7px 0;
+}
+.summary-row:first-child { border-top: none; padding-top: 0; }
+.summary-label {
+  min-width: 86px; max-width: 86px;
+  font-size: 11px; font-weight: 700;
+  color: var(--navy); letter-spacing: .2px;
+  padding-right: 10px; padding-top: 2px;
+  flex-shrink: 0;
+}
+.summary-text {
+  font-size: 13px; line-height: 1.65; color: #333;
+  flex: 1; word-break: break-word;
+}
+
+/* ─── 핵심 수치 카드 ─── */
+.knum-section { margin: 8px 0 2px; }
+.knum-label {
+  font-size: 11px; font-weight: 700; color: var(--gray4);
+  text-transform: uppercase; letter-spacing: .8px; margin-bottom: 6px;
+}
+.knum-row { display: flex; flex-wrap: wrap; gap: 7px; }
+.knum-item {
+  background: #fff8f0;
+  border: 1px solid #f0c090;
+  border-radius: 8px;
+  padding: 5px 11px;
+  font-size: 12px; font-weight: 600;
+  color: #7a3500;
+  line-height: 1.4;
+}
+
+/* ─── 리포트 링크 버튼 ─── */
+.btn-report {
+  background: var(--navy); color: var(--white);
+  border: 1px solid var(--navy);
+}
+.btn-report:hover { background: var(--navy2); }
+
+/* ─── 세션 요약 리포트 링크 ─── */
+.session-report-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 600; color: var(--navy);
+  background: #e8eaf6; border: 1px solid #b0bcd4;
+  border-radius: 6px; padding: 5px 12px;
+  text-decoration: none; margin-top: 6px;
+  transition: background .15s;
+}
+.session-report-link:hover { background: #d0d6ed; }
+
 /* ─── 하단 액션 버튼 ─── */
 .paper-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 .btn {
@@ -389,6 +444,101 @@ const SESSIONS = [
   { key: '비뇨기·종양·CPP', label: '🏥 비뇨기·종양·CPP', pm: '김지완' },
   { key: '골대사·신경',     label: '🦴 골대사·신경',      pm: '최우열·임범성' }
 ];
+
+/* ──────────── 월별 리포트 파일 URL 매핑 ──────────────
+   매월 리포트 생성 후 아래 객체에 월+세션 → 파일명을 추가하세요.
+   GitHub Pages 기준 상대경로 사용 (같은 레포지토리 루트)
+──────────────────────────────────────────────────── */
+const REPORT_URLS = {
+  '2026년 4월': {
+    '장내미생물':      '문헌모니터링_1주차_장내미생물_2026-04-06.html',
+    '골대사·신경':     '문헌모니터링_2주차_골대사신경_2026-04-13.html',
+    '탈모치료':        '문헌모니터링_3주차_탈모치료_2026-04-20.html',
+    '비뇨기·종양·CPP': '문헌모니터링_4주차_비뇨기종양_2026-04-27.html',
+    'Gut-Liver Axis':  '문헌모니터링_5주차_GutLiverAxis_2026-05-04.html',
+  }
+  /* 다음 달 추가 예시:
+  '2026년 5월': {
+    '장내미생물': '문헌모니터링_..._2026-05-??.html',
+    ...
+  } */
+};
+
+function getReportUrl(sessionKey, month) {
+  return (REPORT_URLS[month] && REPORT_URLS[month][sessionKey]) || null;
+}
+
+/* ═══════════════════════════════════════════
+   논문 요약 파싱 (5-파트 구조화 + 핵심 수치 추출)
+═══════════════════════════════════════════ */
+const SUMMARY_LABELS = ['배경', '대상/방법', '핵심 결과', '안전성', '결론 및 한계'];
+
+function parseSummaryHtml(text) {
+  if (!text) return '';
+  const hasStructure = SUMMARY_LABELS.some(l => text.includes(l + ':'));
+  if (!hasStructure) {
+    // 구조 없는 일반 텍스트
+    return `<div class="section-content">${escHtml(text).replace(/\n/g, '<br>')}</div>`;
+  }
+
+  const sections = {};
+  let knumLines  = [];
+  let currentKey = null;
+  let currentBuf = [];
+  let inKnum     = false;
+
+  text.split('\n').forEach(raw => {
+    const line = raw.replace(/^[\s•\-]+/, '');
+    if (/^핵심\s*수치\s*:?/.test(line)) {
+      if (currentKey) { sections[currentKey] = currentBuf.join('\n').trim(); currentBuf = []; }
+      currentKey = null; inKnum = true;
+      const rest = line.replace(/^핵심\s*수치\s*:?\s*/, '');
+      if (rest) knumLines.push(rest);
+    } else {
+      const found = SUMMARY_LABELS.find(l => line.startsWith(l + ':'));
+      if (found) {
+        if (inKnum) inKnum = false;
+        if (currentKey) { sections[currentKey] = currentBuf.join('\n').trim(); currentBuf = []; }
+        currentKey = found;
+        const rest = line.slice(found.length + 1).trim();
+        if (rest) currentBuf.push(rest);
+      } else if (inKnum && line.trim()) {
+        knumLines.push(line.trim());
+      } else if (currentKey) {
+        currentBuf.push(raw.replace(/^[\s•]+/, ''));
+      }
+    }
+  });
+  if (currentKey) sections[currentKey] = currentBuf.join('\n').trim();
+
+  let html = '';
+
+  // 5-파트 그리드
+  const hasRows = SUMMARY_LABELS.some(l => sections[l]);
+  if (hasRows) {
+    html += '<div class="summary-grid">';
+    SUMMARY_LABELS.forEach(label => {
+      if (sections[label]) {
+        html += `<div class="summary-row">
+          <div class="summary-label">${escHtml(label)}</div>
+          <div class="summary-text">${escHtml(sections[label]).replace(/\n/g, '<br>')}</div>
+        </div>`;
+      }
+    });
+    html += '</div>';
+  }
+
+  // 핵심 수치 pills
+  if (knumLines.length) {
+    html += `<div class="knum-section">
+      <div class="knum-label">📊 핵심 수치</div>
+      <div class="knum-row">`;
+    knumLines.forEach(l => { if (l) html += `<div class="knum-item">${escHtml(l)}</div>`; });
+    html += '</div></div>';
+  }
+
+  return html || `<div class="section-content">${escHtml(text).replace(/\n/g, '<br>')}</div>`;
+}
 
 /* ──────────── 전역 상태 ──────────── */
 let allPapers   = [];
@@ -554,11 +704,17 @@ function renderSession() {
   document.getElementById('totalBadge').textContent = `총 ${total}편`;
 
   // 세션 요약 카드
+  const reportUrl  = getReportUrl(session.key, activeMonth);
+  const reportLink = reportUrl
+    ? `<a class="session-report-link" href="${reportUrl}" target="_blank">📋 상세 리포트 보기 ↗</a>`
+    : '';
+
   let html = `
     <div class="session-summary">
       <div>
         <div class="session-title">${session.label}</div>
         <div class="session-pm">담당 PM : ${session.pm}</div>
+        ${reportLink}
       </div>
       <div class="session-stats">
         <div class="stat-box stat-new">
@@ -595,8 +751,8 @@ function renderSession() {
    논문 카드 HTML
 ══════════════════════════════════════════ */
 function renderCard(p, idx) {
-  const starClass = p.stars === '★★★' ? 'star3' : p.stars === '★★☆' ? 'star2' : 'star1';
-  const starsHtml = renderStars(p.stars);
+  const starClass  = p.stars === '★★★' ? 'star3' : p.stars === '★★☆' ? 'star2' : 'star1';
+  const starsHtml  = renderStars(p.stars);
 
   const evBadge = p.evidence === '직접근거'
     ? `<span class="badge badge-direct">🔵 직접근거</span>`
@@ -605,9 +761,9 @@ function renderCard(p, idx) {
   const designBadge = p.design
     ? `<span class="badge badge-design">${p.design}</span>` : '';
 
-  const newBadge  = p.isNew ? `<span class="badge badge-new">✦ NEW</span>` : '';
+  const newBadge = p.isNew ? `<span class="badge badge-new">✦ NEW</span>` : '';
 
-  // BD 버튼 텍스트/상태
+  // BD 버튼 텍스트/상태 (기존 로직 그대로 유지)
   let bdBtn = '';
   if (p.bdDone && p.driveLink) {
     bdBtn = `<a class="btn btn-drive" href="${p.driveLink}" target="_blank">📂 BD자료 보기</a>`;
@@ -621,6 +777,15 @@ function renderCard(p, idx) {
 
   const urlBtn = p.url
     ? `<a class="btn btn-outline" href="${p.url}" target="_blank">📄 논문 보기 ↗</a>` : '';
+
+  // 5-파트 구조화 요약 파싱
+  const summaryHtml = p.summary ? parseSummaryHtml(p.summary) : '';
+
+  // 활용 포인트 (escHtml 유지)
+  const keyPointHtml = p.keyPoint
+    ? `<div class="section-label">💡 활용 포인트</div>
+       <div class="key-point-box">${escHtml(p.keyPoint).replace(/\n/g,'<br>')}</div>`
+    : '';
 
   return `
   <div class="paper-card ${starClass}" id="card-${idx}">
@@ -638,12 +803,8 @@ function renderCard(p, idx) {
       <span class="expand-icon">▾</span>
     </div>
     <div class="paper-body">
-      ${p.summary ? `
-        <div class="section-label">📋 논문 요약</div>
-        <div class="section-content">${escHtml(p.summary)}</div>` : ''}
-      ${p.keyPoint ? `
-        <div class="section-label">💡 활용 포인트</div>
-        <div class="key-point-box">${escHtml(p.keyPoint)}</div>` : ''}
+      ${summaryHtml ? `<div class="section-label">📋 논문 요약</div>${summaryHtml}` : ''}
+      ${keyPointHtml}
       <div class="paper-actions">
         ${urlBtn}
         ${bdBtn}

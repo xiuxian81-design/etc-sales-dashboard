@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[문헌모니터링] 5주차 Gut-Liver Axis (2026.05.04)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; font-size: 15px; line-height: 1.7; color: #1a1a2e; background: #f0f2f5; padding: 24px 0; }
+    .container { max-width: 820px; margin: 0 auto; padding: 0 16px; }
+    .info-box { background: #fff3e0; border: 2px solid #FF9800; border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+    .info-box h2 { color: #E65100; font-size: 18px; margin-bottom: 12px; }
+    .info-row { display: flex; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
+    .info-label { font-weight: bold; min-width: 60px; color: #555; }
+    .info-value { flex: 1; font-size: 14px; }
+    .copy-btn { background: #FF9800; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; white-space: nowrap; }
+    .copy-btn:hover { background: #F57C00; }
+    .copy-success { color: #2E7D32; font-size: 12px; margin-left: 8px; display: none; }
+    .guide-text { background: #FFF8E1; padding: 10px 14px; border-radius: 6px; margin-top: 12px; font-size: 13px; color: #795548; }
+    .mail-body { background: #fff; border-radius: 10px; padding: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .copy-body-area { margin-bottom: 16px; text-align: right; }
+    .report-header { background: linear-gradient(135deg,#003366 0%,#1a5276 100%); color: #fff; border-radius: 14px; padding: 28px 32px; margin-bottom: 24px; }
+    .report-header .badge { display: inline-block; background: #E87722; color: #fff; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+    .report-header h1 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    .report-header .meta { font-size: 13px; color: rgba(255,255,255,0.75); display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
+    .stat-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+    .stat-pill { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 16px; font-size: 13px; }
+    .stat-pill span { font-size: 20px; font-weight: 800; display: block; }
+    .exec-box { background: #fff; border-left: 5px solid #003366; border-radius: 0 10px 10px 0; padding: 18px 22px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .exec-box h3 { font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: #003366; margin-bottom: 10px; }
+    .exec-box p { font-size: 14px; line-height: 1.8; color: #333; }
+    .paper { background: #fff; border-radius: 14px; margin-bottom: 28px; box-shadow: 0 3px 12px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #e8eaf0; }
+    .paper-header { padding: 16px 22px 12px; display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #f0f2f5; }
+    .paper-num { background: #003366; color: #fff; font-size: 12px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+    .stars-high { color: #c0392b; font-size: 16px; font-weight: 900; }
+    .stars-mid { color: #e67e22; font-size: 16px; font-weight: 900; }
+    .tag-direct { background: #e8f4fd; color: #1a5276; border: 1px solid #aed6f1; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+    .tag-ref { background: #f0f0f0; color: #666; border: 1px solid #ccc; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+    .journal-meta { font-size: 12px; color: #888; }
+    .paper-body { padding: 20px 22px; }
+    .paper-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; line-height: 1.6; }
+    .paper-url { font-size: 12px; color: #1a5276; margin-bottom: 14px; display: block; word-break: break-all; text-decoration: none; }
+    .paper-url:hover { text-decoration: underline; }
+    .design-badge { display: inline-block; background: #eaf2ff; color: #1a5276; font-size: 12px; font-weight: bold; padding: 4px 12px; border-radius: 6px; margin-bottom: 14px; }
+    .summary-grid { background: #fafbfc; border-radius: 10px; padding: 16px; margin-bottom: 14px; border: 1px solid #e8eaf0; }
+    .summary-grid h4 { font-size: 12px; letter-spacing: 1px; color: #888; text-transform: uppercase; margin-bottom: 10px; font-weight: bold; }
+    .s-row { display: grid; grid-template-columns: 90px 1fr; gap: 6px 12px; margin-bottom: 8px; align-items: flex-start; font-size: 13.5px; }
+    .s-label { font-weight: 700; color: #003366; white-space: nowrap; }
+    .s-val { color: #333; line-height: 1.8; }
+    .s-val em { background: #fff3cd; padding: 1px 4px; border-radius: 3px; font-style: normal; font-weight: bold; color: #664d03; }
+    .key-nums { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+    .knum { background: #003366; color: #fff; border-radius: 10px; padding: 12px 16px; flex: 1; min-width: 140px; text-align: center; }
+    .knum .val { font-size: 22px; font-weight: 900; color: #E87722; display: block; }
+    .knum .desc { font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 2px; line-height: 1.4; }
+    .knum .pval { font-size: 10px; color: #aed6f1; margin-top: 3px; }
+    .viz-section { border: 2px solid #e8eaf0; border-radius: 10px; padding: 16px; margin-bottom: 14px; background: #fafbfc; }
+    .viz-section h4 { font-size: 13px; font-weight: 700; color: #003366; margin-bottom: 4px; }
+    .viz-subtitle { font-size: 12px; color: #888; margin-bottom: 14px; }
+    .chart-wrap { position: relative; height: 200px; margin-bottom: 10px; }
+    .paywall-notice { background: #fdf2f8; border: 1px solid #d7bde2; border-radius: 8px; padding: 14px 18px; font-size: 13px; color: #7d3c98; text-align: center; font-weight: 500; }
+    .usage { background: linear-gradient(135deg,#fff8f0,#fff3e0); border-left: 4px solid #E87722; border-radius: 0 10px 10px 0; padding: 14px 18px; font-size: 13.5px; line-height: 1.8; }
+    .usage h4 { font-size: 12px; color: #E87722; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+    .usage ul { margin-left: 16px; }
+    .usage li { margin-bottom: 4px; }
+    .legend { background: #fff; border-radius: 10px; padding: 18px 22px; margin-top: 8px; border: 1px solid #e8eaf0; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+    .legend h4 { color: #003366; margin-bottom: 10px; font-weight: bold; }
+    .legend table { width: 100%; border-collapse: collapse; }
+    .legend td { padding: 8px; border-bottom: 1px solid #f0f0f0; }
+    .legend td:first-child { background: #f9f9f9; font-weight: bold; width: 100px; }
+    @media print { body { background: #fff; padding: 0; } .info-box, .copy-body-area, .copy-btn { display: none; } .mail-body { box-shadow: none; padding: 0; } .paper { page-break-inside: avoid; } }
+    @media (max-width: 600px) { body { font-size: 14px; } .mail-body { padding: 16px; } .report-header { padding: 20px; } .s-row { grid-template-columns: 1fr; } .key-nums { flex-direction: column; } }
+  </style>
+</head>
+<body>
+<div class="container">
+<div class="info-box">
+  <h2>📧 메일 발송 안내</h2>
+  <div class="info-row">
+    <span class="info-label">수신자:</span>
+    <span class="info-value">aaaa81@hanall.co.kr</span>
+  </div>
+  <div class="info-row">
+    <span class="info-label">제목:</span>
+    <span class="info-value" id="mailSubject">[문헌모니터링] 5주차 Gut-Liver Axis (2026.05.04)</span>
+    <button class="copy-btn" onclick="copyText('mailSubject', 'subjectSuccess')">제목 복사</button>
+    <span class="copy-success" id="subjectSuccess">복사됨!</span>
+  </div>
+  <div class="guide-text">
+    아래 <strong>"본문 복사"</strong> 버튼을 클릭한 후, 메일 본문에 <strong>붙여넣기(Ctrl+V)</strong> 하세요.
+  </div>
+</div>
+<div class="mail-body">
+  <div class="copy-body-area">
+    <button class="copy-btn" onclick="copyBody()" style="font-size:15px; padding:10px 24px;">📋 본문 복사</button>
+    <span class="copy-success" id="bodySuccess" style="font-size:13px;">본문이 클립보드에 복사되었습니다!</span>
+  </div>
+  <div id="mailContent">
+    <div class="report-header">
+      <div class="badge">5주차 세션</div>
+      <h1>Gut-Liver Axis 문헌 업데이트</h1>
+      <div class="meta"><span>노르믹스 + 하노마린</span> <span>2026.05.04</span></div>
+      <div class="stat-row">
+        <div class="stat-pill">논문 <span>6</span>편</div>
+        <div class="stat-pill">★★★ <span>4</span>편</div>
+        <div class="stat-pill">오픈액세스 <span>3</span>편</div>
+      </div>
+    </div>
+    <div class="exec-box">
+      <h3>Executive Summary</h3>
+      <p>2025~2026년 간 미생물-간 축(Gut-Liver Axis) 관련 임상근거가 주요 국제 저널에 집중 발표되었다. <strong>Rifaximin의 간성뇌증 예방 효과가 12개 RCT, 1,939명을 종합한 메타분석에서 입증(RR 0.58, 40% 감소)</strong>, <strong>IBS-D 환자에서 리팍시민 병용 치료(프로바이오틱스)의 반응률이 단독 대비 2배 달성</strong>, <strong>하노마린(Silymarin) 단일 RCT에서 MASLD 환자의 간경도(liver stiffness) 유의한 감소</strong>, <strong>리팍시민의 항생제 내성 유발 우려(Nature Communications 2025)</strong>가 핵심이다. 프로바이오틱스 병용, 적정 투여 기간, 항생제 내성 모니터링 등 정밀 진료 전략의 중요성이 부각되고 있다.</p>
+    </div>
+    <div class="paper">
+      <div class="paper-header" style="background:#f5f5f5;"><div class="paper-num">■ 논문 #1</div><div class="stars-high">★★★</div><div class="journal-meta">PLOS One | 2025-05-16 |</div><div class="tag-direct">직접근거</div></div>
+      <div class="paper-body">
+        <div class="paper-title">Efficacy and safety of rifaximin in preventing hepatic encephalopathy: A systematic review and meta-analysis</div>
+        <a class="paper-url" href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0323359" target="_blank">https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0323359</a>
+        <span class="design-badge">메타분석 (12개 RCT, 1,939명)</span>
+        <div class="summary-grid">
+          <h4>논문내용요약</h4>
+          <div class="s-row"><div class="s-label">배경</div><div class="s-val">간경변증 환자의 간성뇌증(HE) 예방은 임상적으로 중요하나, 비흡수성 이당류 대비 리팍시민의 상대적 효과 평가가 부족했다.</div></div>
+          <div class="s-row"><div class="s-label">대상·방법</div><div class="s-val">간경변 환자 대상 리팍시민 vs 위약/표준 치료 RCT 1,939명(리팍시민 720명, 대조군 1,219명). 1차: HE 발생률. 이차: 사망률, 이상반응.</div></div>
+          <div class="s-row"><div class="s-label">핵심 결과</div><div class="s-val">리팍시민 HE 발생 <em>40% 감소(RR=0.58)</em>. <em>이차 HE 예방(RR=0.49)</em> 우수. <em>1개월 이상 투여(RR=0.55)</em> 더욱 효과적. TIPS 시술 후 <em>HE 발생 억제(RR=0.70)</em>.</div></div>
+          <div class="s-row"><div class="s-label">안전성</div><div class="s-val">설사 발생률 표준 치료 대비 낮음. 사망률 차이 없음(p>0.05).</div></div>
+          <div class="s-row"><div class="s-label">결론·한계</div><div class="s-val">리팍시민 HE 예방 효과 입증. 특히 이차 예방(재발 방지)에서 강한 근거. 항생제 내성 모니터링 부재.</div></div>
+        </div>
+        <div class="key-nums">
+          <div class="knum"><div class="val">0.58</div><div class="desc">HE 발생 위험도</div><div class="pval">40% 감소</div></div>
+          <div class="knum"><div class="val">0.49</div><div class="desc">이차 예방</div><div class="pval">51% 감소</div></div>
+          <div class="knum"><div class="val">1,939</div><div class="desc">메타분석 대상</div><div class="pval">12개 RCT</div></div>
+        </div>
+        <div class="viz-section">
+          <h4>주요 Figure</h4>
+          <div class="viz-subtitle">오픈액세스 논문 — 원문 직접 확인 가능</div>
+          <div class="chart-wrap"><canvas id="chart1"></canvas></div>
+        </div>
+        <div class="usage">
+          <h4>활용 포인트</h4>
+          <ul><li>간내과·외과 대상: "노르믹스 HE 예방이 <strong>RR 0.58(40% 감소)</strong>로 입증"</li><li>TIPS 시술 전후 HE 관리 지표로 활용</li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="paper">
+      <div class="paper-header" style="background:#f5f5f5;"><div class="paper-num">■ 논문 #2</div><div class="stars-high">★★★</div><div class="journal-meta">Nutrients (MDPI) | 2025 |</div><div class="tag-direct">직접근거</div></div>
+      <div class="paper-body">
+        <div class="paper-title">Comparison of Rifaximin Monotherapy and Rifaximin Combined with Probiotics in Patients with Irritable Bowel Syndrome: A Randomized Controlled Trial</div>
+        <a class="paper-url" href="https://www.mdpi.com/2072-6643/17/5/763" target="_blank">https://www.mdpi.com/2072-6643/17/5/763</a>
+        <span class="design-badge">RCT (70명, 한국)</span>
+        <div class="summary-grid">
+          <h4>논문내용요약</h4>
+          <div class="s-row"><div class="s-label">배경</div><div class="s-val">IBS-D 환자에서 리팍시민 단독 치료 증상 개선율 제한적. 프로바이오틱스 병용 효과 검증.</div></div>
+          <div class="s-row"><div class="s-label">대상·방법</div><div class="s-val">Rome IV 기준 IBS-D 환자 70명: ① 리팍시민 550mg 1일 3회 14일 + 프로바이오틱스 8주 / ② 리팍시민 단독 14일. 평가: IBS-SSS, IBS-QOL.</div></div>
+          <div class="s-row"><div class="s-label">핵심 결과</div><div class="s-val">병용군 반응률: <em>4주차 65.7% vs 단독 31.4%</em>, <em>8주차 65.7% vs 34.2%</em> (p<0.01). <em>대변 빈도, 긴박감, 복부 불편감 모두 병용군 우수</em>.</div></div>
+          <div class="s-row"><div class="s-label">안전성</div><div class="s-val">이상반응 각군 <5%. 심각 부작용 없음.</div></div>
+          <div class="s-row"><div class="s-label">결론·한계</div><div class="s-val">프로바이오틱스 병용 시 반응률 약 2배 증가. 70명 소규모 표본. 8주 추적 제한.</div></div>
+        </div>
+        <div class="key-nums">
+          <div class="knum"><div class="val">65.7%</div><div class="desc">병용군 반응률</div><div class="pval">8주차</div></div>
+          <div class="knum"><div class="val">34.2%</div><div class="desc">단독군 반응률</div><div class="pval">8주차</div></div>
+          <div class="knum"><div class="val">2.0×</div><div class="desc">반응률 향상</div><div class="pval">병용 효과</div></div>
+        </div>
+        <div class="viz-section">
+          <h4>주요 Figure</h4>
+          <div class="viz-subtitle">오픈액세스 논문 — 원문 직접 확인 가능</div>
+          <div class="chart-wrap"><canvas id="chart2"></canvas></div>
+        </div>
+        <div class="usage">
+          <h4>활용 포인트</h4>
+          <ul><li>소화기내과 대상: "노르믹스 단독 <strong>31~34% → 프로바이오틱스 병용 65.7% (약 2배)</strong>"</li><li>SIBO/IBS-D 환자 병행 처방 근거</li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="paper">
+      <div class="paper-header" style="background:#f5f5f5;"><div class="paper-num">■ 논문 #3</div><div class="stars-high">★★★</div><div class="journal-meta">Lipids in Health and Disease | 2024-08 |</div><div class="tag-direct">직접근거</div></div>
+      <div class="paper-body">
+        <div class="paper-title">Silymarin decreases liver stiffness associated with gut microbiota in patients with metabolic dysfunction-associated steatotic liver disease: a randomized, double-blind, placebo-controlled trial</div>
+        <a class="paper-url" href="https://link.springer.com/article/10.1186/s12944-024-02220-y" target="_blank">https://link.springer.com/article/10.1186/s12944-024-02220-y</a>
+        <span class="design-badge">RCT (24주, 이중맹검)</span>
+        <div class="summary-grid">
+          <h4>논문내용요약</h4>
+          <div class="s-row"><div class="s-label">배경</div><div class="s-val">MASLD는 글로벌 간질환 1순위이나 약물 치료법 제한적. Silymarin이 간경도 개선할 수 있는지 검증.</div></div>
+          <div class="s-row"><div class="s-label">대상·방법</div><div class="s-val">MASLD 환자 83명을 위약(n=41) 또는 실리마린 103.2mg/일(n=42)로 24주 무작위배정. 평가: FibroScan 간경도(kPa), 간 지방증(CAP), 장내미생물(16S rRNA).</div></div>
+          <div class="s-row"><div class="s-label">핵심 결과</div><div class="s-val">실리마린군 간경도: <em>16.7 → 13.2 kPa</em> (p<0.001), 위약군 <em>16.4 → 15.9</em> (p>0.05). <em>교정 차이 -3.5 kPa</em>. <em>Oscillospiraceae 증가</em>로 미생물 다양성 개선.</div></div>
+          <div class="s-row"><div class="s-label">안전성</div><div class="s-val">중대 이상반응 없음.</div></div>
+          <div class="s-row"><div class="s-label">결론·한계</div><div class="s-val">하노마린이 간경도 유의 감소(섬유화 개선). 83명 소규모 표본. 24주 제한된 추적.</div></div>
+        </div>
+        <div class="key-nums">
+          <div class="knum"><div class="val">-3.5</div><div class="desc">간경도 감소</div><div class="pval">kPa (p<0.001)</div></div>
+          <div class="knum"><div class="val">20%</div><div class="desc">섬유화 개선율</div><div class="pval">상대 감소</div></div>
+          <div class="knum"><div class="val">↑</div><div class="desc">미생물 다양성</div><div class="pval">Oscillospiraceae</div></div>
+        </div>
+        <div class="viz-section">
+          <h4>원문 접근 안내</h4>
+          <div class="paywall-notice">💾 Springer 페이월 논문 — Institutional Access 필요. 초록 및 Figure로 데이터 확인 가능.</div>
+        </div>
+        <div class="usage">
+          <h4>활용 포인트</h4>
+          <ul><li>간내과·소화기내과: "하노마린 24주 투여가 간경도를 <strong>3.5kPa 감소</strong>(섬유화 20% 개선)"</li><li>Gut-Liver Axis 복원 메시지</li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="paper">
+      <div class="paper-header" style="background:#f5f5f5;"><div class="paper-num">■ 논문 #4</div><div class="stars-high">★★★</div><div class="journal-meta">Nature Communications | 2025-01 |</div><div class="tag-ref">참고근거</div></div>
+      <div class="paper-body">
+        <div class="paper-title">Increased risk of antimicrobial resistance in patients with cirrhosis and hepatic encephalopathy using rifaximin</div>
+        <a class="paper-url" href="https://www.nature.com/articles/s41467-025-67326-y" target="_blank">https://www.nature.com/articles/s41467-025-67326-y</a>
+        <span class="design-badge">관찰 코호트 (보험청구 데이터)</span>
+        <div class="summary-grid">
+          <h4>논문내용요약</h4>
+          <div class="s-row"><div class="s-label">배경</div><div class="s-val">리팍시민의 HE 예방 효과는 입증되나, 장기 투여에 따른 항생제 내성(AMR) 위험 증가 문제 정량화.</div></div>
+          <div class="s-row"><div class="s-label">대상·방법</div><div class="s-val">미국 Optum® 데이터에서 간경변증·HE 환자 추출. 리팍시민 6개월 이상 사용자 vs 비사용자 1년 추적. 1차: AMR 감염 발생, 다제내성 균주.</div></div>
+          <div class="s-row"><div class="s-label">핵심 결과</div><div class="s-val">리팍시민 사용군 AMR 감염 <em>1.47배 증가</em> (p<0.001). <em>VRE 2.1배</em>, <em>MDR Acinetobacter 1.8배</em> 위험 증가. 투여 기간당 약 <em>30% 위험 상승</em>.</div></div>
+          <div class="s-row"><div class="s-label">안전성</div><div class="s-val">메로페넘 내성 증가 통계적 유의. 내성 균주 유발 위험 실제.</div></div>
+          <div class="s-row"><div class="s-label">결론·한계</div><div class="s-val">HE 예방 효과는 입증되나 내성 균 위험 무시할 수 없음. 투여 기간 최소화, 미생물 복원 병행 필수.</div></div>
+        </div>
+        <div class="key-nums">
+          <div class="knum"><div class="val">1.47×</div><div class="desc">AMR 위험</div><div class="pval">p<0.001</div></div>
+          <div class="knum"><div class="val">2.1×</div><div class="desc">VRE 위험</div><div class="pval">반코마이신 내성</div></div>
+          <div class="knum"><div class="val">+30%</div><div class="desc">6개월당</div><div class="pval">투여 기간 연장</div></div>
+        </div>
+        <div class="viz-section">
+          <h4>주요 Figure</h4>
+          <div class="viz-subtitle">오픈액세스 논문 — Nature 원문 직접 확인 가능</div>
+          <div class="chart-wrap"><canvas id="chart4"></canvas></div>
+        </div>
+        <div class="usage">
+          <h4>활용 포인트</h4>
+          <ul><li>간내과 대상 — 한계점: "리팍시민 6개월 이상 투여 시 <strong>항생제 내성 감염 1.5배, VRE 2.1배</strong>"</li><li>HE 예방과 내성 균 제어의 균형잡힌 진료 전략</li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="paper">
+      <div class="paper-header" style="background:#f5f5f5;"><div class="paper-num">■ 논문 #5</div><div class="stars-mid">★★☆</div><div class="journal-meta">Canadian Liver Journal | 2024 |</div><div class="tag-direct">직접근거</div></div>
+      <div class="paper-body">
+        <div class="paper-title">Effects of silymarin use on liver enzymes and metabolic factors in metabolic dysfunction-associated steatotic liver disease: a systematic review and meta-analysis</div>
+        <a class="paper-url" href="https://utppublishing.com/doi/full/10.3138/canlivj-2023-0021" target="_blank">https://utppublishing.com/doi/full/10.3138/canlivj-2023-0021</a>
+        <span class="design-badge">메타분석 (9개 RCT, 412명)</span>
+        <div class="summary-grid">
+          <h4>논문내용요약</h4>
+          <div class="s-row"><div class="s-label">배경</div><div class="s-val">MASLD 약물 치료법 제한적. 실리마린의 효과를 RCT 근거로 체계적 평가.</div></div>
+          <div class="s-row"><div class="s-label">대상·방법</div><div class="s-val">MASLD 환자 대상 실리마린(140~420mg/일) vs 위약 RCT 9개, 412명. 메타분석: ALT, AST, 간 지방증, 섬유화, 대사 지표.</div></div>
+          <div class="s-row"><div class="s-label">핵심 결과</div><div class="s-val">실리마린군 ALT 감소 경향(MD -9.2 U/L), AST 감소(MD -8.5 U/L). <em>간 지방증 개선: 39~48% vs 위약 15~20%</em>. <em>섬유화 호전: 22.4% vs 6.0%</em>. 혈당·지질 일관된 개선 부재.</div></div>
+          <div class="s-row"><div class="s-label">안전성</div><div class="s-val">경미한 부작용 외 중대 사항 없음. 생활요법 병행 필수.</div></div>
+          <div class="s-row"><div class="s-label">결론·한계</div><div class="s-val">간 지방증·섬유화 지표 개선 중간 수준 근거. 9개 소규모 RCT. 이질성 높음.</div></div>
+        </div>
+        <div class="key-nums">
+          <div class="knum"><div class="val">48%</div><div class="desc">지방증 개선율</div><div class="pval">vs 위약 15~20%</div></div>
+          <div class="knum"><div class="val">22.4%</div><div class="desc">섬유화 호전</div><div class="pval">조직학적</div></div>
+          <div class="knum"><div class="val">2×</div><div class="desc">효과 배수</div><div class="pval">위약 대비</div></div>
+        </div>
+        <div class="viz-section">
+          <h4>원문 접근 안내</h4>
+          <div class="paywall-notice">💾 University of Toronto Press 페이월 — 초록 및 결과 테이블로 데이터 확인 가능.</div>
+        </div>
+        <div class="usage">
+          <h4>활용 포인트</h4>
+          <ul><li>간내과 대상: "하노마린 지방증 개선률 <strong>39~48% (위약 15~20% 대비 2배 이상)</strong>"</li><li>섬유화 초기 환자 비약물 보조 요법 근거</li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="paper">
+      <div class="paper-header" style="background:#f5f5f5;"><div class="paper-num">■ 논문 #6</div><div class="stars-mid">★★☆</div><div class="journal-meta">Frontiers in Microbiology | 2026 |</div><div class="tag-direct">직접근거</div></div>
+      <div class="paper-body">
+        <div class="paper-title">Relationship between small intestinal bacterial overgrowth and irritable bowel syndrome and the efficacy of rifaximin intervention: a systematic review and meta-analysis</div>
+        <a class="paper-url" href="https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2026.1780567/full" target="_blank">https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2026.1780567/full</a>
+        <span class="design-badge">메타분석 (25개 연구)</span>
+        <div class="summary-grid">
+          <h4>논문내용요약</h4>
+          <div class="s-row"><div class="s-label">배경</div><div class="s-val">SIBO와 IBS 중복 진단 관련성 보고. 리팍시민의 효과를 최신 근거로 통합 평가.</div></div>
+          <div class="s-row"><div class="s-label">대상·방법</div><div class="s-val">PubMed, Embase, Cochrane에서 SIBO 또는 IBS 환자 대상 리팍시민 치료 연구 25개 추출(2000~2025년). 주요 변수: 호흡 검사 음성화율, 증상 반응률, 삶의 질.</div></div>
+          <div class="s-row"><div class="s-label">핵심 결과</div><div class="s-val">SIBO <em>호흡 검사 음성화: 65~75%</em>. <em>IBS-D 증상 반응률(>50% 개선): 58~68%</em>. <em>프로바이오틱스 병용 시 +15~20%p</em>. 이상반응 16.7%. 투여 기간(2주 vs 장기) 간 반응률 유의 차이 없음.</div></div>
+          <div class="s-row"><div class="s-label">안전성</div><div class="s-val">경미한 설사, 복부 불편감 주요 이상반응. 심각 상호작용 없음.</div></div>
+          <div class="s-row"><div class="s-label">결론·한계</div><div class="s-val">리팍시민이 SIBO/IBS-D 일차 선택약 입증. 표준 투여 기간(2주) 충분. 설계 이질성. 균주별 분석 부족.</div></div>
+        </div>
+        <div class="key-nums">
+          <div class="knum"><div class="val">75%</div><div class="desc">SIBO 음성화율</div><div class="pval">호흡 검사</div></div>
+          <div class="knum"><div class="val">68%</div><div class="desc">IBS-D 반응률</div><div class="pval">증상 50%↑</div></div>
+          <div class="knum"><div class="val">+20%</div><div class="desc">프로바이오틱스</div><div class="pval">병용 시 추가</div></div>
+        </div>
+        <div class="viz-section">
+          <h4>주요 Figure</h4>
+          <div class="viz-subtitle">오픈액세스 논문 — Frontiers 원문 직접 확인 가능</div>
+          <div class="chart-wrap"><canvas id="chart6"></canvas></div>
+        </div>
+        <div class="usage">
+          <h4>활용 포인트</h4>
+          <ul><li>소화기내과: "노르믹스 SIBO 호흡 검사 음성화 <strong>65~75%, IBS-D 증상 완화 58~68%</strong>로 1차 치료약 입증"</li><li>프로바이오틱스 병용으로 <strong>추가 15~20%</strong> 향상</li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="legend">
+      <h4>근거 분류 기준</h4>
+      <table>
+        <tr><td>직접근거</td><td>노르믹스(rifaximin) 또는 하노마린(silymarin) 동일 성분을 사용한 RCT, 메타분석, 또는 간-장내미생물 축 관련 동일 성분의 임상적 효능·안전성 직접 검증 연구</td></tr>
+        <tr><td>참고근거</td><td>리팍시민 항생제 내성 우려 등 간접적 임상 정보나 관련 메커니즘 연구. 임상적 주의사항·한계점으로 활용</td></tr>
+      </table>
+    </div>
+    <div class="legend">
+      <h4>중요도 평가 기준</h4>
+      <table>
+        <tr><td>★★★</td><td>즉시 활용 — RCT, 메타분석, Phase 3 이상. PM팀 디테일링에 바로 반영 가능</td></tr>
+        <tr><td>★★☆</td><td>참고 활용 — 체계적 문헌고찰, 중등도 임상. KOL 학술강연 소재</td></tr>
+        <tr><td>★☆☆</td><td>모니터링 — 동향 파악 수준. 후속 연구 결과 확인 필요</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+function copyText(elementId, successId) {
+  const text = document.getElementById(elementId).textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    const successEl = document.getElementById(successId);
+    successEl.style.display = 'inline';
+    setTimeout(() => { successEl.style.display = 'none'; }, 2000);
+  });
+}
+function copyBody() {
+  const mailContent = document.getElementById('mailContent').innerText;
+  navigator.clipboard.writeText(mailContent).then(function() {
+    const successEl = document.getElementById('bodySuccess');
+    successEl.style.display = 'inline';
+    setTimeout(() => { successEl.style.display = 'none'; }, 3000);
+  });
+}
+function initCharts() {
+  new Chart(document.getElementById('chart1'), {
+    type: 'bar', data: { labels: ['vs Placebo', 'vs Lactulose', '2차 예방', 'Post-TIPS'], datasets: [{label: 'Risk Ratio (RR)', data: [0.58, 0.65, 0.49, 0.70], backgroundColor: ['#E87722', '#E87722', '#FF6B35', '#FF6B35'], borderColor: '#003366', borderWidth: 1}]
+    }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { max: 1.0, ticks: { stepSize: 0.2 } } }, plugins: { legend: { display: false } } }
+  });
+  new Chart(document.getElementById('chart2'), {
+    type: 'bar', data: { labels: ['4주차', '8주차'], datasets: [{ label: '병용군', data: [65.7, 65.7], backgroundColor: '#003366' }, { label: '단독군', data: [31.4, 34.2], backgroundColor: '#E8EAF0' }]
+    }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { max: 100 } }, plugins: { legend: { position: 'top' } } }
+  });
+  new Chart(document.getElementById('chart4'), {
+    type: 'bar', data: { labels: ['전체 AMR', 'VRE', 'MDR Acinetobacter'], datasets: [{label: 'Risk Ratio', data: [1.47, 2.1, 1.8], backgroundColor: ['#C0392B', '#E74C3C', '#E67E22'], borderColor: '#003366', borderWidth: 1}]
+    }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { max: 2.5 } }, plugins: { legend: { display: false } } }
+  });
+  new Chart(document.getElementById('chart6'), {
+    type: 'bar', data: { labels: ['SIBO 음성화', 'IBS-D 반응', '병용 추가'], datasets: [{label: '성공률 (%)', data: [75, 68, 88], backgroundColor: ['#003366', '#1A5276', '#E87722'], borderColor: '#003366', borderWidth: 1}]
+    }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { max: 100 } }, plugins: { legend: { display: false } } }
+  });
+}
+window.addEventListener('DOMContentLoaded', initCharts);
+</script>
+</body>
+</html>
