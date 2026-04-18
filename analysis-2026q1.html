@@ -79,6 +79,7 @@ tr:hover{background:#f7fafc;}
     <div class="tab" data-tab="forecast">매출 예측</div>
     <div class="tab" data-tab="risk">리스크/기회</div>
     <div class="tab" data-tab="all">전체 품목</div>
+    <div class="tab" data-tab="pmforecast">PM 마감예측 <span style="font-size:9px;background:#e53e3e;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:1px;">LIVE</span></div>
   </div>
 
   <div class="panel active" id="panel-overview">
@@ -242,6 +243,47 @@ tr:hover{background:#f7fafc;}
       <table id="allTable"><thead><tr>
         <th>#</th><th>품목</th><th>1월</th><th>2월</th><th>3월</th><th>Q1실적</th><th>Q1목표</th><th>달성율</th><th>Q1 YoY</th><th>3월MoM</th><th>연간SF</th><th>잔여월목표</th><th>4월목표</th>
       </tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+
+  <!-- =================== PM 마감예측 (LIVE — 2026 마감예측 시트 실시간 연동) =================== -->
+  <div class="panel" id="panel-pmforecast">
+    <div style="background:#fff7ed;border:1px solid #fdba74;padding:10px 14px;border-radius:8px;margin-bottom:14px;font-size:12px;color:#9a3412;line-height:1.6;">
+      <b>📡 실시간 연동 시트:</b> <a href="https://docs.google.com/spreadsheets/d/1LYuUQrUrtFLfUCjpUgoVNtEqIyTv-0l_-F6nSY4ESF0/edit#gid=1589134561" target="_blank" style="color:#9a3412;text-decoration:underline;">「2026 마감예측」</a> 탭 (PM 개별 입력 → 즉시 반영).
+      <span id="pmf_status" style="margin-left:8px;color:#555;">로딩 중…</span>
+      <button onclick="loadPMForecast()" style="margin-left:10px;background:#fff;border:1px solid #fdba74;padding:3px 10px;border-radius:5px;cursor:pointer;font-size:11px;color:#9a3412;">↻ 새로고침</button>
+    </div>
+
+    <!-- 요약 KPI -->
+    <div class="kpi-row" id="pmf_kpis" style="margin-bottom:14px;"></div>
+
+    <!-- PM별 월별 달성률 히트맵 -->
+    <div class="section">
+      <div class="card">
+        <h3>PM별 월별 달성률 히트맵 <span style="font-size:11px;color:var(--muted);font-weight:400;">(단위: 달성률 %, 실적 억원)</span></h3>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-bottom:10px;align-items:center;">
+          <span>등급:
+            <b style="background:#c6f6d5;color:#22543d;padding:2px 8px;border-radius:3px;margin:0 3px;">A</b>달성률 100%↑
+            <b style="background:#fefcbf;color:#744210;padding:2px 8px;border-radius:3px;margin:0 3px;">B</b>90%↑
+            <b style="background:#fed7d7;color:#742a2a;padding:2px 8px;border-radius:3px;margin:0 3px;">C</b>90%↓
+          </span>
+          <span style="color:#c05621;">※ 공란: 미마감월(예측만 존재) · <b>마케팅1/마케팅2</b> 팀합계는 굵게 표시</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table id="pmf_heatmap" class="grp-table" style="min-width:1050px;"></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 연간 전망 표 (PM별) -->
+    <div class="section">
+      <div class="card">
+        <h3>PM별 26년 연간 착지 전망 <span style="font-size:11px;color:var(--muted);font-weight:400;">(단위: 억원 / PM 직접 입력 기반)</span></h3>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">PM의 4월 1차 마감예측치를 합산하여 연간 착지를 예측합니다. 목표 대비 편차가 큰 PM은 <span style="color:#e53e3e;font-weight:700;">붉은색</span>으로 표시됩니다.</p>
+        <div style="overflow-x:auto;">
+          <table id="pmf_yearTable" class="grp-table"></table>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1068,6 +1110,265 @@ renderAll();
     <strong>③ 성수기 집중구간:</strong> 9월(지수 ${S.seasonIdx[8].toFixed(2)}x)·7월(${S.seasonIdx[6].toFixed(2)}x)·12월(${S.seasonIdx[11].toFixed(2)}x)이 연중 Top3 → 노르믹스(3Q 시즌) / 수액·IVNT / 연말 밀어내기 품목 자원집중 타이밍.<br>
     <strong>④ 현재 추세의 의미:</strong> 26년 Q1 YoY +${(S.yoyQ1*100).toFixed(1)}%인데 SF 달성 위해 필요 YoY는 +${((D.total.ann_sf/D.total.ann_25-1)*100).toFixed(1)}% → Q2 이후 성장률 가속 필요 (현 추세로는 약 ${Math.abs(annualGap).toFixed(0)}억 부족).`;
 })();
+
+// =================== PM 마감예측 LIVE (2026 마감예측 시트 JSONP 연동) ===================
+// 출처 시트: 1LYuUQrUrtFLfUCjpUgoVNtEqIyTv-0l_-F6nSY4ESF0, gid=1589134561 (2026 마감예측)
+// 월별 4-컬럼 블록: [목표, 실적, 달성률, 등급] 시작 컬럼 = 67(1월), 71(2월), ... 111(12월)
+// PM 행: 7=강태석, 8=최우열, 9=김유연, 10=마케팅1합, 11=임범성, 12=박지현, 13=이민정, 14=김지완, 15=마케팅2합, 16=강경완, 17=총합
+const PMF_CFG = {
+  sheetId: '1LYuUQrUrtFLfUCjpUgoVNtEqIyTv-0l_-F6nSY4ESF0',
+  gid: 1589134561,
+  // PM 식별 테이블: (team × pmMatch) — JSONP 행에서 이름으로 검색
+  // pmMatch는 cell F(=5) 값이 포함하는 문자열. 합계행은 F='합' + B=team명으로 구분
+  pmList: [
+    {team:'마케팅1', pmName:'강태석',       label:'강태석',       isTotal:false, teamMatch:'마케팅1', pmMatch:'강태석'},
+    {team:'마케팅1', pmName:'최우열',       label:'최우열',       isTotal:false, teamMatch:'마케팅1', pmMatch:'최우열'},
+    {team:'마케팅1', pmName:'김유연',       label:'김유연',       isTotal:false, teamMatch:'마케팅1', pmMatch:'김유연'},
+    {team:'마케팅1', pmName:'마케팅1 합계',  label:'마케팅1 합계', isTotal:true,  teamMatch:'마케팅1', pmMatch:'합'},
+    {team:'마케팅2', pmName:'임범성',       label:'임범성',       isTotal:false, teamMatch:'마케팅2', pmMatch:'임범성'},
+    {team:'마케팅2', pmName:'박지현',       label:'박지현',       isTotal:false, teamMatch:'마케팅2', pmMatch:'박지현'},
+    {team:'마케팅2', pmName:'이민정',       label:'이민정',       isTotal:false, teamMatch:'마케팅2', pmMatch:'이민정'},
+    {team:'마케팅2', pmName:'김지완',       label:'김지완',       isTotal:false, teamMatch:'마케팅2', pmMatch:'김지완'},
+    {team:'마케팅2', pmName:'마케팅2 합계',  label:'마케팅2 합계', isTotal:true,  teamMatch:'마케팅2', pmMatch:'합'},
+    {team:'영업기획', pmName:'강경완',       label:'강경완',       isTotal:false, teamMatch:'영업기획', pmMatch:'강경완'},
+    {team:'전사',    pmName:'총합계',       label:'총합계',       isTotal:true,  teamMatch:'마케팅', pmMatch:'총합'},
+  ],
+  monthStartCol: 67,  // 1월 목표 컬럼 (1-indexed): 월 m = monthStartCol + 4*(m-1)
+};
+
+let PMF_DATA = null;
+
+function gvizQuery(sheetId, gid, cb){
+  // range Row 7~17, Col 2~142 (넉넉하게) — gviz 범위 지정: select * offset/limit 대신 직접 지정
+  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}&headers=0&tq=${encodeURIComponent('select * limit 20')}`;
+  fetch(url)
+    .then(r=>r.text())
+    .then(body=>{
+      const m = body.match(/\{[\s\S]*\}/);
+      if(!m){ cb(null, 'JSONP 파싱 실패'); return; }
+      try{ cb(JSON.parse(m[0]), null); }catch(e){ cb(null, e.message); }
+    })
+    .catch(e=>cb(null, e.message));
+}
+
+function loadPMForecast(){
+  const st = document.getElementById('pmf_status');
+  st.textContent = '로딩 중…';
+  st.style.color = '#555';
+  gvizQuery(PMF_CFG.sheetId, PMF_CFG.gid, (j, err)=>{
+    if(err || !j || j.status !== 'ok'){
+      st.innerHTML = '<span style="color:#e53e3e;">⚠️ 연동 실패 — ' + (err || j?.errors?.[0]?.message || 'unknown') + '</span>';
+      return;
+    }
+    const rows = j.table.rows;
+    const getV = (row, colIdx)=>{
+      if(!row || !row.c || colIdx>=row.c.length) return null;
+      const c = row.c[colIdx];
+      return c ? c.v : null;
+    };
+    // 이름 매칭: team(컬럼 B=idx1) + pm(컬럼 F=idx5)
+    const findRow = (teamMatch, pmMatch)=>{
+      for(const r of rows){
+        const tVal = String(getV(r, 1) || '').trim();
+        const pVal = String(getV(r, 5) || '').trim();
+        if(tVal.includes(teamMatch) && pVal === pmMatch) return r;
+      }
+      // 총합은 team='마케팅' 정확 매칭 필요 (예: '마케팅1'과 구분)
+      for(const r of rows){
+        const tVal = String(getV(r, 1) || '').trim();
+        const pVal = String(getV(r, 5) || '').trim();
+        if(tVal === teamMatch && pVal === pmMatch) return r;
+      }
+      return null;
+    };
+
+    const pms = PMF_CFG.pmList.map(p=>{
+      // 총합계 특수처리: team='마케팅' (정확매칭)
+      let row;
+      if(p.pmName === '총합계'){
+        row = rows.find(r=>{
+          const t = String(getV(r,1)||'').trim();
+          const pv = String(getV(r,5)||'').trim();
+          return t === '마케팅' && pv === '총합';
+        });
+      } else {
+        row = findRow(p.teamMatch, p.pmMatch);
+      }
+      const months = [];
+      for(let m=1;m<=12;m++){
+        const base = PMF_CFG.monthStartCol + 4*(m-1);  // 1-indexed
+        const target = row ? getV(row, base-1)   : null;
+        const actual = row ? getV(row, base)     : null;
+        const rate   = row ? getV(row, base+1)   : null;
+        const grade  = row ? getV(row, base+2)   : null;
+        months.push({
+          target: typeof target==='number' ? target : null,
+          actual: typeof actual==='number' ? actual : null,
+          rate:   typeof rate==='number'   ? rate   : null,
+          grade:  typeof grade==='string'  ? grade  : null,
+        });
+      }
+      return {
+        team: p.team, pm: p.label, isTotal: p.isTotal, months
+      };
+    });
+
+    PMF_DATA = {pms, loadedAt: new Date()};
+    renderPMForecast();
+    st.innerHTML = '<span style="color:#38a169;">✓ 최종 업데이트: ' + PMF_DATA.loadedAt.toLocaleString('ko-KR') + '</span>';
+  });
+}
+
+function renderPMForecast(){
+  if(!PMF_DATA) return;
+  const {pms} = PMF_DATA;
+
+  // ---- KPI Strip ----
+  // 직전 마감월 = 오늘 날짜 기준 (SAP가 매월 10일경 전월 마감)
+  // 오늘이 X월 이면, X-1월까지가 마감됨 (단, X월 10일 이전이면 X-2월까지)
+  const now = new Date();
+  const curMonth = now.getMonth()+1;
+  const curDay = now.getDate();
+  let lastClosed = curDay >= 10 ? curMonth - 1 : curMonth - 2;
+  if(lastClosed < 1) lastClosed = 12;
+  const total = pms.find(p=>p.pm==='총합계');
+  const mkt1  = pms.find(p=>p.pm==='마케팅1 합계');
+  const mkt2  = pms.find(p=>p.pm==='마케팅2 합계');
+  const lastClosedRate = total?.months[lastClosed-1]?.rate;
+  // 2) 연간 마감예측 vs 목표 편차 — 총합계 연간 sum
+  const yrTgt = total.months.reduce((s,m)=>s+(m.target||0),0);
+  const yrFcst = total.months.reduce((s,m)=>s+((m.actual||m.target)||0),0);  // 마감월은 실적, 미마감월은 예측=목표 (sheet에선 미마감월 "실적"컬럼에 PM 예측 입력)
+  // 개정: sheet의 "실적"컬럼은 마감전엔 PM 예측치가 들어있으므로 그 값을 사용
+  const yrPredicted = total.months.reduce((s,m)=>s+(m.actual||0),0);
+  // 3) C등급 위험 PM 수 (마감월 기준)
+  const riskPMs = pms.filter(p=>!p.isTotal && p.pm!=='강경완' && p.months[lastClosed-1]?.grade==='C').length;
+  // 4) 상향 예측 PM 수 (연간 예측 > 목표)
+  const upPMs = pms.filter(p=>!p.isTotal && p.pm!=='강경완').filter(p=>{
+    const t = p.months.reduce((s,m)=>s+(m.target||0),0);
+    const f = p.months.reduce((s,m)=>s+(m.actual||0),0);
+    return f > t;
+  }).length;
+
+  const eok = n => (n/1e8).toFixed(0);
+  const kpiEl = document.getElementById('pmf_kpis');
+  kpiEl.innerHTML = `
+    <div class="kpi-card" style="background:#fff7ed;border-color:#fdba74;">
+      <div class="kpi-label">직전 마감월 (${lastClosed}월) 총달성률</div>
+      <div class="kpi-value" style="color:${lastClosedRate>=1?'#38a169':(lastClosedRate>=0.9?'#d69e2e':'#e53e3e')};">${lastClosedRate?(lastClosedRate*100).toFixed(1)+'%':'-'}</div>
+      <div class="kpi-sub">실적 ${eok(total.months[lastClosed-1]?.actual||0)}억 / 목표 ${eok(total.months[lastClosed-1]?.target||0)}억</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">PM 연간 착지 예측 (직접입력 합)</div>
+      <div class="kpi-value">${eok(yrPredicted)}<span style="font-size:14px;">억</span></div>
+      <div class="kpi-sub">목표 ${eok(yrTgt)}억 대비 <span style="color:${yrPredicted>=yrTgt?'#38a169':'#e53e3e'};font-weight:700;">${yrPredicted>=yrTgt?'+':''}${eok(yrPredicted-yrTgt)}억</span></div>
+    </div>
+    <div class="kpi-card" style="background:${riskPMs>0?'#fff5f5':'#f0fff4'};border-color:${riskPMs>0?'#feb2b2':'#9ae6b4'};">
+      <div class="kpi-label">위험 PM (${lastClosed}월 C등급)</div>
+      <div class="kpi-value" style="color:${riskPMs>0?'#e53e3e':'#38a169'};">${riskPMs}<span style="font-size:14px;">명</span></div>
+      <div class="kpi-sub">${riskPMs>0?'집중 면담·지원 대상':'전 PM 안정권'}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">상향 예측 PM</div>
+      <div class="kpi-value" style="color:#2b6cb0;">${upPMs}<span style="font-size:14px;">명</span></div>
+      <div class="kpi-sub">연간 목표 대비 초과 예측</div>
+    </div>
+  `;
+
+  // ---- Heatmap ----
+  const tbl = document.getElementById('pmf_heatmap');
+  let html = '<thead><tr><th style="text-align:left;min-width:110px;">PM / 월</th>';
+  for(let m=1;m<=12;m++){
+    let label, tag;
+    if(m <= lastClosed){ label=m+'월'; tag='<br><span style="font-size:9px;color:#38a169;">마감</span>'; }
+    else if(m === curMonth){ label=m+'월'; tag='<br><span style="font-size:9px;color:#c05621;">진행중</span>'; }
+    else { label=m+'월'; tag='<br><span style="font-size:9px;color:#a0aec0;">예측</span>'; }
+    const highlight = m === curMonth ? 'background:#fef5e7;border:2px solid #f6ad55;' : (m<=lastClosed ? 'background:#f0fff4;' : '');
+    html += `<th style="min-width:72px;${highlight}">${label}${tag}</th>`;
+  }
+  html += '<th style="min-width:80px;background:#edf2f7;">연간전망</th></tr></thead><tbody>';
+  for(const p of pms){
+    const isEmpty = p.months.every(m=>!m.actual && !m.target);
+    if(isEmpty) continue;  // 강경완 등 데이터 없는 행 스킵
+    const rowStyle = p.isTotal ? 'background:#f7fafc;font-weight:700;' : '';
+    html += `<tr style="${rowStyle}"><td style="text-align:left;">${p.team}<br><b>${p.pm}</b></td>`;
+    for(let m=1;m<=12;m++){
+      const cell = p.months[m-1];
+      const rate = cell.rate;
+      const act  = cell.actual;
+      const grade = cell.grade;
+      const isClosed = m <= lastClosed;
+      const isFuture = m > curMonth;
+      let bg='', col='', cellContent='-';
+      if(rate!=null){
+        if(grade==='A'){ bg='#c6f6d5'; col='#22543d'; }
+        else if(grade==='B'){ bg='#fefcbf'; col='#744210'; }
+        else if(grade==='C'){ bg='#fed7d7'; col='#742a2a'; }
+        // 미래월은 색상 연하게 (예측치임을 시각적으로 구분)
+        if(isFuture){ bg=bg ? bg+';opacity:0.55' : ''; }
+        const pct = (rate*100).toFixed(0)+'%';
+        const actEok = (act && act>0) ? (act/1e8).toFixed(1)+'억' : '';
+        // 미래월: 예측만 표시 (실적 라벨 대신 "예측" 표시)
+        let valLabel;
+        if(isClosed && actEok){ valLabel = actEok; }
+        else if(!isClosed && actEok){ valLabel = '<i style="opacity:0.7">예측 '+actEok+'</i>'; }
+        else { valLabel = ''; }
+        cellContent = `<b>${pct}</b>${valLabel?'<br><span style="font-size:10px;opacity:0.8;">'+valLabel+'</span>':''}`;
+      }
+      // 미래월은 배경 투명도 적용
+      const finalStyle = isFuture ? `background:${bg};color:${col};opacity:0.7;` : `background:${bg};color:${col};`;
+      html += `<td style="${finalStyle}text-align:center;font-size:11px;padding:4px 2px;">${cellContent}</td>`;
+    }
+    // 연간 전망 셀
+    const yrT = p.months.reduce((s,x)=>s+(x.target||0),0);
+    const yrF = p.months.reduce((s,x)=>s+(x.actual||0),0);
+    const gapPct = yrT>0 ? (yrF/yrT-1)*100 : 0;
+    const gapColor = gapPct>=0 ? '#2b6cb0' : '#e53e3e';
+    html += `<td style="background:#edf2f7;text-align:center;font-size:11px;"><b>${(yrF/1e8).toFixed(0)}억</b><br><span style="color:${gapColor};font-size:10px;">${gapPct>=0?'+':''}${gapPct.toFixed(1)}%</span></td>`;
+    html += '</tr>';
+  }
+  html += '</tbody>';
+  tbl.innerHTML = html;
+
+  // ---- Year Table ----
+  const yTbl = document.getElementById('pmf_yearTable');
+  let yh = `<thead><tr><th>팀</th><th>PM</th><th>26년 목표</th><th>직접입력 마감예측(연간)</th><th>편차</th><th>편차율</th><th>${lastClosed}월 달성률</th><th>평가</th></tr></thead><tbody>`;
+  for(const p of pms){
+    const isEmpty = p.months.every(m=>!m.actual && !m.target);
+    if(isEmpty) continue;
+    const yrT = p.months.reduce((s,x)=>s+(x.target||0),0);
+    const yrF = p.months.reduce((s,x)=>s+(x.actual||0),0);
+    const gap = yrF - yrT;
+    const gapPct = yrT>0 ? (yrF/yrT-1)*100 : 0;
+    const lcm = p.months[lastClosed-1];
+    const lcRate = lcm?.rate;
+    const lcGrade = lcm?.grade || '-';
+    let grdBg='',grdCol='';
+    if(lcGrade==='A'){grdBg='#c6f6d5';grdCol='#22543d';}
+    else if(lcGrade==='B'){grdBg='#fefcbf';grdCol='#744210';}
+    else if(lcGrade==='C'){grdBg='#fed7d7';grdCol='#742a2a';}
+    const rowStyle = p.isTotal ? 'background:#f7fafc;font-weight:700;' : '';
+    yh += `<tr style="${rowStyle}">
+      <td>${p.team}</td><td><b>${p.pm}</b></td>
+      <td style="text-align:right;">${(yrT/1e8).toFixed(0)}억</td>
+      <td style="text-align:right;">${(yrF/1e8).toFixed(0)}억</td>
+      <td style="text-align:right;color:${gap>=0?'#38a169':'#e53e3e'};font-weight:700;">${gap>=0?'+':''}${(gap/1e8).toFixed(1)}억</td>
+      <td style="text-align:right;color:${gap>=0?'#38a169':'#e53e3e'};">${gapPct>=0?'+':''}${gapPct.toFixed(1)}%</td>
+      <td style="text-align:right;">${lcRate?(lcRate*100).toFixed(1)+'%':'-'}</td>
+      <td style="text-align:center;background:${grdBg};color:${grdCol};font-weight:700;">${lcGrade}</td>
+    </tr>`;
+  }
+  yh += '</tbody>';
+  yTbl.innerHTML = yh;
+}
+
+// 탭 첫 진입 시 자동 로드 (성능 고려: 탭 클릭 시에만 호출)
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    if(t.dataset.tab === 'pmforecast' && !PMF_DATA){
+      loadPMForecast();
+    }
+  });
+});
 
 </script>
 </body>
