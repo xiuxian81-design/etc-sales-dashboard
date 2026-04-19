@@ -60,6 +60,48 @@ tr:hover{background:#f7fafc;}
 .grp-table th{background:#edf2f7;}
 .grp-bar{display:inline-block;height:8px;border-radius:3px;vertical-align:middle;margin-right:5px;}
 @media(max-width:1200px){.kpi-row{grid-template-columns:repeat(3,1fr);}.grid-2{grid-template-columns:1fr;}.fc-summary{grid-template-columns:repeat(2,1fr);}.header-center{gap:10px;}}
+/* ===== 품목 드릴다운 모달 ===== */
+#fcTable tbody tr[data-pm-key]:not([data-pm-key="__total__"]){cursor:pointer;}
+#fcTable tbody tr[data-pm-key]:not([data-pm-key="__total__"]):hover{background:#ebf8ff !important;}
+#fcTable tbody tr[data-pm-key]:not([data-pm-key="__total__"]) td:first-child::after{content:' ▸';color:#a0aec0;font-size:10px;font-weight:400;}
+.dd-overlay{position:fixed;inset:0;background:rgba(26,54,93,.55);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px;overflow-y:auto;}
+.dd-overlay.show{display:flex;}
+.dd-modal{background:#fff;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.3);width:100%;max-width:960px;max-height:92vh;overflow-y:auto;animation:ddIn .2s ease-out;}
+@keyframes ddIn{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.dd-header{background:linear-gradient(135deg,#1a365d,#2b6cb0);color:#fff;padding:18px 24px;border-radius:14px 14px 0 0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;}
+.dd-header .dd-title{font-size:20px;font-weight:700;}
+.dd-header .dd-pm{font-size:12px;opacity:.88;margin-top:3px;}
+.dd-header .dd-close{background:rgba(255,255,255,.18);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+.dd-header .dd-close:hover{background:rgba(255,255,255,.3);}
+.dd-body{padding:20px 24px 28px;}
+.dd-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+.dd-kpi-box{background:#f7fafc;border-radius:10px;padding:12px 14px;border-left:3px solid #2b6cb0;}
+.dd-kpi-box.green{border-left-color:#38a169;}
+.dd-kpi-box.purple{border-left-color:#805ad5;}
+.dd-kpi-box.orange{border-left-color:#d69e2e;}
+.dd-kpi-box .k-lbl{font-size:10px;color:#718096;font-weight:600;}
+.dd-kpi-box .k-val{font-size:22px;font-weight:800;color:#1a365d;margin-top:2px;line-height:1.1;}
+.dd-kpi-box .k-sub{font-size:10px;color:#718096;margin-top:2px;}
+.dd-section{margin-top:18px;}
+.dd-section h4{font-size:13px;color:#1a365d;font-weight:700;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #e2e8f0;}
+.dd-charts{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;}
+.dd-chart-box{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px;}
+.dd-chart-box canvas{max-height:240px;}
+.dd-reason{background:linear-gradient(135deg,#faf5ff,#ebf8ff);border:1px solid #d6bcfa;border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.65;color:#2d3748;}
+.dd-reason .r-head{font-size:12px;font-weight:700;color:#553c9a;margin-bottom:6px;}
+.dd-reason .r-gap{font-weight:700;}
+.dd-reason .r-gap.pos{color:#c53030;} .dd-reason .r-gap.neg{color:#2c5282;} .dd-reason .r-gap.zero{color:#38a169;}
+.dd-method{width:100%;border-collapse:collapse;font-size:12px;}
+.dd-method th{background:#edf2f7;padding:7px;text-align:center;font-weight:700;color:#1a365d;}
+.dd-method td{padding:7px;border-bottom:1px solid #e2e8f0;}
+.dd-method td:first-child{font-weight:600;text-align:left;}
+.dd-method td.num{text-align:right;font-variant-numeric:tabular-nums;}
+.dd-momentum{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px;}
+.dd-mo{background:#f7fafc;border-radius:8px;padding:10px;text-align:center;border:1px solid #e2e8f0;}
+.dd-mo .mo-l{font-size:11px;color:#718096;font-weight:600;}
+.dd-mo .mo-v{font-size:16px;font-weight:800;color:#1a365d;margin-top:2px;}
+.dd-mo .mo-s{font-size:10px;color:#718096;margin-top:2px;}
+@media(max-width:820px){.dd-kpi{grid-template-columns:repeat(2,1fr);}.dd-charts{grid-template-columns:1fr;}.dd-momentum{grid-template-columns:repeat(2,1fr);}}
 </style>
 </head>
 <body>
@@ -69,7 +111,12 @@ tr:hover{background:#f7fafc;}
     <div class="sub">2026년 Q1(1~3월) 실적 기반 | SAP 마감자료 기준 | 단위: 억원</div>
   </div>
   <div class="header-center" id="headerStats"></div>
-  <div><span class="badge">2026.03 마감 기준</span></div>
+  <div style="text-align:right;">
+    <span class="badge">2026.03 마감 기준</span>
+    <div id="rawSyncBadge" style="margin-top:6px;font-size:11px;background:rgba(255,255,255,.15);padding:5px 11px;border-radius:16px;cursor:pointer;display:inline-block;transition:background .15s;" title="클릭하여 상세 연동 상태 확인">
+      <span id="rawSyncIcon">⏳</span> <span id="rawSyncText">SAP 자동연동 확인 중…</span>
+    </div>
+  </div>
 </div>
 <div class="kpi-row" id="kpiRow"></div>
 <div class="content">
@@ -1120,7 +1167,7 @@ function loadPMProductForecast(){
       return;
     }
     const rows = j.table.rows;
-    const pmData = {};         // key: dashboard name, {apr, ann, q1, rem, cnt}
+    const pmData = (window.__pmData = {});  // 드릴다운에서도 공유
     let totApr=0, totQ1=0, totRem=0;
     const dashKeys = Array.from(document.querySelectorAll('#fcTable tbody tr[data-pm-key]'))
       .map(tr=>tr.dataset.pmKey).filter(k=>k!=='__total__');
@@ -1214,6 +1261,448 @@ function loadPMProductForecast(){
   if(document.querySelector('#panel-forecast.active')){
     loaded = true; setTimeout(loadPMProductForecast, 300);
   }
+})();
+
+// ================= 품목 드릴다운 패널 (B안 ③) =================
+// PM → 담당 품목 매핑 (CLAUDE.md 기준). 매칭 실패 시 '-'
+const PM_BY_PRODUCT = {
+  '바이오탑':'박지현', '하노마린':'박지현', '헤파몬':'박지현', '앱시토':'박지현', '한시움':'박지현', '우데콜':'박지현', '멜라원':'박지현',
+  '노르믹스':'이민정', '네오미노화겐씨':'이민정', '콤비플렉스':'이민정', '유바솔':'이민정', '갈로닉':'이민정',
+  '엘리가드':'김지완', '포드림':'김지완', '포미스터':'김지완', '프로베린':'김지완', '한올탐술로신':'김지완', '엔잘루타':'김지완',
+  '헤어그로':'강태석', '미녹필':'강태석', '헤어덤':'강태석', '아다모':'강태석', '판그로':'강태석', '본그로':'강태석', '본에바':'강태석', '알렌탑':'강태석',
+  '알파본':'최우열(MS)/강태석', '글루코프리':'최우열', '덱시티옥':'최우열', '클로비드':'최우열', '베노론':'최우열', '이글렉스':'최우열', '프레가발린':'최우열',
+  '올리버원':'강경완', '록스페닌':'김유연', '아세로':'김유연', '케랄':'김유연', '한콕스':'김유연', '헤르팜':'김유연'
+};
+function lookupPM(name){
+  if(PM_BY_PRODUCT[name]) return PM_BY_PRODUCT[name];
+  // prefix 매칭
+  for(const k of Object.keys(PM_BY_PRODUCT)){
+    if(name.startsWith(k) || k.startsWith(name)) return PM_BY_PRODUCT[k];
+  }
+  return '-';
+}
+
+// 품목별 월별 계절계수 (24/25 가중평균, 12월 합=12)
+function calcProductSeasonIdx(p){
+  const a24 = p.monthly_24 || [], a25 = p.monthly_25 || [];
+  const s24 = a24.reduce((a,b)=>a+b,0), s25 = a25.reduce((a,b)=>a+b,0);
+  if(s24 <= 0 && s25 <= 0) return null;
+  const avg24 = s24/12, avg25 = s25/12;
+  let idx = [];
+  for(let m=0;m<12;m++){
+    const v24 = avg24>0 ? a24[m]/avg24 : 1;
+    const v25 = avg25>0 ? a25[m]/avg25 : 1;
+    // 25년 60%, 24년 40%, 누락 연도는 반대편 100%
+    const w24 = s24>0 ? 0.4 : 0, w25 = s25>0 ? 0.6 : 0;
+    const wSum = w24 + w25;
+    idx.push(wSum>0 ? (v24*w24 + v25*w25)/wSum : 1);
+  }
+  const s = idx.reduce((a,b)=>a+b,0);
+  return idx.map(x => x*12/s);
+}
+
+// DOM: 모달 삽입
+(function injectDDModal(){
+  const wrap = document.createElement('div');
+  wrap.className = 'dd-overlay'; wrap.id = 'ddOverlay';
+  wrap.innerHTML = `
+    <div class="dd-modal" role="dialog" aria-modal="true" id="ddModal">
+      <div class="dd-header">
+        <div>
+          <div class="dd-title" id="ddTitle">–</div>
+          <div class="dd-pm" id="ddPM">–</div>
+        </div>
+        <button class="dd-close" id="ddClose" aria-label="닫기">×</button>
+      </div>
+      <div class="dd-body" id="ddBody"></div>
+    </div>`;
+  document.body.appendChild(wrap);
+  // 닫기 동작
+  document.getElementById('ddClose').addEventListener('click', closeDD);
+  wrap.addEventListener('click', (e)=>{ if(e.target === wrap) closeDD(); });
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && wrap.classList.contains('show')) closeDD(); });
+})();
+
+let __ddCharts = [];
+function closeDD(){
+  document.getElementById('ddOverlay').classList.remove('show');
+  __ddCharts.forEach(c=>{ try{c.destroy();}catch(e){} });
+  __ddCharts = [];
+}
+
+function openDD(name){
+  const p = D.products.find(x=>x.name === name);
+  if(!p){ console.warn('drill-down: product not found', name); return; }
+  const pmObj = (window.__pmData||{})[name] || null;
+  const seasonIdx = calcProductSeasonIdx(p);
+
+  // KPI 계산
+  const q1_26 = p.q1_26, q1_25 = p.q1_25;
+  const yoy = q1_25>0 ? ((q1_26/q1_25 - 1)*100) : null;
+  const fcAvg = p.fc_avg;
+  const pmAnn = pmObj ? pmObj.ann : null;
+  const pmApr = pmObj ? pmObj.apr : null;
+  const gap = (pmAnn!=null && fcAvg!=null) ? (pmAnn - fcAvg) : null;
+
+  // Claude 4월 예측 (3가지 방법, 품목 단위)
+  const mar = p.mar||0, feb = p.feb||0;
+  const idx3 = seasonIdx ? seasonIdx[2] : 1, idx4 = seasonIdx ? seasonIdx[3] : 1;
+  const f_apr_A = idx3>0 ? mar*(idx4/idx3) : null;   // 3월 대비 계절계수
+  const q1idxSum = seasonIdx ? (seasonIdx[0]+seasonIdx[1]+seasonIdx[2]) : 3;
+  const ann_season = q1idxSum>0 ? q1_26 * 12 / q1idxSum : null;
+  const f_apr_B = (ann_season!=null) ? ann_season * idx4/12 : null;
+  const apr25 = (p.monthly_25||[])[3] || 0;
+  const yoyQ1_p = q1_25>0 ? (q1_26/q1_25 - 1) : 0;
+  const f_apr_C = apr25 * (1 + yoyQ1_p);
+  const aprClaudeCand = [f_apr_A, f_apr_B, f_apr_C].filter(v=>v!=null && !isNaN(v));
+  const aprClaude = aprClaudeCand.length>0 ? aprClaudeCand.reduce((a,b)=>a+b,0)/aprClaudeCand.length : null;
+
+  // 제안 문장 생성
+  let reason = '';
+  const reasonBits = [];
+  if(yoy!=null) reasonBits.push(`Q1 YoY ${yoy>=0?'+':''}${yoy.toFixed(1)}%`);
+  if(p.q1_ach!=null) reasonBits.push(`Q1 달성율 ${p.q1_ach.toFixed(1)}%`);
+  if(seasonIdx) reasonBits.push(`4월 계절계수 ${idx4.toFixed(2)}`);
+  if(p.mar_mom!=null) reasonBits.push(`3월 MoM ${p.mar_mom>=0?'+':''}${p.mar_mom.toFixed(1)}%`);
+  const reasonCtx = reasonBits.join(' · ');
+
+  if(gap == null){
+    reason = `PM 예측 LIVE 데이터가 아직 매칭되지 않았습니다. 매출 예측 탭 진입 후 자동 로드됩니다.`;
+  } else if(gap > 5){
+    reason = `PM 연말전망이 Claude 평균 대비 <span class="r-gap pos">+${gap.toFixed(1)}억</span> 공격적입니다. 근거: ${reasonCtx}. → Q2 실적으로 조기 검증 필요, 4월 랜딩 시점에서 트랙 리뷰 권장.`;
+  } else if(gap < -5){
+    reason = `PM 연말전망이 Claude 평균 대비 <span class="r-gap neg">${gap.toFixed(1)}억</span> 보수적입니다. 근거: ${reasonCtx}. → 상향 검토 여지 있음, 기회 품목 재평가 권장.`;
+  } else {
+    reason = `PM 연말전망과 Claude 평균이 <span class="r-gap zero">${gap>=0?'+':''}${gap.toFixed(1)}억</span> 범위 내 정렬되어 있습니다. 근거: ${reasonCtx}.`;
+  }
+
+  // 렌더
+  document.getElementById('ddTitle').textContent = p.name + (p.is_key?' ★ 주력':'');
+  document.getElementById('ddPM').textContent = `담당 PM: ${lookupPM(p.name)} · 26년 SF목표 ${fmt(p.ann_sf,1)}억 · Q1실적 ${fmt(q1_26,1)}억`;
+
+  const body = document.getElementById('ddBody');
+  body.innerHTML = `
+    <div class="dd-kpi">
+      <div class="dd-kpi-box"><div class="k-lbl">Q1 실적</div><div class="k-val">${fmt(q1_26,1)}</div><div class="k-sub">억원 · ${yoy!=null?`YoY ${yoy>=0?'+':''}${yoy.toFixed(1)}%`:'-'}</div></div>
+      <div class="dd-kpi-box green"><div class="k-lbl">Claude 예측 평균</div><div class="k-val">${fmt(fcAvg,1)}</div><div class="k-sub">억원 · SF대비 ${p.ann_sf>0?(fcAvg/p.ann_sf*100).toFixed(1):'-'}%</div></div>
+      <div class="dd-kpi-box purple"><div class="k-lbl">PM 연말 전망 <sup style="color:#805ad5;font-size:8px;">LIVE</sup></div><div class="k-val">${pmAnn!=null?fmt(pmAnn,1):'–'}</div><div class="k-sub">억원 · ${pmApr!=null?`4월 ${pmApr.toFixed(1)}억`:'로딩 대기'}</div></div>
+      <div class="dd-kpi-box orange"><div class="k-lbl">갭 (PM − Claude)</div><div class="k-val" style="color:${gap==null?'#999':(Math.abs(gap)<3?'#38a169':(gap>0?'#c53030':'#2c5282'))}">${gap!=null?(gap>=0?'+':'')+gap.toFixed(1):'–'}</div><div class="k-sub">${gap==null?'-':(Math.abs(gap)<3?'거의 일치':(gap>0?'PM 공격적':'PM 보수적'))}</div></div>
+    </div>
+
+    <div class="dd-section">
+      <h4>📈 월별 매출 트렌드 & 계절계수</h4>
+      <div class="dd-charts">
+        <div class="dd-chart-box"><canvas id="ddChartTrend"></canvas></div>
+        <div class="dd-chart-box"><canvas id="ddChartSeason"></canvas></div>
+      </div>
+    </div>
+
+    <div class="dd-section">
+      <h4>🎯 PM vs Claude 예측 제안</h4>
+      <div class="dd-reason">
+        <div class="r-head">통합 판단</div>
+        <div>${reason}</div>
+        ${aprClaude!=null && pmApr!=null ? `<div style="margin-top:8px;padding-top:8px;border-top:1px dashed #d6bcfa;font-size:12px;">
+          <b>4월 예측 비교:</b> PM ${pmApr.toFixed(1)}억 vs Claude ${aprClaude.toFixed(1)}억 (갭 ${pmApr-aprClaude>=0?'+':''}${(pmApr-aprClaude).toFixed(1)}억)
+        </div>` : ''}
+      </div>
+    </div>
+
+    <div class="dd-section">
+      <h4>🧮 Claude 예측 3가지 방법 상세</h4>
+      <table class="dd-method">
+        <thead><tr><th style="width:26%">방법</th><th>수식</th><th style="width:14%">결과</th></tr></thead>
+        <tbody>
+          <tr><td>예측① 단순연환산</td><td>Q1 실적 × 4</td><td class="num">${fmt(p.fc1,1)}억</td></tr>
+          <tr><td>예측② 계절성 반영</td><td>Q1 × (12 ÷ Q1계절지수합)</td><td class="num">${fmt(p.fc2,1)}억</td></tr>
+          <tr><td>예측③ Q1+SF잔여</td><td>Q1실적 + 4~12월 SF목표 합</td><td class="num">${fmt(p.fc3,1)}억</td></tr>
+          <tr style="background:#ebf8ff;font-weight:700"><td>Claude 평균</td><td>①②③ 산술평균</td><td class="num" style="color:#2c5282">${fmt(p.fc_avg,1)}억</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="dd-section">
+      <h4>📅 월별 모멘텀 (26년 Q1)</h4>
+      <div class="dd-momentum">
+        <div class="dd-mo"><div class="mo-l">1월</div><div class="mo-v">${fmt(p.jan,1)}</div><div class="mo-s">25년 ${fmt((p.monthly_25||[])[0],1)}</div></div>
+        <div class="dd-mo"><div class="mo-l">2월</div><div class="mo-v">${fmt(p.feb,1)}</div><div class="mo-s">MoM ${p.jan>0?(((p.feb/p.jan)-1)*100).toFixed(1)+'%':'-'}</div></div>
+        <div class="dd-mo"><div class="mo-l">3월</div><div class="mo-v">${fmt(p.mar,1)}</div><div class="mo-s">MoM ${p.mar_mom!=null?(p.mar_mom>=0?'+':'')+p.mar_mom.toFixed(1)+'%':'-'}</div></div>
+        <div class="dd-mo" style="background:#faf5ff;border-color:#d6bcfa"><div class="mo-l">4월 (예측)</div><div class="mo-v" style="color:#553c9a">${aprClaude!=null?aprClaude.toFixed(1):'-'}</div><div class="mo-s">PM ${pmApr!=null?pmApr.toFixed(1):'-'}</div></div>
+      </div>
+    </div>
+  `;
+
+  // 차트 렌더 (약간 지연: 모달 open 뒤)
+  document.getElementById('ddOverlay').classList.add('show');
+  setTimeout(()=>{
+    // 트렌드 차트: 24/25/26 + Claude 4~12월 예측(계절계수 기반 B안)
+    const lbl = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+    const data26Actual = (p.monthly_26||[]).map((v,i)=> i<3 ? v : null);
+    let projClaude = [];
+    if(seasonIdx && ann_season!=null){
+      for(let m=0;m<12;m++) projClaude.push(m<3 ? null : ann_season * seasonIdx[m]/12);
+    } else {
+      projClaude = lbl.map(()=>null);
+    }
+    const sf = (p.sf_monthly||[]).slice(0,12);
+    const trendCtx = document.getElementById('ddChartTrend');
+    if(trendCtx){
+      __ddCharts.push(new Chart(trendCtx, {
+        type:'line',
+        data:{ labels: lbl, datasets:[
+          {label:'24년 실적', data:p.monthly_24||[], borderColor:'#a0aec0', borderDash:[4,4], pointRadius:2, tension:.3},
+          {label:'25년 실적', data:p.monthly_25||[], borderColor:'#63b3ed', pointRadius:3, tension:.3},
+          {label:'26년 실적 (Q1)', data:data26Actual, borderColor:'#2b6cb0', borderWidth:3, pointRadius:5, tension:.3},
+          {label:'26년 Claude 예측', data:projClaude, borderColor:'#38a169', borderDash:[6,4], borderWidth:2, pointRadius:3, tension:.3},
+          {label:'26년 SF목표', data:sf, borderColor:'#d69e2e', borderDash:[2,3], pointRadius:0, borderWidth:1.5, tension:.2}
+        ]},
+        options:{ responsive:true, plugins:{ legend:{position:'bottom', labels:{font:{size:10}}} }, scales:{y:{title:{display:true,text:'억원',font:{size:10}}}} }
+      }));
+    }
+    // 계절계수 바 차트
+    const seasonCtx = document.getElementById('ddChartSeason');
+    if(seasonCtx){
+      const idxArr = seasonIdx || lbl.map(()=>1);
+      __ddCharts.push(new Chart(seasonCtx, {
+        type:'bar',
+        data:{ labels: lbl, datasets:[{
+          label:'계절계수 (24·25 가중평균, 1.0=월평균)',
+          data: idxArr,
+          backgroundColor: idxArr.map(v => v>=1.1 ? '#38a169' : v<=0.9 ? '#e53e3e' : '#63b3ed'),
+        }]},
+        options:{ responsive:true, plugins:{ legend:{display:false} },
+          scales:{ y:{ beginAtZero:false, suggestedMin:0.6, suggestedMax:1.4, title:{display:true,text:'계수',font:{size:10}}, ticks:{stepSize:0.1} } }
+        }
+      }));
+    }
+  }, 50);
+}
+
+// fcTable 행 클릭 → openDD
+document.addEventListener('click', function(e){
+  const tr = e.target.closest('#fcTable tbody tr[data-pm-key]');
+  if(!tr) return;
+  const key = tr.dataset.pmKey;
+  if(key === '__total__') return;
+  openDD(key);
+});
+
+// ================= B안 ④ SAP 마감 자동연동 (RAW25~26매출 탭) =================
+// 목적: 인라인 D 와 RAW 탭의 데이터 일관성을 자동 검증하고, 최신월 반영 여부를 가시화
+// 향후 확장 지점: rebuildDFromRaw() 로 D.products/all_products/total 교체 → 주요 renderer 재호출
+const RAW_CFG = {
+  sheetId: '1eYmkY9G2JtpqIIeJPaImEmrnZHz76Zi2iByHdha9wV8',
+  sheetName: 'RAW25~26매출',
+  // 컬럼 인덱스 (0-based): A=품목명, B=주력, C=수익군, D=신제품연도, E=디마케팅
+  //  F-Q = 24년 1~12월 (5~16)
+  //  R-AC = 25년 1~12월 (17~28)
+  //  AD-AO = 26년 1~12월 (29~40)
+  colName: 0, colKey: 1, colGroup: 2, colNewYr: 3, colDmkt: 4,
+  col24Start: 5, col25Start: 17, col26Start: 29,
+  sheetUrl: 'https://docs.google.com/spreadsheets/d/1eYmkY9G2JtpqIIeJPaImEmrnZHz76Zi2iByHdha9wV8/edit'
+};
+
+function fetchRAW(cb){
+  const url = `https://docs.google.com/spreadsheets/d/${RAW_CFG.sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(RAW_CFG.sheetName)}`;
+  fetch(url).then(r=>r.text()).then(body=>{
+    const m = body.match(/\{[\s\S]*\}/);
+    if(!m){ cb(null, 'JSON 파싱 실패'); return; }
+    try{
+      const j = JSON.parse(m[0]);
+      if(j.status !== 'ok'){ cb(null, j.errors ? j.errors[0].detailed_message : 'RAW status != ok'); return; }
+      cb(j, null);
+    }catch(e){ cb(null, e.message); }
+  }).catch(e=>cb(null, e.message));
+}
+
+// RAW 테이블 → 품목별 구조 (name → {key, dmkt, y24[12], y25[12], y26[12]})
+function parseRAW(j){
+  const rows = j.table.rows;
+  const out = {};
+  for(const r of rows){
+    if(!r || !r.c) continue;
+    const nameCell = r.c[RAW_CFG.colName];
+    if(!nameCell || !nameCell.v) continue;
+    const name = String(nameCell.v).trim();
+    const y24 = [], y25 = [], y26 = [];
+    for(let m=0;m<12;m++){
+      const v24 = r.c[RAW_CFG.col24Start + m];
+      const v25 = r.c[RAW_CFG.col25Start + m];
+      const v26 = r.c[RAW_CFG.col26Start + m];
+      y24.push(v24 && typeof v24.v === 'number' ? v24.v : 0);
+      y25.push(v25 && typeof v25.v === 'number' ? v25.v : 0);
+      y26.push(v26 && typeof v26.v === 'number' ? v26.v : 0);
+    }
+    const key = r.c[RAW_CFG.colKey]?.v === 'Y';
+    const dmkt = r.c[RAW_CFG.colDmkt]?.v === 'Y';
+    out[name] = { name, is_key:key, is_demarketing:dmkt, y24, y25, y26 };
+  }
+  return out;
+}
+
+// 최신 채워진 26년 월 인덱스 (0=1월 … 11=12월), -1 = 전부 0
+function latestMonth(arr){
+  for(let i=arr.length-1;i>=0;i--){
+    if(arr[i] && arr[i] > 0.01) return i;
+  }
+  return -1;
+}
+
+// 인라인 D와 RAW 비교 → 불일치 리스트 + 최신월 감지
+function compareInlineVsRaw(rawMap){
+  const diffs = [];   // [{name, year, month, inline, raw, gap}]
+  let rawLatest26 = -1, inlineLatest26 = -1;
+
+  // total(ETC 전체) 최신월 기준
+  inlineLatest26 = latestMonth(D.total.act_26);
+
+  // RAW 전체 합산의 최신월
+  const rawTotal26 = [0,0,0,0,0,0,0,0,0,0,0,0];
+  Object.values(rawMap).forEach(r => r.y26.forEach((v,m)=> rawTotal26[m]+=v));
+  rawLatest26 = latestMonth(rawTotal26);
+
+  // 품목별 월별 비교 (D.all_products 기준)
+  D.all_products.forEach(p=>{
+    const raw = rawMap[p.name];
+    if(!raw) return;   // 매칭 실패는 별도 카운트
+    // 26년 비교 (인라인은 monthly_26 사용)
+    const inline26 = p.monthly_26 || [];
+    for(let m=0;m<Math.min(12, inline26.length);m++){
+      const iv = inline26[m]||0, rv = raw.y26[m]||0;
+      if(Math.abs(iv - rv) > 0.01){
+        diffs.push({name:p.name, year:26, month:m+1, inline:iv, raw:rv, gap:rv-iv});
+      }
+    }
+    // 25년 샘플 비교 (첫 3월만 — 연간 전체는 노이즈 많음)
+    const inline25 = p.monthly_25 || [];
+    for(let m=0;m<Math.min(3, inline25.length);m++){
+      const iv = inline25[m]||0, rv = raw.y25[m]||0;
+      if(Math.abs(iv - rv) > 0.01){
+        diffs.push({name:p.name, year:25, month:m+1, inline:iv, raw:rv, gap:rv-iv});
+      }
+    }
+  });
+
+  // 인라인에는 있지만 RAW에 없는 품목
+  const inlineNames = new Set(D.all_products.map(p=>p.name));
+  const rawNames = new Set(Object.keys(rawMap));
+  const missingInRaw = D.all_products.filter(p=>!rawMap[p.name]).map(p=>p.name);
+  const extraInRaw = [...rawNames].filter(n=>!inlineNames.has(n));
+
+  return {
+    inlineLatest26, rawLatest26,
+    diffs, missingInRaw, extraInRaw,
+    rawProductCount: Object.keys(rawMap).length,
+    inlineProductCount: D.all_products.length,
+    newerRaw: rawLatest26 > inlineLatest26
+  };
+}
+
+// 배지 업데이트
+function updateSyncBadge(report, err){
+  const badge = document.getElementById('rawSyncBadge');
+  const icon = document.getElementById('rawSyncIcon');
+  const text = document.getElementById('rawSyncText');
+  if(!badge) return;
+
+  if(err){
+    icon.textContent = '⚠️';
+    text.textContent = 'SAP 자동연동 실패 (RAW 탭 접근 불가)';
+    badge.style.background = 'rgba(229,62,62,.35)';
+    badge.title = err;
+    return;
+  }
+  const mn = (m)=> m<0 ? '–' : `26.${m+1}월`;
+  const diffCount = report.diffs.length;
+  const matchCount = report.inlineProductCount - report.missingInRaw.length;
+
+  if(report.newerRaw){
+    icon.textContent = '🔔';
+    text.innerHTML = `RAW 탭에 <b>${mn(report.rawLatest26)}</b> 반영됨 (인라인: ${mn(report.inlineLatest26)}) · 대시보드 재빌드 필요`;
+    badge.style.background = 'rgba(214,158,46,.45)';
+  } else if(diffCount === 0){
+    icon.textContent = '✅';
+    text.innerHTML = `SAP 자동연동 정상 · 최신 <b>${mn(report.rawLatest26)}</b> · ${matchCount}/${report.inlineProductCount}품목 일치`;
+    badge.style.background = 'rgba(56,161,105,.35)';
+  } else {
+    icon.textContent = '⚠️';
+    text.innerHTML = `RAW vs 인라인 불일치 <b>${diffCount}</b>건 · 최신 ${mn(report.rawLatest26)} · <span style="text-decoration:underline;">검증 필요</span>`;
+    badge.style.background = 'rgba(214,158,46,.45)';
+  }
+  badge.title = '클릭하여 연동 상세 내역 확인';
+
+  // 클릭 → 모달
+  badge.onclick = ()=> openSyncModal(report);
+}
+
+// 연동 상세 모달 (드릴다운 모달 UI 재활용)
+function openSyncModal(report){
+  const ov = document.getElementById('ddOverlay');
+  const mn = (m)=> m<0 ? '–' : `26.${m+1}월`;
+  document.getElementById('ddTitle').textContent = '📡 SAP 자동연동 상세';
+  document.getElementById('ddPM').innerHTML = `RAW25~26매출 탭 · 품목 매칭 ${report.inlineProductCount - report.missingInRaw.length}/${report.inlineProductCount} · 불일치 ${report.diffs.length}건 · <a href="${RAW_CFG.sheetUrl}" target="_blank" style="color:#bee3f8;">시트 열기 ↗</a>`;
+
+  const top = report.diffs.slice().sort((a,b)=>Math.abs(b.gap)-Math.abs(a.gap)).slice(0,30);
+  const diffRows = top.length ? top.map(d=>`
+    <tr>
+      <td>${d.name}</td>
+      <td style="text-align:center">${d.year}.${d.month}월</td>
+      <td class="num">${d.inline.toFixed(2)}</td>
+      <td class="num">${d.raw.toFixed(2)}</td>
+      <td class="num" style="color:${Math.abs(d.gap)>=0.5?'#c53030':d.gap>0?'#2c5282':'#805ad5'};font-weight:600">${d.gap>=0?'+':''}${d.gap.toFixed(2)}</td>
+    </tr>`).join('') : `<tr><td colspan="5" style="text-align:center;color:#38a169;padding:20px">✅ 모든 월별 데이터 일치</td></tr>`;
+
+  const missingList = report.missingInRaw.length ? `<div style="margin-top:10px;font-size:11px;color:#c53030;">⚠️ RAW에 없는 품목(${report.missingInRaw.length}): ${report.missingInRaw.join(', ')}</div>` : '';
+  const extraList = report.extraInRaw.length ? `<div style="margin-top:6px;font-size:11px;color:#2c5282;">ℹ️ RAW에만 있는 품목(${report.extraInRaw.length}, 참고용): ${report.extraInRaw.slice(0,20).join(', ')}${report.extraInRaw.length>20?' 외':''}</div>` : '';
+
+  document.getElementById('ddBody').innerHTML = `
+    <div class="dd-kpi">
+      <div class="dd-kpi-box"><div class="k-lbl">인라인 최신월</div><div class="k-val">${mn(report.inlineLatest26)}</div><div class="k-sub">HTML 내장 D.total</div></div>
+      <div class="dd-kpi-box ${report.newerRaw?'orange':'green'}"><div class="k-lbl">RAW 최신월</div><div class="k-val">${mn(report.rawLatest26)}</div><div class="k-sub">Google Sheets RAW 탭</div></div>
+      <div class="dd-kpi-box ${report.diffs.length>0?'orange':'green'}"><div class="k-lbl">불일치 건수</div><div class="k-val">${report.diffs.length}</div><div class="k-sub">0.01억 초과 차이</div></div>
+      <div class="dd-kpi-box purple"><div class="k-lbl">품목 매칭</div><div class="k-val">${report.inlineProductCount-report.missingInRaw.length}/${report.inlineProductCount}</div><div class="k-sub">인라인 기준</div></div>
+    </div>
+    ${report.newerRaw ? `<div style="background:linear-gradient(135deg,#fef5e7,#fdf2d3);border:1px solid #f6ad55;border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:#744210;">
+      🔔 <b>업데이트 알림:</b> RAW 탭에 인라인보다 최신 월(${mn(report.rawLatest26)}) 데이터가 반영되어 있습니다. PM 마감이 완료되었다면 대시보드를 재빌드하세요.<br>
+      <span style="font-size:11px;color:#975a16;">※ 현재 버전은 상태 감지만 지원. 전체 재렌더는 다음 업데이트 예정.</span>
+    </div>` : ''}
+    <div class="dd-section">
+      <h4>🔎 월별 불일치 Top ${Math.min(top.length,30)} (단위: 억, 절대값 기준)</h4>
+      <table class="dd-method">
+        <thead><tr><th>품목</th><th>월</th><th style="text-align:right">인라인</th><th style="text-align:right">RAW</th><th style="text-align:right">차이 (RAW−인라인)</th></tr></thead>
+        <tbody>${diffRows}</tbody>
+      </table>
+      ${missingList}
+      ${extraList}
+    </div>
+    <div class="dd-section">
+      <h4>📖 연동 구조</h4>
+      <div style="font-size:12px;color:#4a5568;line-height:1.7;background:#f7fafc;padding:12px;border-radius:8px;">
+        • <b>소스</b>: <a href="${RAW_CFG.sheetUrl}" target="_blank">「${RAW_CFG.sheetName}」</a> 탭 (41컬럼: 메타5 + 24년12 + 25년12 + 26년12)<br>
+        • <b>매칭 키</b>: Col A "품목명" = 대시보드 inline D.products[].name<br>
+        • <b>매달 마감 반영 절차</b>: ① SAP에서 해당 월 매출 추출 → ② RAW 탭 Col AD-AO(26년) 업데이트 → ③ 대시보드 새로고침<br>
+        • <b>향후 작업</b>: 본 감지 레이어 위에 hot-reload 렌더링 연결 (B-④ v2)
+      </div>
+    </div>
+  `;
+
+  ov.classList.add('show');
+}
+
+// 부트스트랩 (DOMContentLoaded 이후 실행)
+(function bootstrapRawSync(){
+  const run = ()=>{
+    fetchRAW((j, err)=>{
+      if(err || !j){ updateSyncBadge(null, err || 'unknown'); return; }
+      const rawMap = parseRAW(j);
+      window.__raw = rawMap;    // 향후 확장용
+      const report = compareInlineVsRaw(rawMap);
+      window.__rawReport = report;
+      updateSyncBadge(report);
+    });
+  };
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+  else setTimeout(run, 100);
 })();
 
 </script>
