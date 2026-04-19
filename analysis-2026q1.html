@@ -64,6 +64,7 @@ tr:hover{background:#f7fafc;}
 #fcTable tbody tr[data-pm-key]:not([data-pm-key="__total__"]){cursor:pointer;}
 #fcTable tbody tr[data-pm-key]:not([data-pm-key="__total__"]):hover{background:#ebf8ff !important;}
 #fcTable tbody tr[data-pm-key]:not([data-pm-key="__total__"]) td:first-child::after{content:' ▸';color:#a0aec0;font-size:10px;font-weight:400;}
+.fc-cat-tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;min-width:36px;text-align:center;}
 .dd-overlay{position:fixed;inset:0;background:rgba(26,54,93,.55);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px;overflow-y:auto;}
 .dd-overlay.show{display:flex;}
 .dd-modal{background:#fff;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.3);width:100%;max-width:960px;max-height:92vh;overflow-y:auto;animation:ddIn .2s ease-out;}
@@ -269,20 +270,45 @@ tr:hover{background:#f7fafc;}
     </div>
 
     <div class="grid-2">
-      <div class="card"><h3>주력품목 연간 예측 비교 (3가지 방법)</h3><canvas id="chartForecast"></canvas></div>
-      <div class="card"><h3>예측 평균 vs SF 목표</h3><canvas id="chartFcVsSF"></canvas></div>
+      <div class="card"><h3>상위 20품목 4월 예측 비교 (SF / Claude / PM)</h3><canvas id="chartForecast"></canvas></div>
+      <div class="card"><h3>Claude 4월 예측 vs 25년 4월 실적 (전품목)</h3><canvas id="chartFcVsSF"></canvas></div>
     </div>
     <div class="section"><div class="card">
-      <h3>매출 예측 상세 (억원)</h3>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">예측① 단순연환산(Q1×4) | 예측② 25년 계절성 반영 | 예측③ Q1실적+잔여SF목표</p>
-      <table id="fcTable"><thead><tr>
-        <th>품목</th><th>Q1실적</th><th>예측①</th><th>예측②</th><th>예측③</th>
-        <th style="background:#ebf8ff;color:#2c5282;">Claude<br>예측평균</th>
-        <th style="background:#faf5ff;color:#553c9a;" title="2026 마감예측 시트 Col 79 (1차)">PM 4월<br>예측<sup style="color:#9f7aea;font-size:8px;">LIVE</sup></th>
-        <th style="background:#faf5ff;color:#553c9a;" title="Q1실적 + 4월 PM예측 + 5~12월 목표 합계">PM 연말<br>전망<sup style="color:#9f7aea;font-size:8px;">LIVE</sup></th>
-        <th style="background:#fffaf0;color:#744210;" title="PM − Claude. +면 PM이 공격적, −면 보수적">갭<br>(PM−Claude)</th>
-        <th>SF목표</th><th>SF대비</th><th>전년대비</th>
-      </tr></thead><tbody></tbody></table>
+      <h3>월별(4월) 예측 상세 — PM 월별 예측 보조</h3>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">
+        PM은 시트 <b>Col 79(26.4월 1차)</b>에 월별 예측만 입력 · 연간 예측은 본부 관점이라 제외 ·
+        Claude 4월 = <i>3월실적×계절계수, Q1계절환산×계절계수, 25년4월×Q1YoY</i> 3방법 평균
+      </p>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px;padding:10px;background:#f7fafc;border-radius:8px;">
+        <label style="font-size:12px;font-weight:700;color:#2c5282;">
+          <input type="checkbox" id="fcFilterCore" checked style="transform:scale(1.1);margin-right:4px;vertical-align:middle;">
+          주력+전략+신제품만 (기본)
+        </label>
+        <input id="fcSearch" type="text" placeholder="품목명 검색…" style="flex:1;min-width:180px;padding:6px 10px;border:1px solid #cbd5e0;border-radius:6px;font-size:12px;">
+        <select id="fcSort" style="padding:6px 10px;border:1px solid #cbd5e0;border-radius:6px;font-size:12px;">
+          <option value="cat">카테고리 순 (주력→전략→신제품→기타)</option>
+          <option value="q1_26">Q1실적 내림차순</option>
+          <option value="apr_gap">갭(PM−Claude) 내림차순</option>
+          <option value="apr_sf">4월 SF 내림차순</option>
+          <option value="q1_ach">Q1달성률 내림차순</option>
+        </select>
+        <span id="fcRowCount" style="font-size:11px;color:#4a5568;font-weight:600;"></span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="fcTable"><thead><tr>
+          <th>품목</th>
+          <th style="background:#edf2f7;">태그</th>
+          <th>Q1실적</th>
+          <th>Q1 달성률</th>
+          <th>3월 실적</th>
+          <th title="24·25 가중평균 계절지수 (1.0=월평균)">4월<br>계절지수</th>
+          <th>4월 SF</th>
+          <th style="background:#ebf8ff;color:#2c5282;">Claude<br>4월</th>
+          <th style="background:#faf5ff;color:#553c9a;" title="2026 마감예측 시트 Col 79 (1차)">PM 4월<sup style="color:#9f7aea;font-size:8px;">LIVE</sup></th>
+          <th style="background:#fffaf0;color:#744210;" title="PM − Claude 4월. +면 PM이 공격적, −면 보수적">갭<br>(PM−Claude)</th>
+          <th>25년<br>4월</th>
+        </tr></thead><tbody></tbody></table>
+      </div>
     </div></div>
   </div>
 
@@ -718,59 +744,240 @@ D.products.forEach(p=>{ptb.innerHTML+=`<tr>
   <td style="color:var(--accent);font-weight:700">${fmt(p.remaining_monthly)}</td>
   <td>${fmt(p.apr_sf)}</td></tr>`;});
 
-// === Forecast tab (units now fixed) ===
-function renderForecastTables(){
-const tf=D.total_forecast;
-document.getElementById('fcSummary').innerHTML=`
-  <div class="fc-item"><div class="fc-label">예측① 단순연환산</div><div class="fc-val">${fmt(tf.fc1,1)}</div><div class="fc-sub">억원 (Q1×4)</div></div>
-  <div class="fc-item"><div class="fc-label">예측② 계절성반영</div><div class="fc-val">${fmt(tf.fc2,1)}</div><div class="fc-sub">억원 (25년Q1비중)</div></div>
-  <div class="fc-item"><div class="fc-label">예측③ Q1+잔여SF</div><div class="fc-val">${fmt(tf.fc3,1)}</div><div class="fc-sub">억원</div></div>
-  <div class="fc-item"><div class="fc-label">예측 평균</div><div class="fc-val" style="color:var(--success)">${fmt(tf.fc_avg,1)}</div><div class="fc-sub">억원 | SF대비 ${(tf.fc_avg/D.total.ann_sf*100).toFixed(1)}%</div></div>`;
+// === Forecast tab: 월별(4월) 중심 재편 — PM 월별 예측 보조 목적 ===
 
-const fcP=D.products;
-const ftb=document.querySelector('#fcTable tbody');
-ftb.innerHTML=''; // hot-reload시 재빌드 보장
-const tfc=D.total_forecast;
-ftb.innerHTML+=`<tr style="background:#ebf8ff;font-weight:700" data-pm-key="__total__">
-  <td>ETC 전체</td><td>${fmt(D.total.q1_26)}</td><td>${fmt(tfc.fc1)}</td><td>${fmt(tfc.fc2)}</td><td>${fmt(tfc.fc3)}</td>
-  <td style="color:var(--success)">${fmt(tfc.fc_avg)}</td>
-  <td class="pm-apr" style="background:#faf5ff;color:#999;">–</td>
-  <td class="pm-ann" style="background:#faf5ff;color:#999;">–</td>
-  <td class="pm-gap" style="background:#fffaf0;color:#999;">–</td>
-  <td>${fmt(D.total.ann_sf)}</td>
-  <td>${tagA(tfc.fc_avg/D.total.ann_sf*100)}</td>
-  <td class="pct-up">+${((tfc.fc_avg/D.total.ann_25-1)*100).toFixed(1)}%</td></tr>`;
-fcP.forEach(p=>{
-  const sfP=p.ann_sf>0?(p.fc_avg/p.ann_sf*100):null;
-  const yoyP2=p.ann_25>0?((p.fc_avg/p.ann_25-1)*100):null;
-  ftb.innerHTML+=`<tr data-pm-key="${p.name}"><td>${p.name}</td><td>${fmt(p.q1_26)}</td>
-    <td>${fmt(p.fc1)}</td><td>${fmt(p.fc2)}</td><td>${fmt(p.fc3)}</td>
-    <td style="color:var(--success);font-weight:700">${fmt(p.fc_avg)}</td>
-    <td class="pm-apr" style="background:#faf5ff;color:#999;">–</td>
-    <td class="pm-ann" style="background:#faf5ff;color:#999;">–</td>
-    <td class="pm-gap" style="background:#fffaf0;color:#999;">–</td>
-    <td>${fmt(p.ann_sf)}</td>
-    <td>${tagA(sfP)}</td>
-    <td class="${pctC(yoyP2)}">${yoyP2!=null?fmtP(yoyP2):'-'}</td></tr>`;
-});
-} // end renderForecastTables
+// --- 디마케팅 품목 이름 필터 (다른 탭과 공유 상수) ---
+const DEMKT_NAMES = ['코티소루','케랄'];
+
+// --- 품목 카테고리 판정 (CLAUDE.md 기준) ---
+const PRIMARY_6 = ['바이오탑','노르믹스','엘리가드','헤어그로','알파본','글루코프리'];
+const STRATEGIC_9 = ['하노마린','네오미노화겐','앱시토','덱시티옥','베노론','한시움','헤파몬','클로비드','포드림'];
+const NEW_26 = ['콤비플렉스','미녹필','이글렉스','이글듀오','엔잘루타','헤어덤','프레가발린'];
+function productCategory(p){
+  const nm = p.name || '';
+  if(PRIMARY_6.some(k=>nm.includes(k))) return {tag:'주력', sortKey:1, color:'#2c5282', bg:'#ebf8ff'};
+  if(STRATEGIC_9.some(k=>nm.includes(k))) return {tag:'전략', sortKey:2, color:'#22543d', bg:'#f0fff4'};
+  if(NEW_26.some(k=>nm.includes(k))) return {tag:'신제품', sortKey:3, color:'#744210', bg:'#fffaf0'};
+  return {tag:'기타', sortKey:4, color:'#4a5568', bg:'#f7fafc'};
+}
+
+// --- 품목별 월별 Claude 예측 계산 (기존 openDD 로직 전역화) ---
+function calcMonthlyClaude(p, monthIdx){
+  // monthIdx: 0=1월 ~ 11=12월. 4월=3
+  const seasonIdx = calcProductSeasonIdx(p);
+  if(!seasonIdx) return null;
+  const idxM = seasonIdx[monthIdx] || 1;
+  const q1_26 = p.q1_26 || 0;
+  const q1_25 = p.q1_25 || 0;
+  const m25 = p.monthly_25 || [];
+
+  // 방법A: 직전월(3월) × 계절계수 비율 (4월일 때)
+  const mar = p.mar || 0, feb = p.feb || 0, jan = p.jan || 0;
+  const idx3 = seasonIdx[2] || 1;
+  const f_A = idx3 > 0 ? mar * (idxM / idx3) : null;
+
+  // 방법B: Q1 실적의 연환산(계절성) × 해당월 지수 / 12
+  const q1idxSum = (seasonIdx[0] + seasonIdx[1] + seasonIdx[2]) || 3;
+  const annSeason = q1idxSum > 0 ? q1_26 * 12 / q1idxSum : null;
+  const f_B = (annSeason != null) ? annSeason * idxM / 12 : null;
+
+  // 방법C: 25년 동월 × (Q1_26/Q1_25)
+  const m25_val = m25[monthIdx] || 0;
+  const yoyRate = q1_25 > 0.01 ? (q1_26 / q1_25) : 1;
+  const f_C = m25_val * yoyRate;
+
+  const candidates = [f_A, f_B, f_C].filter(v => v != null && !isNaN(v) && v >= 0);
+  if(candidates.length === 0) return null;
+  return +(candidates.reduce((a,b)=>a+b,0) / candidates.length).toFixed(2);
+}
+
+// --- 필터링 대상 품목 목록 (디마 제외) ---
+function getForecastProducts(){
+  return D.all_products.filter(p => !p.is_demarketing && !DEMKT_NAMES.some(n => p.name.includes(n)));
+}
+
+function renderForecastTables(){
+  const fcList = getForecastProducts();
+  // 각 품목에 Claude 4월 예측, 카테고리, 갭 계산해서 캐시
+  fcList.forEach(p=>{
+    p._cat = productCategory(p);
+    p._aprClaude = calcMonthlyClaude(p, 3); // 4월
+    const pmObj = (window.__pmData || {})[p.name] || null;
+    p._pmApr = pmObj ? pmObj.apr : null;
+    p._aprGap = (p._pmApr != null && p._aprClaude != null) ? +(p._pmApr - p._aprClaude).toFixed(2) : null;
+  });
+
+  // --- fcSummary: 4월 중심 4박스 ---
+  renderFcSummary(fcList);
+
+  // --- fcTable: 필터·정렬·렌더 ---
+  fcRenderRows();
+}
+
+// fcSummary 렌더는 PMFP 로드 후에도 재호출될 수 있도록 함수 분리
+function renderFcSummary(fcList){
+  fcList = fcList || getForecastProducts();
+  // 캐시 누락 시 재계산
+  fcList.forEach(p=>{
+    if(!p._cat) p._cat = productCategory(p);
+    if(p._aprClaude === undefined) p._aprClaude = calcMonthlyClaude(p, 3);
+    const pmObj = (window.__pmData || {})[p.name] || null;
+    if(pmObj && pmObj.apr > 0.01) p._pmApr = +pmObj.apr.toFixed(2);
+  });
+  const totalSfApr = fcList.reduce((a,p)=>a + (p.sf_monthly?.[3] || 0), 0);
+  const totalClaudeApr = fcList.reduce((a,p)=>a + (p._aprClaude || 0), 0);
+  const matchedPM = fcList.filter(p=>p._pmApr != null);
+  const totalPMApr = matchedPM.reduce((a,p)=>a + (p._pmApr || 0), 0);
+  const matchedClaudeApr = matchedPM.reduce((a,p)=>a + (p._aprClaude || 0), 0);
+  const totalGap = totalPMApr > 0 ? +(totalPMApr - matchedClaudeApr).toFixed(1) : null;
+  const box = document.getElementById('fcSummary'); if(!box) return;
+  box.innerHTML = `
+    <div class="fc-item"><div class="fc-label">4월 SF 목표 총합</div><div class="fc-val">${fmt(totalSfApr,1)}</div><div class="fc-sub">억원 · ${fcList.length}품목</div></div>
+    <div class="fc-item"><div class="fc-label">Claude 4월 예측 총합</div><div class="fc-val" style="color:#2c5282">${fmt(totalClaudeApr,1)}</div><div class="fc-sub">억원 · SF대비 ${totalSfApr>0?(totalClaudeApr/totalSfApr*100).toFixed(1):'-'}%</div></div>
+    <div class="fc-item"><div class="fc-label">PM 4월 예측 합 <sup style="color:#805ad5">LIVE</sup></div><div class="fc-val" style="color:#6b46c1" id="fcSumPM">${matchedPM.length>0?fmt(totalPMApr,1):'–'}</div><div class="fc-sub" id="fcSumPMSub">${matchedPM.length>0?`매칭 ${matchedPM.length}품목 (Claude 동일베이스 ${matchedClaudeApr.toFixed(1)}억)`:'로딩 대기…'}</div></div>
+    <div class="fc-item"><div class="fc-label">갭 4월 (PM − Claude)</div><div class="fc-val" style="color:${totalGap==null?'#999':(Math.abs(totalGap)<3?'#38a169':(totalGap>0?'#c53030':'#2c5282'))}" id="fcSumGap">${totalGap!=null?(totalGap>=0?'+':'')+totalGap.toFixed(1):'–'}</div><div class="fc-sub" id="fcSumGapSub">${totalGap!=null?(Math.abs(totalGap)<3?'정렬':(totalGap>0?'PM 공격적':'PM 보수적')):'매칭 대기'}</div></div>`;
+}
+window.__refreshFcSummary = renderFcSummary;
+
+function fcRenderRows(){
+  const fcList = getForecastProducts();
+  // 캐시 재확인 (hot-reload 대응)
+  fcList.forEach(p=>{
+    if(!p._cat) p._cat = productCategory(p);
+    if(p._aprClaude === undefined) p._aprClaude = calcMonthlyClaude(p, 3);
+    const pmObj = (window.__pmData || {})[p.name] || null;
+    p._pmApr = pmObj ? pmObj.apr : null;
+    p._aprGap = (p._pmApr != null && p._aprClaude != null) ? +(p._pmApr - p._aprClaude).toFixed(2) : null;
+  });
+
+  const coreOnly = (document.getElementById('fcFilterCore')||{checked:true}).checked;
+  const q = ((document.getElementById('fcSearch')||{value:''}).value || '').toLowerCase().trim();
+  const sortKey = (document.getElementById('fcSort')||{value:'cat'}).value;
+
+  let rows = fcList.filter(p=>{
+    if(coreOnly && p._cat.tag === '기타') return false;
+    if(q && !p.name.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  // 정렬
+  if(sortKey === 'cat'){
+    rows.sort((a,b)=>{
+      const d = a._cat.sortKey - b._cat.sortKey;
+      if(d !== 0) return d;
+      return (b.q1_26 || 0) - (a.q1_26 || 0);
+    });
+  } else if(sortKey === 'apr_gap'){
+    rows.sort((a,b)=> (Math.abs(b._aprGap||0)) - (Math.abs(a._aprGap||0)));
+  } else if(sortKey === 'apr_sf'){
+    rows.sort((a,b)=> ((b.sf_monthly?.[3])||0) - ((a.sf_monthly?.[3])||0));
+  } else {
+    rows.sort((a,b)=> (b[sortKey]||-9999) - (a[sortKey]||-9999));
+  }
+
+  const ftb = document.querySelector('#fcTable tbody');
+  ftb.innerHTML = '';
+  rows.forEach(p=>{
+    const seasonIdx = calcProductSeasonIdx(p);
+    const idx4 = seasonIdx ? +(seasonIdx[3]).toFixed(2) : null;
+    const sfApr = p.sf_monthly?.[3] || 0;
+    const m25apr = p.monthly_25?.[3] || 0;
+    const cat = p._cat;
+    // 갭 배경 강조: |갭| > max(sfApr×0.2, 1.0)억
+    const gapThr = Math.max(sfApr * 0.2, 1.0);
+    const gapSignificant = p._aprGap != null && Math.abs(p._aprGap) > gapThr;
+    const rowBg = gapSignificant ? 'background:#fff5f5;' : '';
+    ftb.innerHTML += `<tr data-pm-key="${p.name}" style="${rowBg}">
+      <td>${p.name}</td>
+      <td style="text-align:center"><span class="fc-cat-tag" style="background:${cat.bg};color:${cat.color};">${cat.tag}</span></td>
+      <td>${fmt(p.q1_26,1)}</td>
+      <td>${tagA(p.q1_ach)}</td>
+      <td>${fmt(p.mar,1)}</td>
+      <td style="color:${idx4&&idx4>=1.1?'#22543d':(idx4&&idx4<=0.9?'#c53030':'#4a5568')}">${idx4!=null?idx4.toFixed(2):'-'}</td>
+      <td>${fmt(sfApr,1)}</td>
+      <td style="color:#2c5282;font-weight:700">${p._aprClaude!=null?p._aprClaude.toFixed(1):'-'}</td>
+      <td class="pm-apr" style="background:#faf5ff;color:${p._pmApr!=null?'#553c9a':'#999'};font-weight:${p._pmApr!=null?'700':'400'}">${p._pmApr!=null?p._pmApr.toFixed(1):'–'}</td>
+      <td class="pm-gap" style="background:#fffaf0;color:${p._aprGap==null?'#999':(Math.abs(p._aprGap)<1?'#38a169':(p._aprGap>0?'#c53030':'#2c5282'))};font-weight:700">${p._aprGap!=null?((p._aprGap>=0?'+':'')+p._aprGap.toFixed(1)):'–'}</td>
+      <td>${fmt(m25apr,1)}</td>
+    </tr>`;
+  });
+
+  const cnt = document.getElementById('fcRowCount');
+  if(cnt) cnt.textContent = `${rows.length}개 품목 표시 (전체 ${fcList.length}개 중)`;
+}
+
+// 필터 UI 이벤트
+(function bindFcFilter(){
+  const bind = (id, ev)=>{
+    const el = document.getElementById(id);
+    if(el) el.addEventListener(ev, fcRenderRows);
+  };
+  bind('fcFilterCore', 'change');
+  bind('fcSearch', 'input');
+  bind('fcSort', 'change');
+})();
+
 renderForecastTables();
 window.renderForecastTables = renderForecastTables;
+window.fcRenderRows = fcRenderRows;
+window.calcMonthlyClaude = calcMonthlyClaude;
+window.productCategory = productCategory;
+window.getForecastProducts = getForecastProducts;
 
-// === Forecast 탭의 Chart 부분(재빌드 대상 아님 - 1회성) ===
+// === Forecast 탭의 Chart 부분(재빌드 대상 아님 - 1회성) — 4월 중심 ===
 (function(){
-const fcP=D.products;
-new Chart(document.getElementById('chartForecast'),{type:'bar',data:{labels:fcP.map(p=>p.name),datasets:[
-  {label:'예측① 단순연환산',data:fcP.map(p=>p.fc1),backgroundColor:C.blue+'80'},
-  {label:'예측② 계절성반영',data:fcP.map(p=>p.fc2),backgroundColor:C.green+'80'},
-  {label:'예측③ Q1+SF잔여',data:fcP.map(p=>p.fc3),backgroundColor:C.orange+'80'}
-]},options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{title:{display:true,text:'억원'}}}}});
+const fcAll = getForecastProducts();
+// 주력+전략+신제품 중 4월 SF 기준 상위 20품목
+const top20 = fcAll
+  .filter(p => productCategory(p).tag !== '기타')
+  .map(p => ({...p, _aprSf: p.sf_monthly?.[3] || 0, _aprClaudeV: calcMonthlyClaude(p, 3) || 0}))
+  .sort((a,b) => b._aprSf - a._aprSf)
+  .slice(0, 20);
 
-new Chart(document.getElementById('chartFcVsSF'),{type:'bar',data:{labels:fcP.map(p=>p.name),datasets:[
-  {label:'예측평균',data:fcP.map(p=>p.fc_avg),backgroundColor:C.blue},
-  {label:'SF연간목표',data:fcP.map(p=>p.ann_sf),backgroundColor:C.orange+'40',borderColor:C.orange,borderWidth:2}
-]},options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{title:{display:true,text:'억원'}}}}});
+new Chart(document.getElementById('chartForecast'),{type:'bar',data:{labels:top20.map(p=>p.name),datasets:[
+  {label:'4월 SF 목표',data:top20.map(p=>p._aprSf),backgroundColor:C.orange+'40',borderColor:C.orange,borderWidth:2},
+  {label:'Claude 4월 예측',data:top20.map(p=>p._aprClaudeV),backgroundColor:C.blue+'CC'},
+  {label:'PM 4월 예측 (LIVE)',data:top20.map(p=>0),backgroundColor:'#9f7aea', borderColor:'#6b46c1', borderWidth:1, _dynamic:'pm_apr', _names:top20.map(p=>p.name)}
+]},options:{responsive:true,plugins:{legend:{position:'bottom', labels:{font:{size:10}}}, tooltip:{callbacks:{label:(ctx)=>`${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}억`}}},scales:{y:{title:{display:true,text:'억원'}},x:{ticks:{font:{size:9},maxRotation:60,minRotation:45}}}}});
+
+// 두번째 차트: 전품목 Claude 4월 vs 25년 4월 scatter (YoY 시각화)
+const bubbleData = fcAll
+  .filter(p => productCategory(p).tag !== '기타')
+  .map(p => ({
+    x: p.monthly_25?.[3] || 0,
+    y: calcMonthlyClaude(p, 3) || 0,
+    r: Math.max(4, Math.min(18, Math.sqrt((p.sf_monthly?.[3] || 0.5)) * 3)),
+    name: p.name,
+    cat: productCategory(p).tag
+  }))
+  .filter(d => d.x > 0 || d.y > 0);
+
+const bubbleByCat = {
+  '주력': {data: bubbleData.filter(d=>d.cat==='주력'), color:'#2c5282'},
+  '전략': {data: bubbleData.filter(d=>d.cat==='전략'), color:'#22543d'},
+  '신제품': {data: bubbleData.filter(d=>d.cat==='신제품'), color:'#744210'}
+};
+new Chart(document.getElementById('chartFcVsSF'),{type:'bubble',data:{datasets:[
+  {label:'주력', data:bubbleByCat['주력'].data, backgroundColor:bubbleByCat['주력'].color+'CC', borderColor:bubbleByCat['주력'].color},
+  {label:'전략', data:bubbleByCat['전략'].data, backgroundColor:bubbleByCat['전략'].color+'CC', borderColor:bubbleByCat['전략'].color},
+  {label:'신제품', data:bubbleByCat['신제품'].data, backgroundColor:bubbleByCat['신제품'].color+'CC', borderColor:bubbleByCat['신제품'].color}
+]},options:{responsive:true,plugins:{legend:{position:'bottom', labels:{font:{size:10}}}, tooltip:{callbacks:{label:(ctx)=>`${ctx.raw.name}: 25년 ${ctx.raw.x.toFixed(1)}억 → Claude ${ctx.raw.y.toFixed(1)}억`}}},scales:{x:{title:{display:true,text:'25년 4월 실적 (억)'}},y:{title:{display:true,text:'Claude 4월 예측 (억)'}}}}});
 })(); // end forecast chart IIFE
+
+// PM 예측 로드 후 chartForecast의 PM 시리즈를 갱신하기 위해 전역 훅
+window.__updateChartForecastPM = function(){
+  const ch = Chart.getChart('chartForecast');
+  if(!ch) return;
+  const pmDs = ch.data.datasets.find(d => d._dynamic === 'pm_apr');
+  if(!pmDs) return;
+  const names = pmDs._names || [];
+  const pm = window.__pmData || {};
+  pmDs.data = names.map(n => {
+    const obj = pm[n];
+    return obj && obj.apr != null ? obj.apr : 0;
+  });
+  ch.update();
+};
 
 // === FIX 5: Risk/Opportunity - 매출금액 기준, 디마케팅 제외 ===
 function renderRiskOpp(){
@@ -813,7 +1020,7 @@ renderRiskOpp();
 window.renderRiskOpp = renderRiskOpp;
 
 // All products tab (디마케팅 품목 제외: is_demarketing 플래그 + 코티소루군·케랄군 26년 이관예정)
-const DEMKT_NAMES = ['코티소루','케랄'];
+// DEMKT_NAMES는 line 750 근처에서 공유 상수로 선언됨
 let allD=D.all_products.filter(p=>!p.is_demarketing && !DEMKT_NAMES.some(n=>p.name.includes(n)));
 function renderAll(){
   const s=document.getElementById('searchAll').value.toLowerCase();
@@ -1248,47 +1455,88 @@ function loadPMProductForecast(){
       }
     });
 
-    // DOM patch — 품목별 행
+    // D.all_products에 PM 4월 예측/갭 캐시 주입 (fcRenderRows 재호출 시 유지되도록)
+    if(D.all_products){
+      D.all_products.forEach(p=>{
+        const pd = pmData[p.name];
+        if(pd && pd.apr != null){
+          p._pmApr = +pd.apr.toFixed(2);
+          if(p._aprClaude != null){
+            p._aprGap = +(p._pmApr - p._aprClaude).toFixed(2);
+          } else {
+            p._aprGap = null;
+          }
+        } else {
+          p._pmApr = null;
+          p._aprGap = null;
+        }
+      });
+    }
+
+    // 현재 표시 중인 행들의 PM 4월·갭 셀 패치 (리렌더 비용 절약 + 즉시 반영)
     document.querySelectorAll('#fcTable tbody tr[data-pm-key]').forEach(tr=>{
       const name = tr.dataset.pmKey;
-      const isTotal = name === '__total__';
-      const pd = isTotal ? {apr:totApr/1e8, q1:totQ1/1e8, rem:totRem/1e8, ann:(totApr+totQ1+totRem)/1e8, cnt:Object.keys(pmData).length} : pmData[name];
-      const fcAvgCell = tr.children[5];
+      if(name === '__total__') return;
+      const pd = pmData[name];
       const aprCell = tr.querySelector('.pm-apr');
-      const annCell = tr.querySelector('.pm-ann');
       const gapCell = tr.querySelector('.pm-gap');
-      if(!pd || !aprCell) return;
+      if(!aprCell) return;
 
-      const fcAvg = parseFloat(fcAvgCell.textContent);
+      if(pd && pd.apr > 0.01){
+        const pmApr = +pd.apr.toFixed(2);
+        aprCell.textContent = pmApr.toFixed(1);
+        aprCell.style.color = '#553c9a';
+        aprCell.style.fontWeight = '700';
+        aprCell.title = `PM 4월 1차 예측 ${pmApr.toFixed(2)}억 · 매칭행 ${pd.cnt}개 · 연말 PM 전망 참고 ${pd.ann.toFixed(1)}억`;
 
-      aprCell.textContent = pd.apr > 0.05 ? pd.apr.toFixed(1) : '–';
-      aprCell.style.color = pd.apr > 0.05 ? '#6b46c1' : '#999';
-      aprCell.title = `PM 4월 1차 예측 · 매칭행 ${pd.cnt}개`;
-
-      annCell.textContent = pd.ann.toFixed(1);
-      annCell.style.color = '#553c9a';
-      annCell.style.fontWeight = '700';
-      annCell.title = `Q1 실적 ${pd.q1.toFixed(1)}억 + 4월 PM예측 ${pd.apr.toFixed(1)}억 + 5~12월 목표 ${pd.rem.toFixed(1)}억`;
-
-      if(isTotal){
-        // __total__ 행은 fcP 13개 품목 합산이 아닌 ETC 전체 fc_avg라 apples-to-oranges → 갭 생략
-        gapCell.textContent = '–';
-        gapCell.style.color = '#999';
-        gapCell.title = `주력 품목 PM 연말전망 합계 ${pd.ann.toFixed(1)}억 (매칭 ${pd.cnt}품목). ETC 전체 Claude 예측(${fcAvg.toFixed(0)}억)과는 범위가 달라 갭은 표시하지 않음.`;
-      } else if(!isNaN(fcAvg) && pd.ann > 0){
-        const gap = pd.ann - fcAvg;
-        gapCell.textContent = (gap>=0?'+':'') + gap.toFixed(1);
-        gapCell.style.color = Math.abs(gap) < 3 ? '#4a5568' : (gap > 0 ? '#c53030' : '#2c5282');
-        gapCell.style.fontWeight = Math.abs(gap) >= 10 ? '700' : '600';
-        gapCell.title = gap > 3 ? `PM이 Claude보다 ${Math.abs(gap).toFixed(1)}억 공격적 예측` :
-                        gap < -3 ? `PM이 Claude보다 ${Math.abs(gap).toFixed(1)}억 보수적 예측` :
-                        '거의 일치 (±3억 이내)';
+        if(gapCell){
+          // 해당 품목의 Claude 4월 예측 캐시 우선, 없으면 재계산
+          const prod = (D.all_products || []).find(x=>x.name === name);
+          const claudeApr = prod ? (prod._aprClaude != null ? prod._aprClaude : calcMonthlyClaude(prod, 3)) : null;
+          if(claudeApr != null){
+            const gap = +(pmApr - claudeApr).toFixed(2);
+            const sfApr = prod && prod.sf_monthly ? (prod.sf_monthly[3] || 0) : 0;
+            const gapBand = Math.max(sfApr * 0.2, 1.0);
+            gapCell.textContent = (gap>=0?'+':'') + gap.toFixed(1);
+            gapCell.style.color = Math.abs(gap) < gapBand ? '#38a169' : (gap > 0 ? '#c53030' : '#2c5282');
+            gapCell.style.fontWeight = '700';
+            gapCell.title = gap > gapBand ? `PM 4월이 Claude보다 ${Math.abs(gap).toFixed(2)}억 공격적` :
+                            gap < -gapBand ? `PM 4월이 Claude보다 ${Math.abs(gap).toFixed(2)}억 보수적` :
+                            `허용 범위 내 (±${gapBand.toFixed(1)}억)`;
+            // 하이라이트 배경 (fcRenderRows와 동일 기준)
+            if(Math.abs(gap) > gapBand){
+              tr.style.background = '#fff5f5';
+            } else {
+              tr.style.background = '';
+            }
+          } else {
+            gapCell.textContent = '–';
+            gapCell.style.color = '#999';
+            gapCell.title = 'Claude 4월 예측 계산 불가';
+          }
+        }
+      } else {
+        aprCell.textContent = '–';
+        aprCell.style.color = '#999';
+        aprCell.style.fontWeight = '400';
+        aprCell.title = 'PM 4월 예측 매칭 없음';
+        if(gapCell){
+          gapCell.textContent = '–';
+          gapCell.style.color = '#999';
+          gapCell.title = '갭 계산 불가 (PM 예측 매칭 없음)';
+        }
+        tr.style.background = '';
       }
     });
 
+    // fcSummary 4박스(PM 4월 합·갭) 즉시 갱신 + 차트 PM 시리즈 갱신
+    if(typeof window.__refreshFcSummary === 'function'){ window.__refreshFcSummary(); }
+    if(typeof window.__updateChartForecastPM === 'function'){ window.__updateChartForecastPM(); }
+
     if(sts){
       const matched = Object.keys(pmData).length;
-      sts.innerHTML = `✅ ${matched}/${dashKeys.length}개 품목 매칭 · 매출 예측 탭에 <b>PM 4월예측·연말전망·갭</b> 반영 완료`;
+      const totPm = (totApr/1e8).toFixed(1);
+      sts.innerHTML = `✅ ${matched}/${dashKeys.length}개 품목 매칭 · PM 4월 예측 합 <b>${totPm}억</b> · 테이블/차트/Summary 모두 반영 완료`;
     }
   });
 }
@@ -1378,7 +1626,9 @@ function closeDD(){
 }
 
 function openDD(name){
-  const p = D.products.find(x=>x.name === name);
+  // fcTable(전품목)에서 클릭되므로 all_products까지 포함해서 검색
+  const p = (D.products.find(x=>x.name === name))
+         || (D.all_products ? D.all_products.find(x=>x.name === name) : null);
   if(!p){ console.warn('drill-down: product not found', name); return; }
   const pmObj = (window.__pmData||{})[name] || null;
   const seasonIdx = calcProductSeasonIdx(p);
@@ -1389,22 +1639,20 @@ function openDD(name){
   const fcAvg = p.fc_avg;
   const pmAnn = pmObj ? pmObj.ann : null;
   const pmApr = pmObj ? pmObj.apr : null;
-  const gap = (pmAnn!=null && fcAvg!=null) ? (pmAnn - fcAvg) : null;
 
-  // Claude 4월 예측 (3가지 방법, 품목 단위)
-  const mar = p.mar||0, feb = p.feb||0;
+  // Claude 4월 예측 (3가지 방법, 품목 단위) — 전역 함수 재사용
   const idx3 = seasonIdx ? seasonIdx[2] : 1, idx4 = seasonIdx ? seasonIdx[3] : 1;
-  const f_apr_A = idx3>0 ? mar*(idx4/idx3) : null;   // 3월 대비 계절계수
-  const q1idxSum = seasonIdx ? (seasonIdx[0]+seasonIdx[1]+seasonIdx[2]) : 3;
-  const ann_season = q1idxSum>0 ? q1_26 * 12 / q1idxSum : null;
-  const f_apr_B = (ann_season!=null) ? ann_season * idx4/12 : null;
   const apr25 = (p.monthly_25||[])[3] || 0;
-  const yoyQ1_p = q1_25>0 ? (q1_26/q1_25 - 1) : 0;
-  const f_apr_C = apr25 * (1 + yoyQ1_p);
-  const aprClaudeCand = [f_apr_A, f_apr_B, f_apr_C].filter(v=>v!=null && !isNaN(v));
-  const aprClaude = aprClaudeCand.length>0 ? aprClaudeCand.reduce((a,b)=>a+b,0)/aprClaudeCand.length : null;
+  const aprClaude = calcMonthlyClaude(p, 3);
+  // 4월 기준 갭 (PM 4월 − Claude 4월)
+  const aprGap = (pmApr != null && aprClaude != null) ? +(pmApr - aprClaude).toFixed(2) : null;
+  // 4월 SF 목표
+  const sfApr = (p.sf_monthly||[])[3] || 0;
+  // ann_season: 월별 트렌드 차트 Claude 라인 그리기용 (Q1 계절환산 연간치)
+  const q1idxSum = seasonIdx ? (seasonIdx[0]+seasonIdx[1]+seasonIdx[2]) : 3;
+  const ann_season = q1idxSum > 0 ? q1_26 * 12 / q1idxSum : null;
 
-  // 제안 문장 생성
+  // 제안 문장 생성 (4월 기준)
   let reason = '';
   const reasonBits = [];
   if(yoy!=null) reasonBits.push(`Q1 YoY ${yoy>=0?'+':''}${yoy.toFixed(1)}%`);
@@ -1413,14 +1661,16 @@ function openDD(name){
   if(p.mar_mom!=null) reasonBits.push(`3월 MoM ${p.mar_mom>=0?'+':''}${p.mar_mom.toFixed(1)}%`);
   const reasonCtx = reasonBits.join(' · ');
 
-  if(gap == null){
-    reason = `PM 예측 LIVE 데이터가 아직 매칭되지 않았습니다. 매출 예측 탭 진입 후 자동 로드됩니다.`;
-  } else if(gap > 5){
-    reason = `PM 연말전망이 Claude 평균 대비 <span class="r-gap pos">+${gap.toFixed(1)}억</span> 공격적입니다. 근거: ${reasonCtx}. → Q2 실적으로 조기 검증 필요, 4월 랜딩 시점에서 트랙 리뷰 권장.`;
-  } else if(gap < -5){
-    reason = `PM 연말전망이 Claude 평균 대비 <span class="r-gap neg">${gap.toFixed(1)}억</span> 보수적입니다. 근거: ${reasonCtx}. → 상향 검토 여지 있음, 기회 품목 재평가 권장.`;
+  // 4월 기준 차이 임계값: max(SF 4월의 20%, 1.0억) — fcTable 하이라이트 기준과 일치
+  const gapBand = Math.max((sfApr || 0) * 0.2, 1.0);
+  if(aprGap == null){
+    reason = `PM 4월 예측 데이터가 아직 매칭되지 않았습니다. 매출 예측 탭 진입 후 자동 로드됩니다.`;
+  } else if(aprGap > gapBand){
+    reason = `PM 4월 예측이 Claude 4월 대비 <span class="r-gap pos">+${aprGap.toFixed(2)}억</span> 공격적입니다. 근거: ${reasonCtx}. → 3월까지 실적이 받쳐주는지 검증, 4월 첫 2주 랜딩 모니터링 권장.`;
+  } else if(aprGap < -gapBand){
+    reason = `PM 4월 예측이 Claude 4월 대비 <span class="r-gap neg">${aprGap.toFixed(2)}억</span> 보수적입니다. 근거: ${reasonCtx}. → 상향 검토 여지 있음, 기회 품목 재평가 권장.`;
   } else {
-    reason = `PM 연말전망과 Claude 평균이 <span class="r-gap zero">${gap>=0?'+':''}${gap.toFixed(1)}억</span> 범위 내 정렬되어 있습니다. 근거: ${reasonCtx}.`;
+    reason = `PM 4월 예측과 Claude 4월이 <span class="r-gap zero">${aprGap>=0?'+':''}${aprGap.toFixed(2)}억</span> 범위 내 정렬되어 있습니다. 근거: ${reasonCtx}.`;
   }
 
   // 렌더
@@ -1431,9 +1681,9 @@ function openDD(name){
   body.innerHTML = `
     <div class="dd-kpi">
       <div class="dd-kpi-box"><div class="k-lbl">Q1 실적</div><div class="k-val">${fmt(q1_26,1)}</div><div class="k-sub">억원 · ${yoy!=null?`YoY ${yoy>=0?'+':''}${yoy.toFixed(1)}%`:'-'}</div></div>
-      <div class="dd-kpi-box green"><div class="k-lbl">Claude 예측 평균</div><div class="k-val">${fmt(fcAvg,1)}</div><div class="k-sub">억원 · SF대비 ${p.ann_sf>0?(fcAvg/p.ann_sf*100).toFixed(1):'-'}%</div></div>
-      <div class="dd-kpi-box purple"><div class="k-lbl">PM 연말 전망 <sup style="color:#805ad5;font-size:8px;">LIVE</sup></div><div class="k-val">${pmAnn!=null?fmt(pmAnn,1):'–'}</div><div class="k-sub">억원 · ${pmApr!=null?`4월 ${pmApr.toFixed(1)}억`:'로딩 대기'}</div></div>
-      <div class="dd-kpi-box orange"><div class="k-lbl">갭 (PM − Claude)</div><div class="k-val" style="color:${gap==null?'#999':(Math.abs(gap)<3?'#38a169':(gap>0?'#c53030':'#2c5282'))}">${gap!=null?(gap>=0?'+':'')+gap.toFixed(1):'–'}</div><div class="k-sub">${gap==null?'-':(Math.abs(gap)<3?'거의 일치':(gap>0?'PM 공격적':'PM 보수적'))}</div></div>
+      <div class="dd-kpi-box green"><div class="k-lbl">Claude 4월 예측</div><div class="k-val">${aprClaude!=null?fmt(aprClaude,2):'–'}</div><div class="k-sub">억원 · SF 4월 ${sfApr>0?sfApr.toFixed(2):'-'} · 25년 4월 ${apr25>0?apr25.toFixed(2):'-'}</div></div>
+      <div class="dd-kpi-box purple"><div class="k-lbl">PM 4월 예측 <sup style="color:#805ad5;font-size:8px;">LIVE</sup></div><div class="k-val">${pmApr!=null?fmt(pmApr,2):'–'}</div><div class="k-sub">억원 · ${pmAnn!=null?`연말 PM 전망 ${pmAnn.toFixed(1)}억 (참고)`:'로딩 대기'}</div></div>
+      <div class="dd-kpi-box orange"><div class="k-lbl">갭 4월 (PM − Claude)</div><div class="k-val" style="color:${aprGap==null?'#999':(Math.abs(aprGap)<gapBand?'#38a169':(aprGap>0?'#c53030':'#2c5282'))}">${aprGap!=null?(aprGap>=0?'+':'')+aprGap.toFixed(2):'–'}</div><div class="k-sub">${aprGap==null?'-':(Math.abs(aprGap)<gapBand?'허용 범위 내':(aprGap>0?'PM 공격적':'PM 보수적'))}</div></div>
     </div>
 
     <div class="dd-section">
@@ -1445,12 +1695,12 @@ function openDD(name){
     </div>
 
     <div class="dd-section">
-      <h4>🎯 PM vs Claude 예측 제안</h4>
+      <h4>🎯 PM vs Claude 4월 예측 제안</h4>
       <div class="dd-reason">
-        <div class="r-head">통합 판단</div>
+        <div class="r-head">4월 기준 통합 판단</div>
         <div>${reason}</div>
-        ${aprClaude!=null && pmApr!=null ? `<div style="margin-top:8px;padding-top:8px;border-top:1px dashed #d6bcfa;font-size:12px;">
-          <b>4월 예측 비교:</b> PM ${pmApr.toFixed(1)}억 vs Claude ${aprClaude.toFixed(1)}억 (갭 ${pmApr-aprClaude>=0?'+':''}${(pmApr-aprClaude).toFixed(1)}억)
+        ${fcAvg!=null && pmAnn!=null ? `<div style="margin-top:8px;padding-top:8px;border-top:1px dashed #d6bcfa;font-size:11px;color:#718096;">
+          ※ 참고 — 연말 전망: Claude FC평균 ${fcAvg.toFixed(1)}억 vs PM 연말전망 ${pmAnn.toFixed(1)}억 (월별 논의가 우선, 연간치는 보조 지표)
         </div>` : ''}
       </div>
     </div>
@@ -1639,46 +1889,61 @@ function wifUpdateSummary(){
   const st = window.__wifState; if(!st) return;
   const box = document.getElementById('wifSummary'); if(!box) return;
 
-  // 연간합계 = Q1 + 4~12월 합
-  let rest = 0;
-  for(let m=3;m<12;m++) rest += st.currentVals[m] || 0;
+  // 1. 4월 예측
+  const apr = +((st.currentVals[3]||0)).toFixed(2);
+  const sfApr = +((st.sfMonthly[3]||0)).toFixed(2);
+  const apr25 = +((st.m25[3]||0)).toFixed(2);
+
+  // 2. Q2 합 (4~6월)
+  const q2 = +((st.currentVals[3]||0) + (st.currentVals[4]||0) + (st.currentVals[5]||0)).toFixed(2);
+  const q2sf = +((st.sfMonthly[3]||0) + (st.sfMonthly[4]||0) + (st.sfMonthly[5]||0)).toFixed(2);
+  const q225 = +((st.m25[3]||0) + (st.m25[4]||0) + (st.m25[5]||0)).toFixed(2);
+
+  // 3. 남은 9개월 합 (4~12월)
+  let rest = 0, restSF = 0, rest25 = 0;
+  for(let m=3;m<12;m++){
+    rest += st.currentVals[m] || 0;
+    restSF += st.sfMonthly[m] || 0;
+    rest25 += st.m25[m] || 0;
+  }
+  rest = +rest.toFixed(2); restSF = +restSF.toFixed(2); rest25 = +rest25.toFixed(2);
+
+  // 4. 조정 후 25년 대비 YoY
   const annTotal = +(st.q1_26 + rest).toFixed(2);
+  const yoy = st.ann_25 > 0 ? +((annTotal/st.ann_25 - 1)*100).toFixed(1) : null;
+  const vs25abs = st.ann_25 > 0 ? +(annTotal - st.ann_25).toFixed(2) : null;
 
-  // vs SF
-  const vsSF = st.ann_sf > 0 ? +(annTotal - st.ann_sf).toFixed(2) : null;
-  const vsSFpct = st.ann_sf > 0 ? +((annTotal/st.ann_sf - 1)*100).toFixed(1) : null;
+  // 보조 계산: vs SF/25년 Δ·%
+  const vsSfApr = sfApr>0 ? +((apr/sfApr - 1)*100).toFixed(1) : null;
+  const vs25Apr = apr25>0 ? +((apr/apr25 - 1)*100).toFixed(1) : null;
+  const vsSfQ2 = q2sf>0 ? +((q2/q2sf - 1)*100).toFixed(1) : null;
+  const vs25Q2 = q225>0 ? +((q2/q225 - 1)*100).toFixed(1) : null;
+  const vsSfRest = restSF>0 ? +((rest/restSF - 1)*100).toFixed(1) : null;
+  const vs25Rest = rest25>0 ? +((rest/rest25 - 1)*100).toFixed(1) : null;
 
-  // vs 25년
-  const vs25 = st.ann_25 > 0 ? +(annTotal - st.ann_25).toFixed(2) : null;
-  const vs25pct = st.ann_25 > 0 ? +((annTotal/st.ann_25 - 1)*100).toFixed(1) : null;
-
-  // vs Claude FC평균
-  const vsFc = st.fcAvg > 0 ? +(annTotal - st.fcAvg).toFixed(2) : null;
-  const vsFcPct = st.fcAvg > 0 ? +((annTotal/st.fcAvg - 1)*100).toFixed(1) : null;
-
-  function clsGap(v, band){ if(v==null) return 'zero'; const a=Math.abs(v); return a<band?'zero':(v>0?'pos':'neg'); }
+  function clsPct(v, band){ if(v==null) return 'zero'; const a=Math.abs(v); return a<band?'zero':(v>0?'pos':'neg'); }
   function sign(v){ return (v!=null && v>=0) ? '+' : ''; }
 
   box.innerHTML = `
     <div class="wif-sum-box">
-      <div class="s-lbl">연간 합계 (Q1+시나리오)</div>
-      <div class="s-val">${annTotal.toFixed(1)}<span style="font-size:12px;color:#4a5568;font-weight:600;"> 억</span></div>
-      <div class="s-sub zero">Q1 ${st.q1_26.toFixed(1)} + 4~12월 ${rest.toFixed(1)}</div>
+      <div class="s-lbl">4월 예측</div>
+      <div class="s-val">${apr.toFixed(2)}<span style="font-size:12px;color:#4a5568;font-weight:600;"> 억</span></div>
+      <div class="s-sub ${clsPct(vsSfApr,5)}">SF ${sfApr.toFixed(2)} (${vsSfApr!=null?sign(vsSfApr)+vsSfApr+'%':'-'}) · 25년 ${apr25.toFixed(2)} (${vs25Apr!=null?sign(vs25Apr)+vs25Apr+'%':'-'})</div>
     </div>
     <div class="wif-sum-box">
-      <div class="s-lbl">vs SF목표 (${st.ann_sf.toFixed(1)}억)</div>
-      <div class="s-val">${vsSF!=null?sign(vsSF)+vsSF.toFixed(1):'-'}</div>
-      <div class="s-sub ${clsGap(vsSF,2)}">${vsSFpct!=null?sign(vsSFpct)+vsSFpct.toFixed(1)+'%':'-'}</div>
+      <div class="s-lbl">Q2 합 (4~6월)</div>
+      <div class="s-val">${q2.toFixed(2)}<span style="font-size:12px;color:#4a5568;font-weight:600;"> 억</span></div>
+      <div class="s-sub ${clsPct(vsSfQ2,5)}">SF ${q2sf.toFixed(2)} (${vsSfQ2!=null?sign(vsSfQ2)+vsSfQ2+'%':'-'}) · 25년 ${q225.toFixed(2)} (${vs25Q2!=null?sign(vs25Q2)+vs25Q2+'%':'-'})</div>
     </div>
     <div class="wif-sum-box">
-      <div class="s-lbl">vs 25년 실적 (${st.ann_25.toFixed(1)}억)</div>
-      <div class="s-val">${vs25!=null?sign(vs25)+vs25.toFixed(1):'-'}</div>
-      <div class="s-sub ${clsGap(vs25,2)}">${vs25pct!=null?sign(vs25pct)+vs25pct.toFixed(1)+'%':'-'}</div>
+      <div class="s-lbl">남은 9개월 합 (4~12월)</div>
+      <div class="s-val">${rest.toFixed(1)}<span style="font-size:12px;color:#4a5568;font-weight:600;"> 억</span></div>
+      <div class="s-sub ${clsPct(vsSfRest,5)}">SF ${restSF.toFixed(1)} (${vsSfRest!=null?sign(vsSfRest)+vsSfRest+'%':'-'}) · 25년 ${rest25.toFixed(1)} (${vs25Rest!=null?sign(vs25Rest)+vs25Rest+'%':'-'})</div>
     </div>
     <div class="wif-sum-box">
-      <div class="s-lbl">vs Claude FC (${st.fcAvg.toFixed(1)}억)</div>
-      <div class="s-val">${vsFc!=null?sign(vsFc)+vsFc.toFixed(1):'-'}</div>
-      <div class="s-sub ${clsGap(vsFc,2)}">${vsFcPct!=null?sign(vsFcPct)+vsFcPct.toFixed(1)+'%':'-'}</div>
+      <div class="s-lbl">조정 후 25년 대비 YoY</div>
+      <div class="s-val ${clsPct(yoy,2)}">${yoy!=null?sign(yoy)+yoy.toFixed(1)+'%':'-'}</div>
+      <div class="s-sub zero">연간 ${annTotal.toFixed(1)}억 (25년 ${st.ann_25.toFixed(1)}억 · ${vs25abs!=null?sign(vs25abs)+vs25abs.toFixed(1)+'억':'-'})</div>
     </div>
   `;
 }
