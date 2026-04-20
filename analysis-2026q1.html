@@ -252,8 +252,28 @@ tr:hover{background:#f7fafc;}
       📡 <b>PM예측 LIVE 연동:</b> <a href="https://docs.google.com/spreadsheets/d/1LYuUQrUrtFLfUCjpUgoVNtEqIyTv-0l_-F6nSY4ESF0/edit#gid=1589134561" target="_blank" style="color:#6b46c1;text-decoration:underline;">「2026 마감예측」</a> 시트 Col 79 (26.4월 1차) · 품목명 매칭 · 연말전망 = Q1실적 + 4월PM + 5~12월 목표 합산
       <span id="pmfpStatus" style="margin-left:8px;color:#6b46c1;font-weight:600;">로딩 대기…</span>
     </div>
+    <!-- ★★ ETC 전체 PM 4월 예측 고정 배지 (필터 무관 · PMFP 시트 전체 집계) ★★ -->
+    <div id="pmTotalBadge" style="background:linear-gradient(135deg,#faf5ff 0%,#f7fafc 100%);border:2px solid #b794f4;border-radius:10px;padding:14px 18px;margin-bottom:12px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;box-shadow:0 2px 6px rgba(159,122,234,0.15);">
+      <div style="flex:1;min-width:260px;">
+        <div style="font-size:11px;color:#6b46c1;font-weight:700;letter-spacing:0.3px;margin-bottom:4px;">📌 ETC 전체 PM 4월 1차 예측 (PMFP 시트 전수 집계)</div>
+        <div style="font-size:12px;color:#4a5568;">필터와 무관하게 「2026 마감예측」 Col 79의 모든 양수 값을 합산한 본부 기준값입니다.</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:28px;font-weight:800;color:#553c9a;line-height:1;"><span id="pmTotalVal">–</span><span style="font-size:16px;font-weight:600;color:#805ad5;">억</span></div>
+        <div style="font-size:11px;color:#805ad5;margin-top:4px;"><span id="pmTotalCount">–</span>개 행 매칭</div>
+      </div>
+      <div style="border-left:1px solid #d6bcfa;padding-left:18px;text-align:right;min-width:160px;">
+        <div style="font-size:11px;color:#718096;margin-bottom:2px;">현재 필터 집계</div>
+        <div style="font-size:18px;font-weight:700;color:#4a5568;"><span id="pmTotalFiltered">–</span>억</div>
+        <div style="font-size:11px;color:#718096;margin-top:2px;">차이 <span id="pmTotalDiff" style="font-weight:700;">–</span></div>
+      </div>
+    </div>
     <!-- ★★ 신규: 4월 & 연 착지 전망 요약 ★★ -->
     <div class="fc-summary" id="fcSummary"></div>
+
+    <!-- ★★ 연간 예측 & 필요매출 (하단 섹션) ★★ -->
+    <div style="font-size:12px;color:#4a5568;font-weight:700;margin:4px 2px 6px;letter-spacing:0.3px;">📅 연간 예측 & 5~12월 필요 매출 <span style="font-weight:400;color:#718096;">(현재 필터 기준)</span></div>
+    <div class="fc-summary" id="fcAnnualSummary" style="background:linear-gradient(135deg,#fffaf0,#fef5e7);margin-bottom:20px;"></div>
     <div class="section" style="margin-top:0;">
       <div class="card">
         <h3>계절성 기반 26년 월별 착지 전망 <span style="font-size:11px;color:var(--muted);font-weight:400;">(최근 2년 가중평균 40:60 기준, 단위: 억원)</span></h3>
@@ -836,6 +856,40 @@ function renderFcSummary(fcList){
     <div class="fc-item"><div class="fc-label">Claude 4월 예측 총합</div><div class="fc-val" style="color:#2c5282">${fmt(totalClaudeApr,1)}</div><div class="fc-sub">억원 · SF대비 ${totalSfApr>0?(totalClaudeApr/totalSfApr*100).toFixed(1):'-'}%</div></div>
     <div class="fc-item"><div class="fc-label">PM 4월 예측 합 <sup style="color:#805ad5">LIVE</sup></div><div class="fc-val" style="color:#6b46c1" id="fcSumPM">${matchedPM.length>0?fmt(totalPMApr,1):'–'}</div><div class="fc-sub" id="fcSumPMSub">${matchedPM.length>0?`매칭 ${matchedPM.length}품목 (Claude 동일베이스 ${matchedClaudeApr.toFixed(1)}억)`:'로딩 대기…'}</div></div>
     <div class="fc-item"><div class="fc-label">갭 4월 (PM − Claude)</div><div class="fc-val" style="color:${totalGap==null?'#999':(Math.abs(totalGap)<3?'#38a169':(totalGap>0?'#c53030':'#2c5282'))}" id="fcSumGap">${totalGap!=null?(totalGap>=0?'+':'')+totalGap.toFixed(1):'–'}</div><div class="fc-sub" id="fcSumGapSub">${totalGap!=null?(Math.abs(totalGap)<3?'정렬':(totalGap>0?'PM 공격적':'PM 보수적')):'매칭 대기'}</div></div>`;
+
+  // ── 연간 예측 & 필요매출 (하단 4박스) ──────────────
+  // 계산식:
+  //  · 연 SF 목표 = Σ p.sf_monthly(0..11)
+  //  · Claude 연 착지 = Σ [Q1실적 + Claude 4월 + 5~12월 SF]
+  //  · PM 연 착지 = Σ [Q1실적 + (PM 4월 || Claude 4월 대체) + 5~12월 SF]
+  //  · 5~12월 필요매출 = 연 SF − Σ Q1실적 − Σ (PM 4월|Claude 대체)
+  //    → vs 5~12월 SF 합 비교로 배분 빡빡함/여유 판단
+  const totalAnnSf = fcList.reduce((a,p)=>{
+    const sm = p.sf_monthly || []; let s = 0; for(let i=0;i<12;i++) s += (sm[i]||0); return a + s;
+  }, 0);
+  const totalQ1Act = fcList.reduce((a,p)=>a + (p.q1_26 || 0), 0);
+  const totalRemMay = fcList.reduce((a,p)=>{
+    const sm = p.sf_monthly || []; let s = 0; for(let i=4;i<12;i++) s += (sm[i]||0); return a + s;
+  }, 0);
+  const totalAprPMorClaude = fcList.reduce((a,p)=>{
+    const v = (p._pmApr != null) ? p._pmApr : (p._aprClaude || 0); return a + v;
+  }, 0);
+  const claudeAnnLand = totalQ1Act + totalClaudeApr + totalRemMay;
+  const pmAnnLand = totalQ1Act + totalAprPMorClaude + totalRemMay;
+  const needRev = totalAnnSf - totalQ1Act - totalAprPMorClaude;
+  const remGap = needRev - totalRemMay;  // +면 SF 대비 더 필요, -면 여유
+
+  const annBox = document.getElementById('fcAnnualSummary'); if(annBox){
+    const claudeAch = totalAnnSf>0 ? (claudeAnnLand/totalAnnSf*100).toFixed(1) : '-';
+    const pmAch = totalAnnSf>0 ? (pmAnnLand/totalAnnSf*100).toFixed(1) : '-';
+    const needColor = remGap > 0 ? '#c53030' : (remGap < -3 ? '#38a169' : '#d69e2e');
+    const needLabel = remGap > 3 ? `SF 대비 +${remGap.toFixed(1)}억 추가 필요` : (remGap < -3 ? `SF 대비 ${remGap.toFixed(1)}억 여유` : '5~12월 SF와 근접');
+    annBox.innerHTML = `
+      <div class="fc-item"><div class="fc-label">연 SF 목표 총합</div><div class="fc-val">${fmt(totalAnnSf,0)}</div><div class="fc-sub">억원 · ${fcList.length}품목 · Q1실적 ${fmt(totalQ1Act,0)}억</div></div>
+      <div class="fc-item"><div class="fc-label">Claude 기준 연 착지</div><div class="fc-val" style="color:#2c5282">${fmt(claudeAnnLand,0)}</div><div class="fc-sub">달성률 ${claudeAch}% · Q1+4월Claude+5~12월 SF</div></div>
+      <div class="fc-item"><div class="fc-label">PM 기준 연 착지 <sup style="color:#805ad5">LIVE</sup></div><div class="fc-val" style="color:#6b46c1">${fmt(pmAnnLand,0)}</div><div class="fc-sub">달성률 ${pmAch}% · Q1+4월PM+5~12월 SF</div></div>
+      <div class="fc-item"><div class="fc-label">5~12월 필요 매출</div><div class="fc-val" style="color:${needColor}">${fmt(needRev,0)}</div><div class="fc-sub">5~12월 SF ${fmt(totalRemMay,0)}억 · ${needLabel}</div></div>`;
+  }
 }
 window.__refreshFcSummary = renderFcSummary;
 
@@ -1423,6 +1477,37 @@ function loadPMProductForecast(){
     const rows = j.table.rows;
     const pmData = (window.__pmData = {});  // 드릴다운에서도 공유
     let totApr=0, totQ1=0, totRem=0;
+
+    // ★★ 옵션 C: PMFP 시트 전체 집계 (필터·매칭 무관, 양수 값만) ★★
+    // 목적: 구글시트 원본의 '진짜 ETC 전체 PM 4월 예측' 값을 고정 노출
+    // 필터링/매칭 로직 버그 영향 없이 시트 총합을 항상 확인할 수 있음
+    let allTotalAprWon = 0;
+    let allMatchedRows = [];
+    for(let i=PMFP_CFG.dataStartRow; i<rows.length; i++){
+      const r = rows[i]; if(!r || !r.c) continue;
+      const vApr = r.c[PMFP_CFG.apr1Col]?.v;
+      if(typeof vApr === 'number' && vApr > 0){
+        allTotalAprWon += vApr;
+        const g2 = r.c[3]?.v ? String(r.c[3].v) : '';
+        const g3 = r.c[4]?.v ? String(r.c[4].v) : '';
+        const g4 = r.c[5]?.v ? String(r.c[5].v) : '';
+        allMatchedRows.push({g2, g3, g4, apr: vApr/1e8});
+      }
+    }
+    window.__pmTotalAll = {
+      apr: +(allTotalAprWon/1e8).toFixed(2),
+      count: allMatchedRows.length,
+      rows: allMatchedRows
+    };
+
+    // 전체 배지 먼저 갱신 (필터 집계 없이도 ETC 전체 값 확정)
+    try {
+      const _valEl = document.getElementById('pmTotalVal');
+      const _cntEl = document.getElementById('pmTotalCount');
+      if(_valEl) _valEl.textContent = window.__pmTotalAll.apr.toFixed(1);
+      if(_cntEl) _cntEl.textContent = String(window.__pmTotalAll.count);
+    } catch(e){ /* 배지 갱신 실패 무시 */ }
+
     const dashKeys = Array.from(document.querySelectorAll('#fcTable tbody tr[data-pm-key]'))
       .map(tr=>tr.dataset.pmKey).filter(k=>k!=='__total__');
 
@@ -1456,22 +1541,24 @@ function loadPMProductForecast(){
     });
 
     // D.all_products에 PM 4월 예측/갭 캐시 주입 (fcRenderRows 재호출 시 유지되도록)
-    if(D.all_products){
-      D.all_products.forEach(p=>{
-        const pd = pmData[p.name];
-        if(pd && pd.apr != null){
-          p._pmApr = +pd.apr.toFixed(2);
-          if(p._aprClaude != null){
-            p._aprGap = +(p._pmApr - p._aprClaude).toFixed(2);
+    try {
+      if(typeof D !== 'undefined' && D.all_products){
+        D.all_products.forEach(p=>{
+          const pd = pmData[p.name];
+          if(pd && pd.apr != null){
+            p._pmApr = +pd.apr.toFixed(2);
+            if(p._aprClaude != null){
+              p._aprGap = +(p._pmApr - p._aprClaude).toFixed(2);
+            } else {
+              p._aprGap = null;
+            }
           } else {
+            p._pmApr = null;
             p._aprGap = null;
           }
-        } else {
-          p._pmApr = null;
-          p._aprGap = null;
-        }
-      });
-    }
+        });
+      }
+    } catch(e){ /* D 미정의 시 스킵 */ }
 
     // 현재 표시 중인 행들의 PM 4월·갭 셀 패치 (리렌더 비용 절약 + 즉시 반영)
     document.querySelectorAll('#fcTable tbody tr[data-pm-key]').forEach(tr=>{
@@ -1530,13 +1617,32 @@ function loadPMProductForecast(){
     });
 
     // fcSummary 4박스(PM 4월 합·갭) 즉시 갱신 + 차트 PM 시리즈 갱신
-    if(typeof window.__refreshFcSummary === 'function'){ window.__refreshFcSummary(); }
-    if(typeof window.__updateChartForecastPM === 'function'){ window.__updateChartForecastPM(); }
+    try { if(typeof window.__refreshFcSummary === 'function'){ window.__refreshFcSummary(); } } catch(e){ /* skip */ }
+    try { if(typeof window.__updateChartForecastPM === 'function'){ window.__updateChartForecastPM(); } } catch(e){ /* skip */ }
+
+    // ★★ 옵션 C: 상단 고정 배지 갱신 (ETC 전체 PM 4월 예측 vs 현재 필터 집계) ★★
+    const totalAllEl = document.getElementById('pmTotalVal');
+    const totalCountEl = document.getElementById('pmTotalCount');
+    const totalFilteredEl = document.getElementById('pmTotalFiltered');
+    const totalDiffEl = document.getElementById('pmTotalDiff');
+    if(totalAllEl){
+      const allApr = window.__pmTotalAll.apr;
+      const filteredApr = +(totApr/1e8).toFixed(2);
+      const diff = +(allApr - filteredApr).toFixed(2);
+      totalAllEl.textContent = allApr.toFixed(1);
+      if(totalCountEl) totalCountEl.textContent = window.__pmTotalAll.count;
+      if(totalFilteredEl) totalFilteredEl.textContent = filteredApr.toFixed(1);
+      if(totalDiffEl){
+        totalDiffEl.textContent = (diff === 0) ? '±0.0억' : ((diff>0?'+':'') + diff.toFixed(1) + '억');
+        totalDiffEl.style.color = Math.abs(diff) < 0.5 ? '#38a169' : (diff > 0 ? '#d69e2e' : '#c53030');
+      }
+    }
 
     if(sts){
       const matched = Object.keys(pmData).length;
       const totPm = (totApr/1e8).toFixed(1);
-      sts.innerHTML = `✅ ${matched}/${dashKeys.length}개 품목 매칭 · PM 4월 예측 합 <b>${totPm}억</b> · 테이블/차트/Summary 모두 반영 완료`;
+      const allPm = window.__pmTotalAll.apr.toFixed(1);
+      sts.innerHTML = `✅ ${matched}/${dashKeys.length}개 품목 매칭 · 필터 합 <b>${totPm}억</b> · <span style="color:#553c9a">ETC전체 ${allPm}억 (${window.__pmTotalAll.count}행)</span>`;
     }
   });
 }
