@@ -60,6 +60,10 @@ tr:hover{background:#f7fafc;}
 .grp-table th{background:#edf2f7;}
 .grp-bar{display:inline-block;height:8px;border-radius:3px;vertical-align:middle;margin-right:5px;}
 @media(max-width:1200px){.kpi-row{grid-template-columns:repeat(3,1fr);}.grid-2{grid-template-columns:1fr;}.fc-summary{grid-template-columns:repeat(2,1fr);}#fcSummaryRow2{grid-template-columns:repeat(2,1fr)!important;}.header-center{gap:10px;}}
+#fcPMFilterBar{display:flex;gap:6px;flex-wrap:wrap;padding:8px 10px;background:#faf5ff;border-radius:8px;margin-bottom:8px;align-items:center;}
+#fcPMFilterBar .pm-chip{padding:4px 10px;border:1px solid #d6bcfa;border-radius:20px;background:#fff;font-size:11px;font-weight:600;color:#553c9a;cursor:pointer;transition:all .15s;}
+#fcPMFilterBar .pm-chip:hover{background:#f3e8ff;}
+#fcPMFilterBar .pm-chip.active{background:#553c9a;color:#fff;border-color:#553c9a;}
 /* ===== 품목 드릴다운 모달 ===== */
 #fcTable tbody tr[data-pm-key]:not([data-pm-key="__total__"]){cursor:pointer;}
 #fcTable tbody tr[data-pm-key]:not([data-pm-key="__total__"]):hover{background:#ebf8ff !important;}
@@ -269,10 +273,10 @@ tr:hover{background:#f7fafc;}
       </div>
     </div>
     <!-- ★★ 해당월 예측 요약 — 2줄 헤드라인 ★★ -->
-    <!-- Row 1 (4박스): 해당월 SF목표 / Claude 예측 / PM 예측 / GAP(PM-Claude) -->
+    <!-- Row 1 (4박스): 해당월 SF목표 / Claude 예측 / PM 예측(전체품목, CA/CB) / GAP(PM-Claude) -->
     <div class="fc-summary" id="fcSummary"></div>
-    <!-- Row 2 (3박스): 연착지 전망(Claude) / 목표대비 GAP / 남은기간 필요매출 -->
-    <div class="fc-summary" id="fcSummaryRow2" style="grid-template-columns:repeat(3,1fr);background:linear-gradient(135deg,#fffaf0,#fef5e7);margin-top:-8px;"></div>
+    <!-- Row 2 (4박스): 연간목표 / 현수준 예측(Q1월평균×12) / 남은기간 월평균 목표 / 추가 월 성장목표 -->
+    <div class="fc-summary" id="fcSummaryRow2" style="grid-template-columns:repeat(4,1fr);background:linear-gradient(135deg,#fffaf0,#fef5e7);margin-top:-8px;"></div>
     <div class="section" style="margin-top:0;">
       <div class="card">
         <h3>계절성 기반 26년 월별 착지 전망 <span style="font-size:11px;color:var(--muted);font-weight:400;">(최근 2년 가중평균 40:60 기준, 단위: 억원)</span></h3>
@@ -313,10 +317,25 @@ tr:hover{background:#f7fafc;}
         </select>
         <span id="fcRowCount" style="font-size:11px;color:#4a5568;font-weight:600;"></span>
       </div>
+      <!-- ★ B-⑨ PM 필터 칩 바 ★ -->
+      <div id="fcPMFilterBar">
+        <span style="font-size:11px;font-weight:700;color:#553c9a;">담당 PM:</span>
+        <span class="pm-chip active" data-pm="">전체</span>
+        <span class="pm-chip" data-pm="임범성">임범성</span>
+        <span class="pm-chip" data-pm="강태석">강태석</span>
+        <span class="pm-chip" data-pm="박지현">박지현</span>
+        <span class="pm-chip" data-pm="김지완">김지완</span>
+        <span class="pm-chip" data-pm="최우열">최우열</span>
+        <span class="pm-chip" data-pm="이민정">이민정</span>
+        <span class="pm-chip" data-pm="김유연">김유연</span>
+        <span class="pm-chip" data-pm="강경완">강경완</span>
+        <span class="pm-chip" data-pm="미분류">미분류</span>
+      </div>
       <div style="overflow-x:auto;">
         <table id="fcTable"><thead><tr>
           <th>품목</th>
           <th style="background:#edf2f7;">태그</th>
+          <th style="background:#faf5ff;color:#553c9a;">담당PM</th>
           <th>Q1실적</th>
           <th>Q1 달성률</th>
           <th>3월 실적</th>
@@ -391,6 +410,44 @@ const TARGET_MONTH_IDX = detectTargetMonthIdx();   // 0-idx (0=1월)
 const TARGET_MONTH_NUM = TARGET_MONTH_IDX + 1;     // 1-idx (1=1월)
 window.__TARGET_MONTH_IDX = TARGET_MONTH_IDX;
 window.__TARGET_MONTH_NUM = TARGET_MONTH_NUM;
+
+// =================== B-⑨ PM ↔ 품목 매핑 (CLAUDE.md 기준) ===================
+// fcRenderRows/renderFcSummary 이전에 반드시 선언되어야 함 (TDZ 방지)
+const PM_PRODUCT_MAP = {
+  // 임범성(팀장)
+  '가스루':'임범성','라토가':'임범성','레바블록':'임범성','레보드':'임범성',
+  '티로민':'임범성','한올트리메부틴':'임범성','한올파모티딘':'임범성',
+  // 강태석(PM)
+  '알파본':'강태석','헤어그로':'강태석','아다모':'강태석','판그로':'강태석',
+  '본그로':'강태석','본에바':'강태석','알렌탑':'강태석','미녹필':'강태석','헤어덤':'강태석',
+  // 박지현(PM)
+  '바이오탑':'박지현','하노마린':'박지현','헤파몬':'박지현','앱시토':'박지현',
+  '한시움':'박지현','우데콜':'박지현','멜라원':'박지현',
+  // 김지완(PM)
+  '엘리가드':'김지완','포드림':'김지완','포미스터':'김지완','프로베린':'김지완',
+  '한올탐술로신':'김지완','엔잘루타':'김지완',
+  // 최우열(PM)
+  '글루코프리':'최우열','덱시티옥':'최우열','클로비드':'최우열','베노론':'최우열',
+  '이글렉스':'최우열','이글듀오':'최우열','프레가발린':'최우열',
+  // 이민정(PM)
+  '노르믹스':'이민정','네오미노화겐씨':'이민정','갈로닉':'이민정',
+  '콤비플렉스':'이민정','유바솔':'이민정',
+  // 김유연(AM)
+  '록스페닌':'김유연','아세로':'김유연','케랄':'김유연','한콕스':'김유연','헤르팜':'김유연',
+  // 강경완(과장)
+  '올리버원':'강경완',
+};
+function getPMForProduct(name){
+  if(!name) return '미분류';
+  const keys = Object.keys(PM_PRODUCT_MAP);
+  keys.sort((a,b)=>b.length - a.length);  // 긴 키 우선
+  for(const key of keys){
+    if(name.indexOf(key) !== -1) return PM_PRODUCT_MAP[key];
+  }
+  return '미분류';
+}
+window.__getPMForProduct = getPMForProduct;
+window.__PM_PRODUCT_MAP = PM_PRODUCT_MAP;
 
 const fmt=(v,d=1)=>v!=null?v.toFixed(d):'-';
 const fmtP=(v)=>v!=null?(v>=0?'+':'')+v.toFixed(1)+'%':'-';
@@ -868,54 +925,60 @@ function renderFcSummary(fcList){
   });
 
   // ===== Row 1: 해당월 중심 4박스 =====
+  // ★ B-⑨: PM 해당월 예측은 '마감예측' CA/CB 전체품목 합계 (window.__pmTotalMonthlyAll.chaFinal)
+  //    필터 무관 — 클로드 예측과 같은 전체품목 기준으로 비교 가능
   const totalSfTarget = fcList.reduce((a,p)=>a + (p.sf_monthly?.[T] || 0), 0);
   const totalClaudeTarget = fcList.reduce((a,p)=>a + (p._aprClaude || 0), 0);
-  const matchedPM = fcList.filter(p=>p._pmApr != null);
-  const totalPMTarget = matchedPM.reduce((a,p)=>a + (p._pmApr || 0), 0);
-  const matchedClaudeTarget = matchedPM.reduce((a,p)=>a + (p._aprClaude || 0), 0);
-  const totalGap = matchedPM.length > 0 ? +(totalPMTarget - matchedClaudeTarget).toFixed(1) : null;
+  const pmAll = window.__pmTotalMonthlyAll || null;
+  const pmFinal = pmAll ? pmAll.chaFinal : null;
+  const pmSource = pmAll ? pmAll.source : null;
+
+  // 전체품목 Claude 예측 (D.all_products 기준) — PM과 동일 스코프로 비교
+  let totalClaudeAll = totalClaudeTarget;
+  try {
+    if(D && D.all_products){
+      totalClaudeAll = 0;
+      D.all_products.forEach(p=>{
+        const c = (p._aprClaude != null) ? p._aprClaude : calcMonthlyClaude(p, T);
+        if(typeof c === 'number') totalClaudeAll += c;
+      });
+      totalClaudeAll = +totalClaudeAll.toFixed(1);
+    }
+  } catch(e){ /* D 미정의 시 fcList fallback */ }
+
+  const totalGap = (pmFinal != null) ? +(pmFinal - totalClaudeAll).toFixed(1) : null;
 
   const box = document.getElementById('fcSummary'); if(!box) return;
   box.innerHTML = `
     <div class="fc-item"><div class="fc-label">${N}월 SF 목표</div><div class="fc-val">${fmt(totalSfTarget,1)}</div><div class="fc-sub">억원 · ${fcList.length}품목</div></div>
-    <div class="fc-item"><div class="fc-label">Claude ${N}월 예측</div><div class="fc-val" style="color:#2c5282">${fmt(totalClaudeTarget,1)}</div><div class="fc-sub">억원 · SF대비 ${totalSfTarget>0?(totalClaudeTarget/totalSfTarget*100).toFixed(1):'-'}%</div></div>
-    <div class="fc-item"><div class="fc-label">PM ${N}월 예측 <sup style="color:#805ad5">LIVE</sup></div><div class="fc-val" style="color:#6b46c1" id="fcSumPM">${matchedPM.length>0?fmt(totalPMTarget,1):'–'}</div><div class="fc-sub" id="fcSumPMSub">${matchedPM.length>0?`매칭 ${matchedPM.length}품목`:'로딩 대기…'}</div></div>
+    <div class="fc-item"><div class="fc-label">Claude ${N}월 예측</div><div class="fc-val" style="color:#2c5282">${fmt(totalClaudeAll,1)}</div><div class="fc-sub">억원 · SF대비 ${totalSfTarget>0?(totalClaudeAll/totalSfTarget*100).toFixed(1):'-'}% · 전체품목</div></div>
+    <div class="fc-item"><div class="fc-label">PM ${N}월 예측 <sup style="color:#805ad5">LIVE</sup></div><div class="fc-val" style="color:#6b46c1" id="fcSumPM">${pmFinal!=null?fmt(pmFinal,1):'–'}</div><div class="fc-sub" id="fcSumPMSub">${pmFinal!=null?`마감예측 ${pmSource} · 전체품목`:'로딩 대기…'}</div></div>
     <div class="fc-item"><div class="fc-label">GAP (PM − Claude)</div><div class="fc-val" style="color:${totalGap==null?'#999':(Math.abs(totalGap)<3?'#38a169':(totalGap>0?'#c53030':'#2c5282'))}" id="fcSumGap">${totalGap!=null?(totalGap>=0?'+':'')+totalGap.toFixed(1):'–'}</div><div class="fc-sub" id="fcSumGapSub">${totalGap!=null?(Math.abs(totalGap)<3?'정렬':(totalGap>0?'PM 공격적':'PM 보수적')):'매칭 대기'}</div></div>`;
 
-  // ===== Row 2: 연착지 전망 / 목표대비 GAP / 남은기간 필요매출 =====
-  let totalAnnSf = 0, totalAnnLandClaude = 0, totalNeedRev = 0;
+  // ===== Row 2: 연간 4박스 =====
+  // ★ B-⑨ 재편: PM 예측 제거 → 1)연간목표 2)현수준 연환산 3)남은기간 월평균 목표 4)추가 월 성장목표
+  // ※ "현수준" = Q1 월평균 실적. "남은기간" = 4~12월 (9개월).
+  let annTarget = 0, q1Actual = 0;
   fcList.forEach(p=>{
-    const annSf = p.ann_sf || 0;
-    const monthly = p.monthly_26 || [];
-    const sf_m = p.sf_monthly || [];
-    // 해당월 이전 마감 누적 실적
-    let pastAct = 0;
-    for(let i=0; i<T; i++){ pastAct += (monthly[i] || 0); }
-    // 해당월 다음월부터 연말까지 SF 목표
-    let remSF = 0;
-    for(let i=T+1; i<12; i++){ remSF += (sf_m[i] || 0); }
-    // Claude 기준 연 착지 = 과거실적 + Claude 해당월 + 남은월 SF
-    const annLand = pastAct + (p._aprClaude || 0) + remSF;
-    // 남은기간 필요매출 = 연 SF - 과거실적 - 해당월 예측 (PM 우선, 없으면 Claude)
-    const targetPredict = (p._pmApr != null) ? p._pmApr : (p._aprClaude || 0);
-    const needRev = annSf - pastAct - targetPredict;
-
-    totalAnnSf += annSf;
-    totalAnnLandClaude += annLand;
-    totalNeedRev += needRev;
+    annTarget += (p.ann_sf || 0);
+    const m = p.monthly_26 || [];
+    for(let i=0; i<3; i++) q1Actual += (m[i] || 0);
   });
-  const annGap = +(totalAnnSf - totalAnnLandClaude).toFixed(1);  // 양수=미달, 음수=초과
-  const annAch = totalAnnSf > 0 ? (totalAnnLandClaude / totalAnnSf * 100).toFixed(1) : '-';
-  const remMonths = 12 - N;  // 해당월 이후 남은 개월 수 (4월 타깃이면 5~12월 = 8개월)
-  const monthlyNeed = remMonths > 0 ? (totalNeedRev / remMonths) : 0;
-  const remRangeLabel = remMonths > 0 ? `${N+1}~12월` : `${N}월`;
+  const q1MonthAvg = q1Actual / 3;
+  const annAtCurrent = q1MonthAvg * 12;                         // 현수준으로 연환산 (Q1 월평균 × 12)
+  const remMonths = 9;                                            // Q1 이후 = 4~12월 = 9개월
+  const remNeedTotal = Math.max(0, annTarget - q1Actual);         // 남은기간 달성해야 할 금액
+  const remMonthAvg = remMonths > 0 ? (remNeedTotal / remMonths) : 0;  // 남은기간 월평균 목표
+  const extraGrowth = remMonthAvg - q1MonthAvg;                   // 추가 월 성장목표
+  const achRatio = annTarget > 0 ? (annAtCurrent / annTarget * 100).toFixed(1) : '-';
 
   const row2 = document.getElementById('fcSummaryRow2');
   if(row2){
     row2.innerHTML = `
-      <div class="fc-item"><div class="fc-label">연 착지 전망 (Claude)</div><div class="fc-val" style="color:${annGap<=0?'#38a169':'#d69e2e'}">${fmt(totalAnnLandClaude,0)}</div><div class="fc-sub">억원 · 연 SF ${fmt(totalAnnSf,0)}억 대비 ${annAch}%</div></div>
-      <div class="fc-item"><div class="fc-label">목표대비 GAP</div><div class="fc-val" style="color:${annGap<=0?'#38a169':'#c53030'}">${annGap>=0?'+':''}${fmt(annGap,0)}</div><div class="fc-sub">억원 · ${annGap>0?`${fmt(annGap,0)}억 미달`:'SF 초과 달성'}</div></div>
-      <div class="fc-item"><div class="fc-label">${remRangeLabel} 필요 매출</div><div class="fc-val" style="color:#805ad5">${fmt(totalNeedRev,0)}</div><div class="fc-sub">억원 · 월평균 ${fmt(monthlyNeed,1)}억 필요</div></div>`;
+      <div class="fc-item"><div class="fc-label">26년 연간목표</div><div class="fc-val" style="color:#2c5282">${fmt(annTarget,0)}</div><div class="fc-sub">억원 · ${fcList.length}품목 SF 합계</div></div>
+      <div class="fc-item"><div class="fc-label">현수준 연환산 예측</div><div class="fc-val" style="color:${annAtCurrent>=annTarget?'#38a169':'#d69e2e'}">${fmt(annAtCurrent,0)}</div><div class="fc-sub">억원 · Q1월평균 ${fmt(q1MonthAvg,1)}억 × 12 (목표 ${achRatio}%)</div></div>
+      <div class="fc-item"><div class="fc-label">남은기간 월평균 목표</div><div class="fc-val" style="color:#805ad5">${fmt(remMonthAvg,1)}</div><div class="fc-sub">억/월 · 4~12월 총 ${fmt(remNeedTotal,0)}억 필요</div></div>
+      <div class="fc-item"><div class="fc-label">추가 월 성장목표</div><div class="fc-val" style="color:${extraGrowth<=0?'#38a169':(extraGrowth>q1MonthAvg*0.2?'#c53030':'#d69e2e')}">${extraGrowth>=0?'+':''}${fmt(extraGrowth,1)}</div><div class="fc-sub">억/월 · 현수준 대비 ${q1MonthAvg>0?((extraGrowth/q1MonthAvg)*100).toFixed(1):'-'}% 추가 성장 필요</div></div>`;
   }
 }
 window.__refreshFcSummary = renderFcSummary;
@@ -934,10 +997,17 @@ function fcRenderRows(){
   const coreOnly = (document.getElementById('fcFilterCore')||{checked:true}).checked;
   const q = ((document.getElementById('fcSearch')||{value:''}).value || '').toLowerCase().trim();
   const sortKey = (document.getElementById('fcSort')||{value:'cat'}).value;
+  // ★ B-⑨ PM 필터: active 칩의 data-pm 값 (빈 문자열 = 전체)
+  const activeChip = document.querySelector('#fcPMFilterBar .pm-chip.active');
+  const pmFilter = activeChip ? (activeChip.dataset.pm || '') : '';
 
   let rows = fcList.filter(p=>{
     if(coreOnly && p._cat.tag === '기타') return false;
     if(q && !p.name.toLowerCase().includes(q)) return false;
+    if(pmFilter){
+      const pmName = getPMForProduct(p.name);
+      if(pmName !== pmFilter) return false;
+    }
     return true;
   });
 
@@ -968,9 +1038,13 @@ function fcRenderRows(){
     const gapThr = Math.max(sfApr * 0.2, 1.0);
     const gapSignificant = p._aprGap != null && Math.abs(p._aprGap) > gapThr;
     const rowBg = gapSignificant ? 'background:#fff5f5;' : '';
-    ftb.innerHTML += `<tr data-pm-key="${p.name}" style="${rowBg}">
+    const pmName = getPMForProduct(p.name);
+    const pmTagBg = pmName === '미분류' ? '#f7fafc' : '#faf5ff';
+    const pmTagColor = pmName === '미분류' ? '#a0aec0' : '#553c9a';
+    ftb.innerHTML += `<tr data-pm-key="${p.name}" data-pm-name="${pmName}" style="${rowBg}">
       <td>${p.name}</td>
       <td style="text-align:center"><span class="fc-cat-tag" style="background:${cat.bg};color:${cat.color};">${cat.tag}</span></td>
+      <td style="text-align:center;background:${pmTagBg};color:${pmTagColor};font-weight:600;font-size:11px;">${pmName}</td>
       <td>${fmt(p.q1_26,1)}</td>
       <td>${tagA(p.q1_ach)}</td>
       <td>${fmt(p.mar,1)}</td>
@@ -996,6 +1070,17 @@ function fcRenderRows(){
   bind('fcFilterCore', 'change');
   bind('fcSearch', 'input');
   bind('fcSort', 'change');
+  // ★ B-⑨ PM 필터 칩 클릭 바인딩
+  const pmBar = document.getElementById('fcPMFilterBar');
+  if(pmBar){
+    pmBar.addEventListener('click', (e)=>{
+      const chip = e.target.closest('.pm-chip');
+      if(!chip) return;
+      pmBar.querySelectorAll('.pm-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      fcRenderRows();
+    });
+  }
 })();
 
 renderForecastTables();
@@ -1495,8 +1580,17 @@ const PMFP_CFG = {
   q1Cols: [30,31,32],        // 1,2,3월 26년 실적
   remCols: [58,59,60,61,62,63,64,65], // 5~12월 26년 목표
   dataStartRow: 40,          // gviz index offset: Section ④ first data row (강경완 올리버원)
+  // ★ B-⑨ PM별 현황 요약블록 (시트 최상단) — 해당월 마감예측 최종치 집계용
+  // CA = 79번째 컬럼 = 0-idx 78 (1차 마감예측)
+  // CB = 80번째 컬럼 = 0-idx 79 (2차 마감예측)
+  // Rows 4~17 (1-idx) = 0-idx 3~16 (14행, PM별 합계)
+  summaryCol1: 78,           // CA (1차 마감예측)
+  summaryCol2: 79,           // CB (2차 마감예측)
+  summaryRowStart: 3,        // Row 4 → 0-idx 3
+  summaryRowEnd: 16,         // Row 17 → 0-idx 16 (loop 조건: i <= summaryRowEnd)
 };
 window.__PMFP_CFG = PMFP_CFG;
+// ※ PM_PRODUCT_MAP / getPMForProduct 는 스크립트 상단(line 414+)으로 이동 — TDZ 방지
 
 function gvizQueryPMFP(cb){
   const url = `https://docs.google.com/spreadsheets/d/${PMFP_CFG.sheetId}/gviz/tq?tqx=out:json&gid=${PMFP_CFG.gid}&headers=0`;
@@ -1539,6 +1633,26 @@ function loadPMProductForecast(){
       apr: +(allTotalAprWon/1e8).toFixed(2),
       count: allMatchedRows.length,
       rows: allMatchedRows
+    };
+
+    // ★★ B-⑨ PM별 현황 요약블록 (CA/CB) 집계 — 해당월 '마감예측' 최종치 ★★
+    // 2차(CB) 값이 있으면 2차, 없으면 1차(CA) 사용
+    let sum1Won = 0, sum2Won = 0, cnt1 = 0, cnt2 = 0;
+    for(let i=PMFP_CFG.summaryRowStart; i<=PMFP_CFG.summaryRowEnd && i<rows.length; i++){
+      const r = rows[i]; if(!r || !r.c) continue;
+      const v1 = r.c[PMFP_CFG.summaryCol1]?.v;
+      const v2 = r.c[PMFP_CFG.summaryCol2]?.v;
+      if(typeof v1 === 'number' && v1 > 0){ sum1Won += v1; cnt1++; }
+      if(typeof v2 === 'number' && v2 > 0){ sum2Won += v2; cnt2++; }
+    }
+    const final2 = sum2Won > 0;
+    const finalWon = final2 ? sum2Won : sum1Won;
+    window.__pmTotalMonthlyAll = {
+      chaFinal: +(finalWon/1e8).toFixed(2),   // 최종 사용 값 (억)
+      cha1: +(sum1Won/1e8).toFixed(2),         // 1차 합계 (CA)
+      cha2: +(sum2Won/1e8).toFixed(2),         // 2차 합계 (CB)
+      source: final2 ? '2차' : '1차',
+      pmCount: final2 ? cnt2 : cnt1,
     };
 
     // 전체 배지 먼저 갱신 (필터 집계 없이도 ETC 전체 값 확정)
