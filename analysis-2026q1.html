@@ -52,6 +52,7 @@ tr:hover{background:#f7fafc;}
 .fc-item .fc-val{font-size:22px;font-weight:800;color:var(--primary);}
 .fc-item .fc-sub{font-size:11px;color:var(--muted);}
 .header-center{display:flex;gap:20px;align-items:center;}
+.header-center:empty{display:none;}  /* 2026-04-21: 지표 비어있을 때 공간 제거 */
 .header-stat{text-align:center;background:rgba(255,255,255,.15);border-radius:10px;padding:8px 18px;min-width:100px;}
 .header-stat .hs-label{font-size:10px;opacity:.8;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
 .header-stat .hs-val{font-size:21px;font-weight:800;line-height:1.2;}
@@ -553,40 +554,12 @@ document.getElementById('kpiRow').innerHTML=`
 renderKPI();
 window.renderKPI = renderKPI;
 
-// === 헤더: 마감월(3월) 매출 표시 ===
+// === 헤더: 2026-04-21 간소화 — 중복 지표 제거 (KPI 행과 매출예측 탭에서 이미 노출) ===
+// 사용자 요청: 헤드라인은 제목만 보이게, 동일 지표 2번 노출 제거, 가시성 개선
+// 이전 버전은 git 히스토리에서 참조 가능. 필요 시 rollback.
 function renderHeaderStats(){
-  const marAct = D.total.act_26[2];   // 3월 실적
-  const marSF  = D.total.sf_26[2];    // 3월 SF 목표
-  const marAch = marSF > 0 ? (marAct / marSF * 100) : 0;
-  const marYoY = D.total.act_25[2] > 0 ? ((marAct / D.total.act_25[2] - 1) * 100) : 0;
-  const achColor = marAch >= 100 ? '#c6f6d5' : marAch >= 90 ? '#fefcbf' : '#fed7d7';
-  const achTextColor = marAch >= 100 ? '#22543d' : marAch >= 90 ? '#744210' : '#9b2c2c';
-  document.getElementById('headerStats').innerHTML = `
-    <div class="header-stat">
-      <div class="hs-label">3월(마감월) 매출</div>
-      <div class="hs-val">${marAct.toFixed(1)}<span style="font-size:13px;font-weight:500"> 억원</span></div>
-      <div class="hs-sub">SF목표 ${marSF.toFixed(1)}억원</div>
-    </div>
-    <div class="header-stat">
-      <div class="hs-label">3월 달성율</div>
-      <div class="hs-val" style="color:${achColor}">${marAch.toFixed(1)}<span style="font-size:13px;font-weight:500">%</span></div>
-      <div class="hs-sub">전년동기 ${marYoY >= 0 ? '+' : ''}${marYoY.toFixed(1)}%</div>
-    </div>
-    <div class="header-stat">
-      <div class="hs-label">Q1 누계 달성율</div>
-      <div class="hs-val" style="color:${(D.total.q1_26/D.total.q1_sf*100)>=100?'#c6f6d5':'#fefcbf'}">${(D.total.q1_26/D.total.q1_sf*100).toFixed(1)}<span style="font-size:13px;font-weight:500">%</span></div>
-      <div class="hs-sub">${D.total.q1_26.toFixed(1)}억 / ${D.total.q1_sf.toFixed(1)}억(목표)</div>
-    </div>
-    <div class="header-stat">
-      <div class="hs-label">4월 예상 (계절성)</div>
-      <div class="hs-val">${window.__seasonal.aprMid.toFixed(1)}<span style="font-size:13px;font-weight:500"> 억원</span></div>
-      <div class="hs-sub">레인지 ${window.__seasonal.aprLow.toFixed(1)} ~ ${window.__seasonal.aprHigh.toFixed(1)}</div>
-    </div>
-    <div class="header-stat ${window.__seasonal.annualAch>=100?'':'hs-warn'}">
-      <div class="hs-label">26년 연착지 전망</div>
-      <div class="hs-val" style="color:${window.__seasonal.annualAch>=100?'#c6f6d5':window.__seasonal.annualAch>=95?'#fefcbf':'#fed7d7'}">${window.__seasonal.annualMid.toFixed(0)}<span style="font-size:13px;font-weight:500"> 억원</span></div>
-      <div class="hs-sub">SF대비 ${window.__seasonal.annualAch.toFixed(1)}% · gap ${(window.__seasonal.annualMid-D.total.ann_sf)>=0?'+':''}${(window.__seasonal.annualMid-D.total.ann_sf).toFixed(0)}억</div>
-    </div>`;
+  const el = document.getElementById('headerStats');
+  if(el) el.innerHTML = '';  // 빈 상태 유지 — 제목/배지만 남김
 }
 renderHeaderStats();
 window.renderHeaderStats = renderHeaderStats;
