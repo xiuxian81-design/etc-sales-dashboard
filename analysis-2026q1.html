@@ -60,6 +60,28 @@ tr:hover{background:#f7fafc;}
 .grp-table th{background:#edf2f7;}
 .grp-bar{display:inline-block;height:8px;border-radius:3px;vertical-align:middle;margin-right:5px;}
 @media(max-width:1200px){.kpi-row{grid-template-columns:repeat(3,1fr);}.grid-2{grid-template-columns:1fr;}.fc-summary{grid-template-columns:repeat(2,1fr);}#fcSummaryRow2{grid-template-columns:repeat(2,1fr)!important;}.header-center{gap:10px;}}
+/* ===== 모바일 반응형 (스마트폰) — 2026-04-21 헤드라인/KPI/매출예측 탭 한정 ===== */
+@media(max-width:640px){
+  .header{flex-direction:column;align-items:flex-start;padding:14px 18px;gap:10px;}
+  .header h1{font-size:18px;line-height:1.25;}
+  .header-center{width:100%;gap:8px;flex-wrap:wrap;}
+  .header-stat{min-width:auto;padding:6px 10px;flex:1 1 45%;}
+  .header-stat .hs-val{font-size:16px;}
+  .header-stat .hs-label{font-size:9px;}
+  .header-stat .hs-sub{font-size:10px;}
+  .kpi-row{grid-template-columns:repeat(2,1fr);padding:12px 16px;gap:10px;}
+  .kpi{padding:12px;}
+  .kpi .value{font-size:18px;}
+  .kpi .label{font-size:10px;}
+  .content{padding:0 16px 20px;}
+  .fc-summary,#fcSummaryRow2{grid-template-columns:1fr!important;padding:14px;gap:10px;}
+  .fc-item .fc-val{font-size:18px;}
+  #pmTotalBadge{padding:12px;flex-direction:column;align-items:flex-start;gap:10px;}
+  #pmTotalBadge > div{min-width:100%!important;width:100%;border-left:none!important;padding-left:0!important;text-align:left!important;}
+  .card{padding:14px;}
+  .tab{padding:8px 10px;font-size:11px;}
+  .tabs{flex-wrap:wrap;gap:4px;}
+}
 #fcPMFilterBar{display:flex;gap:6px;flex-wrap:wrap;padding:8px 10px;background:#faf5ff;border-radius:8px;margin-bottom:8px;align-items:center;}
 #fcPMFilterBar .pm-chip{padding:4px 10px;border:1px solid #d6bcfa;border-radius:20px;background:#fff;font-size:11px;font-weight:600;color:#553c9a;cursor:pointer;transition:all .15s;}
 #fcPMFilterBar .pm-chip:hover{background:#f3e8ff;}
@@ -437,12 +459,30 @@ const PM_PRODUCT_MAP = {
   // 강경완(과장)
   '올리버원':'강경완',
 };
+// B-⑨ 확장 (2026-04-21): PMFP 시트 Section ④ col1(담당PM)을 로드 시점에 캐싱하여
+// window.__pmFromPMFP 에 보관. getPMForProduct 는 동적 맵을 최우선,
+// 일치 없을 경우 하드코딩된 PM_PRODUCT_MAP 으로 fallback.
+// 동적 맵은 loadPMProductForecast() 에서 매 호출마다 재구성 → 시트 편집 즉시 반영.
 function getPMForProduct(name){
   if(!name) return '미분류';
+  const tgt = String(name).trim();
+  // 1) 동적(PMFP) 매핑 — 시트에서 실시간 수집
+  try {
+    if(window.__pmFromPMFP){
+      const entries = Object.entries(window.__pmFromPMFP)
+        .filter(([k,v]) => k && v)
+        .sort((a,b)=>b[0].length - a[0].length);  // 긴 키 우선
+      for(const [key, pm] of entries){
+        // 품목명 or PMFP 키 어느 한쪽이 다른쪽을 포함하면 매칭
+        if(tgt.indexOf(key) !== -1 || key.indexOf(tgt) !== -1) return pm;
+      }
+    }
+  } catch(_) {}
+  // 2) 정적(하드코딩) 매핑 fallback
   const keys = Object.keys(PM_PRODUCT_MAP);
   keys.sort((a,b)=>b.length - a.length);  // 긴 키 우선
   for(const key of keys){
-    if(name.indexOf(key) !== -1) return PM_PRODUCT_MAP[key];
+    if(tgt.indexOf(key) !== -1) return PM_PRODUCT_MAP[key];
   }
   return '미분류';
 }
@@ -1580,12 +1620,13 @@ const PMFP_CFG = {
   q1Cols: [30,31,32],        // 1,2,3월 26년 실적
   remCols: [58,59,60,61,62,63,64,65], // 5~12월 26년 목표
   dataStartRow: 40,          // gviz index offset: Section ④ first data row (강경완 올리버원)
+  dataEndRow: 211,           // gviz index offset: Section ④ last data row (총합행 212 제외)
   // ★ B-⑨ 해당월 '마감예측' 최종치 — Section ④ 제품별 현황 per-product 합계
   // (시트 최상단 PM별 요약블록이 아니라, 제품별 행을 전수 합산)
-  // CA = 0-idx 78 = 1차 마감예측 (품목별)
-  // CB = 0-idx 79 = 2차 마감예측 (품목별)
-  chaCol1: 78,               // CA (1차 마감예측, 품목별)
-  chaCol2: 79,               // CB (2차 마감예측, 품목별)
+  // CA = 해당월 1차 마감예측 (품목별) = PMFP_TARGET_COL_MAP[월] (4월=78)
+  // CB = 해당월 2차 마감예측 (품목별) = 1차 + 1
+  chaCol1: PMFP_TARGET_COL_MAP[TARGET_MONTH_IDX] || 78,      // CA (1차 마감예측)
+  chaCol2: (PMFP_TARGET_COL_MAP[TARGET_MONTH_IDX] || 78) + 1, // CB (2차 마감예측)
 };
 window.__PMFP_CFG = PMFP_CFG;
 // ※ PM_PRODUCT_MAP / getPMForProduct 는 스크립트 상단(line 414+)으로 이동 — TDZ 방지
@@ -1611,13 +1652,39 @@ function loadPMProductForecast(){
     const pmData = (window.__pmData = {});  // 드릴다운에서도 공유
     let totApr=0, totQ1=0, totRem=0;
 
+    // ★★ B-⑨확장 (2026-04-21): PMFP Section ④ col1(담당PM) 실시간 캐싱 ★★
+    // col1=담당PM, col3=품목군(상위), col5=세부품목(하위) — 두 레벨 모두 키로 등록
+    // window.__pmFromPMFP 는 getPMForProduct 에서 최우선 참조됨
+    try {
+      const pmMap = {};
+      for(let i=PMFP_CFG.dataStartRow; i<=PMFP_CFG.dataEndRow; i++){
+        const r = rows[i]; if(!r || !r.c) continue;
+        const pm = r.c[1]?.v;
+        if(!pm) continue;
+        const pmStr = String(pm).trim();
+        if(!pmStr || /총합|합계|소계/.test(pmStr)) continue;
+        const k3 = r.c[3]?.v ? String(r.c[3].v).trim() : '';
+        const k5 = r.c[5]?.v ? String(r.c[5].v).trim() : '';
+        if(k5 && !/총합|합계|소계/.test(k5)) pmMap[k5] = pmStr;
+        if(k3 && !/총합|합계|소계/.test(k3) && !pmMap[k3]) pmMap[k3] = pmStr;  // 상위키는 하위 덮어쓰기 방지
+      }
+      window.__pmFromPMFP = pmMap;
+    } catch(e) {
+      console.warn('[PMFP] 동적 PM 매핑 실패', e);
+    }
+
     // ★★ 옵션 C: PMFP 시트 전체 집계 (필터·매칭 무관, 양수 값만) ★★
-    // 목적: 구글시트 원본의 '진짜 ETC 전체 PM 4월 예측' 값을 고정 노출
-    // 필터링/매칭 로직 버그 영향 없이 시트 총합을 항상 확인할 수 있음
+    // 목적: 구글시트 원본의 '진짜 ETC 전체 PM 해당월 1차 예측' 값을 고정 노출
+    // Section ④ (gviz 40~211) 제품별 행만 합산, 총합/합계 행 방어 가드 포함
     let allTotalAprWon = 0;
     let allMatchedRows = [];
-    for(let i=PMFP_CFG.dataStartRow; i<rows.length; i++){
+    const _isTotalRow = (r) => {
+      const label = ((r?.c?.[5]?.v ?? '') + '' + (r?.c?.[3]?.v ?? '')).toString();
+      return /총합|합계|소계/.test(label);
+    };
+    for(let i=PMFP_CFG.dataStartRow; i<=PMFP_CFG.dataEndRow; i++){
       const r = rows[i]; if(!r || !r.c) continue;
+      if(_isTotalRow(r)) continue;
       const vApr = r.c[PMFP_CFG.apr1Col]?.v;
       if(typeof vApr === 'number' && vApr > 0){
         allTotalAprWon += vApr;
@@ -1633,25 +1700,34 @@ function loadPMProductForecast(){
       rows: allMatchedRows
     };
 
-    // ★★ B-⑨ 해당월 '마감예측' 최종치 — Section ④ 제품별 현황 per-product 합계 ★★
-    // dataStartRow(40)부터 시트 끝까지 품목별로 CA(1차)/CB(2차) 합산
-    // 2차(CB) 값이 있으면 2차 우선, 없으면 1차(CA) 사용
-    let sum1Won = 0, sum2Won = 0, cnt1 = 0, cnt2 = 0;
-    for(let i=PMFP_CFG.dataStartRow; i<rows.length; i++){
+    // ★★ B-⑨ 해당월 '마감예측' 최종치 — Section ④ 제품별 per-row 1차/2차 fallback ★★
+    // 사용자 요청(2026-04-21): 품목별로 2차(CB)가 채워져 있으면 2차 우선, 비어있으면 1차(CA)
+    // 둘 다 비어있으면 해당 품목은 집계에서 제외. 총합/합계 행은 반드시 제외.
+    // 기존 집계-레벨 fallback(전체 2차합>0이면 전체 2차, 아니면 전체 1차)에서 per-row로 변경.
+    let sumWon = 0, cnt = 0, srcCnt1 = 0, srcCnt2 = 0;
+    let sum1WonDbg = 0, sum2WonDbg = 0;
+    for(let i=PMFP_CFG.dataStartRow; i<=PMFP_CFG.dataEndRow; i++){
       const r = rows[i]; if(!r || !r.c) continue;
+      if(_isTotalRow(r)) continue;
       const v1 = r.c[PMFP_CFG.chaCol1]?.v;   // CA (품목별 1차)
       const v2 = r.c[PMFP_CFG.chaCol2]?.v;   // CB (품목별 2차)
-      if(typeof v1 === 'number' && v1 > 0){ sum1Won += v1; cnt1++; }
-      if(typeof v2 === 'number' && v2 > 0){ sum2Won += v2; cnt2++; }
+      if(typeof v1 === 'number' && v1 > 0) sum1WonDbg += v1;
+      if(typeof v2 === 'number' && v2 > 0) sum2WonDbg += v2;
+      let chosen = null;
+      if(typeof v2 === 'number' && v2 > 0){ chosen = v2; srcCnt2++; }
+      else if(typeof v1 === 'number' && v1 > 0){ chosen = v1; srcCnt1++; }
+      if(chosen !== null){ sumWon += chosen; cnt++; }
     }
-    const final2 = sum2Won > 0;
-    const finalWon = final2 ? sum2Won : sum1Won;
+    const finalWon = sumWon;
+    const final2 = srcCnt2 > 0;
     window.__pmTotalMonthlyAll = {
-      chaFinal: +(finalWon/1e8).toFixed(2),   // 최종 사용 값 (억) — 제품별 합계
-      cha1: +(sum1Won/1e8).toFixed(2),         // 1차 합계 (CA, 품목별)
-      cha2: +(sum2Won/1e8).toFixed(2),         // 2차 합계 (CB, 품목별)
-      source: final2 ? '2차' : '1차',
-      productCount: final2 ? cnt2 : cnt1,       // 집계에 포함된 품목 수
+      chaFinal: +(finalWon/1e8).toFixed(2),    // 최종 사용 값 (억) — per-row fallback 합
+      cha1: +(sum1WonDbg/1e8).toFixed(2),       // 1차(CA) 합계 (참고·디버그)
+      cha2: +(sum2WonDbg/1e8).toFixed(2),       // 2차(CB) 합계 (참고·디버그)
+      source: final2 ? (srcCnt1 > 0 ? '2차+1차(per-row)' : '2차') : '1차',
+      productCount: cnt,                         // 집계에 포함된 품목 수
+      fromCha1: srcCnt1,                         // 1차로 선택된 품목 수
+      fromCha2: srcCnt2,                         // 2차로 선택된 품목 수
     };
 
     // 전체 배지 먼저 갱신 (필터 집계 없이도 ETC 전체 값 확정)
