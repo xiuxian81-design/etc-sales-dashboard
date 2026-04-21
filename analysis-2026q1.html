@@ -87,6 +87,26 @@ tr:hover{background:#f7fafc;}
 #fcPMFilterBar .pm-chip{padding:4px 10px;border:1px solid #d6bcfa;border-radius:20px;background:#fff;font-size:11px;font-weight:600;color:#553c9a;cursor:pointer;transition:all .15s;}
 #fcPMFilterBar .pm-chip:hover{background:#f3e8ff;}
 #fcPMFilterBar .pm-chip.active{background:#553c9a;color:#fff;border-color:#553c9a;}
+/* ===== PM 평가 섹션 (2026-04-21 추가) ===== */
+.pmeval-section{margin-top:20px;}
+.pmeval-section h3{font-size:14px;font-weight:700;color:#2d3748;margin:18px 0 8px;padding-left:10px;border-left:4px solid #6b46c1;}
+.pmeval-section .pmeval-desc{font-size:11px;color:#718096;margin-bottom:8px;padding-left:14px;}
+.pmeval-table{width:100%;border-collapse:collapse;font-size:11px;background:#fff;}
+.pmeval-table thead th{background:#553c9a;color:#fff;padding:8px 6px;font-weight:600;text-align:center;border:1px solid #44337a;font-size:10px;line-height:1.3;}
+.pmeval-table thead th.grp-mar{background:#2c5282;border-color:#1a365d;}
+.pmeval-table thead th.grp-q1{background:#22543d;border-color:#1c4532;}
+.pmeval-table tbody td{padding:6px 6px;text-align:right;border:1px solid #e2e8f0;font-variant-numeric:tabular-nums;}
+.pmeval-table tbody td.pm-name{text-align:left;font-weight:700;background:#f7fafc;color:#2d3748;}
+.pmeval-table tbody td.pm-name .pm-products{font-size:10px;font-weight:400;color:#718096;display:block;margin-top:2px;}
+.pmeval-table tbody tr.row-total td{background:#fef5e7 !important;font-weight:700;color:#744210;border-top:2px solid #d69e2e;}
+.pmeval-table tbody tr.row-total td.pm-name{background:#fef5e7 !important;}
+.pmeval-table .col-sep{border-left:2px solid #4a5568;}
+.pmeval-table .ach-good{color:#22543d;font-weight:700;}
+.pmeval-table .ach-warn{color:#744210;font-weight:700;}
+.pmeval-table .ach-bad{color:#742a2a;font-weight:700;}
+.pmeval-table .grow-pos{color:#22543d;}
+.pmeval-table .grow-neg{color:#742a2a;}
+@media(max-width:1200px){.pmeval-table{font-size:10px;}.pmeval-table thead th{font-size:9px;padding:6px 3px;}.pmeval-table tbody td{padding:5px 3px;}}
 /* ===== 품목 드릴다운 모달 ===== */
 #fcTable tbody tr[data-pm-key]:not([data-pm-key="__total__"]){cursor:pointer;}
 #fcTable tbody tr[data-pm-key]:not([data-pm-key="__total__"]):hover{background:#ebf8ff !important;}
@@ -371,6 +391,17 @@ tr:hover{background:#f7fafc;}
         </tr></thead><tbody></tbody></table>
       </div>
     </div></div>
+
+    <!-- ===== PM 평가 섹션 (2026-04-21 추가, v1) ===== -->
+    <div class="card pmeval-section">
+      <h3>📊 PM 평가시트 — 주력품목 현황</h3>
+      <div class="pmeval-desc">PM별 주력품목(본부장 지정) 합산 · 25년 12개월 평균을 '전년평균'으로 사용 · 직전3개월 = 25.12 + 26.01 + 26.02</div>
+      <div style="overflow-x:auto;"><table class="pmeval-table" id="pmevalKey"></table></div>
+
+      <h3 style="margin-top:24px;">📋 PM 평가시트 — 전체 담당품목 현황</h3>
+      <div class="pmeval-desc">PM별 전체 담당품목 합산 · 임범성 · 강경완 · PM 미매핑 품목은 '기타'로 통합 표시</div>
+      <div style="overflow-x:auto;"><table class="pmeval-table" id="pmevalAll"></table></div>
+    </div>
   </div>
 
   <div class="panel" id="panel-risk">
@@ -922,7 +953,193 @@ function renderForecastTables(){
 
   // --- fcTable: 필터·정렬·렌더 ---
   fcRenderRows();
+
+  // --- PM 평가 섹션 ---
+  try { renderPMEval(); } catch(e){ console.warn('[PMEval] 렌더 실패', e); }
 }
+
+// =====================================================================
+// PM 평가시트 렌더 (2026-04-21 추가, v1)
+// - 표1: PM별 주력품목 (본부장 지정 5명)
+// - 표2: PM별 전체 담당품목 (임범성·강경완·미분류 → '기타')
+// - 지표: 해당월(실적/목표/달성%, vs전년월평, vs직전3개월평) + YTD(실적/목표/달성%, vs전년누평, vs전년동기)
+// =====================================================================
+const PMEVAL_JURYEOK = {
+  '강태석': ['헤어그로','아다모','판그로','미녹필','헤어덤'],
+  '박지현': ['바이오탑','앱시토','하노마린'],
+  '김지완': ['엘리가드','엔잘루타'],
+  '최우열': ['글루코프리','클로비드','덱시티옥','프레논'],
+  '이민정': ['네오미노화겐씨'],
+};
+const PMEVAL_MERGE_ETC = new Set(['임범성','강경완','미분류']);
+const PMEVAL_ALL_ORDER = ['박지현','이민정','김지완','강태석','최우열','김유연','기타'];
+const PMEVAL_KEY_ORDER = ['박지현','김지완','강태석','최우열','이민정'];
+
+function pmEvalGetPM(name){
+  // 기존 getPMForProduct 사용 (window.__pmFromPMFP + PM_PRODUCT_MAP)
+  const pm = getPMForProduct(name);
+  return (pm === '미분류') ? '미분류' : pm;
+}
+function pmEvalIsKey(pm, name){
+  const list = PMEVAL_JURYEOK[pm];
+  if(!list) return false;
+  return list.some(k => name.indexOf(k) !== -1);
+}
+function pmEvalAggregate(prods){
+  let act26_mar=0, sf26_mar=0, act26_q1=0, sf26_q1=0, act25_q1=0, ann25=0, last3sum=0;
+  const M = TARGET_MONTH_IDX || 2;  // 마감월 idx
+  prods.forEach(p=>{
+    const m25 = p.monthly_25 || [], m26 = p.monthly_26 || [], sm = p.sf_monthly || [];
+    act26_mar += +(m26[M]||0);
+    sf26_mar  += +(sm[M]||0);
+    for(let i=0;i<=M;i++){
+      act26_q1 += +(m26[i]||0);
+      sf26_q1  += +(sm[i]||0);
+      act25_q1 += +(m25[i]||0);
+    }
+    for(let i=0;i<12;i++) ann25 += +(m25[i]||0);
+    // 직전 3개월 = 25.12 + 26.(M-1) + 26.(M-2) ... 일반화
+    if(M >= 2){
+      last3sum += +(m26[M-1]||0) + +(m26[M-2]||0) + +(m25[11]||0);
+    } else if(M === 1){
+      last3sum += +(m26[0]||0) + +(m25[11]||0) + +(m25[10]||0);
+    } else {
+      last3sum += +(m25[11]||0) + +(m25[10]||0) + +(m25[9]||0);
+    }
+  });
+  const period = M + 1;  // YTD 개월 수
+  return {
+    act26_mar, sf26_mar, act26_q1, sf26_q1, act25_q1,
+    avg25_month: ann25/12,
+    avg25_q1: ann25/12 * period,
+    last3_avg: last3sum/3,
+  };
+}
+function pmEvalFmt(v, decimals){
+  if(decimals == null) decimals = 2;
+  if(!isFinite(v)) return '–';
+  return v.toFixed(decimals);
+}
+function pmEvalPct(num, den){
+  if(!den || !isFinite(den) || den === 0) return null;
+  return (num - den) / den * 100;
+}
+function pmEvalAchClass(p){
+  if(p == null) return '';
+  if(p >= 100) return 'ach-good';
+  if(p >= 90) return 'ach-warn';
+  return 'ach-bad';
+}
+function pmEvalGrowClass(v){
+  if(v == null || v === 0) return '';
+  return v > 0 ? 'grow-pos' : 'grow-neg';
+}
+function pmEvalRenderHeader(){
+  return `<thead>
+    <tr>
+      <th rowspan="2" style="min-width:80px;">PM</th>
+      <th colspan="8" class="grp-mar">${(TARGET_MONTH_NUM||3)}월 (해당월)</th>
+      <th colspan="8" class="grp-q1 col-sep">26년 누계 (1~${TARGET_MONTH_NUM||3}월)</th>
+    </tr>
+    <tr>
+      <th class="grp-mar">실적</th><th class="grp-mar">목표</th><th class="grp-mar">달성%</th>
+      <th class="grp-mar">전년월평</th><th class="grp-mar">vs평%</th><th class="grp-mar">vs평금액</th>
+      <th class="grp-mar">직전3개월평</th><th class="grp-mar">vs직3%</th>
+      <th class="grp-q1 col-sep">실적</th><th class="grp-q1">목표</th><th class="grp-q1">달성%</th>
+      <th class="grp-q1">전년누평</th><th class="grp-q1">vs평%</th><th class="grp-q1">vs평금액</th>
+      <th class="grp-q1">전년동기</th><th class="grp-q1">YoY%</th>
+    </tr>
+  </thead>`;
+}
+function pmEvalRenderRow(label, sub, d, isTotal){
+  const ach_mar = (d.sf26_mar > 0) ? d.act26_mar/d.sf26_mar*100 : null;
+  const ach_q1  = (d.sf26_q1 > 0)  ? d.act26_q1/d.sf26_q1*100  : null;
+  const mar_vs_avg_p = pmEvalPct(d.act26_mar, d.avg25_month);
+  const mar_vs_avg_a = d.act26_mar - d.avg25_month;
+  const mar_vs_l3_p  = pmEvalPct(d.act26_mar, d.last3_avg);
+  const q1_vs_avg_p  = pmEvalPct(d.act26_q1, d.avg25_q1);
+  const q1_vs_avg_a  = d.act26_q1 - d.avg25_q1;
+  const q1_vs_yoy_p  = pmEvalPct(d.act26_q1, d.act25_q1);
+  const fmtP = v => v==null?'–':(v>=0?'+':'')+v.toFixed(1)+'%';
+  const fmtA = v => v==null||!isFinite(v)?'–':(v>=0?'+':'')+v.toFixed(2);
+  const subHTML = sub ? `<span class="pm-products">${sub}</span>` : '';
+  return `<tr class="${isTotal?'row-total':''}">
+    <td class="pm-name">${label}${subHTML}</td>
+    <td>${pmEvalFmt(d.act26_mar)}</td>
+    <td>${pmEvalFmt(d.sf26_mar)}</td>
+    <td class="${pmEvalAchClass(ach_mar)}">${ach_mar==null?'–':ach_mar.toFixed(1)}</td>
+    <td>${pmEvalFmt(d.avg25_month)}</td>
+    <td class="${pmEvalGrowClass(mar_vs_avg_p)}">${fmtP(mar_vs_avg_p)}</td>
+    <td class="${pmEvalGrowClass(mar_vs_avg_a)}">${fmtA(mar_vs_avg_a)}</td>
+    <td>${pmEvalFmt(d.last3_avg)}</td>
+    <td class="${pmEvalGrowClass(mar_vs_l3_p)}">${fmtP(mar_vs_l3_p)}</td>
+    <td class="col-sep">${pmEvalFmt(d.act26_q1)}</td>
+    <td>${pmEvalFmt(d.sf26_q1)}</td>
+    <td class="${pmEvalAchClass(ach_q1)}">${ach_q1==null?'–':ach_q1.toFixed(1)}</td>
+    <td>${pmEvalFmt(d.avg25_q1)}</td>
+    <td class="${pmEvalGrowClass(q1_vs_avg_p)}">${fmtP(q1_vs_avg_p)}</td>
+    <td class="${pmEvalGrowClass(q1_vs_avg_a)}">${fmtA(q1_vs_avg_a)}</td>
+    <td>${pmEvalFmt(d.act25_q1)}</td>
+    <td class="${pmEvalGrowClass(q1_vs_yoy_p)}">${fmtP(q1_vs_yoy_p)}</td>
+  </tr>`;
+}
+function renderPMEval(){
+  const src = (D && D.all_products) ? D.all_products : [];
+  if(!src.length) return;
+
+  // === 표1: 주력품목 ===
+  const keyTbl = document.getElementById('pmevalKey');
+  if(keyTbl){
+    let html = pmEvalRenderHeader() + '<tbody>';
+    let totalProds = [];
+    PMEVAL_KEY_ORDER.forEach(pm=>{
+      const list = PMEVAL_JURYEOK[pm];
+      if(!list) return;
+      const prods = src.filter(p => !p.is_demarketing && pmEvalGetPM(p.name) === pm && pmEvalIsKey(pm, p.name));
+      if(!prods.length) return;
+      totalProds = totalProds.concat(prods);
+      const d = pmEvalAggregate(prods);
+      const sub = list.join('·');
+      html += pmEvalRenderRow(pm, sub, d, false);
+    });
+    if(totalProds.length){
+      const td = pmEvalAggregate(totalProds);
+      html += pmEvalRenderRow('★ 합계', '', td, true);
+    }
+    html += '</tbody>';
+    keyTbl.innerHTML = html;
+  }
+
+  // === 표2: 전체 담당품목 (임범성·강경완·미분류 → 기타) ===
+  const allTbl = document.getElementById('pmevalAll');
+  if(allTbl){
+    const byPM = {};
+    src.forEach(p=>{
+      if(p.is_demarketing) return;
+      let pm = pmEvalGetPM(p.name);
+      if(PMEVAL_MERGE_ETC.has(pm)) pm = '기타';
+      (byPM[pm] = byPM[pm] || []).push(p);
+    });
+    let html = pmEvalRenderHeader() + '<tbody>';
+    let totalProds = [];
+    PMEVAL_ALL_ORDER.forEach(pm=>{
+      const prods = byPM[pm];
+      if(!prods || !prods.length) return;
+      totalProds = totalProds.concat(prods);
+      const d = pmEvalAggregate(prods);
+      const cnt = prods.length;
+      const sub = `${cnt}개 품목`;
+      html += pmEvalRenderRow(pm, sub, d, false);
+    });
+    if(totalProds.length){
+      const td = pmEvalAggregate(totalProds);
+      html += pmEvalRenderRow('★ 본부 합계', '', td, true);
+    }
+    html += '</tbody>';
+    allTbl.innerHTML = html;
+  }
+}
+window.renderPMEval = renderPMEval;
 
 // fcSummary 렌더는 PMFP 로드 후에도 재호출될 수 있도록 함수 분리 — B-⑧ 2줄 헤드라인
 function renderFcSummary(fcList){
