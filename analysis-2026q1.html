@@ -1580,14 +1580,12 @@ const PMFP_CFG = {
   q1Cols: [30,31,32],        // 1,2,3월 26년 실적
   remCols: [58,59,60,61,62,63,64,65], // 5~12월 26년 목표
   dataStartRow: 40,          // gviz index offset: Section ④ first data row (강경완 올리버원)
-  // ★ B-⑨ PM별 현황 요약블록 (시트 최상단) — 해당월 마감예측 최종치 집계용
-  // CA = 79번째 컬럼 = 0-idx 78 (1차 마감예측)
-  // CB = 80번째 컬럼 = 0-idx 79 (2차 마감예측)
-  // Rows 4~17 (1-idx) = 0-idx 3~16 (14행, PM별 합계)
-  summaryCol1: 78,           // CA (1차 마감예측)
-  summaryCol2: 79,           // CB (2차 마감예측)
-  summaryRowStart: 3,        // Row 4 → 0-idx 3
-  summaryRowEnd: 16,         // Row 17 → 0-idx 16 (loop 조건: i <= summaryRowEnd)
+  // ★ B-⑨ 해당월 '마감예측' 최종치 — Section ④ 제품별 현황 per-product 합계
+  // (시트 최상단 PM별 요약블록이 아니라, 제품별 행을 전수 합산)
+  // CA = 0-idx 78 = 1차 마감예측 (품목별)
+  // CB = 0-idx 79 = 2차 마감예측 (품목별)
+  chaCol1: 78,               // CA (1차 마감예측, 품목별)
+  chaCol2: 79,               // CB (2차 마감예측, 품목별)
 };
 window.__PMFP_CFG = PMFP_CFG;
 // ※ PM_PRODUCT_MAP / getPMForProduct 는 스크립트 상단(line 414+)으로 이동 — TDZ 방지
@@ -1635,24 +1633,25 @@ function loadPMProductForecast(){
       rows: allMatchedRows
     };
 
-    // ★★ B-⑨ PM별 현황 요약블록 (CA/CB) 집계 — 해당월 '마감예측' 최종치 ★★
-    // 2차(CB) 값이 있으면 2차, 없으면 1차(CA) 사용
+    // ★★ B-⑨ 해당월 '마감예측' 최종치 — Section ④ 제품별 현황 per-product 합계 ★★
+    // dataStartRow(40)부터 시트 끝까지 품목별로 CA(1차)/CB(2차) 합산
+    // 2차(CB) 값이 있으면 2차 우선, 없으면 1차(CA) 사용
     let sum1Won = 0, sum2Won = 0, cnt1 = 0, cnt2 = 0;
-    for(let i=PMFP_CFG.summaryRowStart; i<=PMFP_CFG.summaryRowEnd && i<rows.length; i++){
+    for(let i=PMFP_CFG.dataStartRow; i<rows.length; i++){
       const r = rows[i]; if(!r || !r.c) continue;
-      const v1 = r.c[PMFP_CFG.summaryCol1]?.v;
-      const v2 = r.c[PMFP_CFG.summaryCol2]?.v;
+      const v1 = r.c[PMFP_CFG.chaCol1]?.v;   // CA (품목별 1차)
+      const v2 = r.c[PMFP_CFG.chaCol2]?.v;   // CB (품목별 2차)
       if(typeof v1 === 'number' && v1 > 0){ sum1Won += v1; cnt1++; }
       if(typeof v2 === 'number' && v2 > 0){ sum2Won += v2; cnt2++; }
     }
     const final2 = sum2Won > 0;
     const finalWon = final2 ? sum2Won : sum1Won;
     window.__pmTotalMonthlyAll = {
-      chaFinal: +(finalWon/1e8).toFixed(2),   // 최종 사용 값 (억)
-      cha1: +(sum1Won/1e8).toFixed(2),         // 1차 합계 (CA)
-      cha2: +(sum2Won/1e8).toFixed(2),         // 2차 합계 (CB)
+      chaFinal: +(finalWon/1e8).toFixed(2),   // 최종 사용 값 (억) — 제품별 합계
+      cha1: +(sum1Won/1e8).toFixed(2),         // 1차 합계 (CA, 품목별)
+      cha2: +(sum2Won/1e8).toFixed(2),         // 2차 합계 (CB, 품목별)
       source: final2 ? '2차' : '1차',
-      pmCount: final2 ? cnt2 : cnt1,
+      productCount: final2 ? cnt2 : cnt1,       // 집계에 포함된 품목 수
     };
 
     // 전체 배지 먼저 갱신 (필터 집계 없이도 ETC 전체 값 확정)
