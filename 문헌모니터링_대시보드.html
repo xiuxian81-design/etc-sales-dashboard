@@ -781,8 +781,8 @@ function renderCard(p, idx) {
   const urlBtn = p.url
     ? `<a class="btn btn-outline" href="${p.url}" target="_blank">📄 논문 보기 ↗</a>` : '';
 
-  // 상세 리포트 버튼 (논문별)
-  const paperReportUrl = getReportUrl(p.session, p.month || activeMonth);
+  // 상세 리포트 버튼 (NEW 논문만 표시)
+  const paperReportUrl = p.isNew ? getReportUrl(p.session, p.month || activeMonth) : null;
   const reportBtn = paperReportUrl
     ? `<a class="btn btn-report" href="${paperReportUrl}" target="_blank">📋 상세 리포트 ↗</a>` : '';
 
