@@ -605,5 +605,38 @@
             한올바이오파마 ETC마케팅기획본부 · 월간 문헌모니터링 리포트 · 다음 발행 예정: 2026년 5월 22일
         </footer>
     </div>
+
+<script>
+/* 논문별 포커스 뷰 */
+(function(){
+  var h = decodeURIComponent(location.hash.slice(1));
+  if (!h) return;
+  var papers = document.querySelectorAll('.paper');
+  var found = null;
+  for (var i = 0; i < papers.length; i++) {
+    var t = papers[i].querySelector('.paper-title');
+    var txt = t ? t.textContent.trim().toLowerCase() : '';
+    if (txt.indexOf(h.toLowerCase()) !== -1) { found = papers[i]; break; }
+  }
+  if (!found) return;
+  for (var j = 0; j < papers.length; j++) {
+    if (papers[j] !== found) papers[j].style.display = 'none';
+  }
+  found.style.outline = '3px solid #E87722';
+  found.style.borderRadius = '8px';
+  found.scrollIntoView({behavior:'smooth', block:'start'});
+  var btn = document.createElement('button');
+  btn.textContent = '📋 모든 논문 보기';
+  btn.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:999;padding:10px 20px;background:#003366;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3);';
+  btn.onclick = function(){
+    for(var k=0;k<papers.length;k++) papers[k].style.display='';
+    found.style.outline='';
+    btn.remove();
+    window.scrollTo(0,0);
+  };
+  document.body.appendChild(btn);
+})();
+</script>
+
 </body>
 </html>

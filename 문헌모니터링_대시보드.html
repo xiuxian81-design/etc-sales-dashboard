@@ -781,10 +781,11 @@ function renderCard(p, idx) {
   const urlBtn = p.url
     ? `<a class="btn btn-outline" href="${p.url}" target="_blank">📄 논문 보기 ↗</a>` : '';
 
-  // 상세 리포트 버튼 (NEW 논문만 표시)
-  const paperReportUrl = p.isNew ? getReportUrl(p.session, p.month || activeMonth) : null;
-  const reportBtn = paperReportUrl
-    ? `<a class="btn btn-report" href="${paperReportUrl}" target="_blank">📋 상세 리포트 ↗</a>` : '';
+  // 상세 리포트 버튼 (해당 논문으로 포커스 이동)
+  const paperReportUrl = getReportUrl(p.session, p.month || activeMonth);
+  const titleHash = p.title ? encodeURIComponent(p.title.slice(0, 30)) : '';
+  const reportBtn = paperReportUrl && titleHash
+    ? `<a class="btn btn-report" href="${paperReportUrl}#${titleHash}" target="_blank">📋 상세 리포트 ↗</a>` : '';
 
   // 5-파트 구조화 요약 파싱
   const summaryHtml = p.summary ? parseSummaryHtml(p.summary) : '';
