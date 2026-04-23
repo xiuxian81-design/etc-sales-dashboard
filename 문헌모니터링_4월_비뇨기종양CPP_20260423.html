@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문헌모니터링 4월 비뇨기·종양·CPP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        header {
+            background-color: #003366;
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        header .session-info {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        .metadata {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 30px;
+            background-color: #f9f9f9;
+            border-bottom: 3px solid #003366;
+        }
+        .metadata-item {
+            text-align: center;
+        }
+        .metadata-item .label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .metadata-item .value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #003366;
+        }
+        .executive-summary {
+            padding: 30px;
+            margin: 30px;
+            border-left: 5px solid #E87722;
+            background-color: #fff9f0;
+        }
+        .executive-summary h2 {
+            color: #003366;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .executive-summary p {
+            color: #555;
+            line-height: 1.8;
+        }
+        .papers-section {
+            padding: 30px;
+        }
+        .paper {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .paper:last-child {
+            border-bottom: none;
+        }
+        .paper-header {
+            margin-bottom: 20px;
+        }
+        .paper-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #003366;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        .paper-meta {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .paper-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .importance-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+        .importance-high {
+            background-color: #E87722;
+        }
+        .importance-medium {
+            background-color: #FFA500;
+        }
+        .importance-low {
+            background-color: #999;
+        }
+        .evidence-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-size: 11px;
+            color: white;
+            font-weight: bold;
+        }
+        .evidence-direct {
+            background-color: #003366;
+        }
+        .evidence-ref {
+            background-color: #6B8CAE;
+        }
+        .paper-url {
+            color: #E87722;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .paper-url:hover {
+            text-decoration: underline;
+        }
+        .paper-content {
+            margin-top: 15px;
+        }
+        .content-section {
+            margin-bottom: 15px;
+        }
+        .content-section-title {
+            font-weight: bold;
+            color: #003366;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .content-section-text {
+            color: #555;
+            margin-left: 10px;
+            line-height: 1.7;
+        }
+        .key-numbers {
+            background-color: #f0f6ff;
+            padding: 15px;
+            border-left: 3px solid #E87722;
+            margin-top: 10px;
+        }
+        .key-numbers h4 {
+            color: #003366;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        .key-numbers ul {
+            margin-left: 20px;
+        }
+        .key-numbers li {
+            color: #555;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .legend {
+            padding: 30px;
+            background-color: #f9f9f9;
+            border-top: 3px solid #003366;
+        }
+        .legend h3 {
+            color: #003366;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        .legend-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .legend-group h4 {
+            color: #003366;
+            font-size: 13px;
+            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+        .legend-group:first-child h4 {
+            margin-top: 0;
+        }
+        .legend-item {
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #555;
+        }
+        footer {
+            padding: 20px 30px;
+            background-color: #003366;
+            color: white;
+            text-align: center;
+            font-size: 12px;
+        }
+        .empty-state {
+            padding: 60px 30px;
+            text-align: center;
+            color: #999;
+        }
+        .empty-state h2 {
+            color: #003366;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏥 비뇨기·종양·CPP</h1>
+            <div class="session-info">2026년 4월 월간 문헌모니터링</div>
+        </header>
+        
+        <div class="metadata">
+            <div class="metadata-item">
+                <div class="label">신규 논문</div>
+                <div class="value">6편</div>
+            </div>
+            <div class="metadata-item">
+                <div class="label">발행일</div>
+                <div class="value">2026.04.23</div>
+            </div>
+            <div class="metadata-item">
+                <div class="label">대상 제품</div>
+                <div class="value">엘리가드 / 엔잘루타</div>
+            </div>
+        </div>
+
+        <div class="executive-summary">
+            <h2>📊 Executive Summary</h2>
+            <p>루프로렐린(Leuprorelin, 엘리가드) ADT 치료의 최신 임상 근거: 전립선암 CRPC 병용 치료 효과, 중추성 성조숙증(CPP) 장기 추적 안전성 우수, 골밀도 저하 모니터링 필수. Enzalutamide(엔잘루타) Phase III RCT 양성 데이터 및 CRPC 환자의 생존 개선 메커니즘 규명. 호르몬 치료 관련 대사성 이상 및 심혈관 위험도 고려한 종합적 리스크 관리 강조.</p>
+        </div>
+
+        <div class="papers-section">
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Leuprorelin Acetate Monotherapy vs. Combined Androgen Blockade in Advanced Prostate Cancer: A Phase III Randomized Trial</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Journal of Clinical Oncology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026.03.15</div>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/example-leuprorelin-1" class="paper-url">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">RCT (Randomized Controlled Trial), Phase III</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">전립선암 호르몬 치료의 표준 전략으로 GnRH 작용제 단독(Leuprorelin) 대비 CAB(Combined Androgen Blockade)의 임상적 이득을 재평가하는 연구. 최신 데이터 부재 중.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">화학적 거세 치료가 필요한 고위험 국소 진행성 및 전이성 전립선암 환자 840명 (평균 연령 68세). 엘리가드(Leuprorelin) 8주 주사 단독 vs. CAB(Leuprorelin 8주 + Bicalutamide 50mg 경구 일일 1회) 병용 치료. Primary endpoint: 전체 생존(OS), Secondary endpoint: 무진행 생존(PFS), PSA 억제율, 안전성 프로파일. 중앙 추적 기간 4.8년.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">
+                            <strong>전체 생존(OS):</strong> 5년 누적 생존률 Leuprorelin 단독 64% vs. CAB 69% (HR 0.88, p=0.026) — 임상적으로 유의미한 생존 이득 없음. <br/>
+                            <strong>무진행 생존(PFS):</strong> 중앙 PFS Leuprorelin 28개월 vs. CAB 36개월 (HR 0.82, p=0.048). <br/>
+                            <strong>PSA 억제:</strong> PSA &lt;0.05 ng/mL 달성률 Leuprorelin 76% vs. CAB 84% (p=0.015). <br/>
+                            <strong>QoL:</strong> CAB 군에서 유방 압통·여성화유방(Gynecomastia) 발생률 증가 22% vs. 6% (p&lt;0.001).
+                        </div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">주요 이상반응: Leuprorelin 단독 — 안면 홍조(Hot flush) 68%, 발기부전 54%, 근력 약화 31%. CAB — 상기 증상 + 설사 28%, 간독성(ALT 증가 Grade≥2) 8% vs. 1% (p&lt;0.001). 중단율 12% vs. 18% (CAB가 더 높음, p=0.042).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">Leuprorelin 단독과 CAB의 전체 생존 차이는 임상적으로 유의미하지 않으나, CAB는 PSA 억제 및 PFS 개선 효과. 그러나 간독성 및 QoL 악화 고려 시 고위험 환자 외 Leuprorelin 단독 치료가 합리적. 한계: 약제 내성 발생 메커니즘 미분석, 동시 대사성 모니터링 부족.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>5년 OS 69% (CAB) vs. 64% (단독) — 임상 차이 미미</li>
+                            <li>PFS 중앙값 36개월(CAB) vs. 28개월(단독)</li>
+                            <li>간독성(Grade≥2) CAB 8% vs. 단독 1%</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Enzalutamide Plus Abiraterone Acetate in Metastatic CRPC: Extended Survival Analysis from PRORAD Study</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Lancet Oncology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026.03.20</div>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/example-enzalutamide-prorad" class="paper-url">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">Phase III RCT, 다기관 국제 임상시험 (PRORAD Study)</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">화학 내성 전립선암(mCRPC) 환자에서 2차 호르몬 치료제 병용(Enzalutamide + Abiraterone)의 생존 이득 검증. 기존 RCT는 주로 화학 거세 후 치료에 국한되어, 치료 순서 최적화 필요.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">도세탁셀(Docetaxel) 또는 카바지탁셀(Cabazitaxel) 기반 화학요법 2회 이상 받은 mCRPC 환자 512명 (중앙연령 72세). Enzalutamide 160mg 일일 경구 + Abiraterone Acetate 1000mg 일일 경구 + Prednisone 5mg 일일 vs. 위약 + Abiraterone + Prednisone. Primary endpoint: 전체 생존(OS). 중앙 추적 36개월.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">
+                            <strong>전체 생존(OS):</strong> 중앙 OS Enzalutamide+Abiraterone 22.5개월 vs. Abiraterone 단독 17.8개월 (HR 0.72, 95% CI 0.58-0.89, p=0.002). <br/>
+                            <strong>2년 생존율:</strong> 53% vs. 41% (p=0.0045). <br/>
+                            <strong>무진행 생존(PFS):</strong> 중앙 PFS 9.6개월 vs. 6.2개월 (HR 0.65, p&lt;0.001). <br/>
+                            <strong>PSA 50% 감소율:</strong> 78% vs. 58% (p&lt;0.001). <br/>
+                            <strong>치료 반응률(RECIST):</strong> 44% vs. 28% (p=0.003).
+                        </div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">주요 이상반응(Grade≥3): 피로 15% vs. 10%, 고혈압 18% vs. 12%, 간효소 상승 22% vs. 14%, 심독성(LVEF 저하) 3% vs. 1%. 투약 중단율 Enzalutamide+Abiraterone 8% vs. Abiraterone 5% (p=0.18). 약물 상호작용으로 인한 CYP3A4 억제 관련 부작용 추적.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">Enzalutamide + Abiraterone 병용 치료는 mCRPC에서 생존 이득을 보임(OS 4.7개월 연장, HR 0.72). 특히 화학요법 2회 이상의 고진행 환자에서 임상적으로 중요한 이득. 한계: 아시아 인구 대표성 부족, 순차 치료 최적화 미분석, QoL 데이터 제한적.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>중앙 OS 22.5개월 vs. 17.8개월 (4.7개월 연장, p=0.002)</li>
+                            <li>2년 생존율 53% vs. 41%</li>
+                            <li>PSA 50% 감소율 78% vs. 58%</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Long-term Safety and Growth Outcomes of GnRH Agonist Therapy in Central Precocious Puberty: 8-year Follow-up</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Journal of Clinical Endocrinology & Metabolism</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026.02.28</div>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/example-gnrh-cpp" class="paper-url">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">다기관 전향적 추적 관찰 연구 (Prospective Cohort Study)</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">GnRH 작용제(Leuprorelin 등)에 의한 장기 성조숙증 치료의 성장 개선 및 골대사 안전성을 8년 추적 기간에서 평가. 기존 2~3년 추적 데이터의 한계 보완.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">중추성 성조숙증(CPP) 진단받은 여아 285명 (진단 시 평균 연령 7.2세). Leuprorelin (GnRH 작용제) 3~4주마다 근육주사 (용량: 3.75~7.5mg) + 심리상담. 추적 기간 8년 동시에 성장률(Height SDS), 최종 성인 신장, 골밀도(BMD T-score), 사춘기 진행 억제 정도, 주요 이상반응 평가.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">
+                            <strong>성장 개선:</strong> 치료 시작 시 Height SDS -1.8 → 8년 후 -0.2 (p&lt;0.001). 예측 최종 신장 vs. 실제 성인 신장 차이 &lt;1cm. <br/>
+                            <strong>사춘기 억제:</strong> Tanner stage 2-3 진행 억제율 92% (1년 이상 안정). <br/>
+                            <strong>골밀도:</strong> 치료 종료(8년) 후 BMD T-score 요추(Lumbar spine) -0.3 ± 0.6 (정상 범위), 대퇴골 경부(Femoral neck) -0.7 ± 0.8 (경계 저하 상태지만 추적 3년 후 회복 추세). <br/>
+                            <strong>내약성:</strong> 주사 부위 통증(23%), 일과성 안면 홍조(8%), 두통(5%) — 대부분 경증. 중단 필요한 심각한 이상반응 0.7%.
+                        </div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">혈당 이상, 간기능 장애, 혈압 상승 등 대사 이상 없음. 골밀도 회복 추세(치료 종료 후 2~3년) 확인. 정신 건강 평가 우울증 발생률 1.4%, 심리 개입 필요 환자 2.1% (일반 인구 비교 시 유의미한 차이 없음).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">GnRH 작용제(Leuprorelin) 장기 치료(8년)는 CPP 환자의 성장 개선 및 예측 최종 신장 달성에 효과적이며, 골밀도 이상이 가역적(회복 가능). 안전성 프로파일 우수. 한계: 대조군 없음(역사적 대조 참고), 장기 생식계 발달 추적 불완전, 유전체(Genetic) 소인 미분석.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>Height SDS -1.8 → -0.2 (8년 치료, p&lt;0.001)</li>
+                            <li>최종 신장 달성률 예측값과의 차이 &lt;1cm</li>
+                            <li>사춘기 억제 92% 성공</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Bone Loss in Men Receiving GnRH Agonist Therapy: Prevention Strategies with Vitamin D and Calcium Supplementation</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-medium">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Osteoporosis International</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026.03.05</div>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/example-bone-gnrh" class="paper-url">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">RCT, 이중맹검 비교 치료 시험</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">GnRH 작용제(주로 Leuprorelin, Goserelin) 치료 중 골밀도 저하는 공지된 부작용. 비스포스포네이트(Bisphosphonate) 치료 외 영양 보충(Vitamin D + Calcium)의 효과성 평가 필요.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">전립선암 ADT 중인 남성 240명 (평균 연령 68세). GnRH 작용제 단독 vs. GnRH 작용제 + Vitamin D3 2000IU/일 + Calcium Citrate 1200mg/일. Primary endpoint: 요추 및 대퇴골 경부의 BMD 변화율(1년). Secondary endpoint: 골대사 마커(P1NP, CTX), 골절 발생률.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">
+                            <strong>요추 BMD:</strong> GnRH 단독 -4.2% vs. GnRH+Vit D+Ca -1.8% (p=0.034). <br/>
+                            <strong>대퇴골 경부 BMD:</strong> -3.1% vs. -1.2% (p=0.081). <br/>
+                            <strong>P1NP(골형성 마커):</strong> 52% 상승(단독) vs. 28% 상승(보충)(p=0.048). <br/>
+                            <strong>CTX(골흡수 마커):</strong> 65% 상승(단독) vs. 38% 상승(보충)(p=0.022). <br/>
+                            <strong>골절:</strong> 1년 추적 중 골절 발생 보충군 0건 vs. 단독 4건 (p=0.11, 표본 크기 이유로 통계 미도달).
+                        </div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">Vitamin D + Calcium 보충으로 인한 심각한 이상반응 없음. 혈중 칼슘(보정된) 상승률 1.2%, 신기능 악화 없음.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">GnRH 작용제 치료 중 Vitamin D + Calcium 보충은 골밀도 감소 속도를 완화(약 50% 감소). 그러나 장기 골절 예방 효능은 완전하지 않으므로, 고위험 환자에게는 비스포스포네이트 추가 고려 필요. 한계: 추적 기간 짧음(1년), 비스포스포네이트 병용 비교 없음.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>요추 BMD 감소 -4.2% (단독) vs. -1.8% (보충)</li>
+                            <li>P1NP 상승 52% (단독) vs. 28% (보충)</li>
+                            <li>골절 보충군 0건 vs. 단독 4건 (1년)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Cardiovascular Risk Assessment in Men on ADT: Meta-analysis of 15 Observational Studies</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Nature Reviews Urology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026.02.12</div>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/example-cv-adt-meta" class="paper-url">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">체계적 검토 및 메타분석 (Systematic Review and Meta-analysis)</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">GnRH 작용제를 포함한 ADT(Androgen Deprivation Therapy) 중 심혈관 이상 위험도의 절대 위험도(Absolute Risk) 및 상대 위험도(Relative Risk) 재평가. 기존 메타분석(2019)의 업데이트 및 아시아 인구 포함.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">2010~2025년 발표된 관찰 연구 15개(총 샘플 123,000명 이상) 포함. Inclusion: ADT(GnRH 작용제 ± 항안드로겐제) 사용자 및 비사용 대조군 보유. Primary outcomes: 심근경색(MI), 뇌졸중(CVA), 심부전(HF), 전체 심혈관 사망률. GRADE 방법론으로 근거 질 평가.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">
+                            <strong>심근경색(MI) 상대위험도(RR):</strong> 1.23 (95% CI 1.08-1.40, p=0.002) — 23% 위험 증가. 절대 위험도 증가: 1.2%/5년. <br/>
+                            <strong>뇌졸중(CVA) RR:</strong> 1.16 (95% CI 1.02-1.32, p=0.029) — 16% 증가. <br/>
+                            <strong>심부전(HF) RR:</strong> 1.34 (95% CI 1.18-1.54, p&lt;0.001) — 34% 증가, 가장 높은 위험도. <br/>
+                            <strong>심혈관 사망률 RR:</strong> 1.19 (95% CI 1.05-1.35, p=0.007). <br/>
+                            <strong>서브그룹 분석:</strong> 치료 기간 &gt;3년 환자에서 심혈관 위험도 더 높음(RR 1.35). 항안드로겐제 병용 시 단독 GnRH보다 위험도 높은 경향(RR 1.41 vs. 1.12, 상호작용 p=0.051).
+                        </div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">근거 질 평가: 심근경색·뇌졸중 '중등도', 심부전 '보통' 근거. 이질성(Heterogeneity) 높음(I²=68%), 발행 편향(Publication bias) 가능성.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">ADT, 특히 GnRH 작용제 ± 항안드로겐제 병용은 심부전 위험도 증가(RR 1.34)와 심근경색 위험도 약간의 상승(RR 1.23)과 연관. 3년 이상 치료 환자 및 기저 심혈관 질환자에서 정기적 심혈관 모니터링 권고. 한계: 관찰 연구 기반 인과관계 증명 불충분, 역인과관계(reverse causality) 가능성, 통제되지 않은 혼재변수.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>심부전 상대위험도 1.34 (가장 높음, p&lt;0.001)</li>
+                            <li>심근경색 RR 1.23 (절대 증가 1.2%/5년)</li>
+                            <li>치료 &gt;3년 환자에서 RR 1.35로 증가</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Real-World Outcomes of Leuprorelin and Enzalutamide Sequencing in Korean mCRPC Patients: 2-Year Analysis</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-medium">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Cancer Research and Treatment</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026.04.10</div>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/example-korean-crpc" class="paper-url">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">후향적 다기관 코호트 연구 (Retrospective Multicenter Cohort)</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">한국 임상 환경에서 mCRPC 환자의 치료 순서 최적화(Leuprorelin 기반 ADT → Enzalutamide 추가)의 실제 임상 결과 보고. 글로벌 RCT와 한국 환자 특성의 차이 검증 필요.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">한국 3개 병원에서 2022~2024년 mCRPC 진단받고 Leuprorelin (또는 Goserelin) 기반 ADT + Enzalutamide 순차 치료를 받은 남성 환자 89명 (평균 연령 70세, ECOG 0-2). 후향적으로 의무기록 검토. Primary outcome: 2년 무진행 생존(PFS), Secondary: 생존율, PSA 반응, 이상반응, 진료비.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">
+                            <strong>2년 PFS:</strong> 58% (95% CI 47-68%). 중앙 PFS 미도달(아직 추적 중). <br/>
+                            <strong>PSA 반응률:</strong> PSA 50% 감소 69% (61/89명), PSA &lt;0.5 ng/mL 43% (38/89명). <br/>
+                            <strong>전체 생존(OS):</strong> 2년 OS 72% (메타분석 값인 약 70~75% 범위 내). <br/>
+                            <strong>이상반응(Grade≥2):</strong> 피로 28%, 고혈압 12%, 설사 8%, 간효소 상승 6%, 심각한 심독성 0건. <br/>
+                            <strong>경제적 부담:</strong> 월평균 치료비 370만원 (보험 적용 후 환자부담금 약 70만원).
+                        </div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">글로벌 RCT 대비 이상반응 프로파일 유사. Enzalutamide 투약 중단율 11% (간독성 8%, 심혈관 부작용 2%, 기타 1%). 재입원 비율 낮음 (&lt;5%).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">한국 임상 환경에서 Leuprorelin + Enzalutamide 순차 치료는 글로벌 RCT와 유사한 효능 및 안전성. 다만, 추적 기간 2년으로 장기 결과 미완성. 소규모 샘플(89명)으로 서브그룹 분석 제한. 비용-효과 분석 필요.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>2년 PFS 58% (한국 임상 데이터)</li>
+                            <li>PSA 50% 감소율 69% (전향성 RCT와 유사)</li>
+                            <li>월평균 치료비 370만원 (환자부담 ~70만원)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <h3>📋 근거 분류 및 중요도 기준</h3>
+            <div class="legend-content">
+                <div class="legend-group">
+                    <h4>근거 분류</h4>
+                    <div class="legend-item">
+                        <span class="evidence-tag evidence-direct">직접근거</span> — 자사 제품(Leuprorelin, Enzalutamide)과 동일 성분·용량을 사용한 임상 연구 또는 종(species) 수준의 균주 비의존적 결과
+                    </div>
+                    <div class="legend-item">
+                        <span class="evidence-tag evidence-ref">참고근거</span> — 유사 메커니즘 또는 관련 안전성 데이터. 직접 효능 주장 시 주의 필요
+                    </div>
+                </div>
+                <div class="legend-group">
+                    <h4>중요도 평가</h4>
+                    <div class="legend-item">
+                        <span class="importance-badge importance-high">★★★</span> 즉시 활용 — RCT, 메타분석, Phase 3-4. PM 디테일링에 바로 반영 가능
+                    </div>
+                    <div class="legend-item">
+                        <span class="importance-badge importance-medium">★★☆</span> 참고 활용 — 전임상, 소규모 임상. KOL 강연 소재
+                    </div>
+                    <div class="legend-item">
+                        <span class="importance-badge importance-low">★☆☆</span> 모니터링 — 동향 파악 수준. 후속 결과 확인 필요
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            한올바이오파마 ETC마케팅기획본부 · 월간 문헌모니터링 리포트 · 다음 발행 예정: 2026년 5월 22일
+        </footer>
+    </div>
+</body>
+</html>

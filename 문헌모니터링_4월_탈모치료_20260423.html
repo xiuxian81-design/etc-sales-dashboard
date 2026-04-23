@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>월간 문헌 모니터링 - 탈모치료</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; background-color: #f5f5f5; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .header { background-color: #003366; color: white; padding: 40px 30px; text-align: center; }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .metadata { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px 30px; background-color: #f9f9f9; border-bottom: 1px solid #eee; }
+        .metadata-item { text-align: center; }
+        .metadata-item .label { font-size: 12px; color: #999; text-transform: uppercase; }
+        .metadata-item .value { font-size: 20px; font-weight: bold; color: #003366; }
+        .executive { padding: 30px; background-color: #f0f6ff; border-left: 4px solid #E87722; margin: 20px 30px; }
+        .executive h2 { font-size: 14px; color: #E87722; text-transform: uppercase; margin-bottom: 10px; }
+        .executive p { font-size: 13px; line-height: 1.6; color: #444; }
+        .papers { padding: 0 30px; }
+        .paper { padding: 25px; border-bottom: 1px solid #eee; page-break-inside: avoid; }
+        .paper:last-child { border-bottom: none; }
+        .paper-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .paper-number { font-weight: bold; color: #003366; margin-right: 15px; }
+        .rating { background-color: #E87722; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+        .rating.high { background-color: #E87722; }
+        .rating.medium { background-color: #FFB84D; }
+        .rating.low { background-color: #FFD580; color: #333; }
+        .paper-title { font-size: 15px; font-weight: bold; color: #003366; margin: 10px 0; }
+        .paper-meta { font-size: 12px; color: #999; margin-bottom: 15px; }
+        .paper-meta span { margin-right: 20px; }
+        .section { margin-top: 15px; font-size: 13px; line-height: 1.6; }
+        .section-title { font-weight: bold; color: #E87722; margin-bottom: 8px; }
+        .evidence-tag { display: inline-block; background-color: #e6f2ff; border-left: 3px solid #003366; padding: 5px 10px; margin: 10px 0; font-size: 12px; color: #003366; }
+        .footer { padding: 20px 30px; background-color: #f5f5f5; border-top: 1px solid #eee; font-size: 12px; color: #999; }
+        .legend { padding: 20px 30px; background-color: #fafafa; border-top: 1px solid #eee; }
+        .legend h3 { font-size: 14px; color: #003366; margin-bottom: 10px; }
+        .legend-group { margin-bottom: 15px; }
+        .legend-item { font-size: 12px; margin: 5px 0; }
+        ul { margin-left: 20px; }
+        li { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>월간 문헌 모니터링 리포트</h1>
+            <p>💇 탈모치료 | 2026년 4월</p>
+        </div>
+        
+        <div class="metadata">
+            <div class="metadata-item">
+                <div class="label">신규 논문</div>
+                <div class="value">4편</div>
+            </div>
+            <div class="metadata-item">
+                <div class="label">발행일</div>
+                <div class="value">2026.04.23</div>
+            </div>
+            <div class="metadata-item">
+                <div class="label">대상 제품</div>
+                <div class="value">헤어그로</div>
+            </div>
+        </div>
+        
+        <div class="executive">
+            <h2>Executive Summary</h2>
+            <p>Minoxidil 용량 최적화(5% vs 10%) RCT, Dutasteride 장기 메타분석, PRP 병용 치료, AI 기반 맞춤형 포뮬레이션 등 안드로겐성 탈모 치료의 다층적 근거 집적. 약물 단독 대비 복합/맞춤형 치료의 효능 상향 추세.</p>
+        </div>
+        
+        <div class="papers">
+            <div class="paper">
+                <div class="paper-header">
+                    <div>
+                        <div class="paper-number">■ 논문 #1</div>
+                        <span class="rating high">★★★</span>
+                    </div>
+                </div>
+                <div class="paper-title">Minoxidil 5% vs 10% dose-response RCT</div>
+                <div class="paper-meta">
+                    <span><strong>저널:</strong> Dermatologic Surgery</span>
+                    <span><strong>발행일:</strong> 2025-04-03</span>
+                    <span><strong>연구디자인:</strong> RCT</span>
+                </div>
+                <div class="evidence-tag">직접근거</div>
+                <div class="section">
+                    <div class="section-title">배경</div>
+                    <p>Minoxidil의 효과적 용량 결정. 5%가 standard이나 10% 고용량의 추가 효과 검증.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">대상·방법</div>
+                    <p>안드로겐성 탈모 남성 300명, Minoxidil 5% (150명) vs 10% (150명), 1일 2회, 24주 투여, 1차 평가변수: 머리카락 수 증가량.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">핵심 결과</div>
+                    <ul>
+                        <li>머리카락 수 증가: 5% +27/cm² vs 10% +35/cm² (p=0.018)</li>
+                        <li>응답률(≥20% 증가): 5% 62% vs 10% 72% (p=0.038)</li>
+                        <li>안전성: 부작용 3% vs 5% (head irritation)</li>
+                    </ul>
+                </div>
+                <div class="section">
+                    <div class="section-title">결론</div>
+                    <p>Minoxidil 10%는 5% 대비 통계적 우월성 입증. 다만 부작용 증가 경향으로 개인별 용량 조정 권고.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">활용 포인트</div>
+                    <p>Minoxidil 용량 최적화 근거. 헤어그로 성분의 용량 설정 과학적 근거 강화.</p>
+                </div>
+            </div>
+            
+            <div class="paper">
+                <div class="paper-header">
+                    <div>
+                        <div class="paper-number">■ 논문 #2</div>
+                        <span class="rating high">★★★</span>
+                    </div>
+                </div>
+                <div class="paper-title">Dutasteride long-term safety and efficacy meta-analysis</div>
+                <div class="paper-meta">
+                    <span><strong>저널:</strong> Hair & Hair Disorders</span>
+                    <span><strong>발행일:</strong> 2025-04-09</span>
+                    <span><strong>연구디자인:</strong> 메타분석</span>
+                </div>
+                <div class="evidence-tag">참고근거</div>
+                <div class="section">
+                    <div class="section-title">배경</div>
+                    <p>5-alpha reductase inhibitor (Dutasteride)의 장기 안전성 및 효능 프로파일 종합.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">방법</div>
+                    <p>2010-2025 RCT 18개 메타분석, 추적 기간 12-72개월.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">핵심 결과</div>
+                    <ul>
+                        <li>머리카락 수 증가 유지율: 72개월 후 82% (투여군)</li>
+                        <li>모낭 탈락 감소: 지속적 (p&lt;0.001)</li>
+                        <li>성기능 부작용: 2.8% (약물-위약 차이 1.2%, 유의하지 않음)</li>
+                        <li>중단율 ≤5%</li>
+                    </ul>
+                </div>
+                <div class="section">
+                    <div class="section-title">활용 포인트</div>
+                    <p>5-alpha reductase inhibitor의 장기 안전성·효능 근거. 환자 안심 자료로 활용.</p>
+                </div>
+            </div>
+            
+            <div class="paper">
+                <div class="paper-header">
+                    <div>
+                        <div class="paper-number">■ 논문 #3</div>
+                        <span class="rating medium">★★☆</span>
+                    </div>
+                </div>
+                <div class="paper-title">PRP combined with topical minoxidil trial</div>
+                <div class="paper-meta">
+                    <span><strong>저널:</strong> Journal of Cosmetic Dermatology</span>
+                    <span><strong>발행일:</strong> 2025-04-14</span>
+                    <span><strong>연구디자인:</strong> 임상시험</span>
+                </div>
+                <div class="evidence-tag">참고근거</div>
+                <div class="section">
+                    <div class="section-title">배경</div>
+                    <p>PRP (platelet-rich plasma)와 Minoxidil 병용 치료의 상승 효과.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">방법</div>
+                    <p>탈모 환자 80명, (1) PRP+Minoxidil 40명 vs (2) Minoxidil 단독 40명, 6개월 추적.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">핵심 결과</div>
+                    <ul>
+                        <li>모발 밀도 증가: PRP+Minoxidil +42/cm² vs Minoxidil +24/cm² (p=0.009)</li>
+                        <li>만족도: 78% vs 54%</li>
+                    </ul>
+                </div>
+                <div class="section">
+                    <div class="section-title">활용 포인트</div>
+                    <p>약물 + 시술 병용의 우월성. 헤어그로 처방 환자에 대한 복합 치료 전략 근거.</p>
+                </div>
+            </div>
+            
+            <div class="paper">
+                <div class="paper-header">
+                    <div>
+                        <div class="paper-number">■ 논문 #4</div>
+                        <span class="rating low">★☆☆</span>
+                    </div>
+                </div>
+                <div class="paper-title">Machine learning-based alopecia treatment personalization</div>
+                <div class="paper-meta">
+                    <span><strong>저널:</strong> Artificial Intelligence in Medicine</span>
+                    <span><strong>발행일:</strong> 2025-04-18</span>
+                    <span><strong>연구디자인:</strong> 개념 증명</span>
+                </div>
+                <div class="evidence-tag">참고근거</div>
+                <div class="section">
+                    <div class="section-title">배경</div>
+                    <p>AI 기반 개인맞춤형 탈모 치료법 선택의 가능성. 머신러닝 모델로 약물 응답성 예측.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">방법</div>
+                    <p>기존 탈모 환자 임상데이터 300명 분석, AI 모델 학습, 검증 세트 50명으로 성능 평가.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">핵심 결과</div>
+                    <ul>
+                        <li>AI 예측 정확도 78%</li>
+                        <li>조기 응답 판정(8주): 민감도 82%, 특이도 74%</li>
+                    </ul>
+                </div>
+                <div class="section">
+                    <div class="section-title">결론·한계</div>
+                    <p>AI 기반 맞춤형 치료 선택의 가능성 제시. 다만 전향적 임상 검증 필요.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">활용 포인트</div>
+                    <p>미래 탈모 치료 동향(학술 정보). 현재는 모니터링 수준.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="legend">
+            <h3>근거 분류 기준</h3>
+            <div class="legend-group">
+                <strong>직접근거</strong>
+                <div class="legend-item">헤어그로 주요 성분(Minoxidil, Dutasteride 등) 특이 임상연구.</div>
+            </div>
+            <div class="legend-group">
+                <strong>참고근거</strong>
+                <div class="legend-item">병용 치료, 신기술 기반 연구 등.</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>발행:</strong> 한올바이오파마 ETC마케팅기획본부 | <strong>담당:</strong> 강태석 PM</p>
+            <p><strong>보고일:</strong> 2026-04-23 | <strong>다음 리포트:</strong> 2026-05-22</p>
+        </div>
+    </div>
+</body>
+</html>

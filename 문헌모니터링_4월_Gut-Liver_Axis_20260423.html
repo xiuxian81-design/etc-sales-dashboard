@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>월간 문헌 모니터링 - Gut-Liver Axis</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; background-color: #f5f5f5; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .header { background-color: #003366; color: white; padding: 40px 30px; text-align: center; }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .metadata { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px 30px; background-color: #f9f9f9; border-bottom: 1px solid #eee; }
+        .metadata-item { text-align: center; }
+        .metadata-item .label { font-size: 12px; color: #999; text-transform: uppercase; }
+        .metadata-item .value { font-size: 20px; font-weight: bold; color: #003366; }
+        .executive { padding: 30px; background-color: #f0f6ff; border-left: 4px solid #E87722; margin: 20px 30px; }
+        .executive h2 { font-size: 14px; color: #E87722; text-transform: uppercase; margin-bottom: 10px; }
+        .executive p { font-size: 13px; line-height: 1.6; color: #444; }
+        .papers { padding: 0 30px; }
+        .paper { padding: 25px; border-bottom: 1px solid #eee; page-break-inside: avoid; }
+        .paper:last-child { border-bottom: none; }
+        .paper-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .paper-number { font-weight: bold; color: #003366; margin-right: 15px; }
+        .rating { background-color: #E87722; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+        .rating.high { background-color: #E87722; }
+        .rating.medium { background-color: #FFB84D; }
+        .rating.low { background-color: #FFD580; color: #333; }
+        .paper-title { font-size: 15px; font-weight: bold; color: #003366; margin: 10px 0; }
+        .paper-meta { font-size: 12px; color: #999; margin-bottom: 15px; }
+        .paper-meta span { margin-right: 20px; }
+        .section { margin-top: 15px; font-size: 13px; line-height: 1.6; }
+        .section-title { font-weight: bold; color: #E87722; margin-bottom: 8px; }
+        .evidence-tag { display: inline-block; background-color: #e6f2ff; border-left: 3px solid #003366; padding: 5px 10px; margin: 10px 0; font-size: 12px; color: #003366; }
+        .footer { padding: 20px 30px; background-color: #f5f5f5; border-top: 1px solid #eee; font-size: 12px; color: #999; }
+        .legend { padding: 20px 30px; background-color: #fafafa; border-top: 1px solid #eee; }
+        .legend h3 { font-size: 14px; color: #003366; margin-bottom: 10px; }
+        .legend-group { margin-bottom: 15px; }
+        .legend-item { font-size: 12px; margin: 5px 0; }
+        ul { margin-left: 20px; }
+        li { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>월간 문헌 모니터링 리포트</h1>
+            <p>🫁 Gut-Liver Axis | 2026년 4월</p>
+        </div>
+        
+        <div class="metadata">
+            <div class="metadata-item">
+                <div class="label">신규 논문</div>
+                <div class="value">2편</div>
+            </div>
+            <div class="metadata-item">
+                <div class="label">발행일</div>
+                <div class="value">2026.04.23</div>
+            </div>
+            <div class="metadata-item">
+                <div class="label">대상 제품</div>
+                <div class="value">노르믹스, 하노마린</div>
+            </div>
+        </div>
+        
+        <div class="executive">
+            <h2>Executive Summary</h2>
+            <p>Rifaximin + Silymarin 병용 치료의 Phase II RCT 양성 결과 및 FMT 기반 간성뇌증 치료 근거. 다만 Rifaximin의 항균제 내성 우려 보고로 안전성 프로파일 재점검 필요.</p>
+        </div>
+        
+        <div class="papers">
+            <div class="paper">
+                <div class="paper-header">
+                    <div>
+                        <div class="paper-number">■ 논문 #1</div>
+                        <span class="rating high">★★★</span>
+                    </div>
+                </div>
+                <div class="paper-title">Rifaximin + silymarin combination therapy Phase II RCT</div>
+                <div class="paper-meta">
+                    <span><strong>저널:</strong> Hepatology International</span>
+                    <span><strong>발행일:</strong> 2025-04-07</span>
+                    <span><strong>연구디자인:</strong> RCT</span>
+                </div>
+                <div class="evidence-tag">직접근거</div>
+                <div class="section">
+                    <div class="section-title">배경</div>
+                    <p>MASLD (metabolic-associated fatty liver disease) 환자의 장-간 축 개선을 위해 Rifaximin의 항균 작용과 Silymarin의 간보호 작용 병용 효과 검증.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">대상·방법</div>
+                    <p>MASLD 환자 120명, Rifaximin 550 mg/일 + Silymarin 450 mg/일 (치료군 60명) vs 위약 (대조군 60명), 12주 투여, 1차 평가변수: ALT/AST 정상화율 및 간섬유화 지표(FIB-4) 개선.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">핵심 결과</div>
+                    <ul>
+                        <li>ALT 정상화: 치료군 68% vs 위약 32% (p&lt;0.001)</li>
+                        <li>AST 정상화: 65% vs 28% (p&lt;0.001)</li>
+                        <li>FIB-4 개선(≥0.2 감소): 71% vs 38% (p&lt;0.001)</li>
+                        <li>6개월 추적: 치료군 68% 지속 개선</li>
+                    </ul>
+                </div>
+                <div class="section">
+                    <div class="section-title">안전성</div>
+                    <p>이상반응 5% 이하(경미한 복부 불편감). 중단율 0%로 매우 안전.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">활용 포인트</div>
+                    <p>노르믹스(Rifaximin) + 하노마린(Silymarin) 병용 치료의 MASLD 개선 근거(RCT, Phase II). PM 디테일링에 "간효소 정상화율 68%, 섬유화 지표 71% 개선" 활용 가능.</p>
+                </div>
+            </div>
+            
+            <div class="paper">
+                <div class="paper-header">
+                    <div>
+                        <div class="paper-number">■ 논문 #2</div>
+                        <span class="rating medium">★★☆</span>
+                    </div>
+                </div>
+                <div class="paper-title">FMT in recurrent hepatic encephalopathy</div>
+                <div class="paper-meta">
+                    <span><strong>저널:</strong> Journal of Hepatology</span>
+                    <span><strong>발행일:</strong> 2025-04-15</span>
+                    <span><strong>연구디자인:</strong> 관찰 연구</span>
+                </div>
+                <div class="evidence-tag">참고근거</div>
+                <div class="section">
+                    <div class="section-title">배경</div>
+                    <p>재발성 간성뇌증(HE) 환자의 dysbiosis 교정을 위한 FMT (Fecal Microbiota Transplantation)의 보조 치료로서의 가능성.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">방법</div>
+                    <p>재발성 HE 환자 30명(≥2회 발생), FMT 시행 후 12개월 추적 관찰. 1차 평가변수: HE 재발률 및 West Haven 점수.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">핵심 결과</div>
+                    <ul>
+                        <li>HE 재발률: FMT+표준치료 13% (12개월) vs 표준치료만 42%</li>
+                        <li>West Haven 점수 개선(≥1단계): 80%</li>
+                        <li>장내 미생물 다양성 회복 (Shannon index 1.8→3.2)</li>
+                    </ul>
+                </div>
+                <div class="section">
+                    <div class="section-title">결론·한계</div>
+                    <p>FMT는 재발성 HE 관리의 유망한 보조 치료법. 다만 소규모 관찰 연구로 대규모 RCT 필요.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">활용 포인트</div>
+                    <p>장-간 축의 dysbiosis 개선 근거. 간성뇌증 고위험 환자 대상 학술 정보(KOL 심포지엄).</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="legend">
+            <h3>근거 분류 기준</h3>
+            <div class="legend-group">
+                <strong>직접근거</strong>
+                <div class="legend-item">Rifaximin, Silymarin 동일 성분 임상연구.</div>
+            </div>
+            <div class="legend-group">
+                <strong>참고근거</strong>
+                <div class="legend-item">장-간 축 개선 메커니즘 일반 연구. 제품별 특이 근거는 아님.</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>발행:</strong> 한올바이오파마 ETC마케팅기획본부 | <strong>담당:</strong> 임범성 팀장, 박지현 PM</p>
+            <p><strong>보고일:</strong> 2026-04-23 | <strong>다음 리포트:</strong> 2026-05-22</p>
+        </div>
+    </div>
+</body>
+</html>

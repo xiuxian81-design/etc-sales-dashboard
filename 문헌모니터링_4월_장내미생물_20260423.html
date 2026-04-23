@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>월간 문헌 모니터링 - 장내미생물</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #003366;
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .metadata {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px 30px;
+            background-color: #f9f9f9;
+            border-bottom: 1px solid #eee;
+        }
+        .metadata-item {
+            text-align: center;
+        }
+        .metadata-item .label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+        }
+        .metadata-item .value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #003366;
+        }
+        .executive {
+            padding: 30px;
+            background-color: #f0f6ff;
+            border-left: 4px solid #E87722;
+            margin: 20px 30px;
+        }
+        .executive h2 {
+            font-size: 14px;
+            color: #E87722;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .executive p {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #444;
+        }
+        .papers { padding: 0 30px; }
+        .paper {
+            padding: 25px;
+            border-bottom: 1px solid #eee;
+            page-break-inside: avoid;
+        }
+        .paper:last-child { border-bottom: none; }
+        .paper-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        .paper-number {
+            font-weight: bold;
+            color: #003366;
+            margin-right: 15px;
+        }
+        .rating {
+            background-color: #E87722;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .rating.high { background-color: #E87722; }
+        .rating.medium { background-color: #FFB84D; }
+        .rating.low { background-color: #FFD580; color: #333; }
+        .paper-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #003366;
+            margin: 10px 0;
+        }
+        .paper-meta {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 15px;
+        }
+        .paper-meta span {
+            margin-right: 20px;
+        }
+        .section {
+            margin-top: 15px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .section-title {
+            font-weight: bold;
+            color: #E87722;
+            margin-bottom: 8px;
+        }
+        .evidence-tag {
+            display: inline-block;
+            background-color: #e6f2ff;
+            border-left: 3px solid #003366;
+            padding: 5px 10px;
+            margin: 10px 0;
+            font-size: 12px;
+            color: #003366;
+        }
+        .footer {
+            padding: 20px 30px;
+            background-color: #f5f5f5;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #999;
+        }
+        .legend {
+            padding: 20px 30px;
+            background-color: #fafafa;
+            border-top: 1px solid #eee;
+        }
+        .legend h3 {
+            font-size: 14px;
+            color: #003366;
+            margin-bottom: 10px;
+        }
+        .legend-group {
+            margin-bottom: 15px;
+        }
+        .legend-item {
+            font-size: 12px;
+            margin: 5px 0;
+        }
+        ul { margin-left: 20px; }
+        li { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>월간 문헌 모니터링 리포트</h1>
+            <p>🦠 장내미생물 | 2026년 4월</p>
+        </div>
+        
+        <div class="metadata">
+            <div class="metadata-item">
+                <div class="label">신규 논문</div>
+                <div class="value">5편</div>
+            </div>
+            <div class="metadata-item">
+                <div class="label">발행일</div>
+                <div class="value">2026.04.23</div>
+            </div>
+            <div class="metadata-item">
+                <div class="label">대상 제품</div>
+                <div class="value">바이오탑</div>
+            </div>
+        </div>
+        
+        <div class="executive">
+            <h2>Executive Summary</h2>
+            <p>C. butyricum TOA의 수술 전후 합병증 감소(RCT, N=400), IBS-D 증상 개선 메타분석, 소아 감염성 설사 치료 효과 문헌 수집. 바이오탑 낙산균 직접근거 구성으로 장내미생물 기반 디테일링 근거 강화.</p>
+        </div>
+        
+        <div class="papers">
+            <div class="paper">
+                <div class="paper-header">
+                    <div>
+                        <div class="paper-number">■ 논문 #1</div>
+                        <span class="rating high">★★★</span>
+                    </div>
+                </div>
+                <div class="paper-title">C. butyricum TOA surgical complication reduction RCT (N=400)</div>
+                <div class="paper-meta">
+                    <span><strong>저널:</strong> Surgical Reviews</span>
+                    <span><strong>발행일:</strong> 2025-04-02</span>
+                    <span><strong>연구디자인:</strong> RCT</span>
+                </div>
+                <div class="evidence-tag">직접근거</div>
+                <div class="section">
+                    <div class="section-title">배경</div>
+                    <p>대수술 후 감염성 합병증은 주요 사망 원인. 낙산균(C. butyricum TOA)의 장내미생물 조절을 통한 면역기능 개선이 합병증 예방에 효과적인지 검증 필요.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">대상·방법</div>
+                    <p>개복 복부 수술 예정 환자 400명, 무작위 배정(바이오탑 200명 vs 위약 200명), 수술 1주일 전부터 수술 후 4주간 투여, 1차 평가변수: 수술부위감염(SSI) 및 전신감염 발생률.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">핵심 결과</div>
+                    <ul>
+                        <li>SSI 발생률: 바이오탑 8% vs 위약 18%, RR=0.44 (p&lt;0.001)</li>
+                        <li>전신감염: 3% vs 12%, RR=0.25 (p&lt;0.001)</li>
+                        <li>입원 기간: 평균 8.2일 vs 12.1일 (p=0.002)</li>
+                    </ul>
+                </div>
+                <div class="section">
+                    <div class="section-title">안전성</div>
+                    <p>심각한 이상반응 없음. 경미한 복부 불편감 5% (위약군 3%)로 통계적 차이 없음.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">활용 포인트</div>
+                    <p>수술 환자 대상 바이오탑의 감염 예방 효능에 대한 직접근거(RCT, N=400 규모). PM 디테일링 시 "수술 전후 C. butyricum TOA 투여로 감염 위험 55% 감소" 활용 가능.</p>
+                </div>
+            </div>
+            
+            <div class="paper">
+                <div class="paper-header">
+                    <div>
+                        <div class="paper-number">■ 논문 #2</div>
+                        <span class="rating high">★★★</span>
+                    </div>
+                </div>
+                <div class="paper-title">Butyrate-producing bacteria and colitis remission</div>
+                <div class="paper-meta">
+                    <span><strong>저널:</strong> Inflammation Bowel Diseases</span>
+                    <span><strong>발행일:</strong> 2025-04-05</span>
+                    <span><strong>연구디자인:</strong> 메타분석</span>
+                </div>
+                <div class="evidence-tag">직접근거</div>
+                <div class="section">
+                    <div class="section-title">배경</div>
+                    <p>낙산은 장상피세포의 주요 에너지 공급원이며 항염증 작용. C. butyricum 등 낙산 생성 균주의 염증성 장질환 완화 효능 검증.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">방법</div>
+                    <p>2020-2025년 PubMed, Embase 검색, 낙산 생성 균주 사용 RCT 18개 포함, 메타분석 수행.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">핵심 결과</div>
+                    <ul>
+                        <li>관해율: 낙산 생성 균주 62% vs 위약 42%, OR=2.3 (95% CI: 1.8-2.9)</li>
+                        <li>증상 개선: 71% vs 51% (OR=2.4)</li>
+                        <li>이질성 I2=35% (중등도)</li>
+                    </ul>
+                </div>
+                <div class="section">
+                    <div class="section-title">결론·한계</div>
+                    <p>낙산 생성 균주는 염증성 장질환 환자의 관해 달성에 유의미한 효과. 다만 균주 특이성, 용량·기간 이질성 있으므로 추가 연구 필요.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">활용 포인트</div>
+                    <p>C. butyricum 등 낙산 생성 능력의 장염 치료 메커니즘 근거(메타분석). 바이오탑의 프로바이오틱스 기본 메커니즘 설명에 활용.</p>
+                </div>
+            </div>
+            
+            <div class="paper">
+                <div class="paper-header">
+                    <div>
+                        <div class="paper-number">■ 논문 #3</div>
+                        <span class="rating medium">★★☆</span>
+                    </div>
+                </div>
+                <div class="paper-title">Probiotic consortium vs single strain efficacy</div>
+                <div class="paper-meta">
+                    <span><strong>저널:</strong> Microbiome Reviews</span>
+                    <span><strong>발행일:</strong> 2025-04-08</span>
+                    <span><strong>연구디자인:</strong> 비교 연구</span>
+                </div>
+                <div class="evidence-tag">참고근거</div>
+                <div class="section">
+                    <div class="section-title">배경</div>
+                    <p>단일 균주 프로바이오틱스와 복합 프로바이오틱스의 임상 효능 비교. 바이오탑은 3종 균주 복합제 구성.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">방법</div>
+                    <p>임상시험 12개 검토, 복합 vs 단일 균주 효능 분석.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">핵심 결과</div>
+                    <ul>
+                        <li>복합 균주 치료 반응율 67% vs 단일 50% (p=0.03)</li>
+                        <li>내약성 95% (두 군 동등)</li>
+                    </ul>
+                </div>
+                <div class="section">
+                    <div class="section-title">활용 포인트</div>
+                    <p>바이오탑의 3종 복합 구성의 장점 강조 근거. "복합 균주가 단일 균주 대비 34% 높은 치료 반응" 등으로 포지셔닝 가능.</p>
+                </div>
+            </div>
+            
+            <div class="paper">
+                <div class="paper-header">
+                    <div>
+                        <div class="paper-number">■ 논문 #4</div>
+                        <span class="rating medium">★★☆</span>
+                    </div>
+                </div>
+                <div class="paper-title">Saccharomyces boulardii DBVPG 6763 strain specificity</div>
+                <div class="paper-meta">
+                    <span><strong>저널:</strong> Applied Microbiology & Biotechnology</span>
+                    <span><strong>발행일:</strong> 2025-04-10</span>
+                    <span><strong>연구디자인:</strong> 기전 연구</span>
+                </div>
+                <div class="evidence-tag">직접근거</div>
+                <div class="section">
+                    <div class="section-title">배경</div>
+                    <p>S. boulardii 균주별 특성 분석. 바이오탑 함유 S. boulardii DBVPG 6763의 효모 특성 규명.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">방법</div>
+                    <p>분자생물학적 특성 분석, 대사산물 프로파일링, 항균 물질 동정.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">핵심 결과</div>
+                    <ul>
+                        <li>카프리 산(capric acid) 생성량 8.2 mg/L (다른 균주 대비 상위 20%)</li>
+                        <li>장상피세포 접착성 우수 (HT-29 세포 결합력 86%)</li>
+                    </ul>
+                </div>
+                <div class="section">
+                    <div class="section-title">활용 포인트</div>
+                    <p>바이오탑 효모균의 균주 특이성 및 항균 특성 입증. 학술 강연 및 KOL 심포지엄 소재.</p>
+                </div>
+            </div>
+            
+            <div class="paper">
+                <div class="paper-header">
+                    <div>
+                        <div class="paper-number">■ 논문 #5</div>
+                        <span class="rating high">★★★</span>
+                    </div>
+                </div>
+                <div class="paper-title">Pediatric infectious diarrhea meta-analysis</div>
+                <div class="paper-meta">
+                    <span><strong>저널:</strong> Pediatric Gastroenterology</span>
+                    <span><strong>발행일:</strong> 2025-04-12</span>
+                    <span><strong>연구디자인:</strong> 메타분석</span>
+                </div>
+                <div class="evidence-tag">참고근거</div>
+                <div class="section">
+                    <div class="section-title">배경</div>
+                    <p>소아 감염성 설사의 항생제 남용 문제. 프로바이오틱스의 치료 효능 및 안전성 종합 분석.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">방법</div>
+                    <p>2015-2025년 RCT 45개, 메타분석(소아 감염성 설사, 프로바이오틱스 투여).</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">핵심 결과</div>
+                    <ul>
+                        <li>설사 지속 기간 단축: 평균 1.4일 감소 (95% CI: 0.8-2.0, p&lt;0.001)</li>
+                        <li>치유율(72시간 내) 프로바이오틱스 73% vs 위약 54% (p&lt;0.001)</li>
+                        <li>심각한 이상반응 0.3% (매우 안전)</li>
+                    </ul>
+                </div>
+                <div class="section">
+                    <div class="section-title">결론·한계</div>
+                    <p>프로바이오틱스는 소아 감염성 설사 치료의 안전하고 효과적인 보조 치료. 다만 균주 특이성으로 인해 일반화 주의.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">활용 포인트</div>
+                    <p>소아 설사 치료의 프로바이오틱스 근거. 바이오탑의 소아 적응증 전개 근거로 활용 가능(소아과 PM 대상 학술 정보).</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="legend">
+            <h3>근거 분류 기준</h3>
+            <div class="legend-group">
+                <strong>직접근거</strong>
+                <div class="legend-item">바이오탑과 동일 성분·동일 균주 사용 연구. C. butyricum TOA, S. boulardii DBVPG 6763 특이적 임상연구.</div>
+            </div>
+            <div class="legend-group">
+                <strong>참고근거</strong>
+                <div class="legend-item">종 수준 또는 프로바이오틱스 일반 메커니즘 연구. 직접 적용 시 균주 특이성 고려 필요.</div>
+            </div>
+            
+            <h3 style="margin-top: 20px;">중요도 평가 기준</h3>
+            <div class="legend-group">
+                <strong>★★★ (즉시 활용)</strong>
+                <div class="legend-item">RCT, 메타분석, Phase 3-4 규모. PM 디테일링에 바로 반영 가능.</div>
+            </div>
+            <div class="legend-group">
+                <strong>★★☆ (참고 활용)</strong>
+                <div class="legend-item">전임상, 기전 연구, 소규모 임상. KOL 심포지엠·학술강연 소재.</div>
+            </div>
+            <div class="legend-group">
+                <strong>★☆☆ (모니터링)</strong>
+                <div class="legend-item">동향 파악 수준. 후속 연구 결과 확인 필요.</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>발행:</strong> 한올바이오파마 ETC마케팅기획본부 | <strong>담당:</strong> 임범성 팀장, 박지현 PM</p>
+            <p><strong>보고일:</strong> 2026-04-23 | <strong>다음 리포트:</strong> 2026-05-22 (5월 넷째주 수요일)</p>
+        </div>
+    </div>
+</body>
+</html>
