@@ -328,8 +328,6 @@ main { max-width: 960px; margin: 28px auto; padding: 0 16px; }
 .btn-bd.done    { background: #fff3e0; color: var(--orange); cursor: default; }
 .btn-bd.loading { opacity: .6; cursor: wait; }
 .btn-drive { background: #e8f4fd; color: var(--blue); border: 1px solid var(--blue); }
-.btn-report { background: #eef0f7; color: var(--navy); border: 1px solid var(--navy); }
-.btn-report:hover { background: #d0d6ed; }
 
 /* ─── 에러 알림 ─── */
 .toast {
@@ -453,19 +451,13 @@ const SESSIONS = [
 ──────────────────────────────────────────────────── */
 const REPORT_URLS = {
   '2026년 4월': {
-    '장내미생물':      '문헌모니터링_1주차_장내미생물_2026-04-06.html',
-    '골대사·신경':     '문헌모니터링_2주차_골대사신경_2026-04-13.html',
-    '탈모치료':        '문헌모니터링_3주차_탈모치료_2026-04-20.html',
-    '비뇨기·종양·CPP': '문헌모니터링_4주차_비뇨기종양_2026-04-27.html',
-    'Gut-Liver Axis':  '문헌모니터링_5주차_GutLiverAxis_2026-05-04.html',
+    '장내미생물': 'reports/2026-04/문헌모니터링_1주차_장내미생물_2026-04-06.html',
+    'Gut-Liver Axis': 'reports/2026-04/문헌모니터링_5주차_GutLiverAxis_2026-05-04.html',
+    '탈모치료': 'reports/2026-04/문헌모니터링_3주차_탈모치료_2026-04-20.html',
+    '비뇨기·종양·CPP': 'reports/2026-04/문헌모니터링_4주차_비뇨기종양_2026-04-27.html',
+    '골대사·신경': 'reports/2026-04/문헌모니터링_2주차_골대사신경_2026-04-13.html',
   },
-  '2026년 4월 통합': {
-    '장내미생물':      '문헌모니터링_4월_장내미생물_20260423.html',
-    '골대사·신경':     '문헌모니터링_4월_골대사신경_20260423.html',
-    '탈모치료':        '문헌모니터링_4월_탈모치료_20260423.html',
-    '비뇨기·종양·CPP': '문헌모니터링_4월_비뇨기종양CPP_20260423.html',
-    'Gut-Liver Axis':  '문헌모니터링_4월_Gut-Liver_Axis_20260423.html',
-  }
+
   /* 다음 달 추가 예시:
   '2026년 5월': {
     '장내미생물': '문헌모니터링_..._2026-05-??.html',
@@ -713,11 +705,17 @@ function renderSession() {
   document.getElementById('totalBadge').textContent = `총 ${total}편`;
 
   // 세션 요약 카드
+  const reportUrl  = getReportUrl(session.key, activeMonth);
+  const reportLink = reportUrl
+    ? `<a class="session-report-link" href="${reportUrl}" target="_blank">📋 상세 리포트 보기 ↗</a>`
+    : '';
+
   let html = `
     <div class="session-summary">
       <div>
         <div class="session-title">${session.label}</div>
         <div class="session-pm">담당 PM : ${session.pm}</div>
+        ${reportLink}
       </div>
       <div class="session-stats">
         <div class="stat-box stat-new">
@@ -781,12 +779,6 @@ function renderCard(p, idx) {
   const urlBtn = p.url
     ? `<a class="btn btn-outline" href="${p.url}" target="_blank">📄 논문 보기 ↗</a>` : '';
 
-  // 상세 리포트 버튼 (해당 논문으로 포커스 이동)
-  const paperReportUrl = getReportUrl(p.session, p.month || activeMonth);
-  const titleHash = p.title ? encodeURIComponent(p.title.slice(0, 30)) : '';
-  const reportBtn = paperReportUrl && titleHash
-    ? `<a class="btn btn-report" href="${paperReportUrl}#${titleHash}" target="_blank">📋 상세 리포트 ↗</a>` : '';
-
   // 5-파트 구조화 요약 파싱
   const summaryHtml = p.summary ? parseSummaryHtml(p.summary) : '';
 
@@ -817,7 +809,6 @@ function renderCard(p, idx) {
       <div class="paper-actions">
         ${urlBtn}
         ${bdBtn}
-        ${reportBtn}
       </div>
     </div>
   </div>`;
