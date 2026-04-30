@@ -579,8 +579,8 @@ document.getElementById('kpiRow').innerHTML=`
     <div class="change">전년 ${fmt(a25,0)}억 대비 +${((aS/a25-1)*100).toFixed(1)}%</div></div>
   <div class="kpi ${D.total_forecast.fc_avg/aS>=0.9?'green':'yellow'}"><div class="label">예측 평균 (3가지)</div><div class="value">${fmt(D.total_forecast.fc_avg,1)}</div><div class="unit">억원</div>
     <div class="change">SF대비 ${(D.total_forecast.fc_avg/aS*100).toFixed(1)}%</div></div>
-  <div class="kpi ${D.total.act_26[2]>=D.total.act_26[1]?'':'red'}"><div class="label">3월 매출</div><div class="value">${fmt(D.total.act_26[2],1)}</div><div class="unit">억원</div>
-    <div class="change ${D.total.act_26[2]>=D.total.act_26[1]?'up':'down'}">전월 ${((D.total.act_26[2]/D.total.act_26[1]-1)*100).toFixed(1)}%</div></div>`;
+  <div class="kpi ${D.total.act_26[TARGET_MONTH_IDX-1]>=D.total.act_26[TARGET_MONTH_IDX-2]?'':'red'}"><div class="label">${TARGET_MONTH_IDX}월 매출</div><div class="value">${fmt(D.total.act_26[TARGET_MONTH_IDX-1],1)}</div><div class="unit">억원</div>
+    <div class="change ${D.total.act_26[TARGET_MONTH_IDX-1]>=D.total.act_26[TARGET_MONTH_IDX-2]?'up':'down'}">전월 ${((D.total.act_26[TARGET_MONTH_IDX-1]/D.total.act_26[TARGET_MONTH_IDX-2]-1)*100).toFixed(1)}%</div></div>`;
 }
 renderKPI();
 window.renderKPI = renderKPI;
@@ -608,7 +608,7 @@ const C={blue:'#2b6cb0',lb:'#90cdf4',red:'#e53e3e',green:'#38a169',orange:'#dd6b
 new Chart(document.getElementById('chartMonthly'),{type:'line',data:{labels:['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],datasets:[
   {label:'24년',data:D.total.act_24,borderColor:C.gray,borderDash:[5,5],pointRadius:2,tension:.3},
   {label:'25년',data:D.total.act_25,borderColor:C.lb,pointRadius:3,tension:.3},
-  {label:'26년실적',data:D.total.act_26.map((v,i)=>i<3?v:null),borderColor:C.blue,borderWidth:3,pointRadius:5,tension:.3},
+  {label:'26년실적',data:D.total.act_26.map((v,i)=>i<TARGET_MONTH_IDX?v:null),borderColor:C.blue,borderWidth:3,pointRadius:5,tension:.3},
   {label:'26년SF',data:D.total.sf_26,borderColor:C.orange,borderDash:[3,3],pointRadius:2,tension:.3}
 ]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},scales:{y:{title:{display:true,text:'억원'},beginAtZero:false}}}});
 
@@ -864,7 +864,7 @@ function drawPT(name){
   else{const p=D.products.find(x=>x.name===name);ds=[
     {label:'24년',data:p.monthly_24,borderColor:C.gray,borderDash:[5,5],pointRadius:2,tension:.3},
     {label:'25년',data:p.monthly_25,borderColor:C.lb,pointRadius:3,tension:.3},
-    {label:'26년',data:p.monthly_26.map((v,i)=>i<3?v:null),borderColor:C.blue,borderWidth:3,pointRadius:5,tension:.3},
+    {label:'26년',data:p.monthly_26.map((v,i)=>i<TARGET_MONTH_IDX?v:null),borderColor:C.blue,borderWidth:3,pointRadius:5,tension:.3},
     {label:'26년SF',data:p.sf_monthly,borderColor:C.orange,borderDash:[3,3],pointRadius:2,tension:.3}];}
   if(prodChart)prodChart.destroy();
   prodChart=new Chart(document.getElementById('chartProdTrend'),{type:'line',data:{labels:ms,datasets:ds},options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{title:{display:true,text:'억원'}}}}});
@@ -1706,7 +1706,7 @@ window.renderAllTable = function(){
   new Chart(document.getElementById('chartSeasonalForecast'),{
     type:'bar',
     data:{labels:MONTHS, datasets:[
-      {label:'26년 실적', data:D.total.act_26.map((v,i)=>i<3?v:null), backgroundColor:C.blue, order:2},
+      {label:'26년 실적', data:D.total.act_26.map((v,i)=>i<TARGET_MONTH_IDX?v:null), backgroundColor:C.blue, order:2},
       {label:'26년 계절성 예상', data:S.monthForecast.map((v,i)=>i>=3?v:null), backgroundColor:C.green+'99', order:2},
       {label:'26년 SF목표', data:D.total.sf_26, type:'line', borderColor:C.orange, borderDash:[5,5], pointRadius:3, borderWidth:2, order:1},
       {label:'25년 실적', data:D.total.act_25, type:'line', borderColor:C.lb, pointRadius:2, borderWidth:1.5, order:3}
