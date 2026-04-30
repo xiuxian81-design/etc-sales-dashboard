@@ -199,8 +199,45 @@ tr:hover{background:#f7fafc;}
   </div>
 
   <div class="panel active" id="panel-overview">
-    <!-- ★★ 신규: 3개년 월별 매출 트렌드 표 ★★ -->
+
+    <!-- ============================================================ -->
+    <!-- ★★★ 2026-04-30 v3 신규: 본부장 의사결정 핵심 섹션 ★★★ -->
+    <!-- 21품목(주력6+전략9+신제품6) 기준 액션포인트·Top5/Bottom5 -->
+    <!-- ============================================================ -->
     <div class="section" style="margin-top:0;">
+      <div class="card" style="background:linear-gradient(135deg,#fef5e7 0%,#fffbf0 100%);border:2px solid #ed8936;">
+        <h3 style="color:#7b341e;display:flex;align-items:center;gap:8px;">
+          <span style="font-size:18px;">🎯</span> 액션포인트 — 자동 추출 (주력+전략+신제품 21품목)
+          <span id="actionTotalCount" style="margin-left:auto;font-size:11px;color:#9c4221;font-weight:600;background:#fed7aa;padding:3px 10px;border-radius:12px;">총 0건</span>
+        </h3>
+        <p style="font-size:11px;color:#9c4221;margin-bottom:14px;">
+          🔴 달성률 50%↓ · 🟡 YoY 마이너스 + 매출 1억↑ · 🔵 MoM ±30% 이상 · ⚫ 디마케팅 제외
+        </p>
+        <div id="actionPointsContainer" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="grid-2" style="gap:16px;">
+        <div class="card" style="background:linear-gradient(135deg,#f0fff4 0%,#f7fafc 100%);border:2px solid #38a169;">
+          <h3 style="color:#22543d;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:18px;">🏆</span> 잘되는 것 — Top5 (21품목 중)
+          </h3>
+          <p style="font-size:11px;color:#276749;margin-bottom:10px;">YTD 달성률 / YTD YoY 성장률 기준 상위 5</p>
+          <div id="topPerformersContainer"></div>
+        </div>
+        <div class="card" style="background:linear-gradient(135deg,#fff5f5 0%,#f7fafc 100%);border:2px solid #e53e3e;">
+          <h3 style="color:#742a2a;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:18px;">⚠️</span> 안되는 것 — Bottom5 (21품목 중)
+          </h3>
+          <p style="font-size:11px;color:#9b2c2c;margin-bottom:10px;">YTD 달성률 / YTD YoY 부진 하위 5</p>
+          <div id="bottomPerformersContainer"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ★★ 신규: 3개년 월별 매출 트렌드 표 ★★ -->
+    <div class="section">
       <div class="card">
         <h3>3개년 월별 매출 트렌드 <span style="font-size:11px;color:var(--muted);font-weight:400;">(단위: 억원)</span></h3>
         <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">각 연도 월평균 이하 월은 <span style="color:#e53e3e;font-weight:700;">붉은색</span>, 최고월은 <span style="color:#2b6cb0;font-weight:700;">파란색</span>. 4월은 현재 예측 타깃으로 외곽 강조.</p>
@@ -295,6 +332,24 @@ tr:hover{background:#f7fafc;}
   </div>
 
   <div class="panel" id="panel-forecast">
+
+    <!-- ★★★ 2026-04-30 v3 신규: PM별 전품목 예측 별도 화면 진입 ★★★ -->
+    <div class="card" style="background:linear-gradient(135deg,#faf5ff 0%,#fef5e7 100%);border:2px solid #9f7aea;padding:20px 24px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;">
+      <div style="flex:1;min-width:280px;">
+        <div style="font-size:14px;font-weight:800;color:#44337a;margin-bottom:6px;">📋 PM별 전품목 예측 · 신뢰도 분석</div>
+        <div style="font-size:12px;color:#553c9a;line-height:1.5;">
+          전품목 <b>126개</b>에 대한 PM별 카드, 익월 예측 디테일, <b>과거 적중률 기반 신뢰도</b>를 별도 화면에서 자세히 확인하실 수 있습니다.<br>
+          <span style="font-size:11px;color:#805ad5;">현재 화면(매출 예측 탭)은 본부 의사결정용 핵심 KPI/요약만 표시합니다.</span>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <a href="pm-forecast.html" target="_blank" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#805ad5,#6b46c1);color:white;text-decoration:none;border-radius:8px;font-weight:700;font-size:13px;box-shadow:0 4px 12px rgba(107,70,193,0.3);transition:transform 0.15s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          PM 예측 화면 열기 →
+        </a>
+        <div style="font-size:10px;color:#805ad5;margin-top:6px;">신규 탭에서 열림</div>
+      </div>
+    </div>
+
     <div style="background:#faf5ff;border:1px solid #d6bcfa;padding:8px 12px;border-radius:6px;margin-bottom:12px;font-size:11px;color:#553c9a;">
       📡 <b>PM예측 LIVE 연동:</b> <a href="https://docs.google.com/spreadsheets/d/1LYuUQrUrtFLfUCjpUgoVNtEqIyTv-0l_-F6nSY4ESF0/edit#gid=1589134561" target="_blank" style="color:#6b46c1;text-decoration:underline;">「2026 마감예측」</a> 시트 Col 79 (26.4월 1차) · 품목명 매칭 · 연말전망 = Q1실적 + 4월PM + 5~12월 목표 합산
       <span id="pmfpStatus" style="margin-left:8px;color:#6b46c1;font-weight:600;">로딩 대기…</span>
@@ -549,10 +604,58 @@ function detectTargetMonthIdx(){
     return lastClosed + 1;                  // 마감 다음월
   } catch(e) { return 3; }
 }
-let TARGET_MONTH_IDX = detectTargetMonthIdx();   // 0-idx (0=1월)
-let TARGET_MONTH_NUM = TARGET_MONTH_IDX + 1;     // 1-idx (1=1월)
+let TARGET_MONTH_IDX = detectTargetMonthIdx();   // ★예측 대상월★ 0-idx (0=1월) — 4월 마감 후=4 (5월)
+let TARGET_MONTH_NUM = TARGET_MONTH_IDX + 1;     // 예측 대상월 1-idx — 4월 마감 후=5
 window.__TARGET_MONTH_IDX = TARGET_MONTH_IDX;
 window.__TARGET_MONTH_NUM = TARGET_MONTH_NUM;
+// ★★★ 2026-04-30 v3 신규: "마감 완료월" 변수 분리 (KPI/액션포인트/Top5에서 사용) ★★★
+// 4월 마감 후: CLOSED_MONTH_IDX=3, CLOSED_MONTH_NUM=4
+let CLOSED_MONTH_IDX = Math.max(0, TARGET_MONTH_IDX - 1);
+let CLOSED_MONTH_NUM = CLOSED_MONTH_IDX + 1;
+window.__CLOSED_MONTH_IDX = CLOSED_MONTH_IDX;
+window.__CLOSED_MONTH_NUM = CLOSED_MONTH_NUM;
+
+// ============================================================================
+// ★ YTD 누적 재계산 (2026-04-30 v3 재구조화)
+// 기존 q1_xx 필드명은 유지하되 의미를 "1~T월 누적 (YTD)"로 재정의.
+// SAP 마감월(T)이 바뀌면 D.products / D.all_products / D.total의 모든 derived 값이 자동 갱신.
+// 결과: 1~12월 어느 마감이든 코드 수정 0회로 동작.
+// ============================================================================
+function recalcAllYTD(){
+  const T = CLOSED_MONTH_NUM; // 마감 완료월 1~12 (4월 마감 후 = 4)
+  const sumT = (arr) => (arr || []).slice(0, T).reduce((a,v)=>a+(+v||0), 0);
+  // D.total
+  if (D && D.total) {
+    D.total.q1_26 = +sumT(D.total.act_26 || []).toFixed(2);
+    D.total.q1_sf = +sumT(D.total.sf_26 || []).toFixed(2);
+  }
+  function recompP(p){
+    if(!p) return;
+    const m26 = p.monthly_26 || [];
+    const m25 = p.monthly_25 || [];
+    const sm  = p.sf_monthly || [];
+    p.jan = +(m26[0]||0).toFixed(2);
+    p.feb = +(m26[1]||0).toFixed(2);
+    p.mar = +(m26[2]||0).toFixed(2);
+    p.q1_26 = +sumT(m26).toFixed(2);
+    p.q1_25 = +sumT(m25).toFixed(2);
+    p.q1_sf = +sumT(sm).toFixed(2);
+    p.q1_yoy = p.q1_25 > 0.01 ? +(((p.q1_26/p.q1_25)-1)*100).toFixed(1) : null;
+    p.q1_ach = (p.q1_sf > 0.01) ? +((p.q1_26/p.q1_sf)*100).toFixed(1) : null;
+    p.q1_diff = +(p.q1_26 - p.q1_25).toFixed(2);
+    // T월 MoM (mar_mom 필드명 유지하되 "T월 vs T-1월"로 의미 변경)
+    if (T >= 2) {
+      const cur = +(m26[T-1]||0);
+      const prev = +(m26[T-2]||0);
+      p.mar_mom = prev > 0.01 ? +(((cur/prev)-1)*100).toFixed(1) : null;
+      p._tCur = cur; p._tPrev = prev;
+    } else { p.mar_mom = null; }
+  }
+  if (D && D.products) D.products.forEach(recompP);
+  if (D && D.all_products) D.all_products.forEach(recompP);
+}
+recalcAllYTD();
+window.__recalcAllYTD = recalcAllYTD;
 
 // =================== B-⑨ PM ↔ 품목 매핑 (CLAUDE.md 기준) ===================
 // fcRenderRows/renderFcSummary 이전에 반드시 선언되어야 함 (TDZ 방지)
@@ -619,7 +722,11 @@ const tagA=(v)=>{
   if(v>=90)return`<span class="tag tag-yellow">${v.toFixed(1)}%</span>`;
   return`<span class="tag tag-red">${v.toFixed(1)}%</span>`;
 };
-const sum3=(a)=>a[0]+a[1]+a[2];
+// sum3는 이름은 유지하되 1~T월 누적합 (YTD)으로 재정의 — CLOSED_MONTH_NUM 기반 동적 (마감 완료월)
+const sum3=(a)=>(a||[]).slice(0, CLOSED_MONTH_NUM).reduce((s,v)=>s+(+v||0), 0);
+const sumYTD=sum3;  // 별칭 (가독성용)
+// 분기(Q1 본래 의미) 합산이 정말 필요한 곳에서는 sumQ1 사용
+const sumQ1=(a)=>((+a?.[0]||0)+(+a?.[1]||0)+(+a?.[2]||0));
 
 // ★ 계절성 지수 선계산 (헤더/KPI에서 사용) — 24년 40% + 25년 60% 가중평균
 // === B-④ v2: 명명함수화 (hot-reload 가능) ===
@@ -654,22 +761,44 @@ function renderSeasonal(){
 renderSeasonal();
 window.renderSeasonal = renderSeasonal;
 
-// KPIs
+// KPIs (2026-04-30 v3 재구조화 — YTD 누적 기준 4박스 + 21품목 핵심 박스)
 function renderKPI(){
-const q1A=D.total.q1_26,q1S=D.total.q1_sf,aS=D.total.ann_sf,a25=D.total.ann_25;
-const q1Ach=(q1A/q1S*100).toFixed(1);
-const q1Y25=sum3(D.total.act_25);
-document.getElementById('kpiRow').innerHTML=`
-  <div class="kpi"><div class="label">Q1 매출 실적</div><div class="value">${fmt(q1A,1)}</div><div class="unit">억원</div>
-    <div class="change up">전년동기 +${((q1A/q1Y25-1)*100).toFixed(1)}%</div></div>
-  <div class="kpi ${parseFloat(q1Ach)>=95?'green':parseFloat(q1Ach)>=85?'yellow':'red'}"><div class="label">Q1 목표 달성율</div><div class="value">${q1Ach}<span style="font-size:14px">%</span></div>
-    <div class="change">${fmt(q1A,1)} / ${fmt(q1S,1)}</div></div>
-  <div class="kpi"><div class="label">연간 SF 목표</div><div class="value">${fmt(aS,0)}</div><div class="unit">억원</div>
-    <div class="change">전년 ${fmt(a25,0)}억 대비 +${((aS/a25-1)*100).toFixed(1)}%</div></div>
-  <div class="kpi ${D.total_forecast.fc_avg/aS>=0.9?'green':'yellow'}"><div class="label">예측 평균 (3가지)</div><div class="value">${fmt(D.total_forecast.fc_avg,1)}</div><div class="unit">억원</div>
-    <div class="change">SF대비 ${(D.total_forecast.fc_avg/aS*100).toFixed(1)}%</div></div>
-  <div class="kpi ${D.total.act_26[TARGET_MONTH_IDX-1]>=D.total.act_26[TARGET_MONTH_IDX-2]?'':'red'}"><div class="label">${TARGET_MONTH_IDX}월 매출</div><div class="value">${fmt(D.total.act_26[TARGET_MONTH_IDX-1],1)}</div><div class="unit">억원</div>
-    <div class="change ${D.total.act_26[TARGET_MONTH_IDX-1]>=D.total.act_26[TARGET_MONTH_IDX-2]?'up':'down'}">전월 ${((D.total.act_26[TARGET_MONTH_IDX-1]/D.total.act_26[TARGET_MONTH_IDX-2]-1)*100).toFixed(1)}%</div></div>`;
+  const T = CLOSED_MONTH_NUM;       // 마감 완료월 (4월 마감 후 = 4)
+  const Tnext = TARGET_MONTH_NUM;   // 예측 대상월 (4월 마감 후 = 5)
+  // YTD = 1~T월 누적 (recalcAllYTD가 이미 q1_26을 YTD로 갱신함)
+  const ytdA = D.total.q1_26;
+  const ytdS = D.total.q1_sf;
+  const aS = D.total.ann_sf, a25 = D.total.ann_25;
+  const ytdY25 = (D.total.act_25||[]).slice(0, T).reduce((s,v)=>s+(+v||0),0);
+  const ytdAch = ytdS>0 ? (ytdA/ytdS*100) : 0;
+  const ytdYoY = ytdY25>0 ? ((ytdA/ytdY25-1)*100) : 0;
+  // T월 마감 = act_26[T-1]
+  const tCur = +(D.total.act_26?.[T-1]||0);
+  const tPrev = T>=2 ? +(D.total.act_26?.[T-2]||0) : 0;
+  const tMoM = tPrev>0 ? ((tCur/tPrev-1)*100) : null;
+  const t25 = +(D.total.act_25?.[T-1]||0);
+  const tYoY = t25>0 ? ((tCur/t25-1)*100) : null;
+  // T+1월 예측 (있으면)
+  const fcAvg = D.total_forecast?.fc_avg || 0;
+  const fcAch = aS>0 ? (fcAvg/aS*100) : 0;
+  // 주력+전략+신제품 21품목 (D.products 기준 - 인라인 D는 주력 6 + 전략 9 + 신제품 6 = 21로 구성)
+  const coreYTD = (D.products||[]).reduce((s,p)=>s+(p.q1_26||0), 0);
+  const coreShare = ytdA>0 ? (coreYTD/ytdA*100) : 0;
+  // 색상 등급
+  const achColor = ytdAch>=98?'green': ytdAch>=92?'yellow':'red';
+  const fcColor  = fcAch>=98?'green':  fcAch>=92?'yellow':'red';
+  const momColor = (tMoM==null||tMoM>=0) ? 'up':'down';
+  const yoyColor = ytdYoY>=10?'#22543d':ytdYoY>=0?'#2c5282':'#c53030';
+  const yoyArrow = ytdYoY>=0?'▲':'▼';
+  document.getElementById('kpiRow').innerHTML=`
+  <div class="kpi"><div class="label">YTD 실적 (1~${T}월)</div><div class="value">${fmt(ytdA,1)}</div><div class="unit">억원</div>
+    <div class="change" style="color:${yoyColor};font-weight:700">${yoyArrow} 전년동기 ${ytdYoY>=0?'+':''}${ytdYoY.toFixed(1)}% (${fmt(ytdY25,1)}억)</div></div>
+  <div class="kpi ${achColor}"><div class="label">YTD 목표 달성률</div><div class="value">${ytdAch.toFixed(1)}<span style="font-size:14px">%</span></div>
+    <div class="change">${fmt(ytdA,1)} / ${fmt(ytdS,1)} 억 (목표대비 ${ytdAch>=100?'+':''}${(ytdAch-100).toFixed(1)}%p)</div></div>
+  <div class="kpi"><div class="label">${T}월 마감</div><div class="value">${fmt(tCur,1)}</div><div class="unit">억원</div>
+    <div class="change ${momColor}">전월 ${tMoM==null?'-':(tMoM>=0?'+':'')+tMoM.toFixed(1)+'%'} · 전년동월 ${tYoY==null?'-':(tYoY>=0?'+':'')+tYoY.toFixed(1)+'%'}</div></div>
+  <div class="kpi ${fcColor}"><div class="label">연간 착지 전망 (3-method 평균)</div><div class="value">${fmt(fcAvg,0)}</div><div class="unit">억원</div>
+    <div class="change">SF ${fmt(aS,0)}억 대비 ${fcAch.toFixed(1)}% · 주력21 ${fmt(coreYTD,0)}억(${coreShare.toFixed(0)}%)</div></div>`;
 }
 renderKPI();
 window.renderKPI = renderKPI;
@@ -701,23 +830,35 @@ new Chart(document.getElementById('chartMonthly'),{type:'line',data:{labels:['1�
   {label:'26년SF',data:D.total.sf_26,borderColor:C.orange,borderDash:[3,3],pointRadius:2,tension:.3}
 ]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},scales:{y:{title:{display:true,text:'억원'},beginAtZero:false}}}});
 
-// === FIX 2: 목표대비 매출 + 달성율 표시 ===
-const achRates = D.total.act_26.slice(0,3).map((v,i)=>(v/D.total.sf_26[i]*100));
-new Chart(document.getElementById('chartVsSF'),{type:'bar',data:{labels:['1월','2월','3월'],datasets:[
-  {label:'실적',data:D.total.act_26.slice(0,3),backgroundColor:C.blue,order:2},
-  {label:'SF목표',data:D.total.sf_26.slice(0,3),backgroundColor:C.orange+'40',borderColor:C.orange,borderWidth:2,order:2},
-  {label:'달성율(%)',data:achRates,type:'line',borderColor:'#805ad5',backgroundColor:'#805ad540',pointRadius:6,pointStyle:'rectRot',borderWidth:2.5,yAxisID:'y2',order:1}
-]},options:{responsive:true,plugins:{legend:{position:'bottom'},
-  tooltip:{callbacks:{label:function(ctx){
-    if(ctx.dataset.yAxisID==='y2') return '달성율: '+ctx.parsed.y.toFixed(1)+'%';
-    return ctx.dataset.label+': '+ctx.parsed.y.toFixed(1)+'억원';
-  }}}},
-  scales:{
-    y:{title:{display:true,text:'억원'},beginAtZero:false,min:90,position:'left'},
-    y2:{title:{display:true,text:'달성율(%)'},position:'right',min:85,max:110,grid:{drawOnChartArea:false},
-      ticks:{callback:v=>v+'%'}}
-  }
-}});
+// === 목표대비 매출 + 달성율 (1~T월 동적, 2026-04-30 v3) ===
+(function(){
+  const T = CLOSED_MONTH_NUM;  // 마감 완료월 (4월 마감 후 = 4)
+  const monthLabelsAll = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  const lbls = monthLabelsAll.slice(0, T);
+  const actSlice = (D.total.act_26||[]).slice(0, T);
+  const sfSlice  = (D.total.sf_26||[]).slice(0, T);
+  const achRates = actSlice.map((v,i)=> sfSlice[i]>0 ? (v/sfSlice[i]*100) : 0);
+  // y축 min/max 동적 산출 (외부 데이터 변동 대응)
+  const allVals = actSlice.concat(sfSlice).filter(v=>v>0);
+  const yMin = allVals.length ? Math.max(0, Math.floor(Math.min(...allVals)*0.85)) : 0;
+  const achMin = Math.max(0, Math.floor(Math.min(...achRates, 100)*0.92));
+  const achMax = Math.ceil(Math.max(...achRates, 100)*1.05);
+  new Chart(document.getElementById('chartVsSF'),{type:'bar',data:{labels:lbls,datasets:[
+    {label:'실적',data:actSlice,backgroundColor:C.blue,order:2},
+    {label:'SF목표',data:sfSlice,backgroundColor:C.orange+'40',borderColor:C.orange,borderWidth:2,order:2},
+    {label:'달성율(%)',data:achRates,type:'line',borderColor:'#805ad5',backgroundColor:'#805ad540',pointRadius:6,pointStyle:'rectRot',borderWidth:2.5,yAxisID:'y2',order:1}
+  ]},options:{responsive:true,plugins:{legend:{position:'bottom'},
+    tooltip:{callbacks:{label:function(ctx){
+      if(ctx.dataset.yAxisID==='y2') return '달성율: '+ctx.parsed.y.toFixed(1)+'%';
+      return ctx.dataset.label+': '+ctx.parsed.y.toFixed(1)+'억원';
+    }}}},
+    scales:{
+      y:{title:{display:true,text:'억원'},beginAtZero:false,min:yMin,position:'left'},
+      y2:{title:{display:true,text:'달성율(%)'},position:'right',min:achMin,max:achMax,grid:{drawOnChartArea:false},
+        ticks:{callback:v=>v+'%'}}
+    }
+  }});
+})();
 
 // === FIX 3: 주력품목 매출 비중 - 기타 추가, % 표시 ===
 const totalQ1 = D.total.q1_26;
@@ -990,6 +1131,89 @@ function productCategory(p){
   if(NEW_26.some(k=>nm.includes(k))) return {tag:'신제품', sortKey:3, color:'#744210', bg:'#fffaf0'};
   return {tag:'기타', sortKey:4, color:'#4a5568', bg:'#f7fafc'};
 }
+
+// ============================================================================
+// ★★★ 2026-04-30 v3 신규: 본부장 의사결정 핵심 섹션 ★★★
+// 21품목(주력+전략+신제품) 기준 액션포인트 + Top5/Bottom5
+// ============================================================================
+function getCore21(){
+  return D.all_products.filter(p => productCategory(p).tag !== '기타' && !p.is_demarketing);
+}
+
+function renderActionPoints(){
+  const T = CLOSED_MONTH_NUM;  // 마감 완료월 (4월 마감 후 = 4)
+  const targets = getCore21();
+  // 임계값: 달성률 50%↓, YoY- + 매출 1억↑, MoM ±30% (매출 0.5억↑)
+  const ach50 = targets.filter(p => p.q1_ach != null && p.q1_ach < 50 && p.q1_sf >= 1)
+                       .sort((a,b)=>(a.q1_ach||0)-(b.q1_ach||0));
+  const yoyMinus = targets.filter(p => p.q1_yoy != null && p.q1_yoy < 0 && p.q1_25 >= 1)
+                          .sort((a,b)=>(a.q1_diff||0)-(b.q1_diff||0));
+  const momExtreme = targets.filter(p => p.mar_mom != null && Math.abs(p.mar_mom) >= 30
+                                      && Math.max(+(p._tCur||0), +(p._tPrev||0)) >= 0.5)
+                            .sort((a,b)=>Math.abs(b.mar_mom)-Math.abs(a.mar_mom));
+  const total = ach50.length + yoyMinus.length + momExtreme.length;
+  const cnt = document.getElementById('actionTotalCount');
+  if(cnt) cnt.textContent = `총 ${total}건`;
+  const renderCard = (title, items, color, bgColor, valueFn, emptyMsg) => {
+    if(items.length === 0){
+      return `<div style="padding:14px;background:${bgColor};border-radius:8px;border-left:4px solid ${color};min-height:120px;">
+        <div style="font-size:12px;font-weight:700;color:${color};margin-bottom:6px;">${title} <span style="opacity:0.6">(0건)</span></div>
+        <div style="font-size:11px;color:#718096;padding:24px 0;text-align:center;">⭕ ${emptyMsg}</div></div>`;
+    }
+    return `<div style="padding:14px;background:${bgColor};border-radius:8px;border-left:4px solid ${color};min-height:120px;">
+      <div style="font-size:12px;font-weight:700;color:${color};margin-bottom:8px;">${title} <span>(${items.length}건)</span></div>
+      ${items.slice(0,5).map(p => `<div style="font-size:11.5px;padding:5px 0;border-bottom:1px dashed rgba(0,0,0,0.06);display:flex;justify-content:space-between;align-items:center;gap:6px;">
+        <span style="font-weight:600;color:#2d3748;">${p.name} <span style="color:#a0aec0;font-size:10px;">[${productCategory(p).tag}]</span></span>
+        <span style="color:${color};font-weight:700;font-variant-numeric:tabular-nums;">${valueFn(p)}</span></div>`).join('')}
+      ${items.length>5 ? `<div style="font-size:10px;color:#718096;margin-top:6px;text-align:right;">외 ${items.length-5}품목 (PM 화면 참조)</div>` : ''}
+    </div>`;
+  };
+  const fmtAch = p => `${p.q1_ach.toFixed(1)}%`;
+  const fmtYoY = p => `${p.q1_yoy>=0?'+':''}${p.q1_yoy.toFixed(1)}% (${p.q1_diff>=0?'+':''}${p.q1_diff.toFixed(1)}억)`;
+  const fmtMoM = p => `${p.mar_mom>=0?'+':''}${p.mar_mom.toFixed(1)}% (${(p._tPrev||0).toFixed(1)}→${(p._tCur||0).toFixed(1)}억)`;
+  const box = document.getElementById('actionPointsContainer');
+  if(box){
+    box.innerHTML =
+      renderCard('🔴 달성률 50% 미만', ach50, '#c53030', '#fff5f5', fmtAch, '달성률 50% 미만 품목 없음 (양호)') +
+      renderCard('🟡 YoY 마이너스 (매출 1억↑)', yoyMinus, '#d69e2e', '#fffaf0', fmtYoY, 'YoY 역성장 품목 없음 (양호)') +
+      renderCard(`🔵 ${T}월 MoM ±30% 이상`, momExtreme, '#2c5282', '#ebf8ff', fmtMoM, 'MoM 급변동 품목 없음 (안정)');
+  }
+}
+window.renderActionPoints = renderActionPoints;
+
+function renderTopBottom(){
+  const targets = getCore21().filter(p => p.q1_26 > 0);
+  const topAch = [...targets].filter(p => p.q1_ach != null).sort((a,b)=>b.q1_ach-a.q1_ach).slice(0,5);
+  const topYoY = [...targets].filter(p => p.q1_yoy != null && p.q1_25 >= 1).sort((a,b)=>b.q1_yoy-a.q1_yoy).slice(0,5);
+  const botAch = [...targets].filter(p => p.q1_ach != null && p.q1_sf >= 1).sort((a,b)=>a.q1_ach-b.q1_ach).slice(0,5);
+  const botYoY = [...targets].filter(p => p.q1_yoy != null && p.q1_25 >= 1).sort((a,b)=>a.q1_yoy-b.q1_yoy).slice(0,5);
+  const renderList = (title, items, valueFn, color) => `
+    <div style="margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:700;color:${color};margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px;">${title}</div>
+      ${items.map((p,i) => `<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 0;border-bottom:1px dashed rgba(0,0,0,0.05);gap:6px;">
+        <span><span style="color:#a0aec0;font-weight:700;width:18px;display:inline-block;">${i+1}.</span><span style="font-weight:600;">${p.name}</span> <span style="color:#718096;font-size:10px;">[${productCategory(p).tag}]</span></span>
+        <span style="color:${color};font-weight:700;font-variant-numeric:tabular-nums;text-align:right;">${valueFn(p)}</span>
+      </div>`).join('')}
+    </div>`;
+  const top = document.getElementById('topPerformersContainer');
+  const bot = document.getElementById('bottomPerformersContainer');
+  if(top){
+    top.innerHTML =
+      renderList('YTD 달성률 TOP5', topAch, p=>`${p.q1_ach.toFixed(1)}% <span style="color:#718096;font-size:10px;">(${p.q1_26.toFixed(1)}/${p.q1_sf.toFixed(1)}억)</span>`, '#22543d') +
+      renderList('YTD YoY 성장률 TOP5', topYoY, p=>`+${p.q1_yoy.toFixed(1)}% <span style="color:#718096;font-size:10px;">(${p.q1_25.toFixed(1)}→${p.q1_26.toFixed(1)})</span>`, '#276749');
+  }
+  if(bot){
+    bot.innerHTML =
+      renderList('YTD 달성률 BOTTOM5', botAch, p=>`${p.q1_ach.toFixed(1)}% <span style="color:#718096;font-size:10px;">(${p.q1_26.toFixed(1)}/${p.q1_sf.toFixed(1)}억)</span>`, '#9b2c2c') +
+      renderList('YTD YoY 성장률 BOTTOM5', botYoY, p=>`${p.q1_yoy>=0?'+':''}${p.q1_yoy.toFixed(1)}% <span style="color:#718096;font-size:10px;">(${p.q1_25.toFixed(1)}→${p.q1_26.toFixed(1)})</span>`, '#742a2a');
+  }
+}
+window.renderTopBottom = renderTopBottom;
+
+// 초기 렌더 + PMFP 동기화 후 재렌더 보장 (1초 후 한번 더)
+renderActionPoints();
+renderTopBottom();
+setTimeout(()=>{ try { renderActionPoints(); renderTopBottom(); } catch(e){} }, 1500);
 
 // --- 품목별 월별 Claude 예측 계산 (기존 openDD 로직 전역화) ---
 function calcMonthlyClaude(p, monthIdx){
@@ -1275,29 +1499,29 @@ function renderFcSummary(fcList){
     <div class="fc-item"><div class="fc-label">PM ${N}월 예측 <sup style="color:#805ad5">LIVE</sup></div><div class="fc-val" style="color:#6b46c1" id="fcSumPM">${pmFinal!=null?fmt(pmFinal,1):'–'}</div><div class="fc-sub" id="fcSumPMSub">${pmFinal!=null?`마감예측 ${pmSource} · 전체품목`:'로딩 대기…'}</div></div>
     <div class="fc-item"><div class="fc-label">GAP (PM − Claude)</div><div class="fc-val" style="color:${totalGap==null?'#999':(Math.abs(totalGap)<3?'#38a169':(totalGap>0?'#c53030':'#2c5282'))}" id="fcSumGap">${totalGap!=null?(totalGap>=0?'+':'')+totalGap.toFixed(1):'–'}</div><div class="fc-sub" id="fcSumGapSub">${totalGap!=null?(Math.abs(totalGap)<3?'정렬':(totalGap>0?'PM 공격적':'PM 보수적')):'매칭 대기'}</div></div>`;
 
-  // ===== Row 2: 연간 4박스 =====
-  // ★ B-⑨ 재편: PM 예측 제거 → 1)연간목표 2)현수준 연환산 3)남은기간 월평균 목표 4)추가 월 성장목표
-  // ※ "현수준" = Q1 월평균 실적. "남은기간" = 4~12월 (9개월).
-  let annTarget = 0, q1Actual = 0;
+  // ===== Row 2: 연간 4박스 (2026-04-30 v3 — CLOSED_MONTH_NUM 기반) =====
+  // ★ "현수준" = 1~CLOSED_MONTH_NUM월 월평균 실적. "남은기간" = (CLOSED_MONTH_NUM+1)~12월 = (12-CLOSED_MONTH_NUM)개월
+  const Nclosed = CLOSED_MONTH_NUM;
+  let annTarget = 0, ytdActual = 0;
   fcList.forEach(p=>{
     annTarget += (p.ann_sf || 0);
     const m = p.monthly_26 || [];
-    for(let i=0; i<3; i++) q1Actual += (m[i] || 0);
+    for(let i=0; i<Nclosed; i++) ytdActual += (m[i] || 0);
   });
-  const q1MonthAvg = q1Actual / 3;
-  const annAtCurrent = q1MonthAvg * 12;                         // 현수준으로 연환산 (Q1 월평균 × 12)
-  const remMonths = 9;                                            // Q1 이후 = 4~12월 = 9개월
-  const remNeedTotal = Math.max(0, annTarget - q1Actual);         // 남은기간 달성해야 할 금액
-  const remMonthAvg = remMonths > 0 ? (remNeedTotal / remMonths) : 0;  // 남은기간 월평균 목표
-  const extraGrowth = remMonthAvg - q1MonthAvg;                   // 추가 월 성장목표
+  const q1MonthAvg = Nclosed>0 ? (ytdActual / Nclosed) : 0;             // YTD 월평균
+  const annAtCurrent = q1MonthAvg * 12;                                  // 현수준 연환산
+  const remMonths = Math.max(0, 12 - Nclosed);                           // 남은 월수 (4월 마감 시 = 8)
+  const remNeedTotal = Math.max(0, annTarget - ytdActual);
+  const remMonthAvg = remMonths > 0 ? (remNeedTotal / remMonths) : 0;
+  const extraGrowth = remMonthAvg - q1MonthAvg;
   const achRatio = annTarget > 0 ? (annAtCurrent / annTarget * 100).toFixed(1) : '-';
 
   const row2 = document.getElementById('fcSummaryRow2');
   if(row2){
     row2.innerHTML = `
       <div class="fc-item"><div class="fc-label">26년 연간목표</div><div class="fc-val" style="color:#2c5282">${fmt(annTarget,0)}</div><div class="fc-sub">억원 · ${fcList.length}품목 SF 합계</div></div>
-      <div class="fc-item"><div class="fc-label">현수준 연환산 예측</div><div class="fc-val" style="color:${annAtCurrent>=annTarget?'#38a169':'#d69e2e'}">${fmt(annAtCurrent,0)}</div><div class="fc-sub">억원 · Q1월평균 ${fmt(q1MonthAvg,1)}억 × 12 (목표 ${achRatio}%)</div></div>
-      <div class="fc-item"><div class="fc-label">남은기간 월평균 목표</div><div class="fc-val" style="color:#805ad5">${fmt(remMonthAvg,1)}</div><div class="fc-sub">억/월 · 4~12월 총 ${fmt(remNeedTotal,0)}억 필요</div></div>
+      <div class="fc-item"><div class="fc-label">현수준 연환산 예측</div><div class="fc-val" style="color:${annAtCurrent>=annTarget?'#38a169':'#d69e2e'}">${fmt(annAtCurrent,0)}</div><div class="fc-sub">억원 · YTD(${Nclosed}개월) 월평균 ${fmt(q1MonthAvg,1)}억 × 12 (목표 ${achRatio}%)</div></div>
+      <div class="fc-item"><div class="fc-label">남은기간 월평균 목표</div><div class="fc-val" style="color:#805ad5">${fmt(remMonthAvg,1)}</div><div class="fc-sub">억/월 · ${Nclosed+1}~12월 ${remMonths}개월 총 ${fmt(remNeedTotal,0)}억 필요</div></div>
       <div class="fc-item"><div class="fc-label">추가 월 성장목표</div><div class="fc-val" style="color:${extraGrowth<=0?'#38a169':(extraGrowth>q1MonthAvg*0.2?'#c53030':'#d69e2e')}">${extraGrowth>=0?'+':''}${fmt(extraGrowth,1)}</div><div class="fc-sub">억/월 · 현수준 대비 ${q1MonthAvg>0?((extraGrowth/q1MonthAvg)*100).toFixed(1):'-'}% 추가 성장 필요</div></div>`;
   }
 }
@@ -2762,244 +2986,71 @@ function openSyncModal(report){
       <td class="num">${d.inline.toFixed(2)}</td>
       <td class="num">${d.raw.toFixed(2)}</td>
       <td class="num" style="color:${Math.abs(d.gap)>=0.5?'#c53030':d.gap>0?'#2c5282':'#805ad5'};font-weight:600">${d.gap>=0?'+':''}${d.gap.toFixed(2)}</td>
-    </tr>`).join('') : `<tr><td colspan="5" style="text-align:center;color:#38a169;padding:20px">✅ 모든 월별 데이터 일치</td></tr>`;
-
-  const missingList = report.missingInRaw.length ? `<div style="margin-top:10px;font-size:11px;color:#c53030;">⚠️ RAW에 없는 품목(${report.missingInRaw.length}): ${report.missingInRaw.join(', ')}</div>` : '';
-  const extraList = report.extraInRaw.length ? `<div style="margin-top:6px;font-size:11px;color:#2c5282;">ℹ️ RAW에만 있는 품목(${report.extraInRaw.length}, 참고용): ${report.extraInRaw.slice(0,20).join(', ')}${report.extraInRaw.length>20?' 외':''}</div>` : '';
-
-  document.getElementById('ddBody').innerHTML = `
-    <div class="dd-kpi">
-      <div class="dd-kpi-box"><div class="k-lbl">인라인 최신월</div><div class="k-val">${mn(report.inlineLatest26)}</div><div class="k-sub">HTML 내장 D.total</div></div>
-      <div class="dd-kpi-box ${report.newerRaw?'orange':'green'}"><div class="k-lbl">RAW 최신월</div><div class="k-val">${mn(report.rawLatest26)}</div><div class="k-sub">Google Sheets RAW 탭</div></div>
-      <div class="dd-kpi-box ${report.diffs.length>0?'orange':'green'}"><div class="k-lbl">불일치 건수</div><div class="k-val">${report.diffs.length}</div><div class="k-sub">0.01억 초과 차이</div></div>
-      <div class="dd-kpi-box purple"><div class="k-lbl">품목 매칭</div><div class="k-val">${report.inlineProductCount-report.missingInRaw.length}/${report.inlineProductCount}</div><div class="k-sub">인라인 기준</div></div>
-    </div>
-    ${(report.newerRaw || report.diffs.length > 0) ? `<div style="background:linear-gradient(135deg,#fef5e7,#fdf2d3);border:1px solid #f6ad55;border-radius:10px;padding:14px 16px;margin-bottom:14px;font-size:13px;color:#744210;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-      <div style="flex:1;min-width:260px;">
-        🔔 <b>${report.newerRaw ? `업데이트 알림: RAW 탭에 최신 월(${mn(report.rawLatest26)}) 반영됨` : `RAW vs 인라인 불일치 ${report.diffs.length}건`}</b><br>
-        <span style="font-size:11px;color:#975a16;">「재빌드」 클릭 시 KPI · 헤더 · 매출예측표 · 전체품목표 · 리스크/기회 6개 뷰가 RAW 기준으로 즉시 재계산됩니다. (Chart.js 그래프는 새로고침 필요)</span>
-      </div>
-      <button onclick="window.executeRebuild()" style="background:#dd6b20;color:white;border:none;padding:10px 18px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;box-shadow:0 2px 6px rgba(221,107,32,.3);">
-        🔄 지금 재빌드
-      </button>
-    </div>` : ''}
-    <div class="dd-section">
-      <h4>🔎 월별 불일치 Top ${Math.min(top.length,30)} (단위: 억, 절대값 기준)</h4>
-      <table class="dd-method">
-        <thead><tr><th>품목</th><th>월</th><th style="text-align:right">인라인</th><th style="text-align:right">RAW</th><th style="text-align:right">차이 (RAW−인라인)</th></tr></thead>
-        <tbody>${diffRows}</tbody>
-      </table>
-      ${missingList}
-      ${extraList}
-    </div>
-    <div class="dd-section">
-      <h4>📖 연동 구조</h4>
-      <div style="font-size:12px;color:#4a5568;line-height:1.7;background:#f7fafc;padding:12px;border-radius:8px;">
-        • <b>소스</b>: <a href="${RAW_CFG.sheetUrl}" target="_blank">「${RAW_CFG.sheetName}」</a> 탭 (41컬럼: 메타5 + 24년12 + 25년12 + 26년12)<br>
-        • <b>매칭 키</b>: Col A "품목명" = 대시보드 inline D.products[].name<br>
-        • <b>매달 마감 반영 절차</b>: ① SAP에서 해당 월 매출 추출 → ② RAW 탭 Col AD-AO(26년) 업데이트 → ③ 대시보드 새로고침 → ④ 배지 클릭 → 「재빌드」<br>
-        • <b>재빌드 범위 (v2)</b>: ① 상단 KPI/헤더 ② 매출예측 탭 표 ③ 전체품목 탭 표 ④ 리스크·기회·이상변동 표 ⑤ 계절성 지수 (Chart.js 시각화는 새로고침 필요)
-      </div>
-    </div>
-  `;
-
-  ov.classList.add('show');
+    </tr>`).join('') : `<tr><td colspan="5" style="text-align:center;color:#999;padding:20px;">차이 없음 — 모든 품목 일치</td></tr>`;
+  const ddBody = document.getElementById('ddBody');
+  if(ddBody) ddBody.innerHTML = `<table style="width:100%;font-size:11px;border-collapse:collapse;">
+    <thead><tr style="background:#1a365d;color:#fff;"><th style="padding:6px;">품목</th><th>월</th><th>인라인(억)</th><th>RAW(억)</th><th>차이</th></tr></thead>
+    <tbody>${diffRows}</tbody></table>`;
+  if(ov) ov.style.display = 'flex';
 }
 
-// === B-④ v2: D 재계산 로직 ===
-// 품목(p)의 파생필드를 monthly_26 + monthly_25 + sf_monthly + ann_sf + ann_25 기준으로 재계산
-function recomputePDerived(p){
-  const m26 = p.monthly_26 || [];
-  p.jan = +(m26[0]||0).toFixed(2);
-  p.feb = +(m26[1]||0).toFixed(2);
-  p.mar = +(m26[2]||0).toFixed(2);
-  p.q1_26 = +((m26[0]||0)+(m26[1]||0)+(m26[2]||0)).toFixed(2);
-  if(p.monthly_25){
-    p.q1_25 = +((p.monthly_25[0]||0)+(p.monthly_25[1]||0)+(p.monthly_25[2]||0)).toFixed(2);
-    p.q1_yoy = p.q1_25 > 0.01 ? +(((p.q1_26/p.q1_25)-1)*100).toFixed(1) : null;
-  }
-  p.q1_ach = (p.q1_sf && p.q1_sf > 0.01) ? +((p.q1_26/p.q1_sf)*100).toFixed(1) : null;
-  p.mar_mom = p.feb > 0.01 ? +(((p.mar/p.feb)-1)*100).toFixed(1) : null;
-
-  // 최신 채워진 26년 월 (0-based)
-  let lm = -1;
-  for(let i=m26.length-1;i>=0;i--){ if((m26[i]||0) > 0.01){ lm = i; break; } }
-  const ytd = m26.slice(0, lm+1).reduce((a,b)=>a+(b||0),0);
-  const remMonths = 12 - (lm+1);
-  if(p.ann_sf != null){
-    p.remaining_monthly = remMonths > 0 ? +((p.ann_sf - ytd)/remMonths).toFixed(2) : 0;
-  }
-  if(p.sf_monthly){
-    p.apr_sf = +(p.sf_monthly[TARGET_MONTH_IDX]||0).toFixed(2);
-    // fc3 = ytd + sum(sf_monthly[lm+1..11])
-    let sfRem = 0;
-    for(let i=lm+1;i<12;i++) sfRem += p.sf_monthly[i]||0;
-    p.fc3 = +(ytd + sfRem).toFixed(2);
-  }
-  // fc1: 단순 연환산(Q1×4). 최신월이 3월 이후면 YTD/lm * 12
-  if(lm >= 0){
-    p.fc1 = +((ytd * 12) / (lm+1)).toFixed(2);
-  }
-  // fc2: 계절성 (25년 동기비중)
-  if(p.q1_25 && p.q1_25 > 0.01 && p.ann_25){
-    // Q1 고정: 기존 수식 유지. (확장시 월별 계절지수로 바꿀 수 있음)
-    p.fc2 = +(p.ann_25 * p.q1_26 / p.q1_25).toFixed(2);
-  }
-  if(p.fc1 != null && p.fc2 != null && p.fc3 != null){
-    p.fc_avg = +((p.fc1+p.fc2+p.fc3)/3).toFixed(2);
-  }
-  if(p.q1_25 != null) p.q1_diff = +(p.q1_26 - p.q1_25).toFixed(2);
-}
-
-// RAW → D mutate. 기존 D.products / D.all_products / D.total 을 in-place 갱신.
-function rebuildDFromRaw(rawMap){
-  const updated = {products:0, allProducts:0, missing:[]};
-
-  // 1) D.products (13종) 업데이트
-  D.products.forEach(p=>{
-    const r = rawMap[p.name];
-    if(!r){ updated.missing.push(p.name); return; }
-    p.monthly_26 = r.y26.slice();
-    recomputePDerived(p);
-    updated.products++;
-  });
-
-  // 2) D.all_products 전체 업데이트
-  D.all_products.forEach(p=>{
-    const r = rawMap[p.name];
-    if(!r) return;
-    p.monthly_26 = r.y26.slice();
-    recomputePDerived(p);
-    updated.allProducts++;
-  });
-
-  // 3) D.total.act_26 = all_products 합산 (디마케팅 포함 전체)
-  for(let m=0;m<12;m++){
-    let s = 0;
-    D.all_products.forEach(p=>{ s += (p.monthly_26 && p.monthly_26[m]) || 0; });
-    D.total.act_26[m] = +s.toFixed(2);
-  }
-  // 4) total 파생
-  D.total.q1_26 = +(D.total.act_26[0]+D.total.act_26[1]+D.total.act_26[2]).toFixed(2);
-  const q1_25t = D.total.act_25[0]+D.total.act_25[1]+D.total.act_25[2];
-  // total.latestMonth 기준 fc
-  let lm = -1;
-  for(let i=11;i>=0;i--){ if(D.total.act_26[i] > 0.01){ lm = i; break; } }
-  const ytdT = D.total.act_26.slice(0, lm+1).reduce((a,b)=>a+(b||0),0);
-  let sfRemT = 0;
-  for(let i=lm+1;i<12;i++) sfRemT += D.total.sf_26[i]||0;
-  D.total_forecast = D.total_forecast || {};
-  D.total_forecast.fc1 = lm>=0 ? +((ytdT*12)/(lm+1)).toFixed(2) : D.total_forecast.fc1;
-  D.total_forecast.fc2 = q1_25t > 0 ? +(D.total.ann_25 * D.total.q1_26 / q1_25t).toFixed(2) : D.total_forecast.fc2;
-  D.total_forecast.fc3 = +(ytdT + sfRemT).toFixed(2);
-  D.total_forecast.fc_avg = +((D.total_forecast.fc1 + D.total_forecast.fc2 + D.total_forecast.fc3)/3).toFixed(2);
-
-  return updated;
-}
-
-// 4개 핵심 뷰 재렌더 (Chart.js는 v2 범위 외)
-function refreshDashboardFromD(){
-  try { if(window.renderSeasonal)     window.renderSeasonal(); } catch(e){ console.warn('renderSeasonal 실패', e); }
-  try { if(window.renderKPI)          window.renderKPI(); } catch(e){ console.warn('renderKPI 실패', e); }
-  try { if(window.renderHeaderStats)  window.renderHeaderStats(); } catch(e){ console.warn('renderHeaderStats 실패', e); }
-  try { if(window.renderForecastTables) window.renderForecastTables(); } catch(e){ console.warn('renderForecastTables 실패', e); }
-  try { if(window.renderAllTable)     window.renderAllTable(); } catch(e){ console.warn('renderAllTable 실패', e); }
-  try { if(window.renderRiskOpp)      window.renderRiskOpp(); } catch(e){ console.warn('renderRiskOpp 실패', e); }
-}
-window.rebuildDFromRaw = rebuildDFromRaw;
-window.refreshDashboardFromD = refreshDashboardFromD;
-
-// 재빌드 실행 + 사용자에게 토스트 피드백
-function executeRebuild(){
-  if(!window.__raw) return alert('RAW 데이터가 아직 로드되지 않았습니다.');
-  const result = rebuildDFromRaw(window.__raw);
-  refreshDashboardFromD();
-  // 배지 상태 갱신
-  const report = compareInlineVsRaw(window.__raw);
-  window.__rawReport = report;
-  updateSyncBadge(report);
-  // 모달 내용 재렌더 (열려 있다면)
-  const ov = document.getElementById('ddOverlay');
-  if(ov && ov.classList.contains('show')) openSyncModal(report);
-  // 토스트
-  const toast = document.createElement('div');
-  toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#38a169;color:white;padding:14px 20px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-weight:600;z-index:99999;font-size:14px;';
-  toast.innerHTML = `✅ 재빌드 완료 · 주력 ${result.products}/${D.products.length} · 전체 ${result.allProducts}/${D.all_products.length}`;
-  document.body.appendChild(toast);
-  setTimeout(()=>toast.remove(), 3500);
-}
-window.executeRebuild = executeRebuild;
-
-// 부트스트랩 (DOMContentLoaded 이후 실행)
-(function bootstrapRawSync(){
-  const run = ()=>{
-    fetchRAW((j, err)=>{
-      if(err || !j){ updateSyncBadge(null, err || 'unknown'); return; }
-      const rawMap = parseRAW(j);
-      window.__raw = rawMap;    // 향후 확장용
-      const report = compareInlineVsRaw(rawMap);
-      window.__rawReport = report;
-      updateSyncBadge(report);
-    });
-  };
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
-  else setTimeout(run, 100);
-})();
-
-// ★ B-⑧ 해당월(TARGET_MONTH) 기반 정적 라벨 동적 패치
+// ============================================================================
+// ★★★ 2026-04-30 v3 재작성: patchTargetMonthLabels — 마감월(T) 기반 정적 라벨 동적화
+// CLOSED_MONTH_NUM 기준. Q1→YTD 변환 + 표 헤더 + 차트 제목 + 옵션 일괄 패치
+// ============================================================================
 (function patchTargetMonthLabels(){
   const run = ()=>{
     try {
-      const N = TARGET_MONTH_NUM;
-      // 매출 예측 탭 상단 PM 예측 연동 배너: "26.4월 1차" / "ETC 전체 PM 4월 1차 예측"
-      const bannerDesc = document.querySelector('#panel-forecast > div:first-child');
+      const T = (typeof CLOSED_MONTH_NUM !== 'undefined' ? CLOSED_MONTH_NUM : 3);  // 마감 완료월 (4월 마감 시 T=4)
+      const Tnext = (typeof TARGET_MONTH_NUM !== 'undefined' ? TARGET_MONTH_NUM : T+1);  // 예측 대상월
+      const Tprev = T > 1 ? T - 1 : 12;
+      const N = Tnext;  // 호환 (이전 N 사용 코드)
+      const TT = String(T).padStart(2,'0');
+      const ytdLabel = (T===3) ? 'Q1' : 'YTD';
+
+      // (1) 매출 예측 탭 상단 PM 예측 연동 배너
+      const bannerDesc = document.querySelector('#panel-forecast > div:nth-child(2)');
       if(bannerDesc){
         bannerDesc.innerHTML = bannerDesc.innerHTML
-          .replace(/26\.\d+월\s*1차/g, `26.${N}월 1차`)
-          .replace(/\d+월PM/g, `${N}월PM`)
-          .replace(/(\d+월)\s*목표 합산/g, (N<12 ? `${N+1}~12월 목표 합산` : '-'));
+          .replace(/26\.\d+월\s*1차/g, `26.${Tnext}월 1차`)
+          .replace(/(\(\s*)\d+월(\s*PM\s*1차)/g, `$1${Tnext}월$2`);
       }
-      // ETC 전체 배지 라벨
+      // (2) ETC 전체 PM 배지 라벨
       const badgeLabel = document.querySelector('#pmTotalBadge div:first-child > div:first-child');
-      if(badgeLabel) badgeLabel.textContent = `📌 ETC 전체 PM ${N}월 1차 예측 (PMFP 시트 전수 집계)`;
+      if(badgeLabel) badgeLabel.textContent = `📌 ETC 전체 PM ${Tnext}월 1차 예측 (PMFP 시트 전수 집계)`;
       const badgeDesc = document.querySelector('#pmTotalBadge div:first-child > div:nth-child(2)');
-      if(badgeDesc) badgeDesc.textContent = `필터와 무관하게 「2026 마감예측」의 ${N}월 PM 1차 컬럼 모든 양수 값을 합산한 본부 기준값입니다.`;
+      if(badgeDesc) badgeDesc.textContent = `필터와 무관하게 「2026 마감예측」의 ${Tnext}월 PM 1차 컬럼 모든 양수 값을 합산한 본부 기준값입니다.`;
 
-      // fcTable 헤더: "4월 계절지수", "4월 SF", "Claude 4월", "PM 4월", "갭(PM−Claude)", "25년 4월"
+      // (3) fcTable 헤더의 "4월" → "${Tnext}월"
       document.querySelectorAll('#fcTable thead th').forEach(th=>{
-        th.innerHTML = th.innerHTML.replace(/(^|[^\d])4월/g, (_, pre)=> pre + `${N}월`);
+        th.innerHTML = th.innerHTML.replace(/(^|[^\d])4월/g, (_, pre)=> pre + `${Tnext}월`);
       });
-
-      // 차트 제목
+      // (4) 매출 예측 탭 차트/카드 제목의 "4월" → "${Tnext}월"
       document.querySelectorAll('#panel-forecast h3').forEach(h=>{
-        h.innerHTML = h.innerHTML.replace(/(^|[^\d])4월/g, (_, pre)=> pre + `${N}월`);
+        h.innerHTML = h.innerHTML.replace(/(^|[^\d])4월/g, (_, pre)=> pre + `${Tnext}월`);
+      });
+      // (5) 안내 문단의 "4월"
+      document.querySelectorAll('#panel-forecast .card p, #panel-forecast .pmeval-desc').forEach(p=>{
+        p.innerHTML = p.innerHTML.replace(/(^|[^\d])4월/g, (_, pre)=> pre + `${Tnext}월`);
       });
 
-      // 월별 예측 상세 안내문
-      const descPara = document.querySelector('#panel-forecast .card p');
-      if(descPara) descPara.innerHTML = descPara.innerHTML.replace(/(^|[^\d])4월/g, (_, pre)=> pre + `${N}월`);
-
-      // ★★ 2026-04-30 추가: 마감월(T) 기준 정적 라벨 동적화 ★★
-      const T = TARGET_MONTH_IDX;          // 마감월 1-indexed (4월 마감 시 T=4)
-      const Tprev = T > 1 ? T - 1 : 12;
-      // 1) 표 헤더 "3월(마감)" → "T월(마감)"
+      // (6) 표 헤더 "3월(마감)" → "T월(마감)"
       document.querySelectorAll('thead tr th').forEach(th=>{
         const t = th.textContent.trim();
         if(/^\d+월\(마감\)$/.test(t)) th.textContent = `${T}월(마감)`;
         else if(/^\d+월\s*MoM$/.test(t)) th.textContent = t.replace(/^\d+월/, `${T}월`);
         else if(/^\d+월\s*실적$/.test(t)) th.textContent = `${T}월 실적`;
       });
-      // 2) 테이블 헤더의 [1월 2월 3월 ...] 패턴 → [1월 2월 ... T월]
+      // (7) 표 헤더의 [1월,2월,3월] 패턴 → 마지막 셀 T월
       document.querySelectorAll('thead tr').forEach(tr=>{
         const ths = Array.from(tr.querySelectorAll('th'));
         const i1 = ths.findIndex(x=>x.textContent.trim()==='1월');
         if(i1<0) return;
-        const i2 = i1+1, i3 = i1+2;
-        if(ths[i2] && ths[i2].textContent.trim()==='2월' && ths[i3] && ths[i3].textContent.trim()==='3월'){
-          ths[i3].textContent = `${T}월`;
+        if(ths[i1+1]&&ths[i1+1].textContent.trim()==='2월'&&ths[i1+2]&&ths[i1+2].textContent.trim()==='3월'){
+          ths[i1+2].textContent = `${T}월`;
         }
       });
-      // 3) 이상변동 테이블: "2월","3월" → "Tprev월","T월"
+      // (8) 이상변동 테이블 "2월","3월" → Tprev월/T월
       const anomalyHead = document.querySelector('#anomalyTable thead tr');
       if(anomalyHead){
         anomalyHead.querySelectorAll('th').forEach(th=>{
@@ -3008,25 +3059,62 @@ window.executeRebuild = executeRebuild;
           else if(t==='3월') th.textContent = `${T}월`;
         });
       }
-      // 4) 섹션 제목 "3월 이상변동" → "T월 이상변동"
+      // (9) 섹션 제목 "3월 이상변동"
       document.querySelectorAll('h3').forEach(h=>{
         if(/3월\s*이상변동/.test(h.textContent)){
           h.innerHTML = h.innerHTML.replace(/3월\s*이상변동/, `${T}월 이상변동`);
         }
       });
-      // 5) 정렬 옵션 "3월 MoM순"
+      // (10) 정렬 옵션 "3월 MoM순"
       document.querySelectorAll('option').forEach(o=>{
         if(/^3월\s*MoM순$/.test(o.textContent.trim())) o.textContent = `${T}월 MoM순`;
       });
-      // 6) 헤더 부제: "Q1(1~3월) 실적 기반"에 "T월 마감 반영" 보강 (T !== 3 일 때)
+      // (11) 헤더 부제 — 항상 "YTD(1~T월)"로 갱신
       const subT = document.querySelector('.sub');
-      if(subT && /Q1\(1~3월\)/.test(subT.textContent) && T !== 3){
-        subT.innerHTML = subT.innerHTML.replace(/Q1\(1~3월\) 실적 기반/, `Q1(1~3월) + ${T}월 마감 반영`);
+      if(subT){
+        subT.innerHTML = `2026년 YTD(1~${T}월) 누계 + ${T}월 마감 반영 · ${Tnext<=12?Tnext:12}월 예측 진행 중 | SAP 마감자료 기준 | 단위: 억원`;
       }
-    } catch(e) { console.warn('[patchLabels]', e); /* 패치 실패 무시 */ }
+      // (12) 마감 기준 배지
+      document.querySelectorAll('.badge').forEach(b=>{
+        if(/2026\.\d+\s*마감 기준/.test(b.textContent)) b.textContent = `2026.${TT} 마감 기준`;
+      });
+
+      // ===== Q1 → YTD 일괄 변환 (q1_xx 데이터는 이미 YTD로 재계산됨) =====
+      const qSelectors = ['#groupTable thead th','#structureTable thead th','#newProdTable thead th','#prodTable thead th','#allTable thead th','#fcTable thead th','#oppTable thead th','#riskTable thead th','#anomalyTable thead th','#monthTrendTable thead th','#quarterTrendTable thead th'];
+      qSelectors.forEach(sel=>{
+        document.querySelectorAll(sel).forEach(th=>{
+          let txt = th.innerHTML;
+          txt = txt.replace(/Q1\s*(실적|목표|달성률|달성율|YoY|증감액|매출|월평균|계절환산|월목표)/g, (_, w)=> `${ytdLabel} ${w}`);
+          th.innerHTML = txt;
+        });
+      });
+      document.querySelectorAll('h3').forEach(h=>{
+        let txt = h.innerHTML;
+        txt = txt.replace(/Q1\s*(실적|목표|달성률|달성율|YoY|증감액|매출 구성|매출 현황|매출 비교|성장율|성장률)/g, (_, w)=> `${ytdLabel} ${w}`);
+        h.innerHTML = txt;
+      });
+      document.querySelectorAll('option').forEach(o=>{
+        let txt = o.textContent;
+        txt = txt.replace(/Q1\s*(실적|목표|달성률|달성율|YoY|증감액|매출순|성장율순|성장률순)/g, (_, w)=> `${ytdLabel} ${w}`);
+        o.textContent = txt;
+      });
+      // 잔여월목표 / 4월목표 보강
+      document.querySelectorAll('thead th').forEach(th=>{
+        let txt = th.innerHTML;
+        txt = txt.replace(/잔여월목표/g, `잔여월목표(${Tnext<=12?Tnext:12}~12월)`);
+        txt = txt.replace(/(^|[^\d])4월목표/g, (_, pre)=> pre + `${Tnext<=12?Tnext:12}월목표`);
+        th.innerHTML = txt;
+      });
+      // 안내문 "Q1실적" 등
+      document.querySelectorAll('#panel-forecast p, #panel-forecast .pmeval-desc').forEach(p=>{
+        let txt = p.innerHTML;
+        txt = txt.replace(/Q1\s*(실적|목표|달성률|달성율|YoY|증감액|월평균|계절환산|월목표)/g, (_, w)=> `${ytdLabel} ${w}`);
+        p.innerHTML = txt;
+      });
+    } catch(e) { console.warn('[patchLabels v3]', e); }
   };
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
-  else setTimeout(run, 50);
+  else setTimeout(run, 80);
 })();
 
 </script>

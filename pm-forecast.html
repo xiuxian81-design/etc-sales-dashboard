@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>한올바이오파마 ETC — PM별 전품목 예측·신뢰도</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--primary:#1a365d;--accent:#805ad5;--lavender:#b794f4;--bg:#f7fafc;--card:#fff;--muted:#718096;--border:#e2e8f0;--green:#38a169;--orange:#dd6b20;--red:#e53e3e;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:'Segoe UI','Malgun Gothic',sans-serif;color:#2d3748;font-size:13px;line-height:1.5;}
+.header{background:linear-gradient(135deg,var(--primary),#2c5282 60%,var(--accent));color:#fff;padding:18px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;box-shadow:0 2px 12px rgba(0,0,0,0.08);}
+.header h1{margin:0;font-size:20px;font-weight:800;letter-spacing:-0.3px;}
+.header .sub{font-size:12px;opacity:0.92;margin-top:4px;}
+.header-back{background:rgba(255,255,255,0.18);padding:6px 14px;border-radius:18px;font-size:12px;font-weight:600;color:#fff;text-decoration:none;}
+.header-back:hover{background:rgba(255,255,255,0.28);}
+.badge{display:inline-block;background:rgba(255,255,255,0.22);padding:5px 12px;border-radius:14px;font-size:11px;font-weight:700;}
+.content{max-width:1500px;margin:0 auto;padding:18px 24px 60px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:18px;box-shadow:0 2px 6px rgba(0,0,0,0.04);}
+.card h3{margin:0 0 12px;font-size:14px;font-weight:700;color:var(--primary);}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0;}
+.kpi{background:#fff;padding:16px 20px;border-radius:10px;border:1px solid var(--border);box-shadow:0 2px 6px rgba(0,0,0,0.05);}
+.kpi .label{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.3px;}
+.kpi .value{font-size:28px;font-weight:800;color:var(--primary);font-variant-numeric:tabular-nums;margin-top:4px;}
+.kpi .unit{font-size:13px;color:var(--muted);margin-left:3px;}
+.kpi .change{font-size:11px;color:var(--muted);margin-top:5px;}
+.kpi .change.up{color:var(--green);}
+.kpi .change.down{color:var(--red);}
+.pm-chip-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px;background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:12px;}
+.pm-chip-bar > span:first-child{font-size:12px;font-weight:700;color:var(--accent);margin-right:6px;}
+.pm-chip{display:inline-block;padding:6px 14px;font-size:12px;font-weight:600;border-radius:14px;background:#edf2f7;color:#4a5568;cursor:pointer;border:1px solid transparent;transition:all 0.15s;}
+.pm-chip:hover{background:#e2e8f0;}
+.pm-chip.active{background:var(--accent);color:#fff;border-color:#553c9a;}
+.pm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:24px;}
+.pm-card{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:all 0.15s;position:relative;}
+.pm-card:hover{border-color:var(--accent);box-shadow:0 4px 12px rgba(128,90,213,0.18);}
+.pm-card.active{border-color:var(--accent);background:linear-gradient(135deg,#faf5ff,#fff);box-shadow:0 4px 14px rgba(128,90,213,0.22);}
+.pm-card-name{font-size:15px;font-weight:800;color:var(--primary);margin-bottom:2px;display:flex;align-items:center;justify-content:space-between;}
+.pm-card-cnt{font-size:10px;color:var(--muted);font-weight:600;background:#edf2f7;padding:2px 8px;border-radius:8px;}
+.pm-card-rows{margin-top:10px;}
+.pm-card-row{display:flex;justify-content:space-between;font-size:11.5px;padding:4px 0;border-bottom:1px dashed rgba(0,0,0,0.05);}
+.pm-card-row .label{color:var(--muted);}
+.pm-card-row .value{font-weight:700;color:#2d3748;font-variant-numeric:tabular-nums;}
+.pm-card-row .value.live{color:var(--accent);}
+.pm-card-row .value.green{color:var(--green);}
+.pm-card-row .value.red{color:var(--red);}
+.pm-card-conf{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.pm-card-conf-label{font-size:10px;color:var(--muted);font-weight:700;}
+.pm-card-conf-val{font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;}
+.conf-high{color:var(--green);}
+.conf-mid{color:var(--orange);}
+.conf-low{color:var(--red);}
+.detail-table{width:100%;border-collapse:collapse;font-size:11.5px;background:#fff;}
+.detail-table thead th{background:#1a365d;color:#fff;padding:10px 8px;text-align:center;font-weight:600;font-size:11px;border:1px solid #2c5282;position:sticky;top:0;z-index:1;}
+.detail-table tbody td{padding:7px 8px;text-align:right;border:1px solid #edf2f7;font-variant-numeric:tabular-nums;}
+.detail-table tbody td.name{text-align:left;font-weight:600;color:#2d3748;}
+.detail-table tbody td.tag{text-align:center;font-size:10px;}
+.detail-table tbody tr:nth-child(even){background:#f7fafc;}
+.detail-table tbody tr:hover{background:#ebf8ff;}
+.tag-badge{display:inline-block;padding:2px 7px;font-size:10px;font-weight:700;border-radius:8px;}
+.tag-주력{background:#bee3f8;color:#2c5282;}
+.tag-전략{background:#c6f6d5;color:#22543d;}
+.tag-신제품{background:#feebc8;color:#744210;}
+.tag-기타{background:#edf2f7;color:#4a5568;}
+.search-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;padding:12px;background:#f7fafc;border:1px solid var(--border);border-radius:8px;}
+.search-bar input,.search-bar select{padding:7px 12px;border:1px solid #cbd5e0;border-radius:6px;font-size:12px;}
+.search-bar input{flex:1;min-width:200px;}
+.row-count{font-size:11px;color:var(--muted);font-weight:600;}
+.fetching-banner{background:#fffaf0;border:1px solid #f6ad55;padding:10px 14px;border-radius:8px;margin-bottom:14px;font-size:12px;color:#7b341e;display:flex;align-items:center;gap:8px;}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid #f6ad55;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.live-tag{font-size:9px;color:var(--accent);font-weight:700;background:#faf5ff;padding:1px 6px;border-radius:8px;margin-left:4px;}
+.help-block{background:#ebf8ff;border:1px solid #90cdf4;padding:12px 16px;border-radius:8px;margin-bottom:14px;font-size:12px;color:#2c5282;line-height:1.6;}
+.gap-pos{color:#c53030;font-weight:700;}
+.gap-neg{color:#2c5282;font-weight:700;}
+.gap-zero{color:#718096;}
+@media(max-width:900px){
+  .kpi-row{grid-template-columns:repeat(2,1fr);}
+  .pm-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:640px){
+  .kpi-row{grid-template-columns:1fr;}
+  .pm-grid{grid-template-columns:1fr;}
+  .header{flex-direction:column;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <h1>📊 PM별 전품목 예측 · 신뢰도 분석</h1>
+    <div class="sub" id="headerSub">PMFP 마감예측·디마케팅 탭 자동 동기화 · 매월 마감 시 자동 갱신</div>
+  </div>
+  <div style="text-align:right;">
+    <span class="badge" id="closingBadge">마감월 확인 중…</span><br>
+    <a href="analysis-2026q1.html" class="header-back" style="display:inline-block;margin-top:8px;">← 메인 대시보드</a>
+  </div>
+</div>
+
+<div class="content">
+  <div id="fetchBanner" class="fetching-banner">
+    <span class="spinner"></span>
+    <span><b>데이터 로딩 중…</b> PMFP 디마케팅·마감예측 탭에서 전품목 데이터를 가져오고 있습니다 (3~5초 소요).</span>
+  </div>
+
+  <div class="help-block">
+    <b>📌 화면 구성:</b> 상단 KPI(전사 합계) → PM 카드 그리드(8명+미분류) → 선택된 PM의 품목 디테일.
+    <b>신뢰도</b>는 1~T-1월 동안 PMFP 1차/2차 입력값과 실제 SAP 마감의 정확도(평균) 기준 산출.
+    <b>예측 갭</b>은 PM 입력 vs Claude 예측 차이 — +면 PM이 공격적, -면 보수적.
+  </div>
+
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <div class="pm-chip-bar" id="pmChipBar">
+    <span>👤 담당 PM:</span>
+    <span class="pm-chip active" data-pm="">전체</span>
+    <span class="pm-chip" data-pm="임범성">임범성</span>
+    <span class="pm-chip" data-pm="강태석">강태석</span>
+    <span class="pm-chip" data-pm="박지현">박지현</span>
+    <span class="pm-chip" data-pm="김지완">김지완</span>
+    <span class="pm-chip" data-pm="최우열">최우열</span>
+    <span class="pm-chip" data-pm="이민정">이민정</span>
+    <span class="pm-chip" data-pm="김유연">김유연</span>
+    <span class="pm-chip" data-pm="강경완">강경완</span>
+    <span class="pm-chip" data-pm="미분류">미분류</span>
+  </div>
+
+  <div class="card">
+    <h3>📇 PM별 카드 — 클릭하면 해당 PM의 품목만 필터링</h3>
+    <div class="pm-grid" id="pmGrid"></div>
+  </div>
+
+  <div class="card">
+    <h3>📋 품목별 예측 디테일 <span id="detailFilterLabel" style="font-size:11px;color:var(--muted);font-weight:400;">(전체)</span></h3>
+    <div class="search-bar">
+      <input id="prodSearch" type="text" placeholder="품목명 검색…">
+      <select id="prodSort">
+        <option value="ytd_desc">YTD 매출 내림차순</option>
+        <option value="ach_asc">달성률 오름차순 (위험순)</option>
+        <option value="ach_desc">달성률 내림차순</option>
+        <option value="gap_desc">예측 갭 절대값 큰 순</option>
+        <option value="conf_asc">신뢰도 낮은 순</option>
+        <option value="name">품목명 가나다순</option>
+      </select>
+      <label style="font-size:11px;color:#4a5568;">
+        <input type="checkbox" id="hideZero" checked> YTD 0원 품목 숨김
+      </label>
+      <span class="row-count" id="rowCount">-</span>
+    </div>
+    <div style="overflow-x:auto;max-height:700px;overflow-y:auto;">
+      <table class="detail-table" id="detailTable">
+        <thead><tr>
+          <th>품목 (군명)</th>
+          <th>태그</th>
+          <th>담당PM</th>
+          <th>YTD 실적<br><small id="hYtd">(1~T월)</small></th>
+          <th>T월 마감</th>
+          <th>MoM%</th>
+          <th>전년동월</th>
+          <th>YoY%</th>
+          <th>T+1월<br>PM 1차<span class="live-tag">LIVE</span></th>
+          <th>T+1월<br>PM 2차<span class="live-tag">LIVE</span></th>
+          <th>Claude<br>T+1월</th>
+          <th>갭<br>(PM−Claude)</th>
+          <th>신뢰도<br><small>(과거)</small></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// =================== CONFIG ===================
+const PMFP_SHEET_ID = '1LYuUQrUrtFLfUCjpUgoVNtEqIyTv-0l_-F6nSY4ESF0';
+const PMFP_DEMARK_GID = '1872071682';   // 디마케팅 탭 (마감 매출)
+const PMFP_FORECAST_GID = '1589134561'; // 마감예측 탭 (1차/2차 PM 예측)
+
+// 디마케팅 탭 컬럼 (0-indexed)
+const DEMARK_COL = {
+  pm: 2, group1: 4, group2: 6, group3: 8, form: 9, label: 10,
+  m25_start: 25,  // 25년 1월 ~ 12월: col 25~36
+  m26_start: 38,  // 26년 1월 ~ 12월: col 38~49
+};
+
+// 마감예측 탭 컬럼 (0-indexed)
+const FORECAST_COL = {
+  pm: 1, group1: 2, group2: 3, group3: 4, label: 5,
+  m24_start: 6,    // 24년 1~12월
+  m25_start: 18,   // 25년 1~12월
+  m26_start: 30,   // 26년 1~12월 (실적)
+  sf25_start: 42,  // 25년 목표 1~12월
+  sf26_start: 54,  // 26년 목표 1~12월
+  // 26년 월별 1차/2차 PM 예측 컬럼: 메모리 기반
+  // 26.4월 = 78(1차)/79(2차), 26.3월 = 74/75, 26.2월 = 70/71, 26.1월 = 66/67
+  // 즉 (월-1)*4 + 66 = 1차 컬럼, +1 = 2차
+  fc26: (mo) => 66 + (mo-1)*4,
+  fc26_2: (mo) => 67 + (mo-1)*4,
+};
+
+const PM_LIST = ['임범성','강태석','박지현','김지완','최우열','이민정','김유연','강경완'];
+
+// 전역 상태
+let G_PRODUCTS = [];   // 품목 통합 데이터 [{name, group2, pm, monthly_26[12], monthly_25[12], sf_26[12], fc1_26[12], fc2_26[12], ...derived}]
+let G_TARGET_T = null; // 마감월 (1~12)
+let G_FILTER_PM = '';  // 선택 PM
+let G_TOTAL = null;    // 전사 집계
+
+// 헬퍼
+const fmt = (v, d=1) => (v==null||isNaN(v)) ? '-' : (+v).toFixed(d);
+const sumT = (arr, T) => (arr||[]).slice(0, T).reduce((a,v)=>a+(+v||0), 0);
+const toNum = (s) => {
+  if(typeof s==='number') return s;
+  if(s==null) return 0;
+  s = String(s).trim().replace(/,/g,'').replace(/^"|"$/g,'');
+  if(s===''||s==='-') return 0;
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+};
+
+// =================== CSV PARSE ===================
+function parseCSV(text){
+  const rows = [];
+  let cur = '', row = [], inQ = false;
+  for(let i=0;i<text.length;i++){
+    const ch = text[i];
+    if(inQ){
+      if(ch==='"' && text[i+1]==='"'){ cur+='"'; i++; }
+      else if(ch==='"'){ inQ = false; }
+      else { cur += ch; }
+    } else {
+      if(ch==='"') inQ = true;
+      else if(ch===','){ row.push(cur); cur=''; }
+      else if(ch==='\n'){ row.push(cur); rows.push(row); row=[]; cur=''; }
+      else if(ch==='\r'){ /* skip */ }
+      else cur += ch;
+    }
+  }
+  if(cur || row.length){ row.push(cur); rows.push(row); }
+  return rows;
+}
+
+// =================== 동기 fetch (Promise) ===================
+function fetchCSV(sheetId, gid){
+  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&gid=${gid}&_=${Date.now()}`;
+  return fetch(url, {credentials:'omit'}).then(r=>r.text()).then(parseCSV);
+}
+
+// =================== 마감월 자동 감지 ===================
+function detectClosingMonth(productMap){
+  // 모든 품목의 26년 월별 매출 합산해서 마지막 비제로 월 찾기
+  const total = new Array(12).fill(0);
+  for(const k in productMap){
+    const m = productMap[k].monthly_26 || [];
+    for(let i=0;i<12;i++) total[i] += +(m[i]||0);
+  }
+  let last = -1;
+  for(let i=0;i<12;i++) if(total[i] > 0.01) last = i;
+  return last < 0 ? 3 : (last + 1);  // 1-idx 마감월
+}
+
+// =================== 데이터 정규화 ===================
+function buildProductData(demarkRows, fcRows){
+  // 디마케팅 탭에서 군별 매출 집계 → group2(군명) 단위 통합
+  // 마감예측 탭에서 1차/2차 PM 예측치 가져오기
+
+  // (1) 마감예측 탭: 군별로 집계 (담당PM 포함)
+  // row 1부터 데이터 (row 0은 메가헤더)
+  // 각 row의 col 1=PM, col 3=군명, col 30~41=26년 매출, col 54~65=26년 목표, col 66/67/70/71...=1차/2차 예측
+  const fcGroups = {};  // group2 → {pm, monthly_26, sf_26, fc1_26, fc2_26}
+  for(let i=2; i<fcRows.length; i++){
+    const r = fcRows[i];
+    if(!r || r.length < 80) continue;
+    const grp2 = (r[FORECAST_COL.group2]||'').trim();
+    const pm = (r[FORECAST_COL.pm]||'').trim();
+    if(!grp2) continue;
+    if(/총합|합계|소계/.test(grp2)) continue;
+    if(!fcGroups[grp2]){
+      fcGroups[grp2] = {
+        pm: pm || '미분류',
+        monthly_26: new Array(12).fill(0),
+        sf_26: new Array(12).fill(0),
+        fc1_26: new Array(12).fill(0),
+        fc2_26: new Array(12).fill(0),
+      };
+    } else if(!fcGroups[grp2].pm && pm){
+      fcGroups[grp2].pm = pm;
+    }
+    const g = fcGroups[grp2];
+    for(let m=0; m<12; m++){
+      g.monthly_26[m] += toNum(r[FORECAST_COL.m26_start + m]) / 1e6;  // 백만 단위
+      g.sf_26[m]      += toNum(r[FORECAST_COL.sf26_start + m]) / 1e6;
+      g.fc1_26[m]     += toNum(r[FORECAST_COL.fc26(m+1)]) / 1e6;       // 백만 단위
+      g.fc2_26[m]     += toNum(r[FORECAST_COL.fc26_2(m+1)]) / 1e6;
+    }
+  }
+
+  // (2) 디마케팅 탭에서 군별 25년 매출 보강 (마감예측 탭에 없는 경우)
+  // 디마케팅 탭은 row 1부터 데이터, col 6 = 군명, col 25~36 = 25년 1~12월 (원 단위)
+  const demarkAgg = {};
+  for(let i=1; i<demarkRows.length; i++){
+    const r = demarkRows[i];
+    if(!r || r.length < 50) continue;
+    const grp2 = (r[DEMARK_COL.group2]||'').trim();
+    if(!grp2) continue;
+    if(/총합|합계|소계/.test(grp2)) continue;
+    if(!demarkAgg[grp2]){
+      demarkAgg[grp2] = {
+        monthly_26_won: new Array(12).fill(0),
+        monthly_25_won: new Array(12).fill(0),
+        pm: (r[DEMARK_COL.pm]||'').trim(),
+      };
+    }
+    for(let m=0; m<12; m++){
+      demarkAgg[grp2].monthly_26_won[m] += toNum(r[DEMARK_COL.m26_start + m]);
+      demarkAgg[grp2].monthly_25_won[m] += toNum(r[DEMARK_COL.m25_start + m]);
+    }
+  }
+
+  // (3) 통합: fcGroups 기준 + 디마케팅 탭 25년 데이터 추가
+  const products = [];
+  for(const grp2 in fcGroups){
+    const f = fcGroups[grp2];
+    const d = demarkAgg[grp2];
+    // 26년 매출은 디마케팅 탭(원→억)이 더 정확 (마감예측 탭은 PM 입력 기반이라 일부 누락 가능)
+    const monthly_26_eok = (d ? d.monthly_26_won.map(v=>v/1e8) : f.monthly_26.map(v=>v/100));
+    const monthly_25_eok = (d ? d.monthly_25_won.map(v=>v/1e8) : new Array(12).fill(0));
+    // SF 목표: 마감예측 탭 (백만 → 억)
+    const sf_26_eok = f.sf_26.map(v=>v/100);
+    const fc1_26_eok = f.fc1_26.map(v=>v/100);
+    const fc2_26_eok = f.fc2_26.map(v=>v/100);
+    products.push({
+      name: grp2,
+      pm: f.pm || (d?d.pm:'') || '미분류',
+      monthly_26: monthly_26_eok,
+      monthly_25: monthly_25_eok,
+      sf_26: sf_26_eok,
+      fc1_26: fc1_26_eok,
+      fc2_26: fc2_26_eok,
+    });
+  }
+  return products;
+}
+
+// =================== 카테고리 (주력/전략/신제품/기타) ===================
+const PRIMARY_6 = ['바이오탑','노르믹스','엘리가드','헤어그로','알파본','글루코프리','글루코다운','아다모'];
+const STRATEGIC_9 = ['하노마린','네오미노화겐','앱시토','덱시티옥','베노론','한시움','헤파몬','클로비드','포드림'];
+const NEW_26 = ['콤비플렉스','미녹필','이글렉스','이글듀오','엔잘루타','헤어덤','프레가발린'];
+function categorize(name){
+  const nm = name||'';
+  if(PRIMARY_6.some(k=>nm.includes(k))) return '주력';
+  if(STRATEGIC_9.some(k=>nm.includes(k))) return '전략';
+  if(NEW_26.some(k=>nm.includes(k))) return '신제품';
+  return '기타';
+}
+
+// =================== Claude 예측 (3-method 평균) ===================
+function calcClaude(p, T){
+  // T = 0-indexed (예측 대상월). T+1월을 예측하려면 nextIdx = T (0-indexed), 또는 T = TARGET_MONTH_NUM (1-idx) 면 nextIdx = T (0-idx)
+  // 여기서 T는 0-indexed 마감 다음월
+  const m26 = p.monthly_26 || [];
+  const m25 = p.monthly_25 || [];
+  // YTD = 1 ~ T월 (0~T-1 인덱스), 다음월 = T (0-indexed)
+  const YTD_NUM = T;  // T+1월 예측이면, T=마감월 0-indexed = 다음월 인덱스
+  const ytd_26 = m26.slice(0, YTD_NUM).reduce((a,v)=>a+(+v||0),0);
+  const ytd_25 = m25.slice(0, YTD_NUM).reduce((a,v)=>a+(+v||0),0);
+
+  // 방법A: 직전월 × 25년 비율
+  const prev = m26[YTD_NUM-1] || 0;
+  const m25prev = m25[YTD_NUM-1] || 0;
+  const m25next = m25[YTD_NUM] || 0;
+  const f_A = m25prev > 0.01 ? prev * (m25next / m25prev) : null;
+
+  // 방법B: YTD 월평균 × 1.0
+  const ytdAvg = YTD_NUM > 0 ? ytd_26 / YTD_NUM : 0;
+  const f_B = ytdAvg;
+
+  // 방법C: 25년 동월 × YTD YoY
+  const yoyRate = ytd_25 > 0.01 ? (ytd_26 / ytd_25) : 1;
+  const f_C = m25next * yoyRate;
+
+  const candidates = [f_A, f_B, f_C].filter(v => v != null && !isNaN(v) && v >= 0);
+  if(candidates.length === 0) return null;
+  return +(candidates.reduce((a,b)=>a+b,0) / candidates.length).toFixed(2);
+}
+
+// =================== 신뢰도 (과거 1~T-1월 PM 1차/2차 vs 실제 마감 정확도) ===================
+function calcAccuracy(p, T){
+  // 1~T-1월의 (1차+2차)/2 vs 실적 평균오차율 → 정확도
+  let totalAcc = 0, n = 0;
+  for(let m=0; m<T-1; m++){  // 0~T-2 (1~T-1월)
+    const actual = p.monthly_26[m] || 0;
+    const pred = ((p.fc1_26[m] || 0) + (p.fc2_26[m] || 0)) / 2;
+    const usePred = pred > 0.01 ? pred : (p.fc1_26[m] || 0);
+    if(actual > 0.5 && usePred > 0.01){
+      const err = Math.abs(actual - usePred) / Math.max(actual, usePred);
+      const acc = (1 - err) * 100;
+      totalAcc += acc; n++;
+    }
+  }
+  return n > 0 ? +(totalAcc / n).toFixed(0) : null;
+}
+
+// =================== 렌더 ===================
+function renderKPI(){
+  const T = G_TARGET_T;
+  const T_idx = T;  // 0-indexed: 다음월 예측 대상
+  const ytd = G_PRODUCTS.reduce((a,p)=>a + sumT(p.monthly_26, T), 0);
+  const ytdSF = G_PRODUCTS.reduce((a,p)=>a + sumT(p.sf_26, T), 0);
+  const ach = ytdSF > 0 ? (ytd/ytdSF*100) : 0;
+  const tCur = G_PRODUCTS.reduce((a,p)=>a + (p.monthly_26[T-1]||0), 0);
+  const fc1Next = G_PRODUCTS.reduce((a,p)=>a + (p.fc1_26[T_idx]||0), 0);
+  const fc2Next = G_PRODUCTS.reduce((a,p)=>a + (p.fc2_26[T_idx]||0), 0);
+  const claudeNext = G_PRODUCTS.reduce((a,p)=>{
+    const c = calcClaude(p, T_idx);
+    return a + (c||0);
+  }, 0);
+  document.getElementById('kpiRow').innerHTML = `
+    <div class="kpi"><div class="label">전사 YTD 실적 (1~${T}월)</div><div class="value">${fmt(ytd,1)}</div><div class="unit">억원</div>
+      <div class="change">SF ${fmt(ytdSF,1)}억 대비 ${fmt(ach,1)}%</div></div>
+    <div class="kpi"><div class="label">${T}월 마감</div><div class="value">${fmt(tCur,1)}</div><div class="unit">억원</div>
+      <div class="change">${G_PRODUCTS.length}품목 합계</div></div>
+    <div class="kpi"><div class="label">${T+1<=12?T+1:12}월 PM 예측 (1차+2차)</div><div class="value" style="color:#553c9a">${fmt((fc1Next+fc2Next)/2,1)}</div><div class="unit">억원</div>
+      <div class="change">1차 ${fmt(fc1Next,1)} · 2차 ${fmt(fc2Next,1)}</div></div>
+    <div class="kpi"><div class="label">${T+1<=12?T+1:12}월 Claude 예측</div><div class="value" style="color:#2c5282">${fmt(claudeNext,1)}</div><div class="unit">억원</div>
+      <div class="change">갭 PM−Claude: ${fmt((fc1Next+fc2Next)/2 - claudeNext,1)}억</div></div>`;
+}
+
+function renderPMCards(){
+  const T = G_TARGET_T;
+  const T_idx = T;
+  // PM별 집계
+  const pmGroups = {};
+  ['미분류'].concat(PM_LIST).forEach(pm => pmGroups[pm] = []);
+  G_PRODUCTS.forEach(p => {
+    const pm = PM_LIST.includes(p.pm) ? p.pm : '미분류';
+    pmGroups[pm].push(p);
+  });
+  const grid = document.getElementById('pmGrid');
+  grid.innerHTML = PM_LIST.concat(['미분류']).map(pm => {
+    const list = pmGroups[pm] || [];
+    const ytd = list.reduce((a,p)=>a+sumT(p.monthly_26,T),0);
+    const ytdSF = list.reduce((a,p)=>a+sumT(p.sf_26,T),0);
+    const ach = ytdSF > 0 ? (ytd/ytdSF*100) : null;
+    const tCur = list.reduce((a,p)=>a+(p.monthly_26[T-1]||0),0);
+    const fc1 = list.reduce((a,p)=>a+(p.fc1_26[T_idx]||0),0);
+    const fc2 = list.reduce((a,p)=>a+(p.fc2_26[T_idx]||0),0);
+    // 평균 신뢰도
+    const accs = list.map(p=>calcAccuracy(p,T)).filter(v=>v!=null);
+    const avgAcc = accs.length > 0 ? Math.round(accs.reduce((a,b)=>a+b,0)/accs.length) : null;
+    const confClass = avgAcc==null ? '' : (avgAcc>=85 ? 'conf-high' : avgAcc>=70 ? 'conf-mid' : 'conf-low');
+    return `<div class="pm-card" data-pm="${pm}" onclick="selectPM('${pm}')">
+      <div class="pm-card-name">${pm}<span class="pm-card-cnt">${list.length}품목</span></div>
+      <div class="pm-card-rows">
+        <div class="pm-card-row"><span class="label">YTD 실적</span><span class="value">${fmt(ytd,1)}억</span></div>
+        <div class="pm-card-row"><span class="label">YTD 목표</span><span class="value">${fmt(ytdSF,1)}억</span></div>
+        <div class="pm-card-row"><span class="label">달성률</span><span class="value ${ach==null?'':(ach>=95?'green':ach>=85?'':'red')}">${ach==null?'-':fmt(ach,1)+'%'}</span></div>
+        <div class="pm-card-row"><span class="label">${T}월 마감</span><span class="value">${fmt(tCur,1)}억</span></div>
+        <div class="pm-card-row"><span class="label">${T+1<=12?T+1:12}월 PM 1차</span><span class="value live">${fmt(fc1,1)}억</span></div>
+        <div class="pm-card-row"><span class="label">${T+1<=12?T+1:12}월 PM 2차</span><span class="value live">${fmt(fc2,1)}억</span></div>
+      </div>
+      <div class="pm-card-conf">
+        <span class="pm-card-conf-label">예측 신뢰도</span>
+        <span class="pm-card-conf-val ${confClass}">${avgAcc==null?'-':avgAcc+'%'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderDetailTable(){
+  const T = G_TARGET_T;
+  const T_idx = T;
+  const search = (document.getElementById('prodSearch').value || '').trim().toLowerCase();
+  const sortMode = document.getElementById('prodSort').value;
+  const hideZero = document.getElementById('hideZero').checked;
+  let list = G_PRODUCTS.slice();
+  // PM 필터
+  if(G_FILTER_PM){
+    if(G_FILTER_PM === '미분류') list = list.filter(p => !PM_LIST.includes(p.pm));
+    else list = list.filter(p => p.pm === G_FILTER_PM);
+  }
+  // 검색
+  if(search) list = list.filter(p => p.name.toLowerCase().includes(search));
+  // 0 매출 숨김
+  if(hideZero) list = list.filter(p => sumT(p.monthly_26,T) > 0.01 || (p.fc1_26[T_idx]||0) > 0.01 || (p.fc2_26[T_idx]||0) > 0.01);
+  // 파생 데이터 계산
+  list.forEach(p => {
+    p._ytd = sumT(p.monthly_26, T);
+    p._ytdSF = sumT(p.sf_26, T);
+    p._ach = p._ytdSF > 0 ? (p._ytd/p._ytdSF*100) : null;
+    p._tCur = p.monthly_26[T-1] || 0;
+    p._tPrev = T>=2 ? (p.monthly_26[T-2]||0) : 0;
+    p._mom = p._tPrev > 0.01 ? ((p._tCur/p._tPrev - 1)*100) : null;
+    p._t25 = p.monthly_25[T-1] || 0;
+    p._yoy = p._t25 > 0.01 ? ((p._tCur/p._t25 - 1)*100) : null;
+    p._fc1Next = p.fc1_26[T_idx] || 0;
+    p._fc2Next = p.fc2_26[T_idx] || 0;
+    p._claudeNext = calcClaude(p, T_idx) || 0;
+    const pmAvg = (p._fc1Next + p._fc2Next) / 2;
+    p._gap = (p._fc1Next > 0 || p._fc2Next > 0) ? (pmAvg - p._claudeNext) : null;
+    p._acc = calcAccuracy(p, T);
+    p._cat = categorize(p.name);
+  });
+  // 정렬
+  const sorters = {
+    ytd_desc: (a,b)=>b._ytd-a._ytd,
+    ach_asc: (a,b)=>(a._ach==null?Infinity:a._ach)-(b._ach==null?Infinity:b._ach),
+    ach_desc: (a,b)=>(b._ach==null?-Infinity:b._ach)-(a._ach==null?-Infinity:a._ach),
+    gap_desc: (a,b)=>Math.abs(b._gap||0)-Math.abs(a._gap||0),
+    conf_asc: (a,b)=>(a._acc==null?Infinity:a._acc)-(b._acc==null?Infinity:b._acc),
+    name: (a,b)=>a.name.localeCompare(b.name,'ko'),
+  };
+  list.sort(sorters[sortMode] || sorters.ytd_desc);
+  // 헤더 라벨 갱신
+  document.getElementById('hYtd').textContent = `(1~${T}월)`;
+  document.querySelectorAll('#detailTable thead th').forEach(th=>{
+    th.innerHTML = th.innerHTML.replace(/T월/g, T+'월').replace(/T\+1월/g, ((T+1<=12?T+1:'12')+'월'));
+  });
+  // 본문
+  const tbody = document.querySelector('#detailTable tbody');
+  if(list.length === 0){
+    tbody.innerHTML = `<tr><td colspan="13" style="text-align:center;padding:30px;color:#a0aec0;">조건에 맞는 품목이 없습니다.</td></tr>`;
+  } else {
+    tbody.innerHTML = list.map(p => {
+      const achColor = p._ach==null?'':(p._ach>=95?'#38a169':p._ach>=85?'#dd6b20':'#c53030');
+      const momColor = p._mom==null?'':(p._mom>=0?'#22543d':'#9b2c2c');
+      const yoyColor = p._yoy==null?'':(p._yoy>=0?'#22543d':'#9b2c2c');
+      const gapClass = p._gap==null ? 'gap-zero' : (Math.abs(p._gap)<0.1 ? 'gap-zero' : (p._gap>0?'gap-pos':'gap-neg'));
+      const confClass = p._acc==null?'':(p._acc>=85?'conf-high':p._acc>=70?'conf-mid':'conf-low');
+      return `<tr>
+        <td class="name">${p.name}</td>
+        <td class="tag"><span class="tag-badge tag-${p._cat}">${p._cat}</span></td>
+        <td class="tag">${p.pm||'미분류'}</td>
+        <td>${fmt(p._ytd,1)}</td>
+        <td style="font-weight:700;">${fmt(p._tCur,1)}</td>
+        <td style="color:${momColor};font-weight:600">${p._mom==null?'-':(p._mom>=0?'+':'')+fmt(p._mom,1)+'%'}</td>
+        <td style="color:#a0aec0">${fmt(p._t25,1)}</td>
+        <td style="color:${yoyColor};font-weight:600">${p._yoy==null?'-':(p._yoy>=0?'+':'')+fmt(p._yoy,1)+'%'}</td>
+        <td style="background:#faf5ff;color:#553c9a;font-weight:700">${fmt(p._fc1Next,1)}</td>
+        <td style="background:#faf5ff;color:#553c9a;font-weight:700">${fmt(p._fc2Next,1)}</td>
+        <td style="background:#ebf8ff;color:#2c5282;font-weight:700">${fmt(p._claudeNext,1)}</td>
+        <td class="${gapClass}" style="font-weight:700">${p._gap==null?'-':(p._gap>=0?'+':'')+fmt(p._gap,1)}</td>
+        <td class="${confClass}" style="font-weight:700">${p._acc==null?'-':p._acc+'%'}</td>
+      </tr>`;
+    }).join('');
+  }
+  document.getElementById('rowCount').textContent = `${list.length}품목 표시`;
+  const lblText = G_FILTER_PM ? `(${G_FILTER_PM} PM 담당)` : '(전체)';
+  document.getElementById('detailFilterLabel').textContent = lblText;
+}
+
+window.selectPM = function(pm){
+  if(G_FILTER_PM === pm) G_FILTER_PM = '';
+  else G_FILTER_PM = pm;
+  // 카드 active
+  document.querySelectorAll('.pm-card').forEach(c => c.classList.toggle('active', c.dataset.pm === G_FILTER_PM));
+  // 칩 active
+  document.querySelectorAll('.pm-chip').forEach(c => c.classList.toggle('active', c.dataset.pm === G_FILTER_PM));
+  renderDetailTable();
+};
+
+// =================== INIT ===================
+async function init(){
+  const banner = document.getElementById('fetchBanner');
+  try {
+    const [demarkRows, fcRows] = await Promise.all([
+      fetchCSV(PMFP_SHEET_ID, PMFP_DEMARK_GID),
+      fetchCSV(PMFP_SHEET_ID, PMFP_FORECAST_GID),
+    ]);
+    G_PRODUCTS = buildProductData(demarkRows, fcRows);
+    // 마감월 자동 감지: 매출 마지막 비제로 월
+    const total = new Array(12).fill(0);
+    G_PRODUCTS.forEach(p => {
+      for(let i=0;i<12;i++) total[i] += +(p.monthly_26[i]||0);
+    });
+    let last = -1;
+    for(let i=0;i<12;i++) if(total[i] > 0.01) last = i;
+    G_TARGET_T = (last < 0 ? 4 : last + 1);  // 1-idx 마감월 (e.g. 4월 마감 → 4)
+    // header
+    document.getElementById('closingBadge').textContent = `2026.${String(G_TARGET_T).padStart(2,'0')} 마감 기준`;
+    document.getElementById('headerSub').textContent = `${G_PRODUCTS.length}품목 · 마감월 ${G_TARGET_T}월 · 다음월 예측 ${G_TARGET_T+1<=12?G_TARGET_T+1:12}월 · 자동 동기화 완료`;
+    banner.style.display = 'none';
+    renderKPI();
+    renderPMCards();
+    renderDetailTable();
+  } catch(e){
+    banner.innerHTML = `<span style="color:#c53030;">❌ 데이터 로딩 실패: ${e.message}. 새로고침을 시도하거나 시트 권한을 확인해 주세요.</span>`;
+    console.error(e);
+  }
+}
+
+// 칩 클릭 이벤트 (위임)
+document.getElementById('pmChipBar').addEventListener('click', (e)=>{
+  const chip = e.target.closest('.pm-chip');
+  if(!chip) return;
+  const pm = chip.dataset.pm || '';
+  G_FILTER_PM = pm;
+  document.querySelectorAll('.pm-chip').forEach(c => c.classList.toggle('active', c.dataset.pm === pm));
+  document.querySelectorAll('.pm-card').forEach(c => c.classList.toggle('active', c.dataset.pm === pm));
+  renderDetailTable();
+});
+
+// 검색/정렬 이벤트
+document.getElementById('prodSearch').addEventListener('input', renderDetailTable);
+document.getElementById('prodSort').addEventListener('change', renderDetailTable);
+document.getElementById('hideZero').addEventListener('change', renderDetailTable);
+
+// 시작
+init();
+</script>
+</body>
+</html>
