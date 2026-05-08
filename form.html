@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>MBO 신약 진행 보고</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+/* ── GAS URL (고정) ── */
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyhk2el3kwGMStCvyUr-8B-PWS-6aKwcf5EVfvpryqlj3jEeLw5pnttHMEokrpQXO33dQ/exec';
+
+// [🟡-9] HTML 이스케이핑 — XSS 방지 및 특수문자 UI 깨짐 방지
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ── Google Sheets 전송 ── */
+async function sendToSheets() {
+  if (!items.length) { toast('보고할 항목을 먼저 추가하세요'); return; }
+  if (!rpm) { toast('RPM을 선택해주세요'); return; }
+
+  const btn = document.getElementById('btn-sheets');
+  btn.textContent = '📤 전송 중...';
+  btn.disabled = true;
+
+  const payload = {
+    rpm:  rpm,
+    date: today(),
+    items: items.map(item => ({
+      신청월:     item.신청월 || '',               // [🔴-2] 신청월 추가
+      사업자번호: String(item.사업자번호 || ''),
+      기준품명:   item.기준품명 || '',
+      담당RPM:    rpm,
+      RPM연락처:  item.RPM연락처 || '',             // [🟡-8] RPM연락처 추가
+      실납처명:   item.실납처명 || '',
+      '110대':    item.is110 ? '○' : '',
+      시군구:     item.시군구 || '',
+      제품명:     item.제품명  || '',
+      업체명:     item.업체명  || '',
+      MBO:        item.MBO || 0,
+      랜딩예정월: item.랜딩예정월 || '',
+      '상정과/KOL': item.상정과KOL || '',
+      신약과정:   item.신약과정 || item.신약단계 || '',
+      이슈상태:   item.이슈상태 || item.진행평가 || '',
+      진행사항:   item.진행사항 || '',
+      비고:       item.비고 || '',
+      _new:       item._new || false,
+      작성일:     today()
+    }))
+  };
+
+  // [🔴-3] google.script.run 우선 사용 (GAS 내장 폼 → 서버 응답 확인 가능)
+  // GAS 외부 호스팅일 경우 fetch 폴백
+  try {
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      // GAS 내장 실행: 서버 응답을 직접 받을 수 있음
+      google.script.run
+        .withSuccessHandler(function(result) {
+          if (result && result.success) {
+            toast(`✅ ${items.length}건 전송 완료! ${result.message || ''}`);
+            btn.textContent = '✅ 전송 완료';
+          } else {
+            toast(`⚠️ 서버 응답: ${result ? result.message : '알 수 없는 오류'}`);
+            btn.textContent = '⚠️ 확인 필요';
+          }
+          btn.disabled = false;
+          setTimeout(() => { btn.textContent = '📤 Google Sheets 전송'; }, 4000);
+          step(4);
+        })
+        .withFailureHandler(function(err) {
+          toast('❌ 전송 실패: ' + (err.message || err));
+          btn.textContent = '📤 Google Sheets 전송';
+          btn.disabled = false;
+        })
+        .processFormPayload(JSON.stringify(payload));
+    } else {
+      // 외부 호스팅 폴백: fetch 사용 (no-cors → 응답 확인 제한)
+      const resp = await fetch(GAS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+        body: JSON.stringify(payload)
+      });
+      // no-cors는 opaque response → 성공 여부 확인 불가, 경고 표시
+      setTimeout(() => {
+        toast(`📤 ${items.length}건 전송됨 — Google Sheets에서 저장 확인을 권장합니다.`);
+        btn.textContent = '📤 전송됨 (확인 권장)';
+        btn.disabled = false;
+        setTimeout(() => { btn.textContent = '📤 Google Sheets 전송'; }, 4000);
+        step(4);
+      }, 2000);
+    }
+  } catch (err) {
+    toast('❌ 전송 실패: ' + err.message);
+    btn.textContent = '📤 Google Sheets 전송';
+    btn.disabled = false;
+  }
+}
+</script>
+<style>
+:root{--blue:#1a4fa0;--blue-lt:#e8effa;--blue-dk:#123575;--green:#16a34a;--green-lt:#dcfce7;--green-dk:#14532d;--yellow-lt:#fef9c3;--red-lt:#fee2e2;--gray1:#f1f5f9;--gray2:#e2e8f0;--gray3:#94a3b8;--gray4:#475569;--gray5:#1e293b;--shadow:0 1px 6px rgba(0,0,0,.10)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#eef2f9;color:var(--gray5);font-size:14px}
+.hd{background:var(--blue);color:#fff;padding:14px 16px 12px;position:sticky;top:0;z-index:50;box-shadow:0 2px 8px rgba(26,79,160,.3)}
+.hd-top{display:flex;justify-content:space-between;align-items:center}
+.hd h1{font-size:15px;font-weight:700}.hd-sub{font-size:11px;opacity:.7;margin-top:2px}
+.step-bar{display:flex;margin-top:10px;background:rgba(255,255,255,.15);border-radius:6px;overflow:hidden}
+.step-item{flex:1;text-align:center;padding:5px 0;font-size:10px;font-weight:600;opacity:.45;transition:.2s}
+.step-item.done{opacity:.7}.step-item.active{background:rgba(255,255,255,.25);opacity:1}
+.rpm-badge{background:rgba(255,255,255,.2);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;display:none}
+.wrap{max-width:680px;margin:0 auto;padding:14px 12px 80px}
+.card{background:#fff;border-radius:12px;box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden}
+.card-hd{padding:11px 16px;background:var(--blue-lt);border-bottom:1px solid var(--gray2);font-weight:700;font-size:12px;color:var(--blue);display:flex;align-items:center;justify-content:space-between}
+.card-bd{padding:14px 16px}
+/* 로딩 카드 */
+.load-box{text-align:center;padding:28px 16px}
+.load-box .ico{font-size:36px;margin-bottom:10px}
+.load-box p{font-size:14px;font-weight:700;color:var(--blue);margin-bottom:6px}
+.load-box small{font-size:11px;color:var(--gray4)}
+.load-spin{display:inline-block;width:32px;height:32px;border:3px solid var(--blue-lt);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-ok .card-hd{background:var(--green-lt);color:var(--green-dk);border-bottom-color:#a7f3d0}
+.load-ok .load-box{background:var(--green-lt)}
+.load-ok .load-box p{color:var(--green-dk)}
+.load-err .card-hd{background:#fee2e2;color:#b91c1c;border-bottom-color:#fca5a5}
+.load-err .load-box p{color:#b91c1c}
+.btn-retry{margin-top:12px;padding:9px 20px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer}
+/* RPM */
+.rpm-wrap{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px}
+.rpm-btn{padding:9px 18px;border:2px solid var(--gray2);border-radius:50px;background:#fff;font-size:13px;font-weight:700;color:var(--gray4);cursor:pointer;transition:.15s}
+.rpm-btn:hover{border-color:var(--blue);color:var(--blue)}.rpm-btn.on{border-color:var(--blue);background:var(--blue);color:#fff}
+/* 검색 */
+.sw{position:relative;margin-bottom:10px}
+.si{width:100%;border:2px solid var(--gray2);border-radius:8px;padding:11px 36px;font-size:14px;background:#fff;color:var(--gray5);font-family:inherit;transition:.15s}
+.si:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,79,160,.1)}
+.si-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}
+.si-clr{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:var(--gray2);border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:13px;color:var(--gray4);display:none;line-height:22px;text-align:center;font-weight:700}
+.sr-wrap{background:#fff;border:1px solid var(--gray2);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);max-height:260px;overflow-y:auto;display:none;position:relative;z-index:10}
+.sr{padding:10px 14px;border-bottom:1px solid var(--gray1);display:flex;justify-content:space-between;align-items:center;gap:8px;transition:.1s;cursor:pointer}
+.sr:last-child{border-bottom:none}.sr:hover{background:var(--blue-lt)}.sr.added{opacity:.4;pointer-events:none}
+.sr-l .hn{font-weight:700;font-size:13px}.sr-l .hm{font-size:11px;color:var(--gray3);margin-top:2px}
+.sr-add{background:var(--blue);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.sr-done{font-size:11px;color:var(--gray3);flex-shrink:0}
+.no-sr{padding:14px;text-align:center;color:var(--gray3);font-size:13px}
+/* 목록 */
+.rlist{display:flex;flex-direction:column;gap:10px}
+.empty-msg{padding:22px;text-align:center;color:var(--gray3);font-size:13px;line-height:1.8}
+.ri{border:1.5px solid var(--gray2);border-radius:10px;overflow:hidden}
+.ri.isnew{border-color:#a855f7;border-style:dashed}
+.ri-hd{padding:10px 14px;background:var(--gray1);display:flex;justify-content:space-between;align-items:center;gap:6px}
+.ri-hl{flex:1;min-width:0}
+.ri-hn{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ri-hm{font-size:11px;color:var(--gray3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ri-del{background:none;border:none;color:var(--gray3);font-size:20px;cursor:pointer;flex-shrink:0;line-height:1;padding:0 4px}
+.ri-del:hover{color:#dc2626}
+.ri-bd{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.badge-new{background:#f3e8ff;color:#7c3aed;border:1px solid #c4b5fd;border-radius:4px;font-size:10px;padding:1px 6px;font-weight:700;margin-left:4px}
+.badge-dc{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:4px;font-size:10px;padding:1px 6px;font-weight:700;margin-left:4px;animation:dcPulse 2s ease-in-out infinite}
+@keyframes dcPulse{0%,100%{opacity:1}50%{opacity:.6}}
+.dc-changed{border-color:#f59e0b !important;background:#fffbeb !important}
+.hist-icon{display:inline-block;cursor:help;font-size:12px;margin-left:4px;opacity:.65;vertical-align:middle;transition:opacity .15s}.hist-icon:hover{opacity:1}
+.hist-label{position:relative;display:inline-flex;align-items:center;gap:2px}
+.dc-old{font-size:10px;color:#92400e;text-decoration:line-through;margin-right:4px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ig{display:flex;flex-direction:column;gap:4px}
+.ig label{font-size:11px;font-weight:700;color:var(--gray4);letter-spacing:.3px}
+.ig select,.ig input{border:1.5px solid var(--gray2);border-radius:7px;padding:8px 10px;font-size:13px;background:#fff;color:var(--gray5);width:100%;-webkit-appearance:none;appearance:none;font-family:inherit}
+.ig select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.ig select:focus,.ig input:focus{outline:none;border-color:var(--blue)}
+.ev-row{display:flex;gap:6px}
+.ev{flex:1;padding:8px 4px;border:1.5px solid var(--gray2);border-radius:7px;background:#fff;cursor:pointer;text-align:center;font-size:18px;transition:.15s;line-height:1.3}
+.ev small{display:block;font-size:10px;color:var(--gray4);font-weight:600}
+.ev.g{border-color:#86efac;background:var(--green-lt)}.ev.y{border-color:#fde68a;background:var(--yellow-lt)}.ev.r{border-color:#fca5a5;background:var(--red-lt)}
+.iss-sel{width:100%;border:1.5px solid var(--gray2);border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;outline:none;font-weight:700}
+.iss-sel.정상{background:#dcfce7;color:#166534;border-color:#86efac}
+.iss-sel.DC지연{background:#fef9c3;color:#92400e;border-color:#fde68a}
+.iss-sel.오픈블럭{background:#f1f5f9;color:#475569;border-color:#cbd5e1}
+.iss-sel.DC실패재도전{background:#fed7aa;color:#9a3412;border-color:#fdba74}
+.iss-sel.DC실패종결{background:#fee2e2;color:#b91c1c;border-color:#fca5a5}
+.iss-sel.업체변경{background:#1f2937;color:#f9fafb;border-color:#374151}
+.ig textarea{border:1.5px solid var(--gray2);border-radius:7px;padding:9px 10px;font-size:13px;resize:none;height:68px;font-family:inherit;line-height:1.6;width:100%}
+.ig textarea:focus{outline:none;border-color:var(--blue)}
+.full{grid-column:1/-1}
+.add-new-btn{width:100%;padding:13px;border:2px dashed #a855f7;border-radius:10px;background:#faf5ff;color:#7c3aed;font-size:13px;font-weight:700;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.add-new-btn:hover{background:#f3e8ff}
+/* 하단 */
+.bot{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--gray2);padding:10px 16px;display:none;gap:8px;z-index:40}
+.btn-main{flex:1;padding:13px;background:var(--blue);color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer}
+.btn-main:hover{background:var(--blue-dk)}
+.btn-grn{padding:13px 14px;background:#fff;color:var(--green-dk);border:2px solid var(--green);border-radius:9px;font-size:13px;font-weight:700;cursor:pointer}
+.btn-sheets{background:#16a34a;border:none;color:#fff;border-radius:9px;padding:13px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn-sheets:hover{background:#15803d}
+.btn-sheets:disabled{background:#94a3b8;cursor:not-allowed}
+/* 모달 */
+.mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:flex-end;justify-content:center}
+.mbg.show{display:flex}
+.modal{background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:680px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column}
+.m-hd{padding:15px 18px;border-bottom:1px solid var(--gray2);font-weight:700;font-size:15px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.m-x{background:none;border:none;font-size:22px;cursor:pointer;color:var(--gray4);line-height:1}
+.m-bd{padding:16px 18px;overflow-y:auto;flex:1}
+.email-box{background:var(--gray1);border:1px solid var(--gray2);border-radius:8px;padding:14px;font-size:12px;line-height:1.9;white-space:pre-wrap;font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;user-select:all;max-height:45vh;overflow-y:auto}
+.m-ft{padding:12px 18px;border-top:1px solid var(--gray2);display:flex;gap:8px;flex-shrink:0}
+.btn-copy{flex:1;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer}
+.btn-xl{padding:12px 14px;background:#fff;color:var(--green-dk);border:2px solid var(--green);border-radius:8px;font-size:13px;font-weight:700;cursor:pointer}
+.email-meta{margin-bottom:12px;display:flex;flex-direction:column;gap:6px}
+.em-row{display:flex;align-items:center;gap:8px}
+.em-row label{font-size:11px;font-weight:700;color:var(--gray4);width:42px;flex-shrink:0}
+.em-row input{flex:1;border:1.5px solid var(--gray2);border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit}
+.em-row input:focus{outline:none;border-color:var(--blue)}
+/* 토스트 */
+.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:9px 20px;border-radius:50px;font-size:12px;font-weight:600;opacity:0;transition:opacity .3s;z-index:300;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.cnt{background:var(--blue);color:#fff;border-radius:50px;font-size:10px;padding:1px 7px;font-weight:700;margin-left:6px}
+</style>
+</head>
+<body>
+<div class="hd">
+  <div class="hd-top">
+    <div><h1>신약 진행 일일 보고</h1><div class="hd-sub">한올바이오파마 ETC마케팅기획본부</div></div>
+    <div class="rpm-badge" id="rpm-badge"></div>
+  </div>
+  <div class="step-bar">
+    <div class="step-item active" id="s1">① 데이터 로드</div>
+    <div class="step-item" id="s2">② RPM 선택</div>
+    <div class="step-item" id="s3">③ 보고 작성</div>
+    <div class="step-item" id="s4">④ 제출</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- 로딩 카드 -->
+  <div class="card" id="load-card">
+    <div class="card-hd" id="load-card-hd">📡 데이터 연결</div>
+    <div class="load-box" id="load-box">
+      <div class="load-spin" id="load-spin"></div>
+      <p id="load-status">MBO 현황 데이터 불러오는 중...</p>
+      <small id="load-sub">Google Sheets에서 최신 데이터를 가져옵니다</small>
+    </div>
+  </div>
+
+  <!-- RPM 선택 -->
+  <div class="card" id="c-rpm" style="display:none">
+    <div class="card-hd">👤 담당 RPM 선택</div>
+    <div class="rpm-wrap" id="rpm-grid"></div>
+  </div>
+
+  <!-- 보고 영역 -->
+  <div id="c-report" style="display:none">
+    <div class="card">
+      <div class="card-hd">🔍 진행된 거래처 검색 &amp; 추가</div>
+      <div class="card-bd">
+        <div class="sw">
+          <span class="si-ico">🔍</span>
+          <input class="si" id="si" type="text" placeholder="병원명 · 제품명 · CSO업체명으로 검색..." autocomplete="off">
+          <button class="si-clr" id="si-clr">×</button>
+        </div>
+        <div class="sr-wrap" id="sr-wrap"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd">📋 이번 보고 목록 <span class="cnt" id="list-cnt">0</span></div>
+      <div class="card-bd" style="padding-top:10px">
+        <div class="rlist" id="rlist"></div>
+        <div class="empty-msg" id="empty-msg">👆 위에서 병원을 검색해 추가하거나<br>아래에서 신규 블럭을 추가하세요</div>
+        <div style="margin-top:12px">
+          <button class="add-new-btn" onclick="openNB()">＋ 신규 블럭 추가 <span style="font-size:11px;font-weight:400">(리스트에 없는 새 거래처)</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 하단 버튼 -->
+<div class="bot" id="bot">
+  <button class="btn-sheets" id="btn-sheets" onclick="sendToSheets()" disabled>📤 Google Sheets 전송</button>
+  <button class="btn-grn" onclick="saveExcel()">💾 Excel 백업</button>
+  <button class="btn-main" onclick="openEmail()">📧 이메일 보고</button>
+</div>
+
+<!-- 이메일 모달 -->
+<div class="mbg" id="email-modal">
+  <div class="modal">
+    <div class="m-hd">📧 이메일 보고문 <button class="m-x" onclick="closeMd('email-modal')">✕</button></div>
+    <div class="m-bd">
+      <div class="email-meta">
+        <div class="em-row"><label>받는 분</label><input type="text" id="em-to" placeholder="수신자 이메일 주소"></div>
+        <div class="em-row"><label>제목</label><input type="text" id="em-subj" readonly></div>
+      </div>
+      <div class="email-box" id="email-body"></div>
+    </div>
+    <div class="m-ft">
+      <button class="btn-copy" onclick="copyEmail()">📋 본문 복사</button>
+      <button class="btn-xl" onclick="saveExcel()">💾 xlsx 저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 신규 블럭 모달 -->
+<div class="mbg" id="nb-modal">
+  <div class="modal">
+    <div class="m-hd">➕ 신규 거래처 블럭 추가 <button class="m-x" onclick="closeMd('nb-modal')">✕</button></div>
+    <div class="m-bd">
+      <p style="font-size:12px;color:var(--gray3);margin-bottom:14px">리스트에 없는 신규 병원·제품 조합을 추가합니다. 제출 시 Google Sheets에 새 행으로 등록됩니다.</p>
+      <div class="row2">
+        <div class="ig full"><label>병원명 *</label><input type="text" id="nb-h" placeholder="예) 서울아산병원"></div>
+        <div class="ig full" style="margin-top:-6px;padding:8px 12px;background:#fffbeb;border:1.5px solid #fcd34d;border-radius:8px;display:flex;align-items:center;gap:10px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-weight:400;font-size:13px">
+            <input type="checkbox" id="nb-is110" style="width:18px;height:18px;accent-color:#1a4fa0;cursor:pointer">
+            <span>🏥 <b>110대 병원</b> 해당 <span style="font-size:11px;color:var(--gray3);font-weight:400">(해당할 경우 체크)</span></span>
+          </label>
+        </div>
+        <div class="ig full"><label>기준품명 *</label><input type="text" id="nb-p" placeholder="예) 프레논OD정"></div>
+        <div class="ig"><label>CSO 업체명</label><input type="text" id="nb-c" placeholder="업체명 검색 또는 직접 입력" list="vendor-list" autocomplete="off"></div>
+        <div class="ig"><label>CSO 연락처</label><input type="text" id="nb-ct" placeholder="010-0000-0000"></div>
+        <div class="ig"><label>MBO 금액 (원)</label><input type="number" id="nb-m" placeholder="5000000"></div>
+        <div class="ig"><label>랜딩 예정월</label><input type="month" id="nb-ld"></div>
+        <div class="ig full"><label>상정과/KOL <span style="font-size:10px;color:var(--gray3);font-weight:400">상정과 및 담당 DR</span></label><input type="text" id="nb-kol" placeholder="예) 내과 / 홍길동 DR"></div>
+        <div class="ig"><label>신약과정</label>
+          <select id="nb-st"><option value="">-- 선택 --</option><option>미시작</option><option>업체확인(DC진행여부)</option><option>서류준비</option><option>DC신청</option><option>DC통과</option><option>코딩</option><option>처방</option></select>
+        </div>
+        <div class="ig"><label>이슈상태</label>
+          <select id="nb-iss" onchange="paintIssueSelect(this)"><option value="">-- 선택 --</option><option>정상</option><option>DC지연</option><option>오픈블럭</option><option>DC실패(재도전)</option><option>DC실패(종결)</option><option>업체변경</option></select>
+        </div>
+        <div class="ig full"><label>진행사항</label><textarea id="nb-n" placeholder="진행 내용"></textarea></div>
+        <div class="ig full"><label>비고</label><input type="text" id="nb-e" placeholder="기타 특이사항"></div>
+      </div>
+    </div>
+    <div class="m-ft"><button class="btn-copy" onclick="addNB()">목록에 추가</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<datalist id="vendor-list">
+  <option value="주식회사우희">
+  <option value="주식회사에스디메디컬">
+  <option value="주식회사유진팜">
+  <option value="지엠엘코리아주식회사(의료기기)">
+  <option value="(주)라온팜">
+  <option value="엠지코리아">
+  <option value="주식회사오믹스바이오">
+  <option value="제이아이팜">
+  <option value="주식회사에이스씨앤피">
+  <option value="미드미코리아">
+  <option value="에스디코아주식회사">
+  <option value="주식회사 에스엠파트너스">
+  <option value="주식회사율현">
+  <option value="한경팜주식회사">
+  <option value="(주)휴그린">
+  <option value="(주)에스제이피">
+  <option value="주식회사두이팜(DOOIPHARM)">
+  <option value="주식회사아소젠">
+  <option value="주식회사에스투엠">
+  <option value="뉴믹스">
+  <option value="주식회사디에스약품">
+  <option value="주식회사잘팜">
+  <option value="주식회사엠씨앤디">
+  <option value="올웨이즈팜주식회사">
+  <option value="주식회사봉수와">
+  <option value="주식회사에이치팜">
+  <option value="베어팜(주)">
+  <option value="주식회사와이제이">
+  <option value="주식회사엘디메디컴">
+  <option value="제이팜">
+  <option value="보령메디">
+  <option value="제이케이바이오">
+  <option value="주식회사에스디피씨(SDPC)">
+  <option value="주식회사큐브메디슨">
+  <option value="네오헬스팜">
+  <option value="주식회사에스비오">
+  <option value="주식회사동진유통">
+  <option value="그린건강기능식품">
+  <option value="경민팜">
+  <option value="팜메디컬">
+  <option value="에이블주식회사">
+  <option value="주식회사메디정">
+  <option value="지성메디칼">
+  <option value="유한회사하이">
+  <option value="일호메디칼">
+  <option value="주식회사꿈이있는사람들">
+  <option value="주식회사오성메디칼">
+  <option value="메디인">
+  <option value="수정팜">
+  <option value="그린팜주식회사">
+  <option value="주식회사글로벌에스케이팜">
+  <option value="주식회사원파트너스">
+  <option value="현민약품(주)">
+  <option value="(주)중앙약품">
+  <option value="우리바이오">
+  <option value="준성메디칼">
+  <option value="해인건강">
+  <option value="다온메디">
+  <option value="주식회사투케이파트너">
+  <option value="토마토바이오주식회사">
+  <option value="주식회사시에스경남">
+  <option value="주식회사신우메디">
+  <option value="리브베터김천점">
+  <option value="주식회사와이엔벤쳐스">
+  <option value="주식회사서원파마">
+  <option value="우영Pharm">
+  <option value="정상의약품물류">
+  <option value="에스제이(SJ)팜">
+  <option value="한화트레이딩(의료기기)">
+  <option value="주식회사유디오">
+  <option value="영화기업">
+  <option value="유한회사엘파마텍">
+  <option value="(주)에스에이치앤씨">
+  <option value="주식회사와이디팜">
+  <option value="씨엘메디팜주식회사">
+  <option value="주식회사타임바이오">
+  <option value="한올팜">
+  <option value="큐원바이오팜">
+  <option value="주식회사지운헬스케어">
+  <option value="비케이매드">
+  <option value="주식회사앤유컴페니언">
+  <option value="더브레스팜(주)">
+  <option value="주식회사프렌즈팜">
+  <option value="윤컨설팅">
+  <option value="주식회사성목약품">
+  <option value="이음바이오팜">
+  <option value="디더블유파트너스">
+  <option value="(주)남강약품">
+  <option value="주식회사중한니즈">
+  <option value="주식회사하우메디웍스">
+  <option value="주식회사거상메디팜">
+  <option value="제이에이치팜">
+  <option value="주식회사 티와이글로벌">
+  <option value="주식회사포앤세일즈">
+  <option value="(주)미르팜">
+  <option value="주식회사연운">
+  <option value="주식회사베스트팜">
+  <option value="신세계약품">
+  <option value="(주)드림스팜코리아">
+  <option value="주식회사행복파트너쉽">
+  <option value="주식회사베네라인">
+  <option value="주식회사현우">
+  <option value="송현약품">
+  <option value="주식회사디에이치엠">
+  <option value="우리메디팜">
+  <option value="JS메디칼">
+  <option value="주식회사준바이오네트웍스">
+  <option value="(주)효바이오텍">
+  <option value="리본">
+  <option value="주식회사엠에스바이오팜">
+  <option value="영메디칼">
+  <option value="(주)우당약품">
+  <option value="주식회사정인약품">
+  <option value="우리">
+  <option value="메디코셀주식회사">
+  <option value="에스메디신스탠다드주식회사">
+  <option value="주식회사케이에이치에스">
+  <option value="주식회사에스엘씨앤피">
+  <option value="충북상사">
+  <option value="비알팜">
+  <option value="아이온메디컬주식회사">
+  <option value="(주)화성약품">
+  <option value="라임">
+  <option value="(주)로이약품">
+  <option value="씨피엠광주">
+  <option value="지엘헬스케어주식회사">
+  <option value="명성약품">
+  <option value="(주)티티사이언스">
+  <option value="메디닉스">
+  <option value="주식회사에이치에스바이오텍">
+  <option value="(주)신우메디칼">
+  <option value="주식회사디에스메디칼">
+  <option value="진주팜">
+  <option value="선메디칼">
+  <option value="주식회사제이파트너">
+  <option value="오스팜">
+  <option value="라이프파마">
+  <option value="주식회사지오바이오메딕스">
+  <option value="대림약품(주)">
+  <option value="(주)타워메디">
+  <option value="하남약품">
+  <option value="주식회사에이투지파트너스">
+  <option value="(주)정빈메디칼">
+  <option value="(유)전라약품">
+  <option value="수메디텍">
+  <option value="유진메디칼">
+  <option value="(주)진바이오">
+  <option value="주식회사신의에스유">
+  <option value="범영상사">
+  <option value="수림약품">
+  <option value="(주)정진약품">
+  <option value="프랜드팜(주)">
+  <option value="에스와이케어">
+  <option value="호원메디칼">
+  <option value="주식회사해오름메디칼">
+  <option value="주식회사건우바이오">
+  <option value="(주)지비피에스(G.B.P.S.Inc)">
+  <option value="유한회사에이치팜">
+  <option value="성경약품">
+  <option value="유스메디팜">
+  <option value="엘엔피팜">
+  <option value="에스엘">
+  <option value="주식회사메종드제이에이치">
+  <option value="(주)오션팜메디">
+  <option value="주식회사지나메디">
+  <option value="신성바이오">
+  <option value="(주)경화약품">
+  <option value="티엔지팜주식회사">
+  <option value="주식회사엑손메디텍">
+  <option value="다올약품">
+  <option value="뉴젠코리아">
+  <option value="(유)고려약품">
+  <option value="대흥위드주식회사">
+  <option value="주식회사지음바이오">
+  <option value="제이케이(JK)메디칼">
+  <option value="주식회사바이오힐스">
+  <option value="(주)우리약품(인천)">
+  <option value="주식회사바이오엔피">
+  <option value="한경팜메디">
+  <option value="주식회사바이오웰스팜">
+  <option value="에이치바이오메디택">
+  <option value="주식회사류진트레이드">
+  <option value="주식회사그린메디팜">
+  <option value="위브릿지코리아주식회사">
+  <option value="제이케이메디칼">
+  <option value="(주)창준약품">
+  <option value="영메디컬">
+  <option value="주식회사제이와이컴퍼니">
+  <option value="퓨어젠">
+  <option value="(주)한우리약품">
+  <option value="태정약품(주)">
+  <option value="제이스타파트너스주식회사">
+  <option value="태인메디칼">
+  <option value="에스제이메디칼주식회사">
+  <option value="루다메디스트림">
+  <option value="주식회사위아플러스">
+  <option value="퍼스트바이오">
+  <option value="이피에스바이오">
+  <option value="(주)다올약품">
+  <option value="주식회사에이치에이네트웍스">
+  <option value="주식회사엠투에스">
+  <option value="(주)디에이치메디칼">
+  <option value="한상약품">
+  <option value="라온헬스케어">
+  <option value="주식회사선앤김메디팜">
+  <option value="순메디칼">
+  <option value="유한회사푸른솔약품">
+  <option value="온누리약품(유)">
+  <option value="코트엠씨">
+  <option value="세종약품(대전)">
+  <option value="주식회사가온메딕스">
+  <option value="숲그린약품">
+  <option value="주식회사리즈팜">
+  <option value="앤유아이엔씨">
+  <option value="주식회사길훈메디">
+  <option value="에스에스디(SSD)컴퍼니">
+  <option value="바른메디컬-대전">
+  <option value="(주)유니">
+  <option value="율플렉스">
+  <option value="씨디씨코리아주식회사">
+  <option value="주식회사에이치코리아">
+  <option value="삼현메디칼">
+  <option value="주식회사메디포레">
+  <option value="호선약품(주)">
+  <option value="주식회사세영약품">
+  <option value="디앰메디칼">
+  <option value="주식회사메디컬처">
+  <option value="(주)지엘메디칼">
+  <option value="(주)메디시스">
+  <option value="주식회사팜팜">
+  <option value="은우메디칼">
+  <option value="한국엠씨(HangukMC)">
+  <option value="세온헬스케어">
+  <option value="건승메디칼">
+  <option value="주식회사스카이팜">
+  <option value="키움약품(주)">
+  <option value="(주)대영약품-광주">
+  <option value="(주)해양약품">
+  <option value="(주)한국제이피씨">
+  <option value="(주)일진메디팜">
+  <option value="부성약품">
+  <option value="주식회사 세화약품">
+  <option value="주식회사케이앤씨">
+  <option value="서원메디칼">
+  <option value="세일약품">
+  <option value="씨디헬스케어">
+  <option value="가빈주식회사">
+  <option value="두오팜">
+  <option value="주식회사유메디">
+  <option value="욱현팜">
+  <option value="주식회사휴베스트">
+  <option value="수약품">
+  <option value="주식회사지원컨설팅">
+  <option value="큰별메디칼">
+  <option value="주식회사티케이팜">
+  <option value="(주)두산약품">
+  <option value="원메디칼">
+  <option value="대유파마(주)">
+  <option value="(주)이븐메디">
+  <option value="주식회사이에스피씨">
+  <option value="헬릭스주식회사">
+  <option value="주식회사비오젠">
+  <option value="주식회사비알바이오">
+  <option value="엠에스">
+  <option value="(주)더블유우">
+  <option value="주식회사더베럴">
+  <option value="연메딕스">
+  <option value="그린스타">
+  <option value="희랑팜">
+  <option value="엘케이팜">
+  <option value="주식회사유일메디">
+  <option value="주식회사위드엔메디">
+  <option value="한길약품(경기)">
+  <option value="(주)바로팜">
+  <option value="신대동메디케어">
+  <option value="이한메디칼">
+  <option value="제이에이치팜">
+  <option value="주식회사고려팜바이오">
+  <option value="한백메디칼">
+  <option value="주식회사승운">
+  <option value="이음플로우">
+  <option value="유디스에이치">
+  <option value="메디온(MEDION)">
+  <option value="(주)내일약품">
+  <option value="주식회사팜앤듀">
+  <option value="에스앤지">
+  <option value="유니프라임">
+  <option value="주식회사에이원메디">
+  <option value="팜앤바이오">
+  <option value="아트팜">
+  <option value="주식회사더쏘울">
+  <option value="주식회사맥스메디칼">
+  <option value="센텀메디팜(주)">
+  <option value="엠에스엔씨">
+  <option value="주식회사수메디">
+  <option value="대원인터내셔널">
+  <option value="(주)엠피케이바이오솔루션">
+  <option value="(주)미소팜-대전">
+  <option value="(주)에이치아이플라자">
+  <option value="신흥메디컬">
+  <option value="한길약품">
+  <option value="주식회사더블유메디칼">
+  <option value="다즐메디컬">
+  <option value="(주)나우약품">
+  <option value="웨일즈메디주식회사">
+  <option value="별하팜">
+  <option value="주식회사도원에스피">
+  <option value="에스제이(SJ)메디컬">
+  <option value="(주)제이팜컴퍼니">
+  <option value="송은메디칼">
+  <option value="더킴바이오">
+  <option value="드림약품">
+  <option value="(주)민성약품">
+  <option value="주식회사풍림하나">
+  <option value="(주)신성파마">
+  <option value="주식회사제이앤메디칼">
+  <option value="주식회사제이씨멤버스">
+  <option value="(주)삼진메디칼">
+</datalist>
+
+<script>
+const STAGES=['미시작','업체확인(DC진행여부)','서류준비','DC신청','DC통과','코딩','처방'];
+const SC={'미시작':'#e2e8f0','업체확인(DC진행여부)':'#cffafe','서류준비':'#dbeafe','DC신청':'#fef9c3','DC통과':'#dcfce7','코딩':'#ede9fe','처방':'#fee2e2'};
+const STC={'미시작':'#475569','업체확인(DC진행여부)':'#155e75','서류준비':'#1e40af','DC신청':'#92400e','DC통과':'#166534','코딩':'#5b21b6','처방':'#b91c1c'};
+const ISSUES=['정상','DC지연','오픈블럭','DC실패(재도전)','DC실패(종결)','업체변경'];
+/* 이슈상태 우선순위(오름차순 = 심각도 높음부터) — 이메일 정렬용 */
+const ISSUE_ORDER={'DC실패(종결)':0,'DC실패(재도전)':1,'업체변경':2,'오픈블럭':2.5,'DC지연':3,'정상':4,'':5};
+/* 구데이터 호환 매핑 (🟢🟡🔴 → 신규 값) */
+function migrateIssue(v){if(v==='🟢')return'정상';if(v==='🟡')return'DC지연';if(v==='🔴')return'DC실패(재도전)';return v||'';}
+/* 이슈상태 select의 CSS 클래스 이름 (괄호 제거) */
+function issClass(v){return v?('iss-sel '+v.replace(/[()]/g,'').replace(/재도전/,'재도전').replace(/종결/,'종결')):''; }
+/* 이슈상태 select 색상 적용 */
+function paintIssueSelect(sel){sel.className='iss-sel '+(sel.value?sel.value.replace(/[()]/g,''):'');}
+let data=[],rpm='',items=[];
+
+/* ── GAS 데이터 자동 로드 (JSONP) ── */
+function loadFromGAS(){
+  const card=document.getElementById('load-card');
+  const spin=document.getElementById('load-spin');
+  const status=document.getElementById('load-status');
+  const sub=document.getElementById('load-sub');
+  const hd=document.getElementById('load-card-hd');
+
+  spin.style.display='inline-block';
+  status.textContent='MBO 현황 데이터 불러오는 중...';
+  status.style.color='var(--blue)';
+  hd.textContent='📡 데이터 연결';
+  card.className='card';
+
+  const cbName='__gasLoad_'+Date.now();
+  const script=document.createElement('script');
+
+  window[cbName]=function(res){
+    try{ document.head.removeChild(script); }catch(e){}
+    delete window[cbName];
+    spin.style.display='none';
+
+    if(res && res.status==='ok'){
+      data=res.data.map((r,i)=>({
+        _id:i, _new:false,
+        신청월:        r['신청월']||'',
+        담당RPM:       r['담당RPM']||'',
+        RPM연락처:     r['RPM\n연락처']||r['RPM연락처']||'',
+        사업자번호:    String(r['사업자번호']||''),
+        실납처명:      r['실납처명']||'',
+        is110:         r['110대']==='○'||r['110대']==='O',
+        시군구:        r['시군구']||'',
+        제품명:        r['제품명']||'',
+        기준품명:      r['기준품명']||'',
+        업체사업자번호:r['업체 사업자번호']||'',
+        업체명:        r['업체명']||'',
+        업체연락처:    r['업체 연락처']||'',
+        MBO:           Number(r['MBO'])||0,
+        랜딩예정월:    String(r['랜딩예정월']||'').slice(0,7),
+        상정과KOL:     r['상정과/KOL']||'',
+        신약과정:      r['신약과정']||r['신약단계']||'',
+        이슈상태:      migrateIssue(r['이슈상태']||r['진행평가']||''),
+        진행사항:      r['진행사항']||'',
+        작성일:        r['작성일']||'',
+        비고:          r['비고']||'',
+        _원래DC월:     String(r['랜딩예정월']||'').slice(0,7),
+        DC월_이전값:   r['DC월_이전값']||'',
+        DC월_변경일:   r['DC월_변경일']||'',
+        MBO_이전값:    r['MBO_이전값']||'',
+        MBO_변경일:    r['MBO_변경일']||'',
+        업체_이전값:   r['업체_이전값']||'',
+        업체_변경일:   r['업체_변경일']||''
+      }));
+
+      hd.textContent='✅ 데이터 연결 완료';
+      card.className='card load-ok';
+      status.textContent=`${data.length}건 로드 완료 (${today()} 기준)`;
+      status.style.color='var(--green-dk)';
+      sub.textContent='Google Sheets 데이터와 연동되었습니다. 새로고침하면 최신 데이터가 반영됩니다.';
+      step(2);
+      showEl('c-rpm');
+      buildRpm();
+    } else {
+      hd.textContent='❌ 연결 실패';
+      card.className='card load-err';
+      status.textContent='데이터 로드 실패: '+(res&&res.message?res.message:'응답 없음');
+      status.style.color='#b91c1c';
+      sub.innerHTML='<button class="btn-retry" onclick="loadFromGAS()">🔄 다시 시도</button>';
+    }
+  };
+
+  script.onerror=function(){
+    try{ document.head.removeChild(script); }catch(e){}
+    delete window[cbName];
+    spin.style.display='none';
+    hd.textContent='❌ 연결 실패';
+    card.className='card load-err';
+    status.textContent='네트워크 오류가 발생했습니다.';
+    status.style.color='#b91c1c';
+    document.getElementById('load-sub').innerHTML='<button class="btn-retry" onclick="loadFromGAS()">🔄 다시 시도</button>';
+  };
+
+  script.src=GAS_URL+'?callback='+cbName+'&t='+Date.now();
+  document.head.appendChild(script);
+}
+
+/* ── RPM ── */
+function buildRpm(){
+  const rpms=[...new Set(data.map(d=>d.담당RPM).filter(Boolean))].sort();
+  const g=document.getElementById('rpm-grid');g.innerHTML='';
+  rpms.forEach(r=>{
+    const b=document.createElement('button');
+    b.className='rpm-btn';b.textContent=r;
+    b.onclick=()=>selRpm(r,b);
+    g.appendChild(b);
+  });
+}
+function selRpm(r,btn){
+  rpm=r;items=[];
+  document.querySelectorAll('.rpm-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const badge=document.getElementById('rpm-badge');
+  badge.textContent='👤 '+r;badge.style.display='block';
+  step(3);showEl('c-report');renderList();
+  document.getElementById('c-report').scrollIntoView({behavior:'smooth',block:'start'});
+  // Google Sheets 전송 버튼 활성화 조건 설정
+  document.getElementById('btn-sheets').disabled=true;
+}
+
+/* ── 검색 ── */
+const si=document.getElementById('si'),srw=document.getElementById('sr-wrap'),siClr=document.getElementById('si-clr');
+si.addEventListener('input',doSearch);
+siClr.addEventListener('click',()=>{si.value='';siClr.style.display='none';srw.style.display='none';});
+document.addEventListener('click',e=>{if(!e.target.closest('.sw')&&!e.target.closest('.sr-wrap'))srw.style.display='none';});
+
+function doSearch(){
+  const q=si.value.trim().toLowerCase();
+  siClr.style.display=q?'block':'none';
+  if(!q){srw.style.display='none';return;}
+  const hits=data.filter(d=>d.담당RPM===rpm&&(
+    d.실납처명.toLowerCase().includes(q)||d.기준품명.toLowerCase().includes(q)||
+    d.제품명.toLowerCase().includes(q)||d.업체명.toLowerCase().includes(q)
+  )).slice(0,12);
+  if(!hits.length){srw.innerHTML='<div class="no-sr">검색 결과 없음 — 신규 블럭으로 추가하세요 ↓</div>';}
+  else{
+    srw.innerHTML=hits.map(d=>{
+      const added=items.some(x=>x._id===d._id);
+      const mbo=d.MBO?(d.MBO/10000).toLocaleString()+'만':'-';
+      return`<div class="sr${added?' added':''}">
+        <div class="sr-l">
+          <div class="hn">${esc(d.실납처명)}${d.is110?' <span style="font-size:10px;color:#856404">★110</span>':''}</div>
+          <div class="hm">💊 ${esc(d.기준품명)} · 🏢 ${esc(d.업체명||'-')} · 💰 ${mbo} · 📅 ${d.랜딩예정월||'-'}</div>
+        </div>
+        ${added?'<span class="sr-done">추가됨 ✓</span>':`<button class="sr-add" onclick="addItem(${d._id})">＋ 추가</button>`}
+      </div>`;
+    }).join('');
+  }
+  srw.style.display='block';
+}
+
+function addItem(id){
+  if(items.some(x=>x._id===id))return;
+  const d=data.find(d=>d._id===id);if(!d)return;
+  items.push({...d});renderList();doSearch();toast(`✅ ${d.실납처명} 추가됨`);
+  document.getElementById('btn-sheets').disabled=false;
+}
+
+/* ── 목록 렌더 ── */
+function renderList(){
+  const rl=document.getElementById('rlist'),em=document.getElementById('empty-msg');
+  document.getElementById('list-cnt').textContent=items.length;
+  rl.innerHTML='';
+  if(!items.length){em.style.display='block';document.getElementById('bot').style.display='none';return;}
+  em.style.display='none';
+  items.forEach((item,i)=>{const d=document.createElement('div');d.innerHTML=buildRI(item,i);rl.appendChild(d.firstElementChild);});
+  document.getElementById('bot').style.display='flex';
+  document.getElementById('btn-sheets').disabled=false;
+}
+
+function buildRI(it,i){
+  const mbo=it.MBO?(it.MBO/10000).toLocaleString()+'만원':'-';
+  const sb=it.신약과정?`<span style="background:${SC[it.신약과정]||'#e2e8f0'};color:${STC[it.신약과정]||'#475569'};border-radius:4px;font-size:10px;padding:1px 6px;font-weight:700;margin-left:4px">${it.신약과정}</span>`:'';
+  const issCls=it.이슈상태?it.이슈상태.replace(/[()]/g,''):'';
+  /* DC월 변경 감지 */
+  const origDC=it._원래DC월||'';
+  const curDC=it.랜딩예정월||'';
+  const dcChanged=!it._new && origDC && curDC && origDC!==curDC;
+  const dcBadge=dcChanged?`<span class="badge-dc">DC월 변경</span>`:'';
+  const dcOldTxt=dcChanged?`<span class="dc-old">${origDC}</span>→ `:'';
+  /* 서버에서 이미 변경된 이력이 있는 경우 */
+  const svrDcChanged=!it._new && it.DC월_이전값 && !dcChanged;
+  const svrDcBadge=svrDcChanged?`<span class="badge-dc" style="animation:none;opacity:.7">DC월 변경이력</span>`:'';
+  /* MBO 변경 이력 아이콘 */
+  const mboHist=!it._new && it.MBO_이전값;
+  const mboHistTip=mboHist?` title="이전 MBO: ${(Number(it.MBO_이전값)||0).toLocaleString()}원 · 변경일: ${it.MBO_변경일}"`:'';
+  const mboHistIcon=mboHist?`<span class="hist-icon"${mboHistTip}>📋</span>`:'';
+  /* 업체명 변경 이력 아이콘 */
+  const vendorHist=!it._new && it.업체_이전값;
+  const vendorHistTip=vendorHist?` title="이전 업체: ${esc(it.업체_이전값)} · 변경일: ${it.업체_변경일}"`:'';
+  const vendorHistIcon=vendorHist?`<span class="hist-icon"${vendorHistTip}>📋</span>`:'';
+  return`<div class="ri${it._new?' isnew':''}${dcChanged?' dc-changed':''}" id="ri-${i}">
+    <div class="ri-hd">
+      <div class="ri-hl">
+        <div class="ri-hn">${esc(it.실납처명)}${it._new?'<span class="badge-new">NEW</span>':''}${dcBadge}${svrDcBadge}${sb}</div>
+        <div class="ri-hm">💊 ${esc(it.기준품명)} · 🏢 ${esc(it.업체명||'-')} · 💰 ${mbo}${curDC?` · 📅 ${dcOldTxt}${curDC}`:''}</div>
+      </div>
+      <button class="ri-del" onclick="removeItem(${i})">×</button>
+    </div>
+    <div class="ri-bd">
+      <div class="row2">
+        ${!it._new?`<div class="ig"><label>🏢 CSO 업체명 <span style="font-size:10px;color:var(--gray3);font-weight:400">변경 시 수정</span>${vendorHistIcon}</label>
+          <input type="text" value="${esc(it.업체명||'')}" placeholder="업체명 검색 또는 직접 입력" list="vendor-list" autocomplete="off" onchange="setF(${i},'업체명',this.value)">
+        </div>
+        <div class="ig"><label>💰 MBO 금액 (원) <span style="font-size:10px;color:var(--gray3);font-weight:400">변경 시 수정</span>${mboHistIcon}</label>
+          <input type="number" value="${it.MBO||''}" placeholder="예) 5000000" onchange="setF(${i},'MBO',Number(this.value)||0)">
+        </div>`:''}
+        <div class="ig"><label>신약과정</label>
+          <select onchange="setF(${i},'신약과정',this.value)">
+            <option value="">-- 선택 --</option>
+            ${STAGES.map(s=>`<option${it.신약과정===s?' selected':''}>${s}</option>`).join('')}
+          </select>
+        </div>
+        <div class="ig"><label>📅 랜딩예정월 <span style="font-size:10px;color:var(--gray3);font-weight:400">변경 시 수정</span></label>
+          <input type="month" value="${it.랜딩예정월||''}" onchange="setF(${i},'랜딩예정월',this.value)" style="width:100%;border:1.5px solid var(--gray2);border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;outline:none;color:var(--gray5)" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--gray2)'">
+        </div>
+        <div class="ig full"><label>상정과/KOL <span style="font-size:10px;color:var(--gray3);font-weight:400">상정과 및 담당 DR</span></label>
+          <input type="text" placeholder="예) 내과 / 홍길동 DR" value="${esc(it.상정과KOL||'')}" onchange="setF(${i},'상정과KOL',this.value)">
+        </div>
+        <div class="ig"><label>이슈상태</label>
+          <select class="iss-sel ${issCls}" onchange="setIssue(${i},this)">
+            <option value="">-- 선택 --</option>
+            ${ISSUES.map(s=>`<option${it.이슈상태===s?' selected':''}>${s}</option>`).join('')}
+          </select>
+        </div>
+        <div class="ig full"><label>진행사항</label>
+          <textarea placeholder="이번 진행 내용을 입력하세요" onchange="setF(${i},'진행사항',this.value)">${esc(it.진행사항)}</textarea>
+        </div>
+        <div class="ig full"><label>비고</label>
+          <input type="text" placeholder="특이사항" value="${esc(it.비고||'')}" onchange="setF(${i},'비고',this.value)">
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function setF(i,f,v){
+  items[i][f]=v;
+  if(f==='랜딩예정월'){
+    /* DC월 변경 시 해당 카드만 즉시 리렌더 */
+    const ri=document.getElementById('ri-'+i);
+    if(ri){const d=document.createElement('div');d.innerHTML=buildRI(items[i],i);ri.replaceWith(d.firstElementChild);}
+    const orig=items[i]._원래DC월||'';
+    if(orig && v && orig!==v) toast(`⚠️ DC월 변경됨: ${orig} → ${v}`);
+  }
+}
+function setIssue(i,sel){
+  items[i].이슈상태=sel.value;
+  paintIssueSelect(sel);
+}
+function removeItem(i){items.splice(i,1);renderList();toast('제거됨');}
+
+/* ── 신규 블럭 ── */
+function openNB(){
+  document.getElementById('nb-modal').classList.add('show');
+  document.getElementById('nb-is110').checked=false;
+  const iss=document.getElementById('nb-iss');if(iss){iss.value='';paintIssueSelect(iss);}
+}
+function addNB(){
+  const h=V('nb-h'),p=V('nb-p');
+  if(!h||!p){toast('병원명과 기준품명은 필수입니다');return;}
+  const is110=document.getElementById('nb-is110').checked;
+  const issVal=document.getElementById('nb-iss').value;
+  items.push({_id:Date.now(),_new:true,담당RPM:rpm,신청월:today().slice(0,4)+'년',
+    RPM연락처:'',사업자번호:'',실납처명:h,is110:is110,시군구:'',제품명:p,기준품명:p,
+    업체사업자번호:'',업체명:V('nb-c'),업체연락처:V('nb-ct'),MBO:Number(V('nb-m'))||0,
+    랜딩예정월:V('nb-ld'),상정과KOL:V('nb-kol'),신약과정:document.getElementById('nb-st').value,
+    이슈상태:issVal,진행사항:V('nb-n'),작성일:today(),비고:V('nb-e')});
+  ['nb-h','nb-p','nb-c','nb-ct','nb-m','nb-ld','nb-kol','nb-n','nb-e'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('nb-st').value='';
+  const iss=document.getElementById('nb-iss');if(iss){iss.value='';paintIssueSelect(iss);}
+  closeMd('nb-modal');renderList();toast(`✅ ${h} 신규 블럭 추가됨`);
+}
+
+/* ── Excel 백업 저장 ── */
+function saveExcel(){
+  if(!items.length){toast('보고할 항목을 먼저 추가하세요');return;}
+  const hd=['담당RPM','실납처명','기준품명','제품명','업체명','MBO','랜딩예정월','상정과/KOL','신약과정','이슈상태','진행사항','비고','작성일'];
+  const rows=items.map(d=>[d.담당RPM,d.실납처명,d.기준품명,d.제품명,d.업체명,d.MBO,d.랜딩예정월,d.상정과KOL||'',d.신약과정||'',d.이슈상태||'',d.진행사항,d.비고,today()]);
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet([hd,...rows]);
+  ws['!cols']=[{wch:10},{wch:20},{wch:18},{wch:12},{wch:16},{wch:10},{wch:10},{wch:10},{wch:8},{wch:30},{wch:20},{wch:12}];
+  XLSX.utils.book_append_sheet(wb,ws,'보고');
+  XLSX.writeFile(wb,`MBO_일일보고_${rpm}_${today().replace(/-/g,'')}.xlsx`);
+  toast('✅ Excel 저장 완료');
+}
+
+/* ── 이메일 보고문 ── */
+function openEmail(){
+  if(!items.length){toast('보고할 항목을 먼저 추가하세요');return;}
+  const now=new Date();
+  const ds=`${now.getFullYear()}.${now.getMonth()+1}.${now.getDate()}`;
+  const subj=`[한올바이오파마 ETC] 신약 일일보고 — ${rpm} RPM (${ds})`;
+  document.getElementById('em-subj').value=subj;
+  const sorted=[...items].sort((a,b)=>(ISSUE_ORDER[a.이슈상태]??5)-(ISSUE_ORDER[b.이슈상태]??5));
+  const newCnt=sorted.filter(d=>d._new).length;
+  let body='안녕하십니까.\n';
+  body+=`${rpm} RPM입니다.\n\n`;
+  body+=`오늘(${ds}) 신약 진행 현황을 보고 드립니다.\n\n`;
+  body+=`${'─'.repeat(32)}\n`;
+  body+=`■ 총 보고 건수: ${sorted.length}건${newCnt?` (신규 ${newCnt}건 포함)`:''}\n`;
+  body+=`${'─'.repeat(32)}\n\n`;
+  sorted.forEach((d,i)=>{
+    const mbo=d.MBO?(d.MBO/10000).toLocaleString()+'만원':'-';
+    const iss=d.이슈상태?`[${d.이슈상태}] `:'';
+    body+=`[${i+1}] ${iss}${d.실납처명}${d._new?' [신규]':''}${d.is110?' [110대]':''}\n`;
+    body+=`  ∙ 제품: ${d.기준품명}\n`;
+    body+=`  ∙ CSO: ${d.업체명||'-'} / MBO: ${mbo} / 랜딩예정: ${d.랜딩예정월||'-'}\n`;
+    if(d.상정과KOL) body+=`  ∙ 상정과/KOL: ${d.상정과KOL}\n`;
+    if(d.신약과정) body+=`  ∙ 신약과정: ${d.신약과정}\n`;
+    if(d.진행사항) body+=`  ∙ 진행사항: ${d.진행사항}\n`;
+    if(d.비고) body+=`  ∙ 비고: ${d.비고}\n`;
+    body+='\n';
+  });
+  body+='감사합니다.\n';
+  body+=`${rpm} RPM 드림`;
+  document.getElementById('email-body').textContent=body;
+  document.getElementById('email-modal').classList.add('show');
+  step(4);
+}
+
+function copyEmail(){
+  const txt=document.getElementById('email-body').textContent;
+  navigator.clipboard.writeText(txt).catch(()=>{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);});
+  toast('✅ 본문 복사됨');
+}
+
+/* ── 유틸 ── */
+function today(){const n=new Date();return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;}
+function V(id){return document.getElementById(id).value.trim();}
+function step(n){['s1','s2','s3','s4'].forEach((id,i)=>{document.getElementById(id).className='step-item'+(i+1<n?' done':i+1===n?' active':'');});}
+function showEl(id){document.getElementById(id).style.display='block';}
+function closeMd(id){document.getElementById(id).classList.remove('show');}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
+document.querySelectorAll('.mbg').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)
+document.querySelectorAll('.mbg').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('show');}));
+/* [v28] 페이지 로드 시 자동 데이터 로드 */
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadFromGAS);
+} else {
+  loadFromGAS();
+}
+
+</script>
+</body>
+</html>
