@@ -988,7 +988,6 @@ function step(n){['s1','s2','s3','s4'].forEach((id,i)=>{document.getElementById(
 function showEl(id){document.getElementById(id).style.display='block';}
 function closeMd(id){document.getElementById(id).classList.remove('show');}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
-document.querySelectorAll('.mbg').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)
 document.querySelectorAll('.mbg').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('show');}));
 /* [v28] 페이지 로드 시 자동 데이터 로드 */
 if (document.readyState === 'loading') {
