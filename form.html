@@ -687,8 +687,9 @@ function loadFromGAS(){
     delete window[cbName];
     spin.style.display='none';
 
-    if(res && res.status==='ok'){
-      data=res.data.map((r,i)=>({
+    if(res && (res.status==='ok' || res.success)){
+      const rows = (res.data && Array.isArray(res.data)) ? res.data : ((res.data && res.data.data) || []);
+      data=rows.map((r,i)=>({
         _id:i, _new:false,
         신청월:        r['신청월']||'',
         담당RPM:       r['담당RPM']||'',
