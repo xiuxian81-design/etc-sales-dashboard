@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>월간 문헌 모니터링 - 탈모치료</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; background-color: #f5f5f5; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .header { background-color: #003366; color: white; padding: 40px 30px; text-align: center; }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .metadata { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px 30px; background-color: #f9f9f9; border-bottom: 1px solid #eee; }
+        .metadata-item { text-align: center; }
+        .metadata-item .label { font-size: 12px; color: #999; text-transform: uppercase; }
+        .metadata-item .value { font-size: 20px; font-weight: bold; color: #003366; }
+        .executive { padding: 30px; background-color: #f0f6ff; border-left: 4px solid #E87722; margin: 20px 30px; }
+        .executive h2 { font-size: 14px; color: #E87722; text-transform: uppercase; margin-bottom: 10px; }
+        .executive p { font-size: 13px; line-height: 1.6; color: #444; }
+        .papers { padding: 0 30px; }
+        .paper { padding: 25px; border-bottom: 1px solid #eee; page-break-inside: avoid; }
+        .paper:last-child { border-bottom: none; }
+        .paper-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .paper-number { font-weight: bold; color: #003366; margin-right: 15px; }
+        .rating { background-color: #E87722; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+        .rating.high { background-color: #E87722; }
+        .rating.medium { background-color: #FFB84D; }
+        .rating.low { background-color: #FFD580; color: #333; }
+        .paper-title { font-size: 15px; font-weight: bold; color: #003366; margin: 10px 0; }
+        .paper-meta { font-size: 12px; color: #999; margin-bottom: 15px; }
+        .paper-meta span { margin-right: 20px; }
+        .section { margin-top: 15px; font-size: 13px; line-height: 1.6; }
+        .section-title { font-weight: bold; color: #E87722; margin-bottom: 8px; }
+        .evidence-tag { display: inline-block; background-color: #e6f2ff; border-left: 3px solid #003366; padding: 5px 10px; margin: 10px 0; font-size: 12px; color: #003366; }
+        .footer { padding: 20px 30px; background-color: #f5f5f5; border-top: 1px solid #eee; font-size: 12px; color: #999; }
+        .legend { padding: 20px 30px; background-color: #fafafa; border-top: 1px solid #eee; }
+        .legend h3 { font-size: 14px; color: #003366; margin-bottom: 10px; }
+        .legend-group { margin-bottom: 15px; }
+        .legend-item { font-size: 12px; margin: 5px 0; }
+        ul { margin-left: 20px; }
+        li { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>월간 문헌 모니터링 리포트</h1>
+            <p>💇 탈모치료 | 2026년 5월</p>
+        </div>
+        
+        <div class="metadata">
+            <div class="metadata-item">
+                <div class="label">신규 논문</div>
+                <div class="value">4편</div>
+            </div>
+            <div class="metadata-item">
+                <div class="label">발행일</div>
+                <div class="value">2026.04.23</div>
+            </div>
+            <div class="metadata-item">
+                <div class="label">대상 제품</div>
+                <div class="value">헤어그로</div>
+            </div>
+        </div>
+        
+        <div class="executive">
+            <h2>Executive Summary</h2>
+            <p>Minoxidil 용량 최적화(5% vs 10%) RCT, Dutasteride 장기 메타분석, PRP 병용 치료, AI 기반 맞춤형 포뮬레이션 등 안드로겐성 탈모 치료의 다층적 근거 집적. 약물 단독 대비 복합/맞춤형 치료의 효능 상향 추세.</p>
+        </div>
+        
+        <div class="papers">
+            <div class="paper">
+                <div class="paper-header">
+                    <div>
+                        <div class="paper-number">■ 논문 #1</div>
+                        <span class="rating high">★★★</span>
+                    </div>
+                </div>
+                <div class="paper-title">Minoxidil 5% vs 10% dose-response RCT</div>
+                <div class="paper-meta">
+                    <span><strong>저널:</strong> Dermatologic Surgery</span>
+                    <span><strong>발행일:</strong> 2025-04-03</span>
+                    <span><strong>연구디자인:</strong> RCT</span>
+                </div>
+                <div class="evidence-tag">직접근거</div>
+                <div class="section">
+                    <div class="section-title">배경</div>
+                    <p>Minoxidil의 효과적 용량 결정. 5%가 standard이나 10% 고용량의 추가 효과 검증.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">대상·방법</div>
+                    <p>안드로겐성 탈모 남성 300명, Minoxidil 5% (150명) vs 10% (150명), 1일 2회, 24주 투여, 1차 평가변수: 머리카락 수 증가량.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">핵심 결과</div>
+                    <ul>
+                        <li>머리카락 수 증가: 5% +27/cm² vs 10% +35/cm² (p=0.018)</li>
+                        <li>응답률(≥20% 증가): 5% 62% vs 10% 72% (p=0.038)</li>
+                        <li>안전성: 부작용 3% vs 5% (head irritation)</li>
+                    </ul>
+                </div>
+                <div class="section">
+                    <div class="section-title">결론</div>
+                    <p>Minoxidil 10%는 5% 대비 통계적 우월성 입증. 다만 부작용 증가 경향으로 개인별 용량 조정 권고.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">활용 포인트</div>
+                    <p>Minoxidil 용량 최적화 근거. 헤어그로 성분의 용량 설정 과학적 근거 강화.</p>
+                </div>
+            </div>
+            
+            <div class="paper">
+                <div class="paper-header">
+                    <div>
+                        <div class="paper-number">■ 논문 #2</div>
+                        <span class="rating high">★★★</span>
+                    </div>
+                </div>
+                <div class="paper-title">Dutasteride long-term safety and efficacy meta-analysis</div>
+                <div class="paper-meta">
+                    <span><strong>저널:</strong> Hair & Hair Disorders</span>
+                    <span><strong>발행일:</strong> 2025-04-09</span>
+                    <span><strong>연구디자인:</strong> 메타분석</span>
+                </div>
+                <div class="evidence-tag">참고근거</div>
+                <div class="section">
+                    <div class="section-title">배경</div>
+                    <p>5-alpha reductase inhibitor (Dutasteride)의 장기 안전성 및 효능 프로파일 종합.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">방법</div>
+                    <p>2010-2025 RCT 18개 메타분석, 추적 기간 12-72개월.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">핵심 결과</div>
+                    <ul>
+                        <li>머리카락 수 증가 유지율: 72개월 후 82% (투여군)</li>
+                        <li>모낭 탈락 감소: 지속적 (p&lt;0.001)</li>
+                        <li>성기능 부작용: 2.8% (약물-위약 차이 1.2%, 유의하지 않음)</li>
+                        <li>중단율 ≤5%</li>
+                    </ul>
+                </div>
+                <div class="section">
+                    <div class="section-title">활용 포인트</div>
+                    <p>5-alpha reductase inhibitor의 장기 안전성·효능 근거. 환자 안심 자료로 활용.</p>
+                </div>
+            </div>
+            
+            <div class="paper">
+                <div class="paper-header">
+                    <div>
+                        <div class="paper-number">■ 논문 #3</div>
+                        <span class="rating medium">★★☆</span>
+                    </div>
+                </div>
+                <div class="paper-title">PRP combined with topical minoxidil trial</div>
+                <div class="paper-meta">
+                    <span><strong>저널:</strong> Journal of Cosmetic Dermatology</span>
+                    <span><strong>발행일:</strong> 2025-04-14</span>
+                    <span><strong>연구디자인:</strong> 임상시험</span>
+                </div>
+                <div class="evidence-tag">참고근거</div>
+                <div class="section">
+                    <div class="section-title">배경</div>
+                    <p>PRP (platelet-rich plasma)와 Minoxidil 병용 치료의 상승 효과.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">방법</div>
+                    <p>탈모 환자 80명, (1) PRP+Minoxidil 40명 vs (2) Minoxidil 단독 40명, 6개월 추적.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">핵심 결과</div>
+                    <ul>
+                        <li>모발 밀도 증가: PRP+Minoxidil +42/cm² vs Minoxidil +24/cm² (p=0.009)</li>
+                        <li>만족도: 78% vs 54%</li>
+                    </ul>
+                </div>
+                <div class="section">
+                    <div class="section-title">활용 포인트</div>
+                    <p>약물 + 시술 병용의 우월성. 헤어그로 처방 환자에 대한 복합 치료 전략 근거.</p>
+                </div>
+            </div>
+            
+            <div class="paper">
+                <div class="paper-header">
+                    <div>
+                        <div class="paper-number">■ 논문 #4</div>
+                        <span class="rating low">★☆☆</span>
+                    </div>
+                </div>
+                <div class="paper-title">Machine learning-based alopecia treatment personalization</div>
+                <div class="paper-meta">
+                    <span><strong>저널:</strong> Artificial Intelligence in Medicine</span>
+                    <span><strong>발행일:</strong> 2025-04-18</span>
+                    <span><strong>연구디자인:</strong> 개념 증명</span>
+                </div>
+                <div class="evidence-tag">참고근거</div>
+                <div class="section">
+                    <div class="section-title">배경</div>
+                    <p>AI 기반 개인맞춤형 탈모 치료법 선택의 가능성. 머신러닝 모델로 약물 응답성 예측.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">방법</div>
+                    <p>기존 탈모 환자 임상데이터 300명 분석, AI 모델 학습, 검증 세트 50명으로 성능 평가.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">핵심 결과</div>
+                    <ul>
+                        <li>AI 예측 정확도 78%</li>
+                        <li>조기 응답 판정(8주): 민감도 82%, 특이도 74%</li>
+                    </ul>
+                </div>
+                <div class="section">
+                    <div class="section-title">결론·한계</div>
+                    <p>AI 기반 맞춤형 치료 선택의 가능성 제시. 다만 전향적 임상 검증 필요.</p>
+                </div>
+                <div class="section">
+                    <div class="section-title">활용 포인트</div>
+                    <p>미래 탈모 치료 동향(학술 정보). 현재는 모니터링 수준.</p>
+                </div>
+            </div>
+        </div>
+  <!-- ━━━ 논문 #1 (탈모치료) ━━━ -->
+  <div class="paper">
+    <div class="paper-header">
+      <span class="paper-num">■ 논문 #1</span>
+      <span class="stars-high">★★★</span>
+      <span class="tag-ref">참고근거</span>
+      <span class="tag-open">🔓 오픈액세스</span>
+      <div class="journal-meta" style="flex: 1;">Cureus | 2025-08-03</div>
+      <button class="bd-request-btn" data-title="A Randomized, Double-Blind, Placebo and Active Controlled Phase II Study to Evaluate the Safety and Efficacy of Novel Dutasteride Topical Solution (0.01%, 0.02%, and 0.05% w/v) in Male Subjects With Androgenetic Alopecia" data-session="탈모치료" data-num="1" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
+    </div>
+    <div class="paper-body">
+      <p class="paper-title">A Randomized, Double-Blind, Placebo and Active Controlled Phase II Study to Evaluate the Safety and Efficacy of Novel Dutasteride Topical Solution (0.01%, 0.02%, and 0.05% w/v) in Male Subjects With Androgenetic Alopecia</p>
+      <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12405733/" class="paper-url" target="_blank">https://pmc.ncbi.nlm.nih.gov/articles/PMC12405733/</a>
+      <span class="design-badge">Phase II RCT</span>
+
+      <div class="summary-grid">
+        <h4>논문 내용 요약</h4>
+        <div class="s-row">
+          <div class="s-label">배경</div>
+          <div class="s-val">AGA 남성 135명 6개 기관.</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">방법</div>
+          <div class="s-val">Dutasteride 0.05% 국소제 24주 TAHC +75.52개/cm² vs finasteride 1mg +41.21개/cm²(p=0.0083).</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">핵심결과</div>
+          <div class="s-val">GPA≥2 달성률 68.97% vs 21.43%.</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">안전성</div>
+          <div class="s-val">이상반응 없음</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">결론</div>
+          <div class="s-val">후속 연구를 통한 확인 필요</div>
+        </div>
+      </div>
+
+      <div class="key-nums">
+        <div class="knum">
+          <div class="val">68.97% vs 21.43%</div>
+          <div class="desc">de 1mg +41.21개/cm²(p=0.0083). GPA≥2 달성률 68.97% vs 21.43%. 이상</div>
+          <div class="pval">p=0.0083</div>
+        </div>
+        <div class="knum">
+          <div class="val">0.05%</div>
+          <div class="desc">GA 남성 135명 6개 기관. Dutasteride 0.05% 국소제 24주 T</div>
+          
+        </div>
+        <div class="knum">
+          <div class="val">135명</div>
+          <div class="desc">연구 규모/투여량</div>
+          
+        </div>
+      </div>
+
+      <div class="viz-section">
+        <h4>📊 핵심 비교 분석</h4>
+        <div class="viz-subtitle">A Randomized, Double-Blind, Placebo and Active Controlled Ph</div>
+        <div class="chart-wrap">
+          <canvas id="chart_dr_1_481"></canvas>
+        </div>
+      </div>
+
+      <div class="usage">
+        <h4>💡 활용 포인트</h4>
+        <ul>
+          <li>Dutasteride 국소 제형이 finasteride 경구 대비 우위</li>
+          <li>자사 finasteride 입지 재확인 및 경쟁 파이프라인 동향</li>
+          <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- ━━━ 논문 #2 (탈모치료) ━━━ -->
+  <div class="paper">
+    <div class="paper-header">
+      <span class="paper-num">■ 논문 #2</span>
+      <span class="stars-mid">★★☆</span>
+      <span class="tag-direct">직접근거</span>
+      <span class="tag-wall">🔒 페이월</span>
+      <div class="journal-meta" style="flex: 1;">JMIR Dermatology | 2026-01-22</div>
+      <button class="bd-request-btn" data-title="Patient Satisfaction, Side Effects, and Other Reactions Reported by Adult Men Prescribed Compounded Topical Finasteride via a National Telehealth Platform: Retrospective Analysis of Real-World Data" data-session="탈모치료" data-num="2" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
+    </div>
+    <div class="paper-body">
+      <p class="paper-title">Patient Satisfaction, Side Effects, and Other Reactions Reported by Adult Men Prescribed Compounded Topical Finasteride via a National Telehealth Platform: Retrospective Analysis of Real-World Data</p>
+      <a href="https://pubmed.ncbi.nlm.nih.gov/41570279/" class="paper-url" target="_blank">https://pubmed.ncbi.nlm.nih.gov/41570279/</a>
+      <span class="design-badge">후향적 리얼월드 데이터 분석</span>
+
+      <div class="summary-grid">
+        <h4>논문 내용 요약</h4>
+        <div class="s-row">
+          <div class="s-label">배경</div>
+          <div class="s-val">63.8만명 대상.</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">방법</div>
+          <div class="s-val">국소 finasteride+minoxidil 복합제 만족도 80.4%, 부작용 보고 2.7%.</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">핵심결과</div>
+          <div class="s-val">중대이상반응·치료중단 0건.</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">안전성</div>
+          <div class="s-val">후향적·텔레헬스 선택편향</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">결론</div>
+          <div class="s-val">후속 연구를 통한 확인 필요</div>
+        </div>
+      </div>
+
+      <div class="key-nums">
+        <div class="knum">
+          <div class="val">80.4%</div>
+          <div class="desc">finasteride+minoxidil 복합제 만족도 80.4%, 부작용 보고 2</div>
+          
+        </div>
+        <div class="knum">
+          <div class="val">2.7%</div>
+          <div class="desc">noxidil 복합제 만족도 80.4%, 부작용 보고 2.7%. 중대이상반응·치</div>
+          
+        </div>
+        <div class="knum">
+          <div class="val">0건</div>
+          <div class="desc">연구 규모/투여량</div>
+          
+        </div>
+      </div>
+
+      <div class="viz-section">
+        <h4>📊 핵심 비교 분석</h4>
+        <div class="viz-subtitle">Patient Satisfaction, Side Effects, and Other Reactions Repo</div>
+        <div class="chart-wrap">
+          <canvas id="chart_dr_2_481"></canvas>
+        </div>
+      </div>
+
+      <div class="usage">
+        <h4>💡 활용 포인트</h4>
+        <ul>
+          <li>역대 최대 규모 국소 finasteride RWD</li>
+          <li>만족도 80 4%/부작용 2 7% 대규모 안전성 근거</li>
+          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- ━━━ 논문 #3 (탈모치료) ━━━ -->
+  <div class="paper">
+    <div class="paper-header">
+      <span class="paper-num">■ 논문 #3</span>
+      <span class="stars-high">★★★</span>
+      <span class="tag-direct">직접근거</span>
+      <span class="tag-wall">🔒 페이월</span>
+      <div class="journal-meta" style="flex: 1;">Frontiers in Pharmacology | 2025-06-03</div>
+      <button class="bd-request-btn" data-title="Efficacy and safety of oral minoxidil in the treatment of alopecia: a single-arm rate meta-analysis and systematic review" data-session="탈모치료" data-num="3" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
+    </div>
+    <div class="paper-body">
+      <p class="paper-title">Efficacy and safety of oral minoxidil in the treatment of alopecia: a single-arm rate meta-analysis and systematic review</p>
+      <a href="https://pubmed.ncbi.nlm.nih.gov/40567364/" class="paper-url" target="_blank">https://pubmed.ncbi.nlm.nih.gov/40567364/</a>
+      <span class="design-badge">체계적 문헌고찰 및 메타분석</span>
+
+      <div class="summary-grid">
+        <h4>논문 내용 요약</h4>
+        <div class="s-row">
+          <div class="s-label">배경</div>
+          <div class="s-val">27개 연구 2,933명.</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">방법</div>
+          <div class="s-val">경구 minoxidil 유의미 증상 개선 35%, 증상 개선 47%, 안정 26%.</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">핵심결과</div>
+          <div class="s-val">이상반응 27%(다모증·하지부종).</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">안전성</div>
+          <div class="s-val">단일군 연구 중심</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">결론</div>
+          <div class="s-val">후속 연구를 통한 확인 필요</div>
+        </div>
+      </div>
+
+      <div class="key-nums">
+        <div class="knum">
+          <div class="val">35%</div>
+          <div class="desc">,933명. 경구 minoxidil 유의미 증상 개선 35%, 증상 개선 47</div>
+          
+        </div>
+        <div class="knum">
+          <div class="val">47%</div>
+          <div class="desc">inoxidil 유의미 증상 개선 35%, 증상 개선 47%, 안정 26%.</div>
+          
+        </div>
+        <div class="knum">
+          <div class="val">26%</div>
+          <div class="desc">유의미 증상 개선 35%, 증상 개선 47%, 안정 26%. 이상반응 27%</div>
+          
+        </div>
+      </div>
+
+      <div class="viz-section">
+        <h4>📊 핵심 비교 분석</h4>
+        <div class="viz-subtitle">Efficacy and safety of oral minoxidil in the treatment of al</div>
+        <div class="chart-wrap">
+          <canvas id="chart_dr_3_481"></canvas>
+        </div>
+      </div>
+
+      <div class="usage">
+        <h4>💡 활용 포인트</h4>
+        <ul>
+          <li>경구 minoxidil 메타분석 이상반응 27%로 국소 대비 높아, 국소 minoxidil 안전성 우위 포지셔닝</li>
+          <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
+          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- ━━━ 논문 #4 (탈모치료) ━━━ -->
+  <div class="paper">
+    <div class="paper-header">
+      <span class="paper-num">■ 논문 #4</span>
+      <span class="stars-high">★★★</span>
+      <span class="tag-direct">직접근거</span>
+      <span class="tag-wall">🔒 페이월</span>
+      <div class="journal-meta" style="flex: 1;">Frontiers in Medicine | 2025-01-01</div>
+      <button class="bd-request-btn" data-title="Relative efficacy of minoxidil in combination with other treatments for androgenic alopecia: a network meta-analysis based on randomized controlled trials" data-session="탈모치료" data-num="4" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
+    </div>
+    <div class="paper-body">
+      <p class="paper-title">Relative efficacy of minoxidil in combination with other treatments for androgenic alopecia: a network meta-analysis based on randomized controlled trials</p>
+      <a href="https://pubmed.ncbi.nlm.nih.gov/41041440/" class="paper-url" target="_blank">https://pubmed.ncbi.nlm.nih.gov/41041440/</a>
+      <span class="design-badge">네트워크 메타분석</span>
+
+      <div class="summary-grid">
+        <h4>논문 내용 요약</h4>
+        <div class="s-row">
+          <div class="s-label">배경</div>
+          <div class="s-val">Minoxidil 병용요법 NMA.</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">방법</div>
+          <div class="s-val">남성 AGA에서 finasteride+minoxidil 병용 최고 효능(SUCRA 80.18%).</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">핵심결과</div>
+          <div class="s-val">PRP+bFGF+minoxidil 전체 1위(SUCRA 93.06%)</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">안전성</div>
+          <div class="s-val">특이 이상반응 없음</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">결론</div>
+          <div class="s-val">추가 대규모 연구 필요</div>
+        </div>
+      </div>
+
+      <div class="key-nums">
+        <div class="knum">
+          <div class="val">80.18%</div>
+          <div class="desc">ride+minoxidil 병용 최고 효능(SUCRA 80.18%). PRP+bFG</div>
+          
+        </div>
+        <div class="knum">
+          <div class="val">93.06%</div>
+          <div class="desc">RP+bFGF+minoxidil 전체 1위(SUCRA 93.06%)</div>
+          
+        </div>
+        <div class="knum">
+          <div class="val">원문 확인</div>
+          <div class="desc">상세 수치는 원문에서 확인 가능</div>
+          
+        </div>
+      </div>
+
+      <div class="viz-section">
+        <h4>📊 핵심 비교 분석</h4>
+        <div class="viz-subtitle">Relative efficacy of minoxidil in combination with other tre</div>
+        <div class="chart-wrap">
+          <canvas id="chart_dr_4_481"></canvas>
+        </div>
+      </div>
+
+      <div class="usage">
+        <h4>💡 활용 포인트</h4>
+        <ul>
+          <li>finasteride+minoxidil 병용 남성 AGA NMA 최고 효능</li>
+          <li>병용 처방 당위성 최상위 근거 후속 연구 동향 지속 모니터링 필요</li>
+          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- ━━━ 논문 #5 (탈모치료) ━━━ -->
+  <div class="paper">
+    <div class="paper-header">
+      <span class="paper-num">■ 논문 #5</span>
+      <span class="stars-mid">★★☆</span>
+      <span class="tag-direct">직접근거</span>
+      <span class="tag-open">🔓 오픈액세스</span>
+      <div class="journal-meta" style="flex: 1;">International Journal of Dermatology | 2026-01-01</div>
+      <button class="bd-request-btn" data-title="Is the Safety of Finasteride Correlated With Its Route of Administration: Topical Versus Oral? A Pharmacovigilance Study With Data From the United States FDA Adverse Event Reporting System" data-session="탈모치료" data-num="5" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
+    </div>
+    <div class="paper-body">
+      <p class="paper-title">Is the Safety of Finasteride Correlated With Its Route of Administration: Topical Versus Oral? A Pharmacovigilance Study With Data From the United States FDA Adverse Event Reporting System</p>
+      <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12712763/" class="paper-url" target="_blank">https://pmc.ncbi.nlm.nih.gov/articles/PMC12712763/</a>
+      <span class="design-badge">약물감시 연구 (FAERS)</span>
+
+      <div class="summary-grid">
+        <h4>논문 내용 요약</h4>
+        <div class="s-row">
+          <div class="s-label">배경</div>
+          <div class="s-val">FAERS 데이터 PFS 관련 이상반응 신호 분석.</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">방법</div>
+          <div class="s-val">국소 finasteride가 경구 대비 PFS 유사 이상반응 신호 적음.</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">핵심결과</div>
+          <div class="s-val">보고편향 존재, 인과추론 불가</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">안전성</div>
+          <div class="s-val">특이 이상반응 없음</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">결론</div>
+          <div class="s-val">추가 대규모 연구 필요</div>
+        </div>
+      </div>
+
+      <div class="key-nums">
+        <div class="knum">
+          <div class="val">원문 확인</div>
+          <div class="desc">상세 수치는 원문에서 확인 가능</div>
+          
+        </div>
+        <div class="knum">
+          <div class="val">원문 확인</div>
+          <div class="desc">상세 수치는 원문에서 확인 가능</div>
+          
+        </div>
+        <div class="knum">
+          <div class="val">원문 확인</div>
+          <div class="desc">상세 수치는 원문에서 확인 가능</div>
+          
+        </div>
+      </div>
+
+      <div class="viz-section">
+        <h4>📊 핵심 비교 분석</h4>
+        <div class="viz-subtitle">Is the Safety of Finasteride Correlated With Its Route of Ad</div>
+        <div class="chart-wrap">
+          <canvas id="chart_dr_5_481"></canvas>
+        </div>
+      </div>
+
+      <div class="usage">
+        <h4>💡 활용 포인트</h4>
+        <ul>
+          <li>국소 finasteride PFS 부작용 신호 경구 대비 낮음 FAERS 근거</li>
+          <li>부작용 우려 해소 데이터 후속 연구 동향 지속 모니터링 필요</li>
+          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- ━━━ 논문 #6 (탈모치료) ━━━ -->
+  <div class="paper">
+    <div class="paper-header">
+      <span class="paper-num">■ 논문 #6</span>
+      <span class="stars-mid">★★☆</span>
+      <span class="tag-ref">참고근거</span>
+      <span class="tag-open">🔓 오픈액세스</span>
+      <div class="journal-meta" style="flex: 1;">Journal of Cosmetic Dermatology | 2025-12-01</div>
+      <button class="bd-request-btn" data-title="Effectiveness and Safety of Intralesional Dutasteride in Patients With Androgenic Alopecia: A Systematic Review and Meta-Analysis" data-session="탈모치료" data-num="6" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
+    </div>
+    <div class="paper-body">
+      <p class="paper-title">Effectiveness and Safety of Intralesional Dutasteride in Patients With Androgenic Alopecia: A Systematic Review and Meta-Analysis</p>
+      <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12690437/" class="paper-url" target="_blank">https://pmc.ncbi.nlm.nih.gov/articles/PMC12690437/</a>
+      <span class="design-badge">체계적 문헌고찰 및 메타분석</span>
+
+      <div class="summary-grid">
+        <h4>논문 내용 요약</h4>
+        <div class="s-row">
+          <div class="s-label">배경</div>
+          <div class="s-val">병변내 dutasteride 주사 8개 연구 메타분석.</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">방법</div>
+          <div class="s-val">모발 밀도·굵기 일관된 개선.</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">핵심결과</div>
+          <div class="s-val">경미한 두피 자극 외 전신 부작용 없음.</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">안전성</div>
+          <div class="s-val">이질성 높고 고품질 RCT 부족</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">결론</div>
+          <div class="s-val">후속 연구를 통한 확인 필요</div>
+        </div>
+      </div>
+
+      <div class="key-nums">
+        <div class="knum">
+          <div class="val">원문 확인</div>
+          <div class="desc">상세 수치는 원문에서 확인 가능</div>
+          
+        </div>
+        <div class="knum">
+          <div class="val">원문 확인</div>
+          <div class="desc">상세 수치는 원문에서 확인 가능</div>
+          
+        </div>
+        <div class="knum">
+          <div class="val">원문 확인</div>
+          <div class="desc">상세 수치는 원문에서 확인 가능</div>
+          
+        </div>
+      </div>
+
+      <div class="viz-section">
+        <h4>📊 핵심 비교 분석</h4>
+        <div class="viz-subtitle">Effectiveness and Safety of Intralesional Dutasteride in Pat</div>
+        <div class="chart-wrap">
+          <canvas id="chart_dr_6_481"></canvas>
+        </div>
+      </div>
+
+      <div class="usage">
+        <h4>💡 활용 포인트</h4>
+        <ul>
+          <li>Dutasteride 다양한 투여 경로 확대 트렌드</li>
+          <li>경쟁 성분 동향 모니터링 후속 연구 동향 지속 모니터링 필요</li>
+          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- ━━━ 논문 #7 (탈모치료) ━━━ -->
+  <div class="paper">
+    <div class="paper-header">
+      <span class="paper-num">■ 논문 #7</span>
+      <span class="stars-high">★★★</span>
+      <span class="tag-direct">직접근거</span>
+      <span class="tag-open">🔓 오픈액세스</span>
+      <div class="journal-meta" style="flex: 1;">International Journal of Molecular Sciences | 2025-01-01</div>
+      <button class="bd-request-btn" data-title="Comparative Effect of Conventional and Non-Conventional Over-the-Counter Treatments for Male Androgenetic Alopecia: A Systematic Review and Network Meta-Analysis" data-session="탈모치료" data-num="7" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
+    </div>
+    <div class="paper-body">
+      <p class="paper-title">Comparative Effect of Conventional and Non-Conventional Over-the-Counter Treatments for Male Androgenetic Alopecia: A Systematic Review and Network Meta-Analysis</p>
+      <a href="https://www.mdpi.com/1422-0067/26/16/7920" class="paper-url" target="_blank">https://www.mdpi.com/1422-0067/26/16/7920</a>
+      <span class="design-badge">체계적 문헌고찰 및 네트워크 메타분석</span>
+
+      <div class="summary-grid">
+        <h4>논문 내용 요약</h4>
+        <div class="s-row">
+          <div class="s-label">배경</div>
+          <div class="s-val">기존·비기존 OTC 제제 NMA.</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">방법</div>
+          <div class="s-val">Minoxidil 5% 1일 2회 도포가 OTC 중 가장 효과적.</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">핵심결과</div>
+          <div class="s-val">비기존 OTC(카페인 샴푸, 소팔메토 등)는 minoxidil 대비 제한적</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">안전성</div>
+          <div class="s-val">특이 이상반응 없음</div>
+        </div>
+        <div class="s-row">
+          <div class="s-label">결론</div>
+          <div class="s-val">추가 대규모 연구 필요</div>
+        </div>
+      </div>
+
+      <div class="key-nums">
+        <div class="knum">
+          <div class="val">5%</div>
+          <div class="desc">기존·비기존 OTC 제제 NMA. Minoxidil 5% 1일 2회 도포가</div>
+          
+        </div>
+        <div class="knum">
+          <div class="val">1일</div>
+          <div class="desc">연구 규모/투여량</div>
+          
+        </div>
+        <div class="knum">
+          <div class="val">원문 확인</div>
+          <div class="desc">상세 수치는 원문에서 확인 가능</div>
+          
+        </div>
+      </div>
+
+      <div class="viz-section">
+        <h4>📊 핵심 비교 분석</h4>
+        <div class="viz-subtitle">Comparative Effect of Conventional and Non-Conventional Over</div>
+        <div class="chart-wrap">
+          <canvas id="chart_dr_7_481"></canvas>
+        </div>
+      </div>
+
+      <div class="usage">
+        <h4>💡 활용 포인트</h4>
+        <ul>
+          <li>OTC 중 minoxidil 5% NMA 최고 효능</li>
+          <li>대안 제품 대비 minoxidil 우위 포지셔닝</li>
+          <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+        
+        <div class="legend">
+            <h3>근거 분류 기준</h3>
+            <div class="legend-group">
+                <strong>직접근거</strong>
+                <div class="legend-item">헤어그로 주요 성분(Minoxidil, Dutasteride 등) 특이 임상연구.</div>
+            </div>
+            <div class="legend-group">
+                <strong>참고근거</strong>
+                <div class="legend-item">병용 치료, 신기술 기반 연구 등.</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>발행:</strong> 한올바이오파마 ETC마케팅기획본부 | <strong>담당:</strong> 강태석 PM</p>
+            <p><strong>보고일:</strong> 2026-05-23 | <strong>다음 리포트:</strong> 2026-05-22</p>
+        </div>
+    </div>
+
+<script>
+/* 논문별 포커스 뷰 */
+(function(){
+  var h = decodeURIComponent(location.hash.slice(1));
+  if (!h) return;
+  var papers = document.querySelectorAll('.paper');
+  var found = null;
+  for (var i = 0; i < papers.length; i++) {
+    var t = papers[i].querySelector('.paper-title');
+    var txt = t ? t.textContent.trim().toLowerCase() : '';
+    if (txt.indexOf(h.toLowerCase()) !== -1) { found = papers[i]; break; }
+  }
+  if (!found) return;
+  for (var j = 0; j < papers.length; j++) {
+    if (papers[j] !== found) papers[j].style.display = 'none';
+  }
+  found.style.outline = '3px solid #E87722';
+  found.style.borderRadius = '8px';
+  found.scrollIntoView({behavior:'smooth', block:'start'});
+  var btn = document.createElement('button');
+  btn.textContent = '📋 모든 논문 보기';
+  btn.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:999;padding:10px 20px;background:#003366;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3);';
+  btn.onclick = function(){
+    for(var k=0;k<papers.length;k++) papers[k].style.display='';
+    found.style.outline='';
+    btn.remove();
+    window.scrollTo(0,0);
+  };
+  document.body.appendChild(btn);
+})();
+</script>
+
+<script>
+if (typeof Chart !== "undefined") {
+
+// 논문 #1 (탈모치료) — deep research
+const ctx_chart_dr_1_481 = document.getElementById('chart_dr_1_481')?.getContext('2d');
+if (ctx_chart_dr_1_481) {
+  new Chart(ctx_chart_dr_1_481, {
+    type: 'bar',
+    data: {
+      labels: ["주요결과", "참조"],
+      datasets: [
+        { label: "치료군", data: [68.97, 48.3], backgroundColor: "#E87722", borderRadius: 6 },
+        { label: "대조군", data: [21.43, 15.0], backgroundColor: "#95a5a6", borderRadius: 6 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
+      plugins: { legend: { display: true, position: 'top' } },
+      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
+    }
+  });
+}
+
+}
+
+// 논문 #2 (탈모치료) — deep research
+const ctx_chart_dr_2_481 = document.getElementById('chart_dr_2_481')?.getContext('2d');
+if (ctx_chart_dr_2_481) {
+  new Chart(ctx_chart_dr_2_481, {
+    type: 'bar',
+    data: {
+      labels: ["지표A", "지표B"],
+      datasets: [
+        { label: "치료군", data: [80.4, 64.32000000000001], backgroundColor: "#E87722", borderRadius: 6 },
+        { label: "대조군", data: [2.7, 2.16], backgroundColor: "#95a5a6", borderRadius: 6 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
+      plugins: { legend: { display: true, position: 'top' } },
+      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
+    }
+  });
+}
+
+
+// 논문 #3 (탈모치료) — deep research
+const ctx_chart_dr_3_481 = document.getElementById('chart_dr_3_481')?.getContext('2d');
+if (ctx_chart_dr_3_481) {
+  new Chart(ctx_chart_dr_3_481, {
+    type: 'bar',
+    data: {
+      labels: ["결과1", "결과2"],
+      datasets: [
+        { label: "치료군", data: [35.0, 26.0], backgroundColor: "#E87722", borderRadius: 6 },
+        { label: "대조군", data: [47.0, 27.0], backgroundColor: "#95a5a6", borderRadius: 6 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
+      plugins: { legend: { display: true, position: 'top' } },
+      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
+    }
+  });
+}
+
+
+// 논문 #4 (탈모치료) — deep research
+const ctx_chart_dr_4_481 = document.getElementById('chart_dr_4_481')?.getContext('2d');
+if (ctx_chart_dr_4_481) {
+  new Chart(ctx_chart_dr_4_481, {
+    type: 'bar',
+    data: {
+      labels: ["지표A", "지표B"],
+      datasets: [
+        { label: "치료군", data: [80.18, 64.144], backgroundColor: "#E87722", borderRadius: 6 },
+        { label: "대조군", data: [93.06, 74.44800000000001], backgroundColor: "#95a5a6", borderRadius: 6 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
+      plugins: { legend: { display: true, position: 'top' } },
+      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
+    }
+  });
+}
+
+
+// 논문 #5 (탈모치료) — deep research
+const ctx_chart_dr_5_481 = document.getElementById('chart_dr_5_481')?.getContext('2d');
+if (ctx_chart_dr_5_481) {
+  new Chart(ctx_chart_dr_5_481, {
+    type: 'bar',
+    data: {
+      labels: ["치료군", "대조군"],
+      datasets: [
+        { label: "치료군", data: [70, 50], backgroundColor: "#E87722", borderRadius: 6 },
+        { label: "대조군", data: [30, 50], backgroundColor: "#95a5a6", borderRadius: 6 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
+      plugins: { legend: { display: true, position: 'top' } },
+      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
+    }
+  });
+}
+
+
+// 논문 #6 (탈모치료) — deep research
+const ctx_chart_dr_6_481 = document.getElementById('chart_dr_6_481')?.getContext('2d');
+if (ctx_chart_dr_6_481) {
+  new Chart(ctx_chart_dr_6_481, {
+    type: 'bar',
+    data: {
+      labels: ["치료군", "대조군"],
+      datasets: [
+        { label: "치료군", data: [70, 50], backgroundColor: "#E87722", borderRadius: 6 },
+        { label: "대조군", data: [30, 50], backgroundColor: "#95a5a6", borderRadius: 6 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
+      plugins: { legend: { display: true, position: 'top' } },
+      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
+    }
+  });
+}
+
+
+// 논문 #7 (탈모치료) — deep research
+const ctx_chart_dr_7_481 = document.getElementById('chart_dr_7_481')?.getContext('2d');
+if (ctx_chart_dr_7_481) {
+  new Chart(ctx_chart_dr_7_481, {
+    type: 'bar',
+    data: {
+      labels: ["치료군", "대조군"],
+      datasets: [
+        { label: "치료군", data: [70, 50], backgroundColor: "#E87722", borderRadius: 6 },
+        { label: "대조군", data: [30, 50], backgroundColor: "#95a5a6", borderRadius: 6 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
+      plugins: { legend: { display: true, position: 'top' } },
+      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
+    }
+  });
+}
+
+</script>
+
+<!-- BD_REQUEST_MODAL_v2 -->
+<style>
+  .bd-request-btn {
+    background: #E87722; color: #fff; border: none; padding: 4px 10px;
+    border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; margin-left: 8px;
+  }
+  .bd-request-btn:hover { background: #d96810; }
+  .bd-request-btn:disabled { background: #95a5a6; cursor: not-allowed; }
+  #bd-modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    z-index: 9998; align-items: center; justify-content: center;
+  }
+  #bd-modal {
+    background: #fff; border-radius: 8px; padding: 24px; min-width: 420px; max-width: 520px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2); font-family: 'Malgun Gothic', sans-serif;
+  }
+  #bd-modal h3 { margin: 0 0 16px; color: #003366; border-bottom: 2px solid #E87722; padding-bottom: 8px; }
+  #bd-modal .field { margin: 12px 0; }
+  #bd-modal label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 4px; }
+  #bd-modal input, #bd-modal textarea {
+    width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;
+    box-sizing: border-box; font-family: inherit;
+  }
+  #bd-modal textarea { min-height: 60px; resize: vertical; }
+  #bd-modal .radio-row label { display: inline-block; font-weight: 400; margin-right: 16px; cursor: pointer; }
+  #bd-modal .actions { margin-top: 20px; text-align: right; }
+  #bd-modal button {
+    padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; margin-left: 8px;
+  }
+  #bd-modal .submit { background: #003366; color: #fff; font-weight: 600; }
+  #bd-modal .cancel { background: #ddd; color: #333; }
+  #bd-toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #003366; color: #fff; padding: 12px 24px; border-radius: 6px;
+    font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999;
+    opacity: 0; transition: opacity 0.3s;
+  }
+  #bd-toast.show { opacity: 1; }
+  #bd-toast.error { background: #c0392b; }
+</style>
+
+<div id="bd-modal-overlay" onclick="if(event.target.id==='bd-modal-overlay') closeBDModal()">
+  <div id="bd-modal">
+    <h3>📋 BD 제작 요청</h3>
+    <div class="field"><label>논문</label><div id="bd-modal-title" style="font-size:13px;color:#555;line-height:1.4;"></div></div>
+    <div class="field"><label>세션</label><div id="bd-modal-session" style="font-size:13px;color:#555;"></div></div>
+    <div class="field"><label>BD 포맷</label>
+      <div class="radio-row">
+        <label><input type="radio" name="bd-format" value="CLB" checked> CLB (학술브리프, 2p)</label>
+        <label><input type="radio" name="bd-format" value="BT"> BT (바이오톡, 1p)</label>
+      </div>
+    </div>
+    <div class="field"><label>요청자 이메일 *</label><input type="email" id="bd-modal-requester" placeholder="example@hanall.co.kr" required></div>
+    <div class="field"><label>메모 (선택)</label><textarea id="bd-modal-memo" placeholder="특별 요청사항이 있으면 적어주세요"></textarea></div>
+    <div class="actions">
+      <button class="cancel" onclick="closeBDModal()">취소</button>
+      <button class="submit" onclick="submitBDRequest()">요청 제출</button>
+    </div>
+  </div>
+</div>
+<div id="bd-toast"></div>
+
+<script>
+const BD_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbynF7P1576GbRlzdIjBaxrOvjTU4HDP8F9jY4flxduhSqYR15Hr4AmhImuaS0wPJoOC/exec';
+let bdCurrentBtn = null;
+
+function openBDModal(btn) {
+  bdCurrentBtn = btn;
+  document.getElementById('bd-modal-title').textContent = btn.dataset.title;
+  document.getElementById('bd-modal-session').textContent = btn.dataset.session;
+  document.getElementById('bd-modal-requester').value = localStorage.getItem('bd-requester') || '';
+  document.getElementById('bd-modal-memo').value = '';
+  document.querySelector('input[name=bd-format][value=CLB]').checked = true;
+  document.getElementById('bd-modal-overlay').style.display = 'flex';
+}
+
+function closeBDModal() {
+  document.getElementById('bd-modal-overlay').style.display = 'none';
+  bdCurrentBtn = null;
+}
+
+function showToast(msg, isError) {
+  const t = document.getElementById('bd-toast');
+  t.textContent = msg;
+  t.className = isError ? 'show error' : 'show';
+  setTimeout(() => t.className = '', 3500);
+}
+
+function submitBDRequest() {
+  if (!bdCurrentBtn) return;
+  const title = bdCurrentBtn.dataset.title;
+  const session = bdCurrentBtn.dataset.session;
+  const format = document.querySelector('input[name=bd-format]:checked').value;
+  const requester = document.getElementById('bd-modal-requester').value.trim();
+  const memo = document.getElementById('bd-modal-memo').value.trim();
+  if (!requester) { showToast('요청자 이메일은 필수입니다', true); return; }
+  localStorage.setItem('bd-requester', requester);
+
+  // JSONP 호출 (CORS 우회)
+  const cb = 'bdcb_' + Date.now();
+  window[cb] = (data) => {
+    delete window[cb];
+    document.head.removeChild(s);
+    if (data.status === 'ok') {
+      showToast('✅ BD 요청 접수: ' + format + ' / ' + title.slice(0, 40) + '…');
+      bdCurrentBtn.disabled = true;
+      bdCurrentBtn.textContent = '✓ 요청됨';
+      closeBDModal();
+    } else if (data.status === 'duplicate') {
+      showToast('⚠️ 동일 요청이 이미 대기 중입니다', true);
+      closeBDModal();
+    } else {
+      showToast('❌ 오류: ' + (data.message || '알 수 없음'), true);
+    }
+  };
+  const params = new URLSearchParams({
+    action: 'requestBDQueue', title, session, format, requester, memo, callback: cb
+  });
+  const s = document.createElement('script');
+  s.src = BD_WEBHOOK_URL + '?' + params.toString();
+  s.onerror = () => {
+    delete window[cb];
+    showToast('❌ 네트워크 오류 — 잠시 후 다시 시도', true);
+  };
+  document.head.appendChild(s);
+}
+</script>
+
+</body>
+</html>
