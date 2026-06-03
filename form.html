@@ -259,6 +259,18 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#ee
         <div class="sr-wrap" id="sr-wrap"></div>
       </div>
     </div>
+    <div class="card" id="c-prenon">
+      <div class="card-hd">💊 프레논 교차판매 블럭 조회 <span style="font-size:11px;font-weight:400;color:var(--gray3)">— 어느 채널이 보유 중인지 확인 후 소통</span></div>
+      <div class="card-bd">
+        <div class="sw">
+          <span class="si-ico">🔍</span>
+          <input class="si" id="pn-si" type="text" placeholder="병원명으로 프레논 블럭 조회..." autocomplete="off">
+          <button class="si-clr" id="pn-clr">×</button>
+        </div>
+        <div class="sr-wrap" id="pn-wrap"></div>
+        <div id="pn-status" style="font-size:11px;color:var(--gray3);margin-top:6px">프레논 데이터 로딩 중...</div>
+      </div>
+    </div>
     <div class="card">
       <div class="card-hd">📋 이번 보고 목록 <span class="cnt" id="list-cnt">0</span></div>
       <div class="card-bd" style="padding-top:10px">
@@ -734,6 +746,7 @@ function loadFromGAS(){
       step(2);
       showEl('c-rpm');
       buildRpm();
+      loadPrenon();
     } else {
       hd.textContent='❌ 연결 실패';
       card.className='card load-err';
@@ -780,6 +793,43 @@ function selRpm(r,btn){
   // Google Sheets 전송 버튼 활성화 조건 설정
   document.getElementById('btn-sheets').disabled=true;
 }
+
+/* ── 프레논 교차판매 블럭 조회 ── */
+var prenonList=[], prenonReady=false;
+var PN_CH={'MS팀':{bg:'#dbeafe',fg:'#1e40af',label:'MS팀'},'대웅바이오':{bg:'#fef3c7',fg:'#92400e',label:'대웅바이오'},'병원사업부':{bg:'#e0e7ff',fg:'#3730a3',label:'병원사업부'},'미배정':{bg:'#dcfce7',fg:'#166534',label:'빈블럭(배정가능)'}};
+function pnMonth(v){if(!v)return'';var s=String(v);if(/^\d{4}-\d{2}/.test(s))return s.slice(0,7);var d=new Date(s);if(isNaN(d))return s.slice(0,7);return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2);}
+function loadPrenon(){
+  var cb='__pn'+Date.now(),sc=document.createElement('script');
+  window[cb]=function(res){try{document.head.removeChild(sc);}catch(e){}delete window[cb];
+    if(res&&res.success&&Array.isArray(res.data)){prenonList=res.data;prenonReady=true;}
+    var st=document.getElementById('pn-status');if(st&&!document.getElementById('pn-si').value.trim())st.textContent=prenonReady?(prenonList.length+'건 로드됨 — 병원명을 입력하세요'):'프레논 데이터 로드 실패';};
+  sc.onerror=function(){try{document.head.removeChild(sc);}catch(e){}delete window[cb];var st=document.getElementById('pn-status');if(st)st.textContent='프레논 데이터 로드 실패 (네트워크)';};
+  sc.src=GAS_URL+'?mode=prenon&callback='+cb+'&t='+Date.now();
+  document.head.appendChild(sc);
+}
+function pnSearch(){
+  var inp=document.getElementById('pn-si'),wrap=document.getElementById('pn-wrap'),st=document.getElementById('pn-status'),clr=document.getElementById('pn-clr');
+  var q=inp.value.trim().toLowerCase();clr.style.display=q?'block':'none';
+  if(!q){wrap.style.display='none';st.textContent=prenonReady?(prenonList.length+'건 로드됨 — 병원명을 입력하세요'):'프레논 데이터 로딩 중...';return;}
+  if(!prenonReady){st.textContent='프레논 데이터 로딩 중... 잠시 후 다시 시도하세요';wrap.style.display='none';return;}
+  var hits=prenonList.filter(function(r){return String(r['병원명']||'').toLowerCase().indexOf(q)>=0;}).slice(0,15);
+  st.textContent=hits.length?(hits.length+'건 검색됨'):'검색 결과 없음 — 프레논 리스트에 미등록 병원입니다';
+  if(!hits.length){wrap.style.display='none';return;}
+  wrap.innerHTML=hits.map(function(r){
+    var ch=PN_CH[r['채널']]||{bg:'#e2e8f0',fg:'#475569',label:r['채널']||'-'};
+    var badge='<span style="background:'+ch.bg+';color:'+ch.fg+';border-radius:5px;font-size:11px;padding:2px 8px;font-weight:700">'+ch.label+'</span>';
+    var mgr=r['담당']?(' · 담당 '+esc(r['담당'])):'';
+    var plan=pnMonth(r['랜딩예정월']);plan=plan?(' · 랜딩예정 '+plan):'';
+    var stp=r['신약과정']?(' · '+esc(r['신약과정'])):'';
+    var stt=r['상태']?(' · '+esc(r['상태'])):'';
+    var land=r['랜딩유무']?(' · 랜딩 '+esc(r['랜딩유무'])):'';
+    var sz=r['규모']?(' <span style="font-size:10px;color:#856404">'+esc(r['규모'])+'</span>'):'';
+    var vend=r['업체']?esc(r['업체']):'';
+    return '<div class="sr"><div class="sr-l"><div class="hn">'+esc(r['병원명']||'(병원명 미상)')+sz+'&nbsp;&nbsp;'+badge+'</div><div class="hm">'+vend+mgr+plan+stp+stt+land+'</div></div></div>';
+  }).join('');
+  wrap.style.display='block';
+}
+(function(){var i=document.getElementById('pn-si');if(i){i.addEventListener('input',pnSearch);var c=document.getElementById('pn-clr');if(c)c.addEventListener('click',function(){i.value='';pnSearch();i.focus();});}})();
 
 /* ── 검색 ── */
 const si=document.getElementById('si'),srw=document.getElementById('sr-wrap'),siClr=document.getElementById('si-clr');
