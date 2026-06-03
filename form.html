@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- form.html — 2026-05-22 수정: 업체사업자(J열)·업체연락처(L열) payload 키 누락 버그 수정 -->
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -34,9 +35,12 @@ async function sendToSheets() {
       '110대':    item.is110 ? '○' : '',
       시군구:     item.시군구 || '',
       제품명:     item.제품명  || '',
+      업체사업자: String(item.업체사업자번호 || ''),  // [🔴-1] 업체사업자(J열) 키 추가
       업체명:     item.업체명  || '',
+      업체연락처: item.업체연락처 || '',              // [🔴-2] 업체연락처(L열) 키 추가
       MBO:        item.MBO || 0,
-      랜딩예정월: item.랜딩예정월 || '',
+      DC접수월: item.DC접수월 || '',
+      코딩예측월: item.코딩예측월 || '',
       '상정과/KOL': item.상정과KOL || '',
       신약과정:   item.신약과정 || item.신약단계 || '',
       이슈상태:   item.이슈상태 || item.진행평가 || '',
@@ -311,7 +315,8 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#ee
         <div class="ig"><label>CSO 업체명</label><input type="text" id="nb-c" placeholder="업체명 검색 또는 직접 입력" list="vendor-list" autocomplete="off"></div>
         <div class="ig"><label>CSO 연락처</label><input type="text" id="nb-ct" placeholder="010-0000-0000"></div>
         <div class="ig"><label>MBO 금액 (원)</label><input type="number" id="nb-m" placeholder="5000000"></div>
-        <div class="ig"><label>랜딩 예정월</label><input type="month" id="nb-ld"></div>
+        <div class="ig"><label>DC접수월</label><input type="month" id="nb-ld"></div>
+        <div class="ig"><label>코딩예측월</label><input type="month" id="nb-cd"></div>
         <div class="ig full"><label>상정과/KOL <span style="font-size:10px;color:var(--gray3);font-weight:400">상정과 및 담당 DR</span></label><input type="text" id="nb-kol" placeholder="예) 내과 / 홍길동 DR"></div>
         <div class="ig"><label>신약과정</label>
           <select id="nb-st"><option value="">-- 선택 --</option><option>미시작</option><option>업체확인(DC진행여부)</option><option>서류준비</option><option>DC신청</option><option>DC통과</option><option>코딩</option><option>처방</option></select>
@@ -700,18 +705,19 @@ function loadFromGAS(){
         시군구:        r['시군구']||'',
         제품명:        r['제품명']||'',
         기준품명:      r['기준품명']||'',
-        업체사업자번호:r['업체 사업자번호']||'',
+        업체사업자번호:r['업체사업자']||r['업체 사업자번호']||r['업체사업자번호']||'',
         업체명:        r['업체명']||'',
-        업체연락처:    r['업체 연락처']||'',
+        업체연락처:    r['업체연락처']||r['업체 연락처']||'',
         MBO:           Number(r['MBO'])||0,
-        랜딩예정월:    String(r['랜딩예정월']||'').slice(0,7),
+        DC접수월:    String(r['DC접수월']||'').slice(0,7),
+        코딩예측월:    String(r['코딩예측월']||'').slice(0,7),
         상정과KOL:     r['상정과/KOL']||'',
         신약과정:      r['신약과정']||r['신약단계']||'',
         이슈상태:      migrateIssue(r['이슈상태']||r['진행평가']||''),
         진행사항:      r['진행사항']||'',
         작성일:        r['작성일']||'',
         비고:          r['비고']||'',
-        _원래DC월:     String(r['랜딩예정월']||'').slice(0,7),
+        _원래DC월:     String(r['DC접수월']||'').slice(0,7),
         DC월_이전값:   r['DC월_이전값']||'',
         DC월_변경일:   r['DC월_변경일']||'',
         MBO_이전값:    r['MBO_이전값']||'',
@@ -797,7 +803,7 @@ function doSearch(){
       return`<div class="sr${added?' added':''}">
         <div class="sr-l">
           <div class="hn">${esc(d.실납처명)}${d.is110?' <span style="font-size:10px;color:#856404">★110</span>':''}</div>
-          <div class="hm">💊 ${esc(d.기준품명)} · 🏢 ${esc(d.업체명||'-')} · 💰 ${mbo} · 📅 ${d.랜딩예정월||'-'}</div>
+          <div class="hm">💊 ${esc(d.기준품명)} · 🏢 ${esc(d.업체명||'-')} · 💰 ${mbo} · 📅 ${d.DC접수월||'-'}</div>
         </div>
         ${added?'<span class="sr-done">추가됨 ✓</span>':`<button class="sr-add" onclick="addItem(${d._id})">＋ 추가</button>`}
       </div>`;
@@ -831,7 +837,7 @@ function buildRI(it,i){
   const issCls=it.이슈상태?it.이슈상태.replace(/[()]/g,''):'';
   /* DC월 변경 감지 */
   const origDC=it._원래DC월||'';
-  const curDC=it.랜딩예정월||'';
+  const curDC=it.DC접수월||'';
   const dcChanged=!it._new && origDC && curDC && origDC!==curDC;
   const dcBadge=dcChanged?`<span class="badge-dc">DC월 변경</span>`:'';
   const dcOldTxt=dcChanged?`<span class="dc-old">${origDC}</span>→ `:'';
@@ -868,8 +874,11 @@ function buildRI(it,i){
             ${STAGES.map(s=>`<option${it.신약과정===s?' selected':''}>${s}</option>`).join('')}
           </select>
         </div>
-        <div class="ig"><label>📅 랜딩예정월 <span style="font-size:10px;color:var(--gray3);font-weight:400">변경 시 수정</span></label>
-          <input type="month" value="${it.랜딩예정월||''}" onchange="setF(${i},'랜딩예정월',this.value)" style="width:100%;border:1.5px solid var(--gray2);border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;outline:none;color:var(--gray5)" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--gray2)'">
+        <div class="ig"><label>📅 DC접수월 <span style="font-size:10px;color:var(--gray3);font-weight:400">변경 시 수정</span></label>
+          <input type="month" value="${it.DC접수월||''}" onchange="setF(${i},'DC접수월',this.value)" style="width:100%;border:1.5px solid var(--gray2);border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;outline:none;color:var(--gray5)" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--gray2)'">
+        </div>
+        <div class="ig"><label>🧪 코딩예측월 <span style="font-size:10px;color:var(--gray3);font-weight:400">예측 시 입력</span></label>
+          <input type="month" value="${it.코딩예측월||''}" onchange="setF(${i},'코딩예측월',this.value)" style="width:100%;border:1.5px solid var(--gray2);border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;outline:none;color:var(--gray5)" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--gray2)'">
         </div>
         <div class="ig full"><label>상정과/KOL <span style="font-size:10px;color:var(--gray3);font-weight:400">상정과 및 담당 DR</span></label>
           <input type="text" placeholder="예) 내과 / 홍길동 DR" value="${esc(it.상정과KOL||'')}" onchange="setF(${i},'상정과KOL',this.value)">
@@ -893,7 +902,7 @@ function buildRI(it,i){
 
 function setF(i,f,v){
   items[i][f]=v;
-  if(f==='랜딩예정월'){
+  if(f==='DC접수월'){
     /* DC월 변경 시 해당 카드만 즉시 리렌더 */
     const ri=document.getElementById('ri-'+i);
     if(ri){const d=document.createElement('div');d.innerHTML=buildRI(items[i],i);ri.replaceWith(d.firstElementChild);}
@@ -921,9 +930,9 @@ function addNB(){
   items.push({_id:Date.now(),_new:true,담당RPM:rpm,신청월:today().slice(0,4)+'년',
     RPM연락처:'',사업자번호:'',실납처명:h,is110:is110,시군구:'',제품명:p,기준품명:p,
     업체사업자번호:'',업체명:V('nb-c'),업체연락처:V('nb-ct'),MBO:Number(V('nb-m'))||0,
-    랜딩예정월:V('nb-ld'),상정과KOL:V('nb-kol'),신약과정:document.getElementById('nb-st').value,
+    DC접수월:V('nb-ld'),코딩예측월:V('nb-cd'),상정과KOL:V('nb-kol'),신약과정:document.getElementById('nb-st').value,
     이슈상태:issVal,진행사항:V('nb-n'),작성일:today(),비고:V('nb-e')});
-  ['nb-h','nb-p','nb-c','nb-ct','nb-m','nb-ld','nb-kol','nb-n','nb-e'].forEach(id=>document.getElementById(id).value='');
+  ['nb-h','nb-p','nb-c','nb-ct','nb-m','nb-ld','nb-cd','nb-kol','nb-n','nb-e'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('nb-st').value='';
   const iss=document.getElementById('nb-iss');if(iss){iss.value='';paintIssueSelect(iss);}
   closeMd('nb-modal');renderList();toast(`✅ ${h} 신규 블럭 추가됨`);
@@ -932,8 +941,8 @@ function addNB(){
 /* ── Excel 백업 저장 ── */
 function saveExcel(){
   if(!items.length){toast('보고할 항목을 먼저 추가하세요');return;}
-  const hd=['담당RPM','실납처명','기준품명','제품명','업체명','MBO','랜딩예정월','상정과/KOL','신약과정','이슈상태','진행사항','비고','작성일'];
-  const rows=items.map(d=>[d.담당RPM,d.실납처명,d.기준품명,d.제품명,d.업체명,d.MBO,d.랜딩예정월,d.상정과KOL||'',d.신약과정||'',d.이슈상태||'',d.진행사항,d.비고,today()]);
+  const hd=['담당RPM','실납처명','기준품명','제품명','업체명','MBO','DC접수월','코딩예측월','상정과/KOL','신약과정','이슈상태','진행사항','비고','작성일'];
+  const rows=items.map(d=>[d.담당RPM,d.실납처명,d.기준품명,d.제품명,d.업체명,d.MBO,d.DC접수월,d.코딩예측월||'',d.상정과KOL||'',d.신약과정||'',d.이슈상태||'',d.진행사항,d.비고,today()]);
   const wb=XLSX.utils.book_new();
   const ws=XLSX.utils.aoa_to_sheet([hd,...rows]);
   ws['!cols']=[{wch:10},{wch:20},{wch:18},{wch:12},{wch:16},{wch:10},{wch:10},{wch:10},{wch:8},{wch:30},{wch:20},{wch:12}];
@@ -962,7 +971,7 @@ function openEmail(){
     const iss=d.이슈상태?`[${d.이슈상태}] `:'';
     body+=`[${i+1}] ${iss}${d.실납처명}${d._new?' [신규]':''}${d.is110?' [110대]':''}\n`;
     body+=`  ∙ 제품: ${d.기준품명}\n`;
-    body+=`  ∙ CSO: ${d.업체명||'-'} / MBO: ${mbo} / 랜딩예정: ${d.랜딩예정월||'-'}\n`;
+    body+=`  ∙ CSO: ${d.업체명||'-'} / MBO: ${mbo} / DC접수: ${d.DC접수월||'-'}\n`;
     if(d.상정과KOL) body+=`  ∙ 상정과/KOL: ${d.상정과KOL}\n`;
     if(d.신약과정) body+=`  ∙ 신약과정: ${d.신약과정}\n`;
     if(d.진행사항) body+=`  ∙ 진행사항: ${d.진행사항}\n`;
