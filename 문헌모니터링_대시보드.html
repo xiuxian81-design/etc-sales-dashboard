@@ -67,6 +67,17 @@ header h1 { font-size: 17px; font-weight: 700; letter-spacing: -.3px; }
   font-size: 12px;
   color: #cde;
 }
+.bd-folder-link {
+  background: rgba(255,255,255,.92);
+  color: var(--navy);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.bd-folder-link:hover { background: #fff; }
 
 /* ─── 세션 탭 ─── */
 .tabs-wrap {
@@ -402,6 +413,7 @@ main { max-width: 960px; margin: 28px auto; padding: 0 16px; }
     <h1>ETC 문헌모니터링</h1>
   </div>
   <div class="header-right">
+    <a class="bd-folder-link" href="https://drive.google.com/drive/folders/1QwDTVM5f7MtDvGb5Uwql_8SU6S8LMjM0" target="_blank" title="제작 완료된 BD 소재 폴더 열기">📁 제작된 BD 소재</a>
     <select class="month-select" id="monthSelect" onchange="onMonthChange()">
       <option value="">전체 보기</option>
     </select>
@@ -705,18 +717,12 @@ function renderSession() {
 
   document.getElementById('totalBadge').textContent = `총 ${total}편`;
 
-  // 세션 요약 카드
-  const reportUrl  = getReportUrl(session.key, activeMonth);
-  const reportLink = reportUrl
-    ? `<a class="session-report-link" href="${reportUrl}" target="_blank">📋 상세 리포트 보기 ↗</a>`
-    : '';
-
+  // 세션 요약 카드 (상세 리포트 링크 제거 — 대시보드 카드가 곧 상세 화면)
   let html = `
     <div class="session-summary">
       <div>
         <div class="session-title">${session.label}</div>
         <div class="session-pm">담당 PM : ${session.pm}</div>
-        ${reportLink}
       </div>
       <div class="session-stats">
         <div class="stat-box stat-new">
@@ -861,9 +867,9 @@ function submitBDModal() {
   const btn        = _bdBtn;
   const title      = _bdTitle;
 
-  // 요청자 이메일 필수 검증 (모달 닫기 전에)
-  if (!requester || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(requester)) {
-    showToast('⚠️ 요청자 이메일을 정확히 입력해주세요.');
+  // 요청자 이름 필수 검증 (모달 닫기 전에)
+  if (!requester) {
+    showToast('⚠️ 요청자 이름을 입력해주세요.');
     document.getElementById('bdRequester').focus();
     return;
   }
@@ -995,8 +1001,8 @@ document.addEventListener('DOMContentLoaded', () => {
       <span class="format-chip" data-fmt="BT">BT 바이오톡</span>
     </div>
 
-    <label>요청자 이메일 <span style="font-weight:400;color:#c0392b">*</span></label>
-    <input type="email" id="bdRequester" placeholder="example@hanall.co.kr"
+    <label>요청자 (이름) <span style="font-weight:400;color:#c0392b">*</span></label>
+    <input type="text" id="bdRequester" placeholder="예) 박지현"
       style="width:100%;padding:10px 12px;border:1px solid #d6dbe3;border-radius:8px;font-size:13px;box-sizing:border-box;font-family:inherit">
 
     <label>요청사항 <span style="font-weight:400;color:#aaa">(선택)</span></label>
