@@ -157,38 +157,15 @@
     </style>
 
 <style>
-/* ── 풀상세 논문 카드 (build-report.py) ── */
-.paper{background:#fff;border:1px solid #e1e8f0;border-radius:10px;margin:18px 30px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden}
-.paper-header{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 16px;background:#f5f9fc;border-bottom:1px solid #e1e8f0}
-.paper-num{font-weight:700;color:#003366;font-size:14px}
-.stars-high{color:#1A5276;font-weight:700}.stars-mid{color:#2E6DA0;font-weight:700}.stars-low{color:#95a5a6;font-weight:700}
-.tag-direct,.tag-ref,.tag-open,.tag-wall{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600}
-.tag-direct{background:#1A5276;color:#fff}.tag-ref{background:#e1e8f0;color:#456}
-.tag-open{background:#e8f5e9;color:#2e7d32}.tag-wall{background:#f0f0f0;color:#888}
-.journal-meta{font-size:12px;color:#666;text-align:right}
-.paper-body{padding:14px 18px}
-.paper-title{font-size:15px;font-weight:700;color:#1a1a1a;margin:0 0 6px;line-height:1.4}
-.paper-url{font-size:12px;color:#2E6DA0;word-break:break-all;display:inline-block;margin-bottom:6px}
-.design-badge{display:inline-block;font-size:11px;background:#eef3f8;color:#1A5276;padding:2px 10px;border-radius:10px;margin-left:6px}
-.summary-grid{margin:14px 0}
-.summary-grid h4,.viz-section h4,.usage h4{font-size:13px;color:#003366;margin:0 0 8px;padding-left:8px;border-left:3px solid #1A5276}
-.s-row{display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed #eef2f7}
-.s-label{flex:0 0 64px;font-size:12px;font-weight:700;color:#1A5276}
-.s-val{flex:1;font-size:13px;color:#222;line-height:1.65}
-.key-nums{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
-.knum{flex:1;min-width:120px;background:#f5f9fc;border:1px solid #dce6f0;border-radius:8px;padding:10px 12px;text-align:center}
-.knum .val{font-size:16px;font-weight:800;color:#1A5276;line-height:1.25}
-.knum .desc{font-size:11px;color:#555;margin-top:3px;line-height:1.3}
-.knum .pval{font-size:11px;color:#2e7d32;font-weight:600;margin-top:2px}
-.viz-section{margin:14px 0}.viz-subtitle{font-size:12px;color:#666;margin-bottom:6px}
-.chart-wrap{position:relative;height:240px}
-.usage{margin:14px 0 4px;background:#fbfcfe;border:1px solid #eef2f7;border-radius:8px;padding:10px 14px}
-.usage ul{margin:0;padding-left:18px}.usage li{font-size:13px;color:#333;line-height:1.7}
-.bd-request-btn{background:#1A5276;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;margin-left:8px}
+.bd-request-btn{background:#1A5276;color:#fff;border:none;padding:5px 12px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;margin-left:auto}
 .bd-request-btn:hover{background:#14405e}.bd-request-btn:disabled{background:#95a5a6;cursor:not-allowed}
+.paper-meta{align-items:center}
+.evidence-ref{background-color:#7f8c9b !important}
+.importance-mid{background-color:#2E6DA0 !important}.importance-low{background-color:#95a5a6 !important}
+.key-numbers h4{margin:0 0 8px;color:#003366;font-size:14px}
+.content-section-text strong{color:#1A5276}
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -218,390 +195,592 @@
         </div>
         <div class="papers">
 
-  <!-- ━━━ 논문 #1 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #1</span>
-      <span class="stars-mid">★★☆</span>
-      <span class="tag-ref">참고근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex:1;">Cancer Reports | 2025-08-01</div>
-      <button class="bd-request-btn" data-title="Prognostic Impact of Clostridium butyricum MIYAIRI (CBM588) in Combination With Pembrolizumab for Advanced Urothelial Carcinoma: A Retrospective Cohort Study" data-session="장내미생물" data-num="1" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Prognostic Impact of Clostridium butyricum MIYAIRI (CBM588) in Combination With Pembrolizumab for Advanced Urothelial Carcinoma: A Retrospective Cohort Study</p>
-      <a href="https://doi.org/10.1002/cnr2.70308" class="paper-url" target="_blank">https://doi.org/10.1002/cnr2.70308</a>
-      <span class="design-badge">후향적 코호트 연구</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">진행성·전이성 요로상피암(UC)은 백금기반 항암화학요법 이후 예후가 불량하며, 2차 치료로 면역관문억제제(ICI) 펨브롤리주맙 단독요법을 써도 표준 항암제 대비 생존 연장은 약 3개월에 불과하다. 장내미생물이 항종양 면역과 ICI 반응성에 영향을 준다는 근거가 축적되면서, 부티르산 생성균 프로바이오틱을 병용해 ICI 효능을 끌어올리려는 시도가 등장했다. CBM588(C. butyricum MIYAIRI 588)은 신장암 등에서 ICI와의 병용 이점이 보고되었으나 UC에서의 근거는 부재했다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">일본 가고시마대학병원 단일기관 후향적 코호트 연구(2018.2~2024.10). 2차 펨브롤리주맙(200mg/3주 또는 400mg/6주 IV)을 받은 진행/재발 전이성 UC 환자 44명을 분석. 군별 N: 펨브롤리주맙 단독 33명 vs 펨브롤리주맙+CBM588 11명. CBM588은 3g을 1일 3회 매 식후 투여하며 펨브롤리주맙 투여 기간 내내 지속. 펨브롤리주맙 시작 30일 이내 항생제 사용자·타 프로바이오틱 사용자는 제외. 1차 평가변수는 PFS와 OS(군간 비교), 부수적으로 임상병리인자 차이. 추적기간(중앙값) 약 12개월, 펨브롤리주맙 투여기간 중앙값 304일(64~2071일).</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">PFS 중앙값은 단독군 3.9개월 vs 병용군 10.2개월로 병용군이 유의하게 길었다(log-rank p=0.004). OS 중앙값은 단독군 12.0개월 vs 병용군 12.2개월(log-rank p=0.02). 다변량 Cox 분석에서 CBM588은 PFS(HR 0.074, 95%CI 0.016~0.340, p=0.0008)와 OS(HR 0.105, 95%CI 0.022~0.533, p=0.0056) 모두에서 독립적 호전 인자였다. 불량 예후인자로는 T병기≥3(PFS HR 3.634, 95%CI 1.340~9.835, p=0.011), 간전이(PFS HR 5.465, 95%CI 1.516~19.70, p=0.0094)가, 호전 인자로는 면역관련이상반응(irAE) 발생(PFS HR 0.133, 95%CI 0.03~0.586, p=0.0077)이 확인됐다.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">CBM588 투여군 11명 중 CBM588 자체로 인한 이상반응을 경험한 환자는 없었고, 약물로 인한 투여 중단도 없었다. 펨브롤리주맙에 의한 irAE는 전체의 약 20%에서 관찰됐으며, Grade 3 이상 irAE 발생 시 펨브롤리주맙 중단 또는 치료적 개입 등 적절한 조치가 이뤄졌다. CBM588은 금기·특별 주의사항이 없고 저렴해 병용이 용이하다고 기술.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자들은 2차 펨브롤리주맙에 CBM588을 병용하면 진행성 UC에서 PFS·OS가 연장될 수 있다고 결론지었다. 다만 단일기관·후향적·소규모(병용군 11명)·일본인 한정·관찰기간 짧음 등 한계가 크고 OS 중앙값 차이는 미미(12.0 vs 12.2개월)해 PFS 이점이 OS로 충분히 전환됐는지는 불확실하다. 바이오탑 관점에서는 ICI 병용 프로바이오틱 전략의 가능성을 시사하나, CBM588은 바이오탑 성분(C. butyricum TO-A)과 다른 균주이므로 동일 효능으로 단정할 수 없다(참고근거: 균주 상이, 동일효능 단정 불가).</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">3.9개월 vs 10.2개월</div><div class="desc">PFS 중앙값</div><div class="pval">log-rank p=0.004</div></div>
-        <div class="knum"><div class="val">HR 0.074</div><div class="desc">CBM588의 PFS 다변량 위험비</div><div class="pval">p=0.0008 (95%CI 0.016~0.340)</div></div>
-        <div class="knum"><div class="val">HR 0.105</div><div class="desc">CBM588의 OS 다변량 위험비</div><div class="pval">p=0.0056 (95%CI 0.022~0.533)</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Prognostic Impact of Clostridium butyricum MIYAIRI (CBM588) </div><div class="chart-wrap"><canvas id="chart_dr_1_925"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>butyricum+면역항암제 시너지 근거</li>
-          <li>바이오탑 성분 균주의 항암 보조 영역 잠재적 가치 간접 뒷받침</li>
-          <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #1 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Prognostic Impact of Clostridium butyricum MIYAIRI (CBM588) in Combination With Pembrolizumab for Advanced Urothelial Carcinoma: A Retrospective Cohort Study</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Cancer Reports</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-08-01</div>
+                        <button class="bd-request-btn" data-title="Prognostic Impact of Clostridium butyricum MIYAIRI (CBM588) in Combination With Pembrolizumab for Advanced Urothelial Carcinoma: A Retrospective Cohort Study" data-session="장내미생물" data-num="1" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.1002/cnr2.70308" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">후향적 코호트 연구</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">진행성·전이성 요로상피암(UC)은 백금기반 항암화학요법 이후 예후가 불량하며, 2차 치료로 면역관문억제제(ICI) 펨브롤리주맙 단독요법을 써도 표준 항암제 대비 생존 연장은 약 3개월에 불과하다. 장내미생물이 항종양 면역과 ICI 반응성에 영향을 준다는 근거가 축적되면서, 부티르산 생성균 프로바이오틱을 병용해 ICI 효능을 끌어올리려는 시도가 등장했다. CBM588(C. butyricum MIYAIRI 588)은 신장암 등에서 ICI와의 병용 이점이 보고되었으나 UC에서의 근거는 부재했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">일본 가고시마대학병원 단일기관 후향적 코호트 연구(2018.2~2024.10). 2차 펨브롤리주맙(200mg/3주 또는 400mg/6주 IV)을 받은 진행/재발 전이성 UC 환자 44명을 분석. 군별 N: 펨브롤리주맙 단독 33명 vs 펨브롤리주맙+CBM588 11명. CBM588은 3g을 1일 3회 매 식후 투여하며 펨브롤리주맙 투여 기간 내내 지속. 펨브롤리주맙 시작 30일 이내 항생제 사용자·타 프로바이오틱 사용자는 제외. 1차 평가변수는 PFS와 OS(군간 비교), 부수적으로 임상병리인자 차이. 추적기간(중앙값) 약 12개월, 펨브롤리주맙 투여기간 중앙값 304일(64~2071일).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">PFS 중앙값은 단독군 3.9개월 vs 병용군 10.2개월로 병용군이 유의하게 길었다(log-rank p=0.004).<br/>
+OS 중앙값은 단독군 12.0개월 vs 병용군 12.2개월(log-rank p=0.02).<br/>
+다변량 Cox 분석에서 CBM588은 PFS(HR 0.074, 95%CI 0.016~0.340, p=0.0008)와 OS(HR 0.105, 95%CI 0.022~0.533, p=0.0056) 모두에서 독립적 호전 인자였다.<br/>
+불량 예후인자로는 T병기≥3(PFS HR 3.634, 95%CI 1.340~9.835, p=0.011), 간전이(PFS HR 5.465, 95%CI 1.516~19.70, p=0.0094)가, 호전 인자로는 면역관련이상반응(irAE) 발생(PFS HR 0.133, 95%CI 0.03~0.586, p=0.0077)이 확인됐다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">CBM588 투여군 11명 중 CBM588 자체로 인한 이상반응을 경험한 환자는 없었고, 약물로 인한 투여 중단도 없었다. 펨브롤리주맙에 의한 irAE는 전체의 약 20%에서 관찰됐으며, Grade 3 이상 irAE 발생 시 펨브롤리주맙 중단 또는 치료적 개입 등 적절한 조치가 이뤄졌다. CBM588은 금기·특별 주의사항이 없고 저렴해 병용이 용이하다고 기술.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 2차 펨브롤리주맙에 CBM588을 병용하면 진행성 UC에서 PFS·OS가 연장될 수 있다고 결론지었다. 다만 단일기관·후향적·소규모(병용군 11명)·일본인 한정·관찰기간 짧음 등 한계가 크고 OS 중앙값 차이는 미미(12.0 vs 12.2개월)해 PFS 이점이 OS로 충분히 전환됐는지는 불확실하다. 바이오탑 관점에서는 ICI 병용 프로바이오틱 전략의 가능성을 시사하나, CBM588은 바이오탑 성분(C. butyricum TO-A)과 다른 균주이므로 동일 효능으로 단정할 수 없다(참고근거: 균주 상이, 동일효능 단정 불가).</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>3.9개월 vs 10.2개월 — PFS 중앙값 (log-rank p=0.004)</li>
+                            <li>HR 0.074 — CBM588의 PFS 다변량 위험비 (p=0.0008 (95%CI 0.016~0.340))</li>
+                            <li>HR 0.105 — CBM588의 OS 다변량 위험비 (p=0.0056 (95%CI 0.022~0.533))</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #2 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #2</span>
-      <span class="stars-mid">★★☆</span>
-      <span class="tag-ref">참고근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex:1;">Journal of Clinical Oncology (ASCO 2025 Abstract) | 2025-06-01</div>
-      <button class="bd-request-btn" data-title="An exploratory study of clostridium butyricum combined with neoadjuvant chemoimmunotherapy in urothelial carcinoma" data-session="장내미생물" data-num="2" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">An exploratory study of clostridium butyricum combined with neoadjuvant chemoimmunotherapy in urothelial carcinoma</p>
-      <a href="https://ascopubs.org/doi/10.1200/JCO.2025.43.16_suppl.4585" class="paper-url" target="_blank">https://ascopubs.org/doi/10.1200/JCO.2025.43.16_suppl.4585</a>
-      <span class="design-badge">탐색적 임상시험</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">근침윤성 방광암(요로상피암, cT2-T4aN0M0)은 근치적 방광절제술 전 백금기반 신보강요법이 표준이나 병리학적 완전관해(ypT0) 도달률이 제한적이고, 최근 면역항암제(PD-1 억제제)를 더한 신보강 화학면역요법이 시도되고 있다. 장내미생물총이 면역항암제 반응성을 좌우한다는 근거가 축적되며, 부티르산 생성균인 Clostridium butyricum을 병용해 항암 면역반응을 증강하려는 탐색적 시도가 진행 중이다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">단일기관(난징의대 제1부속병원) 탐색적 무작위 연구(ClinicalTrials.gov NCT06696742, 2024-02 등록·모집 중, 목표 60명, 2개군). 대상: 신보강군 cT2-T4aN0M0 요로상피암(보조군은 T3-T4 및/또는 림프절전이 양성). 중재: GC+anti-PD1 화학면역요법 — gemcitabine 1.0 g/m²(d1,8) + cisplatin 70 mg/m²(d2-4) + tislelizumab 200mg q21d. 실험군은 동일 요법 + Clostridium butyricum 정제 20mg 1일 2회 병용. ASCO 초록 시점 대조군 26명이 치료 완료·근치적 방광절제술 시행. 1차 평가변수는 수술 후 3년 무진행생존(PFS), 2차는 3년 전체생존(OS). 초록에서 보고된 단기 종양반응은 임상반응(CR/PR/SD/PD)·병리적 병기강하·ypT0. 균주명·세부 무작위배정 방법은 초록 미보고.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">대조군(GC+anti-PD1 단독, n=26): 임상 CR 30.7%(8/26), 임상 PR 42.3%(11/26), 안정병변(SD) 23.1%(6/26), 진행(PD) 3.8%(1/26); 병리적 병기강하 61.5%(16/26), ypT0(병리적 완전관해) 26.9%(7/26). 군간 비교에서 병용군(C. butyricum 추가)이 대조군 대비 임상 CR+PR 비율(p=0.037)과 병리적 병기강하율(p=0.042)이 유의하게 높았음. 병용군의 절대 수치(군별 n, CR/PR%, ypT0%)는 ASCO 초록에 명시되지 않아 초록 미보고.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">초록에 구체적 이상반응명·발생률·중단율 보고 없음(초록 미보고). C. butyricum 병용에 따른 추가 안전성 신호도 초록에 별도 기술되지 않음.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">(초록 기반 — 전문 미접근) 저자 결론은 신보강 화학면역요법에 Clostridium butyricum을 병용하면 cT2-T4aN0M0 요로상피암에서 임상·병리학적 반응률이 향상된다는 것. 한계: 단일기관·소표본 탐색적 연구로 1차 평가변수(3년 PFS/OS)는 아직 미성숙, 병용군 세부 수치·균주명 미공개, 학회초록 단계. 바이오탑 관점: C. butyricum 보조요법이 종양 면역치료 반응을 증강할 수 있다는 가설을 임상에서 뒷받침하나, 사용 균주가 미명시(인접문헌은 CBM588 계열)로 TO-A 균주와 상이할 수 있어 직접근거가 아닌 &#x27;계열 보조요법&#x27;의 참고근거로 한정 활용해야 함.</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">p=0.037</div><div class="desc">임상 CR+PR 비율</div><div class="pval">p=0.037</div></div>
-        <div class="knum"><div class="val">p=0.042</div><div class="desc">병리적 병기강하율</div><div class="pval">p=0.042</div></div>
-        <div class="knum"><div class="val">26.9% (7/26)</div><div class="desc">대조군 ypT0(병리적 완전관해) 도달률</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">An exploratory study of clostridium butyricum combined with </div><div class="chart-wrap"><canvas id="chart_dr_2_925"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>수술·항암 보조 영역에서 C butyricum 임상적 유용성</li>
-          <li>ASCO 2025 발표 학술적 주목도</li>
-          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #2 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">An exploratory study of clostridium butyricum combined with neoadjuvant chemoimmunotherapy in urothelial carcinoma</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Journal of Clinical Oncology (ASCO 2025 Abstract)</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-06-01</div>
+                        <button class="bd-request-btn" data-title="An exploratory study of clostridium butyricum combined with neoadjuvant chemoimmunotherapy in urothelial carcinoma" data-session="장내미생물" data-num="2" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://ascopubs.org/doi/10.1200/JCO.2025.43.16_suppl.4585" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">탐색적 임상시험</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">근침윤성 방광암(요로상피암, cT2-T4aN0M0)은 근치적 방광절제술 전 백금기반 신보강요법이 표준이나 병리학적 완전관해(ypT0) 도달률이 제한적이고, 최근 면역항암제(PD-1 억제제)를 더한 신보강 화학면역요법이 시도되고 있다. 장내미생물총이 면역항암제 반응성을 좌우한다는 근거가 축적되며, 부티르산 생성균인 Clostridium butyricum을 병용해 항암 면역반응을 증강하려는 탐색적 시도가 진행 중이다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">단일기관(난징의대 제1부속병원) 탐색적 무작위 연구(ClinicalTrials.gov NCT06696742, 2024-02 등록·모집 중, 목표 60명, 2개군). 대상: 신보강군 cT2-T4aN0M0 요로상피암(보조군은 T3-T4 및/또는 림프절전이 양성). 중재: GC+anti-PD1 화학면역요법 — gemcitabine 1.0 g/m²(d1,8) + cisplatin 70 mg/m²(d2-4) + tislelizumab 200mg q21d. 실험군은 동일 요법 + Clostridium butyricum 정제 20mg 1일 2회 병용. ASCO 초록 시점 대조군 26명이 치료 완료·근치적 방광절제술 시행. 1차 평가변수는 수술 후 3년 무진행생존(PFS), 2차는 3년 전체생존(OS). 초록에서 보고된 단기 종양반응은 임상반응(CR/PR/SD/PD)·병리적 병기강하·ypT0. 균주명·세부 무작위배정 방법은 초록 미보고.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text"><strong>대조군(GC+anti-PD1 단독, n=26):</strong> 임상 CR 30.7%(8/26), 임상 PR 42.3%(11/26), 안정병변(SD) 23.1%(6/26), 진행(PD) 3.8%(1/26); 병리적 병기강하 61.5%(16/26), ypT0(병리적 완전관해) 26.9%(7/26).<br/>
+군간 비교에서 병용군(C. butyricum 추가)이 대조군 대비 임상 CR+PR 비율(p=0.037)과 병리적 병기강하율(p=0.042)이 유의하게 높았음.<br/>
+병용군의 절대 수치(군별 n, CR/PR%, ypT0%)는 ASCO 초록에 명시되지 않아 초록 미보고.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">초록에 구체적 이상반응명·발생률·중단율 보고 없음(초록 미보고). C. butyricum 병용에 따른 추가 안전성 신호도 초록에 별도 기술되지 않음.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">(초록 기반 — 전문 미접근) 저자 결론은 신보강 화학면역요법에 Clostridium butyricum을 병용하면 cT2-T4aN0M0 요로상피암에서 임상·병리학적 반응률이 향상된다는 것. 한계: 단일기관·소표본 탐색적 연구로 1차 평가변수(3년 PFS/OS)는 아직 미성숙, 병용군 세부 수치·균주명 미공개, 학회초록 단계. 바이오탑 관점: C. butyricum 보조요법이 종양 면역치료 반응을 증강할 수 있다는 가설을 임상에서 뒷받침하나, 사용 균주가 미명시(인접문헌은 CBM588 계열)로 TO-A 균주와 상이할 수 있어 직접근거가 아닌 &#x27;계열 보조요법&#x27;의 참고근거로 한정 활용해야 함.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>p=0.037 — 임상 CR+PR 비율 (p=0.037)</li>
+                            <li>p=0.042 — 병리적 병기강하율 (p=0.042)</li>
+                            <li>26.9% (7/26) — 대조군 ypT0(병리적 완전관해) 도달률</li>
+                            <li>61.5% (16/26) — 대조군 병리적 병기강하율</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #3 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #3</span>
-      <span class="stars-high">★★★</span>
-      <span class="tag-ref">참고근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex:1;">Oncology Research | 2025-11-27</div>
-      <button class="bd-request-btn" data-title="Clostridium butyricum MIYAIRI 588 Reduces Colorectal Adenomatous Polyp Recurrence: A Randomized Crossover Trial" data-session="장내미생물" data-num="3" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Clostridium butyricum MIYAIRI 588 Reduces Colorectal Adenomatous Polyp Recurrence: A Randomized Crossover Trial</p>
-      <a href="https://doi.org/10.32604/or.2025.070432" class="paper-url" target="_blank">https://doi.org/10.32604/or.2025.070432</a>
-      <span class="design-badge">무작위 교차 시험 (RCT)</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">대장암(CRC)은 전 세계적으로 발생·사망이 높은 악성종양으로 대부분 선종-암 연속과정을 거쳐 진행한다. 대장내시경·용종절제술이 발생을 줄이지만 선종성 용종의 재발은 여전히 큰 과제로 새로운 예방전략이 필요하다. 장내미생물 불균형(dysbiosis)이 대장 발암을 촉진하므로 프로바이오틱 같은 미생물군 표적 중재가 유망하며, 부티르산 생성균 CBM588(C. butyricum MIYAIRI 588)은 HDAC 억제·세포자멸 유도·장벽 강화 등으로 주목받았으나 사람 대상 선종 재발 예방 임상은 부재했다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">대만 가오슝의대병원, 무작위·단일맹검·교차(crossover) 임상시험. 총 398명(최근 3년 내 내시경으로 선종 완전 절제 후 감시 내시경에서 용종 재발 확인된 고위험군) 등록. 군별 N: A군 200명, B군 198명에 1:1 무작위 배정. A군은 1년차에 CBM588(MIYARISAN BM, 1g당 40mg 함유, 1g 1일 2회) 복용 후 3개월 washout·2년차 비투여; B군은 1년차 비투여·2년차에 동일 요법(교차). 위약은 윤리·실무상 미사용. 1차 평가변수: 연간 내시경상 선종성 용종 재발률, 2차: 재발 용종 개수. ITT·PP 분석 병행, NNT 산출. 추적 2년, 196명이 3회 내시경 완료(PP).</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">1년차(A=CBM588 투여) 선종 재발: ITT 30.00% vs 35.35%(p=0.26, 비유의), PP에서는 A군 29.76% vs B군 44.71%로 유의(p&lt;0.05). 평균 용종 수도 PP에서 0.80±0.10 vs 1.25±0.16(p&lt;0.05). 2년차 교차 후 B군(CBM588 투여)은 선종 71.43→61.18%(1년차)→2년차 PP 29.41%로 유의 감소(p&lt;0.05), 용종 수도 1.25→0.82(p=0.02)로 추가 감소해 효과가 자연경과가 아닌 프로바이오틱에 기인함을 시사. NNT는 1년 재발 1건 예방 기준 ITT 19명, PP 7명. 교차효과(carryover) 분석상 유의한 잔류효과 없음(washout 적절).</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">장기 투여에도 중대한 이상반응은 없었고 모든 이상반응은 자연 소실됐다. 0~10 척도로 평가한 증상(복통, 설사, 변비, 후중감, 복부팽만, 트림, 역류)은 대부분 경증(≤3)이었고 군간 유의차 없음(예: 복통 ITT A 1.06±0.12 vs B 1.03±0.12, p=0.87; 설사 0.59 vs 0.51, p=0.55). 완료군 vs 탈락군 기저특성도 유의차 없어 선택편향 적음.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자들은 CBM588이 대장 선종성 용종 재발을 줄이는 잠재적 이점이 있으며 안전·내약성이 양호하다고 결론. 다만 단일맹검·위약 부재·B군의 높은 탈락률(2년차 효과 과대평가 가능)·ITT에서는 1년차 1차변수 비유의 등 한계가 있다. 바이오탑 관점에서 부티르산 생성균의 대장 선종 예방 가능성을 보여주나, CBM588은 바이오탑 성분(C. butyricum TO-A)과 다른 균주이므로 동일 효능으로 등치할 수 없다(참고근거: 균주 상이, 동일효능 단정 불가).</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">29.76% vs 44.71%</div><div class="desc">1년차 선종 재발</div><div class="pval">p&lt;0.05</div></div>
-        <div class="knum"><div class="val">NNT 7 (PP) / 19 (ITT)</div><div class="desc">1년 재발 1건 예방에 필요한 치료수</div></div>
-        <div class="knum"><div class="val">0.80 vs 1.25</div><div class="desc">1년차 평균 용종 수</div><div class="pval">p&lt;0.05</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Clostridium butyricum MIYAIRI 588 Reduces Colorectal Adenoma</div><div class="chart-wrap"><canvas id="chart_dr_3_925"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>butyricum의 대장암 화학예방 RCT 근거</li>
-          <li>폴립 재발 예방 프로바이오틱스 처방 근거</li>
-          <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #3 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Clostridium butyricum MIYAIRI 588 Reduces Colorectal Adenomatous Polyp Recurrence: A Randomized Crossover Trial</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Oncology Research</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-11-27</div>
+                        <button class="bd-request-btn" data-title="Clostridium butyricum MIYAIRI 588 Reduces Colorectal Adenomatous Polyp Recurrence: A Randomized Crossover Trial" data-session="장내미생물" data-num="3" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.32604/or.2025.070432" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">무작위 교차 시험 (RCT)</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">대장암(CRC)은 전 세계적으로 발생·사망이 높은 악성종양으로 대부분 선종-암 연속과정을 거쳐 진행한다. 대장내시경·용종절제술이 발생을 줄이지만 선종성 용종의 재발은 여전히 큰 과제로 새로운 예방전략이 필요하다. 장내미생물 불균형(dysbiosis)이 대장 발암을 촉진하므로 프로바이오틱 같은 미생물군 표적 중재가 유망하며, 부티르산 생성균 CBM588(C. butyricum MIYAIRI 588)은 HDAC 억제·세포자멸 유도·장벽 강화 등으로 주목받았으나 사람 대상 선종 재발 예방 임상은 부재했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">대만 가오슝의대병원, 무작위·단일맹검·교차(crossover) 임상시험. 총 398명(최근 3년 내 내시경으로 선종 완전 절제 후 감시 내시경에서 용종 재발 확인된 고위험군) 등록. 군별 N: A군 200명, B군 198명에 1:1 무작위 배정. A군은 1년차에 CBM588(MIYARISAN BM, 1g당 40mg 함유, 1g 1일 2회) 복용 후 3개월 washout·2년차 비투여; B군은 1년차 비투여·2년차에 동일 요법(교차). 위약은 윤리·실무상 미사용. 1차 평가변수: 연간 내시경상 선종성 용종 재발률, 2차: 재발 용종 개수. ITT·PP 분석 병행, NNT 산출. 추적 2년, 196명이 3회 내시경 완료(PP).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text"><strong>1년차(A=CBM588 투여) 선종 재발:</strong> ITT 30.00% vs 35.35%(p=0.26, 비유의), PP에서는 A군 29.76% vs B군 44.71%로 유의(p&lt;0.05).<br/>
+평균 용종 수도 PP에서 0.80±0.10 vs 1.25±0.16(p&lt;0.05).<br/>
+2년차 교차 후 B군(CBM588 투여)은 선종 71.43→61.18%(1년차)→2년차 PP 29.41%로 유의 감소(p&lt;0.05), 용종 수도 1.25→0.82(p=0.02)로 추가 감소해 효과가 자연경과가 아닌 프로바이오틱에 기인함을 시사.<br/>
+NNT는 1년 재발 1건 예방 기준 ITT 19명, PP 7명.<br/>
+교차효과(carryover) 분석상 유의한 잔류효과 없음(washout 적절).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">장기 투여에도 중대한 이상반응은 없었고 모든 이상반응은 자연 소실됐다. 0~10 척도로 평가한 증상(복통, 설사, 변비, 후중감, 복부팽만, 트림, 역류)은 대부분 경증(≤3)이었고 군간 유의차 없음(예: 복통 ITT A 1.06±0.12 vs B 1.03±0.12, p=0.87; 설사 0.59 vs 0.51, p=0.55). 완료군 vs 탈락군 기저특성도 유의차 없어 선택편향 적음.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 CBM588이 대장 선종성 용종 재발을 줄이는 잠재적 이점이 있으며 안전·내약성이 양호하다고 결론. 다만 단일맹검·위약 부재·B군의 높은 탈락률(2년차 효과 과대평가 가능)·ITT에서는 1년차 1차변수 비유의 등 한계가 있다. 바이오탑 관점에서 부티르산 생성균의 대장 선종 예방 가능성을 보여주나, CBM588은 바이오탑 성분(C. butyricum TO-A)과 다른 균주이므로 동일 효능으로 등치할 수 없다(참고근거: 균주 상이, 동일효능 단정 불가).</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>29.76% vs 44.71% — 1년차 선종 재발 (p&lt;0.05)</li>
+                            <li>NNT 7 (PP) / 19 (ITT) — 1년 재발 1건 예방에 필요한 치료수</li>
+                            <li>0.80 vs 1.25 — 1년차 평균 용종 수 (p&lt;0.05)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #4 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #4</span>
-      <span class="stars-mid">★★☆</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex:1;">Frontiers in Microbiology | 2025-05-19</div>
-      <button class="bd-request-btn" data-title="Clostridium Butyricum 337279 shapes the gut microbiota to attenuate metabolic disorder in diet-induced obese mice" data-session="장내미생물" data-num="4" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Clostridium Butyricum 337279 shapes the gut microbiota to attenuate metabolic disorder in diet-induced obese mice</p>
-      <a href="https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2025.1580847/full" class="paper-url" target="_blank">https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2025.1580847/full</a>
-      <span class="design-badge">전임상 동물실험</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">비만은 전 세계 공중보건의 주요 과제이며 장내미생물 불균형이 발병·진행의 핵심 인자다. 단쇄지방산(SCFA, 특히 부티르산)은 숙주-미생물 상호작용의 중요 매개체로 비만에 이로운 작용을 한다. C. butyricum(균주 BNCC 337279)은 SCFA 생성균으로 염증성 장질환 치료에 사용돼 왔으나 비만·대사장애에 대한 효과와 기전은 불명확했다. 이 연구는 전임상(고지방식 비만 마우스) 모델로 가설을 검증했다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">동물실험(전임상). 6주령 수컷 C57BL/6 마우스를 7일 항생제 칵테일 전처치 후 정상식(ND) 또는 60% 고지방식(HFD)으로 20주 사육, 마지막 8주간 식염수 또는 C. butyricum 투여로 4군 구성(ND+saline, ND+Cb, HFD+saline, HFD+Cb, 군당 n≈6~8). 중재: C. butyricum 1×10^? CFU/마리를 격일 8주 경구 가베지. 평가: 체중·백색지방(WAT) 무게, 경구당부하(OGTT)/인슐린부하(ITT), 혈청 지질(TG/TC)·간 지질, 염증지표(LPS, LBP, TNF-α, IL-6, IL-1β), 장벽 단백(ZO-1·occludin·claudin-2), 16S rRNA 마이크로바이옴, 혈장 BCAA/BCKA(LC-MS/MS). 통계: 이원 ANOVA + Tukey.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">C. butyricum는 식이섭취 변화 없이 HFD 유발 체중증가와 WAT 무게를 유의 감소시키고 당내성·인슐린감수성을 개선(GTT·ITT AUC 감소, p&lt;0.05). 간 TG는 HFD 대비 33.3% 유의 감소(p&lt;0.05), 혈청 TG·총콜레스테롤도 감소. 혈청 TNF-α·IL-1β·IL-6가 HFD에서 상승(p&lt;0.01)했다가 투여로 유의 감소(p&lt;0.05); PBMC 단핵구(CD11b+Ly6C+) 비율도 6.03%→감소. 장벽: ZO-1·occludin 단백/mRNA 증가, claudin-2 감소, 순환 LPS·LBP 감소. 마이크로바이옴: α-다양성(Shannon·Simpson·Chao1) 회복, LPS생성 관련 과(예: Desulfovibrionaceae 계열) 감소·부티르산생성균 증가. Tax4Fun 예측상 BCAA 생합성·지질 생합성 경로 하향조절, 혈장 BCAA/BCKA 감소.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">동물실험으로 인체 이상반응 데이터는 없음. 보고된 독성·사망·이상행동 신호 기술 없이 체중·식이섭취·장기무게 등 안전성 관련 지표를 관찰했고, 식이섭취량 변화가 없어 체중감소가 섭식억제에 의한 것이 아님을 확인. 인체 적용 시 안전성·유효성은 추정에 불과하다.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자들은 C. butyricum가 장내미생물 조성·기능 재편을 통해 장벽 강화(ZO-1·occludin↑), 내독소혈증·전신염증 완화, 미생물 유래 BCAA 생성 감소로 비만 관련 대사장애를 개선한다고 결론. 한계는 전임상 마우스 모델·기전 일부 미규명·BCAA 변화 인과 불명확. 바이오탑 관점에서 부티르산 생성균의 대사 이점 가설을 제시하나, 본 균주(337279)는 바이오탑 성분(C. butyricum TO-A)과 다르고 동물 데이터이므로 인체 적용은 추정이며 동일 효능으로 단정할 수 없다(참고근거: 균주 상이, 동일효능 단정 불가).</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">33.3%</div><div class="desc">간 중성지방</div><div class="pval">p&lt;0.05</div></div>
-        <div class="knum"><div class="val">TNF-α·IL-1β·IL-6 유의 감소</div><div class="desc">HFD 상승</div><div class="pval">p&lt;0.05</div></div>
-        <div class="knum"><div class="val">혈장 BCAA/BCKA 감소</div><div class="desc">미생물 BCAA 생합성 경로 하향조절 동</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Clostridium Butyricum 337279 shapes the gut microbiota to at</div><div class="chart-wrap"><canvas id="chart_dr_4_925"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>butyricum의 장 장벽 보호+미생물 균형 회복 기전</li>
-          <li>바이오탑 기전 설명 활용 후속 연구 동향 지속 모니터링 필요</li>
-          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #4 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Clostridium Butyricum 337279 shapes the gut microbiota to attenuate metabolic disorder in diet-induced obese mice</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Frontiers in Microbiology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-05-19</div>
+                        <button class="bd-request-btn" data-title="Clostridium Butyricum 337279 shapes the gut microbiota to attenuate metabolic disorder in diet-induced obese mice" data-session="장내미생물" data-num="4" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2025.1580847/full" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">전임상 동물실험</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">비만은 전 세계 공중보건의 주요 과제이며 장내미생물 불균형이 발병·진행의 핵심 인자다. 단쇄지방산(SCFA, 특히 부티르산)은 숙주-미생물 상호작용의 중요 매개체로 비만에 이로운 작용을 한다. C. butyricum(균주 BNCC 337279)은 SCFA 생성균으로 염증성 장질환 치료에 사용돼 왔으나 비만·대사장애에 대한 효과와 기전은 불명확했다. 이 연구는 전임상(고지방식 비만 마우스) 모델로 가설을 검증했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">동물실험(전임상). 6주령 수컷 C57BL/6 마우스를 7일 항생제 칵테일 전처치 후 정상식(ND) 또는 60% 고지방식(HFD)으로 20주 사육, 마지막 8주간 식염수 또는 C. butyricum 투여로 4군 구성(ND+saline, ND+Cb, HFD+saline, HFD+Cb, 군당 n≈6~8). 중재: C. butyricum 1×10^? CFU/마리를 격일 8주 경구 가베지. 평가: 체중·백색지방(WAT) 무게, 경구당부하(OGTT)/인슐린부하(ITT), 혈청 지질(TG/TC)·간 지질, 염증지표(LPS, LBP, TNF-α, IL-6, IL-1β), 장벽 단백(ZO-1·occludin·claudin-2), 16S rRNA 마이크로바이옴, 혈장 BCAA/BCKA(LC-MS/MS). 통계: 이원 ANOVA + Tukey.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">C. butyricum는 식이섭취 변화 없이 HFD 유발 체중증가와 WAT 무게를 유의 감소시키고 당내성·인슐린감수성을 개선(GTT·ITT AUC 감소, p&lt;0.05).<br/>
+간 TG는 HFD 대비 33.3% 유의 감소(p&lt;0.05), 혈청 TG·총콜레스테롤도 감소.<br/>
+혈청 TNF-α·IL-1β·IL-6가 HFD에서 상승(p&lt;0.01)했다가 투여로 유의 감소(p&lt;0.05); PBMC 단핵구(CD11b+Ly6C+) 비율도 6.03%→감소.<br/>
+<strong>장벽:</strong> ZO-1·occludin 단백/mRNA 증가, claudin-2 감소, 순환 LPS·LBP 감소.<br/>
+<strong>마이크로바이옴:</strong> α-다양성(Shannon·Simpson·Chao1) 회복, LPS생성 관련 과(예: Desulfovibrionaceae 계열) 감소·부티르산생성균 증가.<br/>
+Tax4Fun 예측상 BCAA 생합성·지질 생합성 경로 하향조절, 혈장 BCAA/BCKA 감소.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">동물실험으로 인체 이상반응 데이터는 없음. 보고된 독성·사망·이상행동 신호 기술 없이 체중·식이섭취·장기무게 등 안전성 관련 지표를 관찰했고, 식이섭취량 변화가 없어 체중감소가 섭식억제에 의한 것이 아님을 확인. 인체 적용 시 안전성·유효성은 추정에 불과하다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 C. butyricum가 장내미생물 조성·기능 재편을 통해 장벽 강화(ZO-1·occludin↑), 내독소혈증·전신염증 완화, 미생물 유래 BCAA 생성 감소로 비만 관련 대사장애를 개선한다고 결론. 한계는 전임상 마우스 모델·기전 일부 미규명·BCAA 변화 인과 불명확. 바이오탑 관점에서 부티르산 생성균의 대사 이점 가설을 제시하나, 본 균주(337279)는 바이오탑 성분(C. butyricum TO-A)과 다르고 동물 데이터이므로 인체 적용은 추정이며 동일 효능으로 단정할 수 없다(참고근거: 균주 상이, 동일효능 단정 불가).</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>33.3% — 간 중성지방 (p&lt;0.05)</li>
+                            <li>TNF-α·IL-1β·IL-6 유의 감소 — HFD 상승 (p&lt;0.05)</li>
+                            <li>혈장 BCAA/BCKA 감소 — 미생물 BCAA 생합성 경로 하향조절 동반</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #5 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #5</span>
-      <span class="stars-mid">★★☆</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex:1;">Microbiology Spectrum | 2026-01-07</div>
-      <button class="bd-request-btn" data-title="Clostridium butyricum RH2 ameliorates diarrhea in juvenile mice under continuous antibiotic exposure by modulating gut microbiota and metabolome" data-session="장내미생물" data-num="5" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Clostridium butyricum RH2 ameliorates diarrhea in juvenile mice under continuous antibiotic exposure by modulating gut microbiota and metabolome</p>
-      <a href="https://doi.org/10.1128/spectrum.01976-25" class="paper-url" target="_blank">https://doi.org/10.1128/spectrum.01976-25</a>
-      <span class="design-badge">전임상 동물실험</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">항생제 연관 설사(AAD)는 항생제 치료의 가장 흔한 합병증으로, 미성숙한 장내생태계를 가진 소아에서 특히 취약하다(외래 6%~입원 80%, 중국 보고 16.8~70.6%). 현행 소아 지침은 원인 항생제 중단을 우선하나 중증감염·예방투여 시 중단이 어려워, 항생제를 지속하면서 AAD를 완화할 보조중재가 임상적으로 중요하다. C. butyricum(균주 RH2)의 소아 AAD 치료효과·기전은 규명되지 않았다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">동물실험(전임상). 4주령 수컷 C57BL/6J 마우스 60마리를 7일 순화 후 6군 무작위 배정: 정상대조(NC), AAD모델(M), 항생제중단대조(AW), 그리고 RH2 저용량(LD 1.05×10^?)·중용량(MD 1.05×10^?)·고용량(HD 1.05×10^? CFU/일). 3일간 항생제 칵테일(암피실린·스트렙토마이신·클린다마이신) 경구로 AAD 유발 후, 항생제를 지속하면서 RH2를 14일 경구 투여(자연회복 차단 위해 항생제 유지). 평가: 체중, 설사점수, 분변 수분함량, 결장 길이·H&amp;E·염증 사이토카인 qPCR, 장벽 유전자, 16S rRNA, UPLC-MS 대사체, Spearman 상관. 항생제와 4시간 간격 유지.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">RH2와 항생제중단 모두 체중감소는 역전 못했으나, 고용량 RH2와 AW군은 설사점수를 점진적으로 낮췄다(M군 대비 p&lt;0.01). 분변 수분함량은 RH2 투여로 용량의존적 유의 감소(p&lt;0.05~0.01). 결장 길이는 RH2·AW가 정상 수준으로 회복(M 대비 p&lt;0.01). 염증 사이토카인 mRNA 정상화, 장벽단백(tight junction·occludin·mucin) mRNA가 RH2로 용량의존적 회복(고용량&gt;저용량). 14일 항생제중단(AW)은 장벽유전자를 부분 회복했으나 완전 정상화는 실패. 마이크로바이옴: 고용량(10^? CFU/일)이 항생제 유발 교란을 상쇄해 부티르산생성균·점액관련균 재증가, β-다양성을 정상에 근접시킴. 대사체 130개가 NC/M/AW/HD 간 반대 패턴, SCFA·유기산을 용량의존적 회복; α-리놀렌산·리놀레산·요소회로 경로 영향.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">동물실험으로 인체 이상반응 데이터 없음. RH2는 항생제 지속 노출 하에서도 내약·생존하며 부작용 신호 기술 없이 체중·설사·조직병리·염증을 관찰. 다만 RH2는 일과성 정착균이고 대사체 보충/수용체 차단 실험이 없어 직접 인과는 미확립. 인체 적용 시 안전성·유효성은 추정이다.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자들은 RH2가 항생제 지속 노출 하에서도 장내미생물·대사체·장벽을 부분 회복시켜 소아 AAD의 합리적 보조후보라고 결론(상관 기반 가설로 인과는 추가검증 필요). 바이오탑 관점에서 항생제 병용 부티르산생성균의 AAD 완화 가능성을 시사하나, RH2는 바이오탑 성분(C. butyricum TO-A)과 다른 균주이며 전임상 마우스 데이터이므로 인체 적용은 추정이고 동일 효능으로 단정할 수 없다(참고근거: 균주 상이, 동일효능 단정 불가).</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">용량의존적 분변 수분 감소</div><div class="desc">RH2 투여로 AAD 마우스 설사 개선</div><div class="pval">p&lt;0.05~0.01 vs 모델군</div></div>
-        <div class="knum"><div class="val">결장 길이 정상화</div><div class="desc">RH2·항생제중단이 결장 단축 회복</div><div class="pval">p&lt;0.01 vs 모델군</div></div>
-        <div class="knum"><div class="val">10^9 CFU/일</div><div class="desc">마이크로바이옴 회복에 효과적인 고용량</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Clostridium butyricum RH2 ameliorates diarrhea in juvenile m</div><div class="chart-wrap"><canvas id="chart_dr_5_925"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>바이오탑 핵심 적응증 &#x27;항생제 관련 설사&#x27;에 대한 최신 기전 연구</li>
-          <li>항생제+바이오탑 병용 합리성 뒷받침 후속 연구 동향 지속 모니터링 필요</li>
-          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #5 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Clostridium butyricum RH2 ameliorates diarrhea in juvenile mice under continuous antibiotic exposure by modulating gut microbiota and metabolome</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Microbiology Spectrum</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-01-07</div>
+                        <button class="bd-request-btn" data-title="Clostridium butyricum RH2 ameliorates diarrhea in juvenile mice under continuous antibiotic exposure by modulating gut microbiota and metabolome" data-session="장내미생물" data-num="5" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.1128/spectrum.01976-25" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">전임상 동물실험</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">항생제 연관 설사(AAD)는 항생제 치료의 가장 흔한 합병증으로, 미성숙한 장내생태계를 가진 소아에서 특히 취약하다(외래 6%~입원 80%, 중국 보고 16.8~70.6%). 현행 소아 지침은 원인 항생제 중단을 우선하나 중증감염·예방투여 시 중단이 어려워, 항생제를 지속하면서 AAD를 완화할 보조중재가 임상적으로 중요하다. C. butyricum(균주 RH2)의 소아 AAD 치료효과·기전은 규명되지 않았다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">동물실험(전임상). 4주령 수컷 C57BL/6J 마우스 60마리를 7일 순화 후 6군 무작위 배정: 정상대조(NC), AAD모델(M), 항생제중단대조(AW), 그리고 RH2 저용량(LD 1.05×10^?)·중용량(MD 1.05×10^?)·고용량(HD 1.05×10^? CFU/일). 3일간 항생제 칵테일(암피실린·스트렙토마이신·클린다마이신) 경구로 AAD 유발 후, 항생제를 지속하면서 RH2를 14일 경구 투여(자연회복 차단 위해 항생제 유지). 평가: 체중, 설사점수, 분변 수분함량, 결장 길이·H&amp;E·염증 사이토카인 qPCR, 장벽 유전자, 16S rRNA, UPLC-MS 대사체, Spearman 상관. 항생제와 4시간 간격 유지.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">RH2와 항생제중단 모두 체중감소는 역전 못했으나, 고용량 RH2와 AW군은 설사점수를 점진적으로 낮췄다(M군 대비 p&lt;0.01).<br/>
+분변 수분함량은 RH2 투여로 용량의존적 유의 감소(p&lt;0.05~0.01).<br/>
+결장 길이는 RH2·AW가 정상 수준으로 회복(M 대비 p&lt;0.01).<br/>
+염증 사이토카인 mRNA 정상화, 장벽단백(tight junction·occludin·mucin) mRNA가 RH2로 용량의존적 회복(고용량&gt;저용량).<br/>
+14일 항생제중단(AW)은 장벽유전자를 부분 회복했으나 완전 정상화는 실패.<br/>
+<strong>마이크로바이옴:</strong> 고용량(10^? CFU/일)이 항생제 유발 교란을 상쇄해 부티르산생성균·점액관련균 재증가, β-다양성을 정상에 근접시킴.<br/>
+대사체 130개가 NC/M/AW/HD 간 반대 패턴, SCFA·유기산을 용량의존적 회복; α-리놀렌산·리놀레산·요소회로 경로 영향.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">동물실험으로 인체 이상반응 데이터 없음. RH2는 항생제 지속 노출 하에서도 내약·생존하며 부작용 신호 기술 없이 체중·설사·조직병리·염증을 관찰. 다만 RH2는 일과성 정착균이고 대사체 보충/수용체 차단 실험이 없어 직접 인과는 미확립. 인체 적용 시 안전성·유효성은 추정이다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 RH2가 항생제 지속 노출 하에서도 장내미생물·대사체·장벽을 부분 회복시켜 소아 AAD의 합리적 보조후보라고 결론(상관 기반 가설로 인과는 추가검증 필요). 바이오탑 관점에서 항생제 병용 부티르산생성균의 AAD 완화 가능성을 시사하나, RH2는 바이오탑 성분(C. butyricum TO-A)과 다른 균주이며 전임상 마우스 데이터이므로 인체 적용은 추정이고 동일 효능으로 단정할 수 없다(참고근거: 균주 상이, 동일효능 단정 불가).</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>용량의존적 분변 수분 감소 — RH2 투여로 AAD 마우스 설사 개선 (p&lt;0.05~0.01 vs 모델군)</li>
+                            <li>결장 길이 정상화 — RH2·항생제중단이 결장 단축 회복 (p&lt;0.01 vs 모델군)</li>
+                            <li>10^9 CFU/일 — 마이크로바이옴 회복에 효과적인 고용량</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #6 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #6</span>
-      <span class="stars-high">★★★</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex:1;">Applied Microbiology | 2026-04-01</div>
-      <button class="bd-request-btn" data-title="Potential Health Benefits of Probiotic Strains of Clostridium butyricum" data-session="장내미생물" data-num="6" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Potential Health Benefits of Probiotic Strains of Clostridium butyricum</p>
-      <a href="https://doi.org/10.3390/applmicrobiol6040053" class="paper-url" target="_blank">https://doi.org/10.3390/applmicrobiol6040053</a>
-      <span class="design-badge">체계적 문헌고찰</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">Clostridium butyricum은 그람양성·아포형성·절대혐기성 부티르산 생성균으로 차세대 프로바이오틱스로 주목받는다. 고온·산·담즙산 및 일부 항생제에 대한 내성과 부티르산(butyrate) 생성능이 장점으로, 부티르산은 대장세포의 에너지원이 되고 장상피 밀착연접(tight junction)을 강화하며 면역조절을 지원한다. 항생제·항암치료로 인한 장내미생물 교란과 그에 따른 면역저하·위장관 합병증이라는 미충족 수요를 배경으로, C. butyricum의 임상적 유용성을 종합 정리할 필요가 제기되었다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">문헌 종합 리뷰(narrative review). 방법=문헌범위: C. butyricum 프로바이오틱 균주(대표 균주 CBM588=MIYAIRI 588 중심)의 전임상·임상 근거를 종합. 리뷰가 포괄한 임상근거 범위는 인터벤션 임상시험 28건 + 관찰연구 7건으로, 위장관질환·수술 후 회복·대사 및 면역조절·암 면역치료 등 다양한 적응증을 망라. 선정기준·메타분석 통계는 리뷰 특성상 미적용(초록 미보고).</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">주요 근거 종합: (1) 전임상 — 장내미생물총 안정화, 단쇄지방산(SCFA)/부티르산 생성 증가, 면역반응 조절을 통해 궤양성대장염·알레르기·암 등에서 치료 잠재력 입증. (2) 임상 — 28건의 인터벤션 시험과 7건의 관찰연구가 전임상 소견을 뒷받침하며, 위장관질환·알레르기성 비염·암 면역치료 등 다양한 조건에서 증상 개선과 면역조절 효과를 보고. (3) 기전 — 부티르산이 콜로노사이트 연료 공급, 밀착연접 강화, 면역 항상성 유지에 기여. 개별 시험의 정량적 효과크기·p값은 리뷰 초록에 통합 제시되지 않음(초록 미보고).</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">C. butyricum은 다양한 환자군에서 양호한 안전성·내약성 프로파일을 보였다고 종합. 구체 이상반응명·발생률은 리뷰 초록에 수치로 제시되지 않음(초록 미보고).</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">(초록 기반 — 전문 미접근) 저자 결론은 C. butyricum(특히 CBM588)이 부티르산 생성·면역조절을 통해 여러 인체 질환에서 치료 잠재력과 양호한 안전성을 보이나, 소표본·프로토콜 이질성·짧은 연구기간이 근거를 제약하므로 대규모·잘 설계된 장기 임상시험이 필요하다는 것. 한계: 리뷰 대상 균주가 CBM588 중심으로 바이오탑의 TO-A와 상이, 정량 데이터 통합 부재. 바이오탑 관점: 동일 종 C. butyricum의 부티르산·장벽강화·면역조절 기전과 양호한 안전성을 학술적으로 뒷받침해 품목의 작용기전·안전성 메시지를 보강하는 참고근거로 활용 가능(균주 상이 유의).</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">28건</div><div class="desc">리뷰가 종합한 C. butyricum 인</div></div>
-        <div class="knum"><div class="val">7건</div><div class="desc">리뷰가 종합한 관찰연구 수</div></div>
-        <div class="knum"><div class="val">CBM588(=MIYAIRI 588)</div><div class="desc">리뷰의 대표 분석 균주</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Potential Health Benefits of Probiotic Strains of Clostridiu</div><div class="chart-wrap"><canvas id="chart_dr_6_925"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>butyricum 프로바이오틱스 임상 근거 총정리 레퍼런스</li>
-          <li>바이오탑 학술 디테일링 배경 자료 최적</li>
-          <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #6 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Potential Health Benefits of Probiotic Strains of Clostridium butyricum</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Applied Microbiology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-04-01</div>
+                        <button class="bd-request-btn" data-title="Potential Health Benefits of Probiotic Strains of Clostridium butyricum" data-session="장내미생물" data-num="6" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.3390/applmicrobiol6040053" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">체계적 문헌고찰</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">Clostridium butyricum은 그람양성·아포형성·절대혐기성 부티르산 생성균으로 차세대 프로바이오틱스로 주목받는다. 고온·산·담즙산 및 일부 항생제에 대한 내성과 부티르산(butyrate) 생성능이 장점으로, 부티르산은 대장세포의 에너지원이 되고 장상피 밀착연접(tight junction)을 강화하며 면역조절을 지원한다. 항생제·항암치료로 인한 장내미생물 교란과 그에 따른 면역저하·위장관 합병증이라는 미충족 수요를 배경으로, C. butyricum의 임상적 유용성을 종합 정리할 필요가 제기되었다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">문헌 종합 리뷰(narrative review). 방법=문헌범위: C. butyricum 프로바이오틱 균주(대표 균주 CBM588=MIYAIRI 588 중심)의 전임상·임상 근거를 종합. 리뷰가 포괄한 임상근거 범위는 인터벤션 임상시험 28건 + 관찰연구 7건으로, 위장관질환·수술 후 회복·대사 및 면역조절·암 면역치료 등 다양한 적응증을 망라. 선정기준·메타분석 통계는 리뷰 특성상 미적용(초록 미보고).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text"><strong>주요 근거 종합:</strong> (1) 전임상 — 장내미생물총 안정화, 단쇄지방산(SCFA)/부티르산 생성 증가, 면역반응 조절을 통해 궤양성대장염·알레르기·암 등에서 치료 잠재력 입증.<br/>
+<strong>(2) 임상:</strong> 28건의 인터벤션 시험과 7건의 관찰연구가 전임상 소견을 뒷받침하며, 위장관질환·알레르기성 비염·암 면역치료 등 다양한 조건에서 증상 개선과 면역조절 효과를 보고.<br/>
+<strong>(3) 기전:</strong> 부티르산이 콜로노사이트 연료 공급, 밀착연접 강화, 면역 항상성 유지에 기여.<br/>
+개별 시험의 정량적 효과크기·p값은 리뷰 초록에 통합 제시되지 않음(초록 미보고).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">C. butyricum은 다양한 환자군에서 양호한 안전성·내약성 프로파일을 보였다고 종합. 구체 이상반응명·발생률은 리뷰 초록에 수치로 제시되지 않음(초록 미보고).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">(초록 기반 — 전문 미접근) 저자 결론은 C. butyricum(특히 CBM588)이 부티르산 생성·면역조절을 통해 여러 인체 질환에서 치료 잠재력과 양호한 안전성을 보이나, 소표본·프로토콜 이질성·짧은 연구기간이 근거를 제약하므로 대규모·잘 설계된 장기 임상시험이 필요하다는 것. 한계: 리뷰 대상 균주가 CBM588 중심으로 바이오탑의 TO-A와 상이, 정량 데이터 통합 부재. 바이오탑 관점: 동일 종 C. butyricum의 부티르산·장벽강화·면역조절 기전과 양호한 안전성을 학술적으로 뒷받침해 품목의 작용기전·안전성 메시지를 보강하는 참고근거로 활용 가능(균주 상이 유의).</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>28건 — 리뷰가 종합한 C. butyricum 인터벤</li>
+                            <li>7건 — 리뷰가 종합한 관찰연구 수</li>
+                            <li>CBM588(=MIYAIRI 588) — 리뷰의 대표 분석 균주</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #7 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #7</span>
-      <span class="stars-mid">★★☆</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex:1;">PMC | 2026-01-01</div>
-      <button class="bd-request-btn" data-title="Randomized, Double-Blind, Placebo-Controlled Trial of ID-CBT5101, a Tyndallized Clostridium butyricum Postbiotic, in Adults with Mild-to-Moderate Knee Osteoarthritis" data-session="장내미생물" data-num="7" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Randomized, Double-Blind, Placebo-Controlled Trial of ID-CBT5101, a Tyndallized Clostridium butyricum Postbiotic, in Adults with Mild-to-Moderate Knee Osteoarthritis</p>
-      <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12861722/" class="paper-url" target="_blank">https://pmc.ncbi.nlm.nih.gov/articles/PMC12861722/</a>
-      <span class="design-badge">RCT (이중맹검, 위약대조)</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">골관절염(OA)은 노년층 만성통증·기능장애의 주원인으로, 현행 NSAIDs·진통제는 증상완화에 그치고 장기사용 시 위장관·심혈관·신장 안전성 문제가 있으며 구조개선 약물은 부재하다. 장-관절 축(gut-joint axis) 가설에 따라 장내미생물 불균형과 저등급 전신염증이 OA에 기여할 수 있어 마이크로바이옴 표적 중재가 주목받는다. ID-CBT5101은 C. butyricum IDCC 5101을 가열사멸(tyndallized)한 포스트바이오틱으로, 전임상 쥐 OA 모델에서 통증·연골 보호 효과가 보고됐다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">단일기관·무작위·이중맹검·위약대조·평행군 임상시험(12주). 대상: 40~75세, 방사선상 무릎 OA(Kellgren-Lawrence I~III), ≥3개월 무릎통증, 보행통증 VAS 일정 기준 이상. 총 96명 1:1 무작위(ID-CBT5101 48명, 위약 48명); 안전성군 95명, FAS 89명(시험약 44, 위약 45), PPS 66명. 중재: ID-CBT5101 800mg 코팅정(가열사멸 C. butyricum 300mg, 사멸 전 5.0×10^? CFU 상당)을 1일 2회, 총 1.0×10^?? CFU상당/일, 12주. 1차 평가변수: 12주 보행통증 VAS(100mm) 변화. 2차: WOMAC, 한국형 무릎점수(KKS), 환자전반평가(PGART), 혈청 바이오마커(IL-6·COMP·PGE2·LTB4·TGF-β·hs-CRP). 방문: 0·6·12주, LOCF 결측대체.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">보행통증 VAS는 양군 모두 군내 유의 감소(ID-CBT5101 −12.55±21.71mm, p=0.0004; 위약 −8.71±18.85mm, p=0.0034)했으나 군간 차이는 비유의(p=0.3757). PPS도 −12.97 vs −12.33mm(p=0.8980)로 동일. WOMAC 총점 군내 유의 호전(시험약 −8.59, p=0.0002; 위약 −7.02, p=0.0005)이나 군간 비유의(p=0.5822). KKS도 군간 비유의(p=0.9118). PGART 군간 비유의(6주 p=0.8802, 12주 p=0.4592). 혈청 IL-6·COMP·PGE2·LTB4·TGF-β 모두 군간 차이 없음; hs-CRP는 오히려 위약군에서 수치상 더 큰 감소(−0.07 vs −0.40 mg/L, p=0.0168, 임상적 무의미로 판단). 사전계획 하위군(기저 VAS≥30mm)에서 시험약이 수치상 더 큰 통증감소(−19.07 vs −12.86mm)를 보였으나 통계적 유의성 미달.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">ID-CBT5101은 위약과 동등한 양호한 내약성. 치료발현 이상반응 발생률이 양군 유사, 대부분 경증~중등도이며 후유증 없이 소실. 가장 흔한 이상반응은 위장관 증상·상기도감염·근골격계 증상으로 군간 분포 유사. 중대한 이상반응으로 뇌경색·쯔쯔가무시병이 발생했으나 연구자가 시험약과 무관 판정. ID-CBT5101군 1명이 이상반응으로 투여 중단; 사망·치료관련 중대 이상반응 없음. 활력징후·검사치 임상적 유의 변화 없음.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자들은 가열사멸 C. butyricum 포스트바이오틱 ID-CBT5101이 경증~중등도 무릎 OA에서 안전·내약성은 양호하나 위약 대비 통증·기능·바이오마커 개선 우월성은 입증하지 못했다고 결론(중립 결과). 한계는 단일기관·표본 적음·12주 단기·전신 바이오마커만 측정·미생물군 미평가·구제약 미정량. 바이오탑 관점에서 사람 OA에 대한 C. butyricum 효능은 본 연구로 뒷받침되지 않으며, 더욱이 가열사멸 균주(IDCC 5101)는 바이오탑 성분(생균 C. butyricum TO-A)과 형태·균주 모두 상이하다(참고근거: 균주 상이, 동일효능 단정 불가).</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">−12.55mm vs −8.71mm</div><div class="desc">12주 보행통증 VAS 변화</div><div class="pval">군간 p=0.3757</div></div>
-        <div class="knum"><div class="val">WOMAC 군간 비유의</div><div class="desc">−8.59 vs −7.02 변화</div><div class="pval">p=0.5822</div></div>
-        <div class="knum"><div class="val">1차 평가변수 위약 대비 우월성 없음</div><div class="desc">중립</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Randomized, Double-Blind, Placebo-Controlled Trial of ID-CBT</div><div class="chart-wrap"><canvas id="chart_dr_7_925"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>butyricum 포스트바이오틱 골관절염 적응증 확장 탐색</li>
-          <li>음성 결과이나 프로바이오틱스 적응증 확장 트렌드 참고</li>
-          <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #7 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Randomized, Double-Blind, Placebo-Controlled Trial of ID-CBT5101, a Tyndallized Clostridium butyricum Postbiotic, in Adults with Mild-to-Moderate Knee Osteoarthritis</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> PMC</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-01-01</div>
+                        <button class="bd-request-btn" data-title="Randomized, Double-Blind, Placebo-Controlled Trial of ID-CBT5101, a Tyndallized Clostridium butyricum Postbiotic, in Adults with Mild-to-Moderate Knee Osteoarthritis" data-session="장내미생물" data-num="7" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12861722/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">RCT (이중맹검, 위약대조)</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">골관절염(OA)은 노년층 만성통증·기능장애의 주원인으로, 현행 NSAIDs·진통제는 증상완화에 그치고 장기사용 시 위장관·심혈관·신장 안전성 문제가 있으며 구조개선 약물은 부재하다. 장-관절 축(gut-joint axis) 가설에 따라 장내미생물 불균형과 저등급 전신염증이 OA에 기여할 수 있어 마이크로바이옴 표적 중재가 주목받는다. ID-CBT5101은 C. butyricum IDCC 5101을 가열사멸(tyndallized)한 포스트바이오틱으로, 전임상 쥐 OA 모델에서 통증·연골 보호 효과가 보고됐다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">단일기관·무작위·이중맹검·위약대조·평행군 임상시험(12주). 대상: 40~75세, 방사선상 무릎 OA(Kellgren-Lawrence I~III), ≥3개월 무릎통증, 보행통증 VAS 일정 기준 이상. 총 96명 1:1 무작위(ID-CBT5101 48명, 위약 48명); 안전성군 95명, FAS 89명(시험약 44, 위약 45), PPS 66명. 중재: ID-CBT5101 800mg 코팅정(가열사멸 C. butyricum 300mg, 사멸 전 5.0×10^? CFU 상당)을 1일 2회, 총 1.0×10^?? CFU상당/일, 12주. 1차 평가변수: 12주 보행통증 VAS(100mm) 변화. 2차: WOMAC, 한국형 무릎점수(KKS), 환자전반평가(PGART), 혈청 바이오마커(IL-6·COMP·PGE2·LTB4·TGF-β·hs-CRP). 방문: 0·6·12주, LOCF 결측대체.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">보행통증 VAS는 양군 모두 군내 유의 감소(ID-CBT5101 −12.55±21.71mm, p=0.0004; 위약 −8.71±18.85mm, p=0.0034)했으나 군간 차이는 비유의(p=0.3757).<br/>
+PPS도 −12.97 vs −12.33mm(p=0.8980)로 동일.<br/>
+WOMAC 총점 군내 유의 호전(시험약 −8.59, p=0.0002; 위약 −7.02, p=0.0005)이나 군간 비유의(p=0.5822).<br/>
+KKS도 군간 비유의(p=0.9118).<br/>
+PGART 군간 비유의(6주 p=0.8802, 12주 p=0.4592).<br/>
+혈청 IL-6·COMP·PGE2·LTB4·TGF-β 모두 군간 차이 없음; hs-CRP는 오히려 위약군에서 수치상 더 큰 감소(−0.07 vs −0.40 mg/L, p=0.0168, 임상적 무의미로 판단).<br/>
+사전계획 하위군(기저 VAS≥30mm)에서 시험약이 수치상 더 큰 통증감소(−19.07 vs −12.86mm)를 보였으나 통계적 유의성 미달.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">ID-CBT5101은 위약과 동등한 양호한 내약성. 치료발현 이상반응 발생률이 양군 유사, 대부분 경증~중등도이며 후유증 없이 소실. 가장 흔한 이상반응은 위장관 증상·상기도감염·근골격계 증상으로 군간 분포 유사. 중대한 이상반응으로 뇌경색·쯔쯔가무시병이 발생했으나 연구자가 시험약과 무관 판정. ID-CBT5101군 1명이 이상반응으로 투여 중단; 사망·치료관련 중대 이상반응 없음. 활력징후·검사치 임상적 유의 변화 없음.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 가열사멸 C. butyricum 포스트바이오틱 ID-CBT5101이 경증~중등도 무릎 OA에서 안전·내약성은 양호하나 위약 대비 통증·기능·바이오마커 개선 우월성은 입증하지 못했다고 결론(중립 결과). 한계는 단일기관·표본 적음·12주 단기·전신 바이오마커만 측정·미생물군 미평가·구제약 미정량. 바이오탑 관점에서 사람 OA에 대한 C. butyricum 효능은 본 연구로 뒷받침되지 않으며, 더욱이 가열사멸 균주(IDCC 5101)는 바이오탑 성분(생균 C. butyricum TO-A)과 형태·균주 모두 상이하다(참고근거: 균주 상이, 동일효능 단정 불가).</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>−12.55mm vs −8.71mm — 12주 보행통증 VAS 변화 (군간 p=0.3757)</li>
+                            <li>WOMAC 군간 비유의 — −8.59 vs −7.02 변화 (p=0.5822)</li>
+                            <li>1차 평가변수 위약 대비 우월성 없음 — 중립</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #8 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #8</span>
-      <span class="stars-high">★★★</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex:1;">Scientific Reports | 2025-05-28</div>
-      <button class="bd-request-btn" data-title="Efficacy and safety of Saccharomyces boulardii as adjunct therapy with Vancomycin in treating Clostridioides difficile infection: A randomized controlled trial" data-session="장내미생물" data-num="8" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Efficacy and safety of Saccharomyces boulardii as adjunct therapy with Vancomycin in treating Clostridioides difficile infection: A randomized controlled trial</p>
-      <a href="https://www.nature.com/articles/s41598-025-04986-2" class="paper-url" target="_blank">https://www.nature.com/articles/s41598-025-04986-2</a>
-      <span class="design-badge">RCT (이중맹검, 위약대조)</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">Clostridioides difficile 감염(CDI)은 입원환자 원내설사의 주요 원인으로 이환·재원·의료비 부담이 크다. 반코마이신·피닥소마이신 등 항생제로 초기치료해도 재발률이 20~30%로 높고, 항생제 자체가 장내미생물을 교란해 재발에 기여한다. 프로바이오틱 효모 S. boulardii는 장내미생물 균형 회복·병원체 정착 억제로 CDI 보조요법 가능성이 있으나, 기존 연구는 주로 예방에 집중됐고 활성치료 중 보조사용 근거는 부족했다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">전향적·이중맹검·무작위·위약대조 시험(태국 치앙마이대병원, 2021.11~2023.11). 대상: 20세 이상, 경증~중등도 CDI(원내설사 + 대변 toxin A/B 양성). 군별 N: 총 120명, 반코마이신 단독 61명 vs S. boulardii+반코마이신 59명(1:1). 중재: S. boulardii CNCM I-745 250mg 캡슐 2정 12시간마다(+반코마이신 125mg 6시간마다) 10일 경구; 위약은 동일 외형 과캡슐화. 1차 평가변수: 임상적 치유율(ITT·PP). 2차: CDI 재발, 글로벌 치유(재발 없는 치유), 설사 지표, Barthel 지수. 추적: 치유 후 56일까지 재발 감시.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">임상적 치유율은 양군 유사(ITT 98.36% vs 98.31%; PP 100% vs 100%, 비유의). 그러나 글로벌 치유율은 병용군이 유의하게 높음(ITT 85.25%→96.61%, p=0.044; PP 86.67%→98.28%, p=0.032). CDI 재발률은 병용군에서 유의 감소(ITT 13.11%→1.69%, p=0.032; PP 13.33%→1.72%, p=0.031). 설사 기간(중앙값 5 vs 4일, p=0.483), 총 설사일수(10 vs 9일, p=0.069), 설사율(0.18 vs 0.16, p=0.322)은 병용군이 수치상 우호적이나 비유의. Barthel 기능지수는 28·56일 모두 군간 차이 없음.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">이상반응은 양군 유사하게 경미한 위장관·비특이 증상이 비슷한 빈도로 발생(병용군 9.7% vs 단독군 9.0%). 내약불능·알레르기로 인한 투약 중단 사례는 없었고, 중대한 이상반응도 보고되지 않음. 약물순응도는 양군 모두 높음(ITT 100%, PP 98% 내외). S. boulardii 추가가 유의한 안전성 우려를 야기하지 않음.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자들은 반코마이신에 S. boulardii를 병용하면 임상적 치유율은 동등하나 CDI 재발을 유의하게 줄이고 글로벌 치유율을 높여 장기 치료성과를 개선하며 안전하다고 결론. 한계는 소표본·단일기관·경증~중등도 한정·설사지표 비유의. 바이오탑 관점에서 S. boulardii는 바이오탑 구성 성분(직접 관련)으로 취급 가능하며, 항생제 병용 시 재발 감소(1.7% vs 13.1%) 근거는 디테일링에 직접 활용 가능하다.</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">1.69% vs 13.11%</div><div class="desc">CDI 재발률</div><div class="pval">p=0.032</div></div>
-        <div class="knum"><div class="val">96.61% vs 85.25%</div><div class="desc">글로벌 치유율</div><div class="pval">p=0.044</div></div>
-        <div class="knum"><div class="val">98.4% vs 98.3%</div><div class="desc">임상적 치유율</div><div class="pval">비유의</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Efficacy and safety of Saccharomyces boulardii as adjunct th</div><div class="chart-wrap"><canvas id="chart_dr_8_925"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>바이오탑 성분(S boulardii) CDI 보조치료 근거</li>
-          <li>7% vs 13 1% 극적 차이 — PM 디테일링 핵심 수치</li>
-          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #8 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Efficacy and safety of Saccharomyces boulardii as adjunct therapy with Vancomycin in treating Clostridioides difficile infection: A randomized controlled trial</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Scientific Reports</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-05-28</div>
+                        <button class="bd-request-btn" data-title="Efficacy and safety of Saccharomyces boulardii as adjunct therapy with Vancomycin in treating Clostridioides difficile infection: A randomized controlled trial" data-session="장내미생물" data-num="8" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://www.nature.com/articles/s41598-025-04986-2" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">RCT (이중맹검, 위약대조)</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">Clostridioides difficile 감염(CDI)은 입원환자 원내설사의 주요 원인으로 이환·재원·의료비 부담이 크다. 반코마이신·피닥소마이신 등 항생제로 초기치료해도 재발률이 20~30%로 높고, 항생제 자체가 장내미생물을 교란해 재발에 기여한다. 프로바이오틱 효모 S. boulardii는 장내미생물 균형 회복·병원체 정착 억제로 CDI 보조요법 가능성이 있으나, 기존 연구는 주로 예방에 집중됐고 활성치료 중 보조사용 근거는 부족했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">전향적·이중맹검·무작위·위약대조 시험(태국 치앙마이대병원, 2021.11~2023.11). 대상: 20세 이상, 경증~중등도 CDI(원내설사 + 대변 toxin A/B 양성). 군별 N: 총 120명, 반코마이신 단독 61명 vs S. boulardii+반코마이신 59명(1:1). 중재: S. boulardii CNCM I-745 250mg 캡슐 2정 12시간마다(+반코마이신 125mg 6시간마다) 10일 경구; 위약은 동일 외형 과캡슐화. 1차 평가변수: 임상적 치유율(ITT·PP). 2차: CDI 재발, 글로벌 치유(재발 없는 치유), 설사 지표, Barthel 지수. 추적: 치유 후 56일까지 재발 감시.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">임상적 치유율은 양군 유사(ITT 98.36% vs 98.31%; PP 100% vs 100%, 비유의).<br/>
+그러나 글로벌 치유율은 병용군이 유의하게 높음(ITT 85.25%→96.61%, p=0.044; PP 86.67%→98.28%, p=0.032).<br/>
+CDI 재발률은 병용군에서 유의 감소(ITT 13.11%→1.69%, p=0.032; PP 13.33%→1.72%, p=0.031).<br/>
+설사 기간(중앙값 5 vs 4일, p=0.483), 총 설사일수(10 vs 9일, p=0.069), 설사율(0.18 vs 0.16, p=0.322)은 병용군이 수치상 우호적이나 비유의.<br/>
+Barthel 기능지수는 28·56일 모두 군간 차이 없음.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">이상반응은 양군 유사하게 경미한 위장관·비특이 증상이 비슷한 빈도로 발생(병용군 9.7% vs 단독군 9.0%). 내약불능·알레르기로 인한 투약 중단 사례는 없었고, 중대한 이상반응도 보고되지 않음. 약물순응도는 양군 모두 높음(ITT 100%, PP 98% 내외). S. boulardii 추가가 유의한 안전성 우려를 야기하지 않음.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 반코마이신에 S. boulardii를 병용하면 임상적 치유율은 동등하나 CDI 재발을 유의하게 줄이고 글로벌 치유율을 높여 장기 치료성과를 개선하며 안전하다고 결론. 한계는 소표본·단일기관·경증~중등도 한정·설사지표 비유의. 바이오탑 관점에서 S. boulardii는 바이오탑 구성 성분(직접 관련)으로 취급 가능하며, 항생제 병용 시 재발 감소(1.7% vs 13.1%) 근거는 디테일링에 직접 활용 가능하다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>1.69% vs 13.11% — CDI 재발률 (p=0.032)</li>
+                            <li>96.61% vs 85.25% — 글로벌 치유율 (p=0.044)</li>
+                            <li>98.4% vs 98.3% — 임상적 치유율 (비유의)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #9 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #9</span>
-      <span class="stars-mid">★★☆</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex:1;">Drug Research | 2025-04-14</div>
-      <button class="bd-request-btn" data-title="A Randomized, Controlled Study Evaluating Effects of Saccharomyces boulardii in Adult Patients with Asthma" data-session="장내미생물" data-num="9" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">A Randomized, Controlled Study Evaluating Effects of Saccharomyces boulardii in Adult Patients with Asthma</p>
-      <a href="https://pubmed.ncbi.nlm.nih.gov/40228543/" class="paper-url" target="_blank">https://pubmed.ncbi.nlm.nih.gov/40228543/</a>
-      <span class="design-badge">RCT (이중맹검, 위약대조)</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">천식은 만성 기도 염증질환으로 표준 흡입제로 조절되지 않는 환자가 상당수 존재한다. 장-폐축(gut-lung axis)과 장내미생물총 조절이 알레르기성 기도염증을 완화할 수 있다는 가설 아래, 프로바이오틱스를 기존 치료에 추가했을 때의 보조효과가 미충족 수요로 주목된다. 본 연구는 직접 성분균인 Saccharomyces boulardii(효모 프로바이오틱)의 천식 보조요법 잠재력을 검증했다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">무작위·이중맹검·위약대조시험. 총 N=50 성인 천식 환자를 1:1 배정 — S. boulardii군 25명 vs 위약군 25명. 양군 모두 기존 표준 천식치료에 병용. 중재기간 3개월. 평가변수: 폐기능검사(FEV1, FVC, FEV1/FVC, FEF 25-75%)와 혈액검사(CBC, 호산구 비율, IgE, IL-5, ESR, CRP)를 기저치와 치료 종료 시 측정·비교. 평균연령 39.22±12.55세. 선정기준·1차/2차 평가변수 구분·추적기간 세부는 초록 미보고(투여용량도 초록 미명시).</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">S. boulardii군은 기저치 대비 FEV1이 유의하게 개선(군내 p=0.026). 다만 FEV1·FVC·FEV1/FVC·FEF 25-75%의 군간 변화 차이는 통계적으로 유의하지 않았음(p&gt;0.05). 면역지표에서는 S. boulardii군이 위약군 대비 IL-5와 IgE가 더 낮은 수준을 보임(구체 수치·p값은 초록 미보고). 즉 폐기능은 부분적 개선, 알레르기 염증 바이오마커(IgE, IL-5)는 감소 경향.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">구체 이상반응명·발생률·중단율은 초록에 보고되지 않음(초록 미보고). S. boulardii 관련 중대 안전성 신호 언급 없음.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">(초록 기반 — 전문 미접근) 저자 결론은 기존 치료에 S. boulardii를 추가하면 폐기능을 부분적으로 개선하고 IgE·IL-5 감소와 연관된다는 것. 한계: 소표본(N=50), 군간 폐기능 차이는 비유의, 단기(3개월) 관찰, 투여용량 미공개. 바이오탑 관점: S. boulardii는 바이오탑의 직접 성분(효모 프로바이오틱)으로, 천식 등 알레르기성 염증질환에서 IgE·IL-5 저하 및 FEV1 개선 가능성을 보여 호흡기·면역조절 영역으로의 적응증 확장 가능성을 시사하는 직접근거.</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">p=0.026</div><div class="desc">S. boulardii군 FEV1 군내 </div><div class="pval">p=0.026</div></div>
-        <div class="knum"><div class="val">25 vs 25</div><div class="desc">군별 N</div></div>
-        <div class="knum"><div class="val">IgE·IL-5 감소</div><div class="desc">S. boulardii군의 위약군 대비 </div><div class="pval">초록 미보고</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">A Randomized, Controlled Study Evaluating Effects of Sacchar</div><div class="chart-wrap"><canvas id="chart_dr_9_925"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>boulardii 적응증 확장(호흡기) 가능성</li>
-          <li>장-폐 축 임상적 검증 시도 후속 연구 동향 지속 모니터링 필요</li>
-          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #9 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">A Randomized, Controlled Study Evaluating Effects of Saccharomyces boulardii in Adult Patients with Asthma</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Drug Research</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-04-14</div>
+                        <button class="bd-request-btn" data-title="A Randomized, Controlled Study Evaluating Effects of Saccharomyces boulardii in Adult Patients with Asthma" data-session="장내미생물" data-num="9" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/40228543/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">RCT (이중맹검, 위약대조)</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">천식은 만성 기도 염증질환으로 표준 흡입제로 조절되지 않는 환자가 상당수 존재한다. 장-폐축(gut-lung axis)과 장내미생물총 조절이 알레르기성 기도염증을 완화할 수 있다는 가설 아래, 프로바이오틱스를 기존 치료에 추가했을 때의 보조효과가 미충족 수요로 주목된다. 본 연구는 직접 성분균인 Saccharomyces boulardii(효모 프로바이오틱)의 천식 보조요법 잠재력을 검증했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">무작위·이중맹검·위약대조시험. 총 N=50 성인 천식 환자를 1:1 배정 — S. boulardii군 25명 vs 위약군 25명. 양군 모두 기존 표준 천식치료에 병용. 중재기간 3개월. 평가변수: 폐기능검사(FEV1, FVC, FEV1/FVC, FEF 25-75%)와 혈액검사(CBC, 호산구 비율, IgE, IL-5, ESR, CRP)를 기저치와 치료 종료 시 측정·비교. 평균연령 39.22±12.55세. 선정기준·1차/2차 평가변수 구분·추적기간 세부는 초록 미보고(투여용량도 초록 미명시).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">S. boulardii군은 기저치 대비 FEV1이 유의하게 개선(군내 p=0.026).<br/>
+다만 FEV1·FVC·FEV1/FVC·FEF 25-75%의 군간 변화 차이는 통계적으로 유의하지 않았음(p&gt;0.05).<br/>
+면역지표에서는 S. boulardii군이 위약군 대비 IL-5와 IgE가 더 낮은 수준을 보임(구체 수치·p값은 초록 미보고).<br/>
+즉 폐기능은 부분적 개선, 알레르기 염증 바이오마커(IgE, IL-5)는 감소 경향.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">구체 이상반응명·발생률·중단율은 초록에 보고되지 않음(초록 미보고). S. boulardii 관련 중대 안전성 신호 언급 없음.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">(초록 기반 — 전문 미접근) 저자 결론은 기존 치료에 S. boulardii를 추가하면 폐기능을 부분적으로 개선하고 IgE·IL-5 감소와 연관된다는 것. 한계: 소표본(N=50), 군간 폐기능 차이는 비유의, 단기(3개월) 관찰, 투여용량 미공개. 바이오탑 관점: S. boulardii는 바이오탑의 직접 성분(효모 프로바이오틱)으로, 천식 등 알레르기성 염증질환에서 IgE·IL-5 저하 및 FEV1 개선 가능성을 보여 호흡기·면역조절 영역으로의 적응증 확장 가능성을 시사하는 직접근거.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>p=0.026 — S. boulardii군 FEV1 군내 개선 (p=0.026)</li>
+                            <li>25 vs 25 — 군별 N</li>
+                            <li>IgE·IL-5 감소 — S. boulardii군의 위약군 대비 알레 (초록 미보고)</li>
+                            <li>p&gt;0.05 — FEV1·FVC·FEV1/FVC·FEF25- (&gt;0.05)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #10 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #10</span>
-      <span class="stars-mid">★★☆</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex:1;">Gut Microbes | 2025-11-07</div>
-      <button class="bd-request-btn" data-title="Saccharomyces boulardii CNCM I-745 mitigates antibiotic-induced gut microbiome functional alterations independently of the host" data-session="장내미생물" data-num="10" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Saccharomyces boulardii CNCM I-745 mitigates antibiotic-induced gut microbiome functional alterations independently of the host</p>
-      <a href="https://doi.org/10.1080/19490976.2025.2575924" class="paper-url" target="_blank">https://doi.org/10.1080/19490976.2025.2575924</a>
-      <span class="design-badge">전임상 (ex vivo 인체 면역세포·장점막 포함)</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">항생제는 장내미생물의 분류학적 조성·대사활성을 교란하고 항생제내성균을 확장시켜 만성질환의 잠재적 유발요인이 된다. S. boulardii CNCM I-745(Sb)는 항생제 연관 설사 예방에 가장 널리 처방되는 프로바이오틱이나, 작용기전(특히 장내미생물에 대한 직접효과)은 불완전하게 규명됐다. 기존 연구는 다중오믹스를 거의 쓰지 않아 Sb가 미생물군 기능·대사산물을 직접 안정화하는지 불명확했다. 이 연구는 숙주를 배제한 체외 미생물군 모델로 직접효과를 검증했다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">체외(in vitro) 인간 장내미생물군 모델 + 면역세포 공배양(전임상·기전연구). 정적 MiPro 모델: 건강 공여자 8명 분변을 AMC(아목시실린/클라불란산) 또는 반코마이신(Van) 0.1mg/mL ± Sb(2 또는 4mg/mL)로 24시간 처리. 동적 SHIME 모델: 공여자 6명, 2주 안정화→1주 AMC(50mg TID) 처리→2주 회복, +Sb군은 Sb 400mg TID 21일 병용. 분석: 16S rRNA·shotgun 메타지노믹스, qPCR 절대정량(QMP), 표적 대사체(SCFA·트립토판대사체·담즙산), 항생제내성유전자(ARG), 인간 PBMC(4명)·장점막 외식편(2명)에 배양상층액 자극 후 사이토카인. 통계: paired ANOVA/Wilcoxon, MaAsLin2/3, PERMANOVA.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">Sb는 항생제 유발 분류학적 조성 변화에는 유의 영향 없었으나(용량·항생제 불문), 세균 바이오매스를 용량의존적으로 안정화. AMC에서 Sb는 QMP 수준에서 phylum 교란을 부분 역전하고 여러 속의 절대존재량을 유의 증가; Van에서는 효과 제한적. 대사체: AMC에서 Sb가 propionate·butyrate·indole-3-propionic acid(IPA) 생성을 용량의존적으로 회복, 담즙산(CA·CDCA) 미생물 전환 촉진. 기능경로: AMC로 변화한 MetaCyc 경로 46개가 Sb 병용 시 11개로 감소. ARG: AMC가 AMC내성 ARG를 유의 증가시켰고 Sb가 대부분 공여자에서 부분 감소(Day 11에 유의), Enterobacteriaceae 확장도 부분 억제. 면역: AMC 처리 미생물군이 TNF-α·IFN-α2·IFN-γ·IL-23·IL-6·IL-8·MCP-1 등 전염증 사이토카인을 상승시켰고, Sb 병용 미생물군 자극 시 PBMC·장점막에서 전염증 사이토카인(MCP-1 등) 유의 감소.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">체외·기전 연구로 임상 이상반응 데이터는 없음. Sb 단독배양 상층액은 사이토카인 분비를 일관되게 변화시키지 않아(매질 대조 대비) Sb의 항염증 효과가 직접이 아닌 미생물군 매개임을 시사. Sb는 AMC 약동학을 바꾸지 않는다고 기존문헌 인용. 인체 적용 시 임상 안전성·유효성은 추정이다.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자들은 Sb(CNCM I-745)가 숙주와 독립적으로 항생제(특히 AMC) 유발 장내미생물 기능교란과 염증을 직접 완화하며, 바이오매스 안정화·항염증 대사산물(propionate·IPA) 생성·전염증 반응 감소를 통해 작용한다고 결론. 한계는 체외 모델(상피장벽·면역신호 부재)·소수 공여자·공여자간 변이. 바이오탑 관점에서 S. boulardii는 바이오탑 구성 성분(직접 관련)으로 취급 가능하며, 항생제 병용 시 미생물 기능·면역 보호의 기전적 근거를 제공한다(단, 체외 기전연구로 임상효과 단정은 불가).</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">46개→11개</div><div class="desc">AMC 교란 MetaCyc 경로가 Sb </div></div>
-        <div class="knum"><div class="val">propionate·IPA 증가</div><div class="desc">AMC 하 Sb의 항염증 대사산물 회복</div><div class="pval">용량의존적, p&lt;0.05</div></div>
-        <div class="knum"><div class="val">MCP-1 등 전염증 사이토카인 유의 감소</div><div class="desc">Sb 처리 미생물군 자극 시 PBMC·장</div><div class="pval">p&lt;0.05</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Saccharomyces boulardii CNCM I-745 mitigates antibiotic-indu</div><div class="chart-wrap"><canvas id="chart_dr_10_925"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>바이오탑 성분(S boulardii) 항생제 병용 시 장내미생물 보호 기전 분자 수준 규명</li>
-          <li>학술 디테일링 기전 설명 핵심 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #10 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Saccharomyces boulardii CNCM I-745 mitigates antibiotic-induced gut microbiome functional alterations independently of the host</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Gut Microbes</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-11-07</div>
+                        <button class="bd-request-btn" data-title="Saccharomyces boulardii CNCM I-745 mitigates antibiotic-induced gut microbiome functional alterations independently of the host" data-session="장내미생물" data-num="10" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.1080/19490976.2025.2575924" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">전임상 (ex vivo 인체 면역세포·장점막 포함)</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">항생제는 장내미생물의 분류학적 조성·대사활성을 교란하고 항생제내성균을 확장시켜 만성질환의 잠재적 유발요인이 된다. S. boulardii CNCM I-745(Sb)는 항생제 연관 설사 예방에 가장 널리 처방되는 프로바이오틱이나, 작용기전(특히 장내미생물에 대한 직접효과)은 불완전하게 규명됐다. 기존 연구는 다중오믹스를 거의 쓰지 않아 Sb가 미생물군 기능·대사산물을 직접 안정화하는지 불명확했다. 이 연구는 숙주를 배제한 체외 미생물군 모델로 직접효과를 검증했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">체외(in vitro) 인간 장내미생물군 모델 + 면역세포 공배양(전임상·기전연구). 정적 MiPro 모델: 건강 공여자 8명 분변을 AMC(아목시실린/클라불란산) 또는 반코마이신(Van) 0.1mg/mL ± Sb(2 또는 4mg/mL)로 24시간 처리. 동적 SHIME 모델: 공여자 6명, 2주 안정화→1주 AMC(50mg TID) 처리→2주 회복, +Sb군은 Sb 400mg TID 21일 병용. 분석: 16S rRNA·shotgun 메타지노믹스, qPCR 절대정량(QMP), 표적 대사체(SCFA·트립토판대사체·담즙산), 항생제내성유전자(ARG), 인간 PBMC(4명)·장점막 외식편(2명)에 배양상층액 자극 후 사이토카인. 통계: paired ANOVA/Wilcoxon, MaAsLin2/3, PERMANOVA.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">Sb는 항생제 유발 분류학적 조성 변화에는 유의 영향 없었으나(용량·항생제 불문), 세균 바이오매스를 용량의존적으로 안정화.<br/>
+AMC에서 Sb는 QMP 수준에서 phylum 교란을 부분 역전하고 여러 속의 절대존재량을 유의 증가; Van에서는 효과 제한적.<br/>
+<strong>대사체:</strong> AMC에서 Sb가 propionate·butyrate·indole-3-propionic acid(IPA) 생성을 용량의존적으로 회복, 담즙산(CA·CDCA) 미생물 전환 촉진.<br/>
+<strong>기능경로:</strong> AMC로 변화한 MetaCyc 경로 46개가 Sb 병용 시 11개로 감소.<br/>
+<strong>ARG:</strong> AMC가 AMC내성 ARG를 유의 증가시켰고 Sb가 대부분 공여자에서 부분 감소(Day 11에 유의), Enterobacteriaceae 확장도 부분 억제.<br/>
+<strong>면역:</strong> AMC 처리 미생물군이 TNF-α·IFN-α2·IFN-γ·IL-23·IL-6·IL-8·MCP-1 등 전염증 사이토카인을 상승시켰고, Sb 병용 미생물군 자극 시 PBMC·장점막에서 전염증 사이토카인(MCP-1 등) 유의 감소.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">체외·기전 연구로 임상 이상반응 데이터는 없음. Sb 단독배양 상층액은 사이토카인 분비를 일관되게 변화시키지 않아(매질 대조 대비) Sb의 항염증 효과가 직접이 아닌 미생물군 매개임을 시사. Sb는 AMC 약동학을 바꾸지 않는다고 기존문헌 인용. 인체 적용 시 임상 안전성·유효성은 추정이다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 Sb(CNCM I-745)가 숙주와 독립적으로 항생제(특히 AMC) 유발 장내미생물 기능교란과 염증을 직접 완화하며, 바이오매스 안정화·항염증 대사산물(propionate·IPA) 생성·전염증 반응 감소를 통해 작용한다고 결론. 한계는 체외 모델(상피장벽·면역신호 부재)·소수 공여자·공여자간 변이. 바이오탑 관점에서 S. boulardii는 바이오탑 구성 성분(직접 관련)으로 취급 가능하며, 항생제 병용 시 미생물 기능·면역 보호의 기전적 근거를 제공한다(단, 체외 기전연구로 임상효과 단정은 불가).</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>46개→11개 — AMC 교란 MetaCyc 경로가 Sb 병용</li>
+                            <li>propionate·IPA 증가 — AMC 하 Sb의 항염증 대사산물 회복 (용량의존적, p&lt;0.05)</li>
+                            <li>MCP-1 등 전염증 사이토카인 유의 감소 — Sb 처리 미생물군 자극 시 PBMC·장점막 (p&lt;0.05)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #11 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #11</span>
-      <span class="stars-mid">★★☆</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex:1;">Translational Gastroenterology and Hepatology | 2026-01-23</div>
-      <button class="bd-request-btn" data-title="Adjunctive use of Saccharomyces boulardii versus bismuth subsalicylate in the management of non-Clostridioides difficile nosocomial diarrhea in severely ill patients: a three-arm randomized controlled trial" data-session="장내미생물" data-num="11" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Adjunctive use of Saccharomyces boulardii versus bismuth subsalicylate in the management of non-Clostridioides difficile nosocomial diarrhea in severely ill patients: a three-arm randomized controlled trial</p>
-      <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12887278/" class="paper-url" target="_blank">https://pmc.ncbi.nlm.nih.gov/articles/PMC12887278/</a>
-      <span class="design-badge">RCT (3-arm, 전향적)</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">원내설사는 입원환자에서 흔한 합병증(발생률 5~38%)으로, 그중 C. difficile 감염(CDI)은 10~25%에 불과하고 대부분은 비감염성·원인불명(항생제연관설사, 약물유발, 경장영양, 기저 위장질환 악화 등)이다. CDI 치료지침은 정립됐으나 비CDI 원내설사 관리는 표준이 없다. 미생물 불균형 교정을 위한 프로바이오틱 S. boulardii와, 항염증·항분비·항균 작용의 비스무트 차살리실산염(BSS)이 후보로 거론되나 중증환자 대상 근거는 빈약하다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">3군·무작위·공개라벨 시험(태국 시리랏병원, 2016.8~2018.2). 대상: 입원 72시간 후 발생한 신규 원내설사(≥3회/일 무른변 등) + 대변 C. difficile toxin 유전자 PCR 음성 성인. 군별 N: 72명을 1:1:1로 S. boulardii군(Sb, Bioflor 250mg 1캡슐 1일 2회) 24명, BSS군(Gastrobismol-L 1,048mg 1정 1일 2회) 24명, 표준치료(SC)군 24명(Sb군 1명 2일째 사망으로 최종 23명). 치료기간 5일. 1차 평가변수: 1→5일 대변 무게·빈도·경도(Bristol 척도) 개선의 군간 비교. 중증환자(약 절반 기계환기, 대부분 경장영양·항생제 노출).</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">5일 치료 후 모든 군에서 대변 지표가 점진 개선됐으나 군간 유의차 없음. 대변 무게 중앙값 감소: Sb 68g vs BSS 170g vs SC 156g(SbvsSC p=0.11, BSSvsSC p=0.60). 대변 빈도 감소: Sb 0.9 vs BSS 1.0 vs SC 1.6회/일(p=0.14, 0.10). 대변 경도(BSFS) 변화: Sb 0.2 vs BSS 0.4 vs SC 0.2(p=0.95). 즉 S. boulardii도 BSS도 표준치료 단독 대비 추가 이점이 없었고, 비감염성 원내설사는 양호한 표준치료만으로 5일 내 점진 호전됨을 시사. 저자들은 중증·장기 항생제 노출 집단에서는 더 높은 용량·긴 기간이 필요할 수 있다고 고찰.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">5일 중재 전 기간 모든 연구군에서 이상반응은 관찰되지 않았다(개입 관련 무). 단, Sb군 1명이 2일째 패혈증 악화로 사망했으나 이는 기저 중증질환 악화로 시험약과 무관 판정. 전반적으로 양 중재 모두 안전했다고 기술.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자들은 S. boulardii와 BSS 모두 비CDI 원내설사 치료에 표준치료 대비 추가 이점이 없으며(모든 설사지표 일관), 치료는 경험적 지사제보다 원인·기여인자 관리에 집중해야 한다고 결론. 한계는 소표본·공개라벨·위약 부재·질병중증도 미보정·약물유발설사 미배제·대변무게 측정 부정확 가능성. 바이오탑 관점에서 S. boulardii는 바이오탑 구성 성분(직접 관련)이나, 본 연구는 중증·항생제 장기노출 입원환자라는 특수집단에서 단기·저용량으로 음성결과를 보였으므로 적응증·용량·기간 설정의 중요성을 보여주는 참고자료다.</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">68g vs 170g vs 156g</div><div class="desc">5일 대변 무게 감소 중앙값</div><div class="pval">SbvsSC p=0.11</div></div>
-        <div class="knum"><div class="val">0.9 vs 1.0 vs 1.6회/일</div><div class="desc">대변 빈도 감소</div><div class="pval">p=0.14</div></div>
-        <div class="knum"><div class="val">추가 이점 없음</div><div class="desc">Sb·BSS 모두 표준치료 대비 비유의</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Adjunctive use of Saccharomyces boulardii versus bismuth sub</div><div class="chart-wrap"><canvas id="chart_dr_11_925"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>비감염성 vs 감염성 설사에서 프로바이오틱스 효과 차이 → 적절한 적응증 선택 중요성</li>
-          <li>후속 연구 동향 지속 모니터링 필요 후속 연구 동향 지속 모니터링 필요</li>
-          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #11 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Adjunctive use of Saccharomyces boulardii versus bismuth subsalicylate in the management of non-Clostridioides difficile nosocomial diarrhea in severely ill patients: a three-arm randomized controlled trial</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Translational Gastroenterology and Hepatology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-01-23</div>
+                        <button class="bd-request-btn" data-title="Adjunctive use of Saccharomyces boulardii versus bismuth subsalicylate in the management of non-Clostridioides difficile nosocomial diarrhea in severely ill patients: a three-arm randomized controlled trial" data-session="장내미생물" data-num="11" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12887278/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">RCT (3-arm, 전향적)</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">원내설사는 입원환자에서 흔한 합병증(발생률 5~38%)으로, 그중 C. difficile 감염(CDI)은 10~25%에 불과하고 대부분은 비감염성·원인불명(항생제연관설사, 약물유발, 경장영양, 기저 위장질환 악화 등)이다. CDI 치료지침은 정립됐으나 비CDI 원내설사 관리는 표준이 없다. 미생물 불균형 교정을 위한 프로바이오틱 S. boulardii와, 항염증·항분비·항균 작용의 비스무트 차살리실산염(BSS)이 후보로 거론되나 중증환자 대상 근거는 빈약하다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">3군·무작위·공개라벨 시험(태국 시리랏병원, 2016.8~2018.2). 대상: 입원 72시간 후 발생한 신규 원내설사(≥3회/일 무른변 등) + 대변 C. difficile toxin 유전자 PCR 음성 성인. 군별 N: 72명을 1:1:1로 S. boulardii군(Sb, Bioflor 250mg 1캡슐 1일 2회) 24명, BSS군(Gastrobismol-L 1,048mg 1정 1일 2회) 24명, 표준치료(SC)군 24명(Sb군 1명 2일째 사망으로 최종 23명). 치료기간 5일. 1차 평가변수: 1→5일 대변 무게·빈도·경도(Bristol 척도) 개선의 군간 비교. 중증환자(약 절반 기계환기, 대부분 경장영양·항생제 노출).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">5일 치료 후 모든 군에서 대변 지표가 점진 개선됐으나 군간 유의차 없음.<br/>
+<strong>대변 무게 중앙값 감소:</strong> Sb 68g vs BSS 170g vs SC 156g(SbvsSC p=0.11, BSSvsSC p=0.60).<br/>
+<strong>대변 빈도 감소:</strong> Sb 0.9 vs BSS 1.0 vs SC 1.6회/일(p=0.14, 0.10).<br/>
+<strong>대변 경도(BSFS) 변화:</strong> Sb 0.2 vs BSS 0.4 vs SC 0.2(p=0.95).<br/>
+즉 S. boulardii도 BSS도 표준치료 단독 대비 추가 이점이 없었고, 비감염성 원내설사는 양호한 표준치료만으로 5일 내 점진 호전됨을 시사.<br/>
+저자들은 중증·장기 항생제 노출 집단에서는 더 높은 용량·긴 기간이 필요할 수 있다고 고찰.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">5일 중재 전 기간 모든 연구군에서 이상반응은 관찰되지 않았다(개입 관련 무). 단, Sb군 1명이 2일째 패혈증 악화로 사망했으나 이는 기저 중증질환 악화로 시험약과 무관 판정. 전반적으로 양 중재 모두 안전했다고 기술.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 S. boulardii와 BSS 모두 비CDI 원내설사 치료에 표준치료 대비 추가 이점이 없으며(모든 설사지표 일관), 치료는 경험적 지사제보다 원인·기여인자 관리에 집중해야 한다고 결론. 한계는 소표본·공개라벨·위약 부재·질병중증도 미보정·약물유발설사 미배제·대변무게 측정 부정확 가능성. 바이오탑 관점에서 S. boulardii는 바이오탑 구성 성분(직접 관련)이나, 본 연구는 중증·항생제 장기노출 입원환자라는 특수집단에서 단기·저용량으로 음성결과를 보였으므로 적응증·용량·기간 설정의 중요성을 보여주는 참고자료다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>68g vs 170g vs 156g — 5일 대변 무게 감소 중앙값 (SbvsSC p=0.11)</li>
+                            <li>0.9 vs 1.0 vs 1.6회/일 — 대변 빈도 감소 (p=0.14)</li>
+                            <li>추가 이점 없음 — Sb·BSS 모두 표준치료 대비 비유의</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="legend">
@@ -637,7 +816,6 @@
     </div>
 
 <script>
-/* 논문별 포커스 뷰 (#논문제목 해시) */
 (function(){
   var h=decodeURIComponent(location.hash.slice(1)); if(!h) return;
   var papers=document.querySelectorAll('.paper'),found=null;
@@ -650,100 +828,6 @@
   btn.onclick=function(){for(var k=0;k<papers.length;k++)papers[k].style.display='';found.style.outline='';btn.remove();window.scrollTo(0,0);};
   document.body.appendChild(btn);
 })();
-</script>
-
-<script>
-if (typeof Chart !== "undefined") {
-
-  // 논문 #1 (장내미생물)
-  (function(){ var c=document.getElementById('chart_dr_1_925'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #2 (장내미생물)
-  (function(){ var c=document.getElementById('chart_dr_2_925'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #3 (장내미생물)
-  (function(){ var c=document.getElementById('chart_dr_3_925'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["비교1", "비교2"], datasets:[{label:"치료군",data:[0.8, 29.76],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[1.25, 44.71],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #4 (장내미생물)
-  (function(){ var c=document.getElementById('chart_dr_4_925'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #5 (장내미생물)
-  (function(){ var c=document.getElementById('chart_dr_5_925'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #6 (장내미생물)
-  (function(){ var c=document.getElementById('chart_dr_6_925'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #7 (장내미생물)
-  (function(){ var c=document.getElementById('chart_dr_7_925'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #8 (장내미생물)
-  (function(){ var c=document.getElementById('chart_dr_8_925'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["비교1", "비교2"], datasets:[{label:"치료군",data:[96.6, 1.7],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[85.3, 13.1],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #9 (장내미생물)
-  (function(){ var c=document.getElementById('chart_dr_9_925'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #10 (장내미생물)
-  (function(){ var c=document.getElementById('chart_dr_10_925'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #11 (장내미생물)
-  (function(){ var c=document.getElementById('chart_dr_11_925'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-}
 </script>
 
 <!-- BD_REQUEST_MODAL_v2 -->
@@ -764,7 +848,7 @@ if (typeof Chart !== "undefined") {
 </style>
 <div id="bd-modal-overlay" onclick="if(event.target.id==='bd-modal-overlay') closeBDModal()">
   <div id="bd-modal">
-    <h3>📋 BD 제작 요청</h3>
+    <h3>📌 BD 제작 요청</h3>
     <div class="field"><label>논문</label><div id="bd-modal-title" style="font-size:13px;color:#555;line-height:1.4"></div></div>
     <div class="field"><label>세션</label><div id="bd-modal-session" style="font-size:13px;color:#555"></div></div>
     <div class="field"><label>BD 포맷</label><div class="radio-row">
