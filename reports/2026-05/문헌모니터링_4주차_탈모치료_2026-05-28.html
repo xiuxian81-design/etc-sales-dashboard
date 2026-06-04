@@ -15,23 +15,23 @@
         .metadata-item { text-align: center; }
         .metadata-item .label { font-size: 12px; color: #999; text-transform: uppercase; }
         .metadata-item .value { font-size: 20px; font-weight: bold; color: #003366; }
-        .executive { padding: 30px; background-color: #f0f6ff; border-left: 4px solid #E87722; margin: 20px 30px; }
-        .executive h2 { font-size: 14px; color: #E87722; text-transform: uppercase; margin-bottom: 10px; }
+        .executive { padding: 30px; background-color: #f0f6ff; border-left: 4px solid #1A5276; margin: 20px 30px; }
+        .executive h2 { font-size: 14px; color: #1A5276; text-transform: uppercase; margin-bottom: 10px; }
         .executive p { font-size: 13px; line-height: 1.6; color: #444; }
         .papers { padding: 0 30px; }
         .paper { padding: 25px; border-bottom: 1px solid #eee; page-break-inside: avoid; }
         .paper:last-child { border-bottom: none; }
         .paper-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
         .paper-number { font-weight: bold; color: #003366; margin-right: 15px; }
-        .rating { background-color: #E87722; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
-        .rating.high { background-color: #E87722; }
+        .rating { background-color: #1A5276; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+        .rating.high { background-color: #1A5276; }
         .rating.medium { background-color: #FFB84D; }
         .rating.low { background-color: #FFD580; color: #333; }
         .paper-title { font-size: 15px; font-weight: bold; color: #003366; margin: 10px 0; }
         .paper-meta { font-size: 12px; color: #999; margin-bottom: 15px; }
         .paper-meta span { margin-right: 20px; }
         .section { margin-top: 15px; font-size: 13px; line-height: 1.6; }
-        .section-title { font-weight: bold; color: #E87722; margin-bottom: 8px; }
+        .section-title { font-weight: bold; color: #1A5276; margin-bottom: 8px; }
         .evidence-tag { display: inline-block; background-color: #e6f2ff; border-left: 3px solid #003366; padding: 5px 10px; margin: 10px 0; font-size: 12px; color: #003366; }
         .footer { padding: 20px 30px; background-color: #f5f5f5; border-top: 1px solid #eee; font-size: 12px; color: #999; }
         .legend { padding: 20px 30px; background-color: #fafafa; border-top: 1px solid #eee; }
@@ -41,6 +41,40 @@
         ul { margin-left: 20px; }
         li { margin: 5px 0; }
     </style>
+
+<style>
+/* ── 풀상세 논문 카드 (build-report.py) ── */
+.paper{background:#fff;border:1px solid #e1e8f0;border-radius:10px;margin:18px 30px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden}
+.paper-header{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 16px;background:#f5f9fc;border-bottom:1px solid #e1e8f0}
+.paper-num{font-weight:700;color:#003366;font-size:14px}
+.stars-high{color:#1A5276;font-weight:700}.stars-mid{color:#2E6DA0;font-weight:700}.stars-low{color:#95a5a6;font-weight:700}
+.tag-direct,.tag-ref,.tag-open,.tag-wall{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600}
+.tag-direct{background:#1A5276;color:#fff}.tag-ref{background:#e1e8f0;color:#456}
+.tag-open{background:#e8f5e9;color:#2e7d32}.tag-wall{background:#f0f0f0;color:#888}
+.journal-meta{font-size:12px;color:#666;text-align:right}
+.paper-body{padding:14px 18px}
+.paper-title{font-size:15px;font-weight:700;color:#1a1a1a;margin:0 0 6px;line-height:1.4}
+.paper-url{font-size:12px;color:#2E6DA0;word-break:break-all;display:inline-block;margin-bottom:6px}
+.design-badge{display:inline-block;font-size:11px;background:#eef3f8;color:#1A5276;padding:2px 10px;border-radius:10px;margin-left:6px}
+.summary-grid{margin:14px 0}
+.summary-grid h4,.viz-section h4,.usage h4{font-size:13px;color:#003366;margin:0 0 8px;padding-left:8px;border-left:3px solid #1A5276}
+.s-row{display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed #eef2f7}
+.s-label{flex:0 0 64px;font-size:12px;font-weight:700;color:#1A5276}
+.s-val{flex:1;font-size:13px;color:#222;line-height:1.65}
+.key-nums{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.knum{flex:1;min-width:120px;background:#f5f9fc;border:1px solid #dce6f0;border-radius:8px;padding:10px 12px;text-align:center}
+.knum .val{font-size:16px;font-weight:800;color:#1A5276;line-height:1.25}
+.knum .desc{font-size:11px;color:#555;margin-top:3px;line-height:1.3}
+.knum .pval{font-size:11px;color:#2e7d32;font-weight:600;margin-top:2px}
+.viz-section{margin:14px 0}.viz-subtitle{font-size:12px;color:#666;margin-bottom:6px}
+.chart-wrap{position:relative;height:240px}
+.usage{margin:14px 0 4px;background:#fbfcfe;border:1px solid #eef2f7;border-radius:8px;padding:10px 14px}
+.usage ul{margin:0;padding-left:18px}.usage li{font-size:13px;color:#333;line-height:1.7}
+.bd-request-btn{background:#1A5276;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;margin-left:8px}
+.bd-request-btn:hover{background:#14405e}.bd-request-btn:disabled{background:#95a5a6;cursor:not-allowed}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -68,709 +102,254 @@
             <h2>Executive Summary</h2>
             <p>Minoxidil 용량 최적화(5% vs 10%) RCT, Dutasteride 장기 메타분석, PRP 병용 치료, AI 기반 맞춤형 포뮬레이션 등 안드로겐성 탈모 치료의 다층적 근거 집적. 약물 단독 대비 복합/맞춤형 치료의 효능 상향 추세.</p>
         </div>
-        
         <div class="papers">
-            <div class="paper">
-                <div class="paper-header">
-                    <div>
-                        <div class="paper-number">■ 논문 #1</div>
-                        <span class="rating high">★★★</span>
-                    </div>
-                </div>
-                <div class="paper-title">Minoxidil 5% vs 10% dose-response RCT</div>
-                <div class="paper-meta">
-                    <span><strong>저널:</strong> Dermatologic Surgery</span>
-                    <span><strong>발행일:</strong> 2025-04-03</span>
-                    <span><strong>연구디자인:</strong> RCT</span>
-                </div>
-                <div class="evidence-tag">직접근거</div>
-                <div class="section">
-                    <div class="section-title">배경</div>
-                    <p>Minoxidil의 효과적 용량 결정. 5%가 standard이나 10% 고용량의 추가 효과 검증.</p>
-                </div>
-                <div class="section">
-                    <div class="section-title">대상·방법</div>
-                    <p>안드로겐성 탈모 남성 300명, Minoxidil 5% (150명) vs 10% (150명), 1일 2회, 24주 투여, 1차 평가변수: 머리카락 수 증가량.</p>
-                </div>
-                <div class="section">
-                    <div class="section-title">핵심 결과</div>
-                    <ul>
-                        <li>머리카락 수 증가: 5% +27/cm² vs 10% +35/cm² (p=0.018)</li>
-                        <li>응답률(≥20% 증가): 5% 62% vs 10% 72% (p=0.038)</li>
-                        <li>안전성: 부작용 3% vs 5% (head irritation)</li>
-                    </ul>
-                </div>
-                <div class="section">
-                    <div class="section-title">결론</div>
-                    <p>Minoxidil 10%는 5% 대비 통계적 우월성 입증. 다만 부작용 증가 경향으로 개인별 용량 조정 권고.</p>
-                </div>
-                <div class="section">
-                    <div class="section-title">활용 포인트</div>
-                    <p>Minoxidil 용량 최적화 근거. 헤어그로 성분의 용량 설정 과학적 근거 강화.</p>
-                </div>
-            </div>
-            
-            <div class="paper">
-                <div class="paper-header">
-                    <div>
-                        <div class="paper-number">■ 논문 #2</div>
-                        <span class="rating high">★★★</span>
-                    </div>
-                </div>
-                <div class="paper-title">Dutasteride long-term safety and efficacy meta-analysis</div>
-                <div class="paper-meta">
-                    <span><strong>저널:</strong> Hair & Hair Disorders</span>
-                    <span><strong>발행일:</strong> 2025-04-09</span>
-                    <span><strong>연구디자인:</strong> 메타분석</span>
-                </div>
-                <div class="evidence-tag">참고근거</div>
-                <div class="section">
-                    <div class="section-title">배경</div>
-                    <p>5-alpha reductase inhibitor (Dutasteride)의 장기 안전성 및 효능 프로파일 종합.</p>
-                </div>
-                <div class="section">
-                    <div class="section-title">방법</div>
-                    <p>2010-2025 RCT 18개 메타분석, 추적 기간 12-72개월.</p>
-                </div>
-                <div class="section">
-                    <div class="section-title">핵심 결과</div>
-                    <ul>
-                        <li>머리카락 수 증가 유지율: 72개월 후 82% (투여군)</li>
-                        <li>모낭 탈락 감소: 지속적 (p&lt;0.001)</li>
-                        <li>성기능 부작용: 2.8% (약물-위약 차이 1.2%, 유의하지 않음)</li>
-                        <li>중단율 ≤5%</li>
-                    </ul>
-                </div>
-                <div class="section">
-                    <div class="section-title">활용 포인트</div>
-                    <p>5-alpha reductase inhibitor의 장기 안전성·효능 근거. 환자 안심 자료로 활용.</p>
-                </div>
-            </div>
-            
-            <div class="paper">
-                <div class="paper-header">
-                    <div>
-                        <div class="paper-number">■ 논문 #3</div>
-                        <span class="rating medium">★★☆</span>
-                    </div>
-                </div>
-                <div class="paper-title">PRP combined with topical minoxidil trial</div>
-                <div class="paper-meta">
-                    <span><strong>저널:</strong> Journal of Cosmetic Dermatology</span>
-                    <span><strong>발행일:</strong> 2025-04-14</span>
-                    <span><strong>연구디자인:</strong> 임상시험</span>
-                </div>
-                <div class="evidence-tag">참고근거</div>
-                <div class="section">
-                    <div class="section-title">배경</div>
-                    <p>PRP (platelet-rich plasma)와 Minoxidil 병용 치료의 상승 효과.</p>
-                </div>
-                <div class="section">
-                    <div class="section-title">방법</div>
-                    <p>탈모 환자 80명, (1) PRP+Minoxidil 40명 vs (2) Minoxidil 단독 40명, 6개월 추적.</p>
-                </div>
-                <div class="section">
-                    <div class="section-title">핵심 결과</div>
-                    <ul>
-                        <li>모발 밀도 증가: PRP+Minoxidil +42/cm² vs Minoxidil +24/cm² (p=0.009)</li>
-                        <li>만족도: 78% vs 54%</li>
-                    </ul>
-                </div>
-                <div class="section">
-                    <div class="section-title">활용 포인트</div>
-                    <p>약물 + 시술 병용의 우월성. 헤어그로 처방 환자에 대한 복합 치료 전략 근거.</p>
-                </div>
-            </div>
-            
-            <div class="paper">
-                <div class="paper-header">
-                    <div>
-                        <div class="paper-number">■ 논문 #4</div>
-                        <span class="rating low">★☆☆</span>
-                    </div>
-                </div>
-                <div class="paper-title">Machine learning-based alopecia treatment personalization</div>
-                <div class="paper-meta">
-                    <span><strong>저널:</strong> Artificial Intelligence in Medicine</span>
-                    <span><strong>발행일:</strong> 2025-04-18</span>
-                    <span><strong>연구디자인:</strong> 개념 증명</span>
-                </div>
-                <div class="evidence-tag">참고근거</div>
-                <div class="section">
-                    <div class="section-title">배경</div>
-                    <p>AI 기반 개인맞춤형 탈모 치료법 선택의 가능성. 머신러닝 모델로 약물 응답성 예측.</p>
-                </div>
-                <div class="section">
-                    <div class="section-title">방법</div>
-                    <p>기존 탈모 환자 임상데이터 300명 분석, AI 모델 학습, 검증 세트 50명으로 성능 평가.</p>
-                </div>
-                <div class="section">
-                    <div class="section-title">핵심 결과</div>
-                    <ul>
-                        <li>AI 예측 정확도 78%</li>
-                        <li>조기 응답 판정(8주): 민감도 82%, 특이도 74%</li>
-                    </ul>
-                </div>
-                <div class="section">
-                    <div class="section-title">결론·한계</div>
-                    <p>AI 기반 맞춤형 치료 선택의 가능성 제시. 다만 전향적 임상 검증 필요.</p>
-                </div>
-                <div class="section">
-                    <div class="section-title">활용 포인트</div>
-                    <p>미래 탈모 치료 동향(학술 정보). 현재는 모니터링 수준.</p>
-                </div>
-            </div>
-        </div>
-      <!-- ━━━ 논문 #1 (탈모치료) ━━━ -->
+
+  <!-- ━━━ 논문 #1 (탈모치료) ━━━ -->
   <div class="paper">
     <div class="paper-header">
       <span class="paper-num">■ 논문 #1</span>
       <span class="stars-high">★★★</span>
       <span class="tag-ref">참고근거</span>
       <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex: 1;">Cureus | 2025-08-03</div>
+      <div class="journal-meta" style="flex:1;">Cureus | 2025-08-03</div>
       <button class="bd-request-btn" data-title="A Randomized, Double-Blind, Placebo and Active Controlled Phase II Study to Evaluate the Safety and Efficacy of Novel Dutasteride Topical Solution (0.01%, 0.02%, and 0.05% w/v) in Male Subjects With Androgenetic Alopecia" data-session="탈모치료" data-num="1" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
     </div>
     <div class="paper-body">
       <p class="paper-title">A Randomized, Double-Blind, Placebo and Active Controlled Phase II Study to Evaluate the Safety and Efficacy of Novel Dutasteride Topical Solution (0.01%, 0.02%, and 0.05% w/v) in Male Subjects With Androgenetic Alopecia</p>
       <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12405733/" class="paper-url" target="_blank">https://pmc.ncbi.nlm.nih.gov/articles/PMC12405733/</a>
       <span class="design-badge">Phase II RCT</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">남성형 안드로겐성 탈모(AGA)는 전 세계 남성의 약 50%, 인도 30~50세 남성의 58%에 영향을 미치는 가장 흔한 탈모로, 외모뿐 아니라 자존감 저하·우울·사회불안 등 심리적 삶의 질을 크게 훼손한다. 현재 FDA 승인 치료는 외용 미녹시딜과 경구 피나스테리드(1mg/일) 두 가지뿐이며, 피나스테리드는 환자의 30~50%가 임상적 개선에 실패하고 경구 사용 시 성기능장애·성욕감소·우울 등 전신 부작용이 장기 사용을 제한한다. 두타스테리드는 1형·2형 5알파환원효소를 모두 억제(피나스테리드보다 2형 3배, 1형 100배 강력)해 더 우수하나, 경구 제형의 전신 부작용 문제로 국소 흡수가 최소화된 외용 두타스테리드 제형의 미충족 수요가 크다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">인도 6개 기관, Phase II, 무작위·이중맹검·이중더미·평행군·활성/위약 대조 시험(CTRI/2021/03/032173). AGA 남성 135명(20~60세, Norwood-Hamilton III vertex·IV·V형)을 2:2:2:2:1 비율로 5군 배정 — 두타스테리드 0.01% 외용액(n=30), 0.02%(n=30), 0.05%(n=30)+경구 피나스테리드 위약; 두타스테리드 위약 외용액+경구 피나스테리드 1mg 정(n=30); 두타스테리드 위약 외용액+경구 위약(n=15). 12개월 내 두타·피나 미사용자 대상, 자가면역·내분비성 탈모, 모발이식·레이저, 항안드로겐제 사용자 등 제외. 중재는 1mL 외용액을 두정부 1.9cm² 탈모 부위에 1일 1회 24주간 도포(6~8시간 잔류). 1차 평가변수는 24주 시점 두정부 1cm² 내 목표부위 모발수(TAHC). 2차는 12주 TAHC, 12·24주 목표부위 모발굵기(TAHW), 남성모발성장설문(MHGQ), 연구자 전반사진평가(GPA, 7점 척도 ≥+2), 혈청 테스토스테론·DHT, 0.05% 약동학. 총 28주(선별 2주+치료 24주+추적 28주), 127명이 완료.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">24주 TAHC는 모든 활성군에서 기저 대비 유의 증가(전부 p≤0.01). 두타스테리드 0.05%군이 +75.52(SEM 8.96, t=8.43, p=0.0001)로 최대 증가를 보여 위약(+0.07, p=0.9957) 및 피나스테리드(+41.21, p=0.0001) 대비 우수. 1차 평가변수 — 0.05% 두타 vs 피나스테리드 직접비교 +34.30(SEM 12.78, t=2.68, p=0.0083)로 유의하게 우월. 위약 대비 0.05% 두타 차이 -75.45(p=0.0001), 0.01% 두타 -32.25(p=0.0388). 12주 시점에도 0.05% 두타가 위약 대비 유의(차이 -31.80, p=0.038). TAHW(모발굵기) 24주: 0.05% 두타 +11.59(p=0.0001)로 위약 대비 유의(차이 -7.59, p=0.0185), 피나스테리드도 위약 대비 유의(p=0.0387); 0.05% 두타 vs 피나 차이는 +0.91(p=0.7322)로 동등. 연구자 GPA ≥+2 달성률(24주): 0.05% 두타 68.97% &gt; 0.02% 51.85% &gt; 피나 21.43% = 0.01% 21.43% &gt; 위약 13.33%. MHGQ 만족(점수≤2, 전반 모발, 24주): 0.05% 두타 93.1%, 0.02% 100%, 피나 71.43%, 위약 46.67%. 호르몬 — 피나스테리드군은 테스토스테론 12주 +16%·24주 +20%, DHT 12주 -27%·24주 -11%로 중등도 변화; 0.05% 외용 두타군은 DHT 12주 -8.9%·24주 -11%로 미미한 변화(테스토·DHT 모두 유의차 없음).</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">전 시험기간 동안 이상반응·중대이상반응·사망·안전성 관련 중단이 전무. 활성군 대부분(n=29, 16.96%)이 피부자극 평가에서 1점(&#x27;자극 없음&#x27;) 기록. 일부에서 &#x27;약간 윤기&#x27;, &#x27;뚜렷한 윤기&#x27;, &#x27;윤기+박리·균열&#x27; 소견이 전 군에 걸쳐 관찰되었으나 임상적으로 의미 있는 검사실 이상은 없었음. 약동학상 0.05% 외용 두타의 전신 노출은 매우 낮아 대부분 정량하한(LLOQ 50.125 pg/mL) 부근 또는 이하, Tmax 약 5시간, 24시간 내 최대 169.47 pg/mL, day168 최대 150.51 pg/mL로 AUC·반감기 산출 불가 수준. 비교 문헌상 외용 피나스테리드 스프레이는 성기능 이상반응 2.8%, 경구 피나스테리드 1mg은 10.81%로 보고되어 외용 두타의 낮은 전신 노출이 안전성 이점으로 부각됨.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">남성 AGA에서 두타스테리드 0.05% 외용액(0.5mg/일)은 경구 피나스테리드(1mg/일)보다 우수한 효능을 보이며, 낮은 전신 노출에 기인한 우호적 안전성·내약성을 입증했다. 한계는 인도인 단일 인종·남성 한정, 24주 단기 추적, 트리코스코피 미사용, 두타-피나 장기 비교 부재이며 대규모 Phase III가 필요하다. 헤어그로(외용 미녹시딜) 관점에서, 이 연구는 외용 5ARI(두타)가 외용 미녹시딜·경구 피나의 빈자리를 채울 차세대 국소 단독요법 후보임을 시사하나, 두타는 모발수 증가 기전이 안드로겐 차단으로 미녹시딜의 혈관확장·모낭 직접자극과 상보적이어서 향후 미녹시딜 병용·비교 데이터 확보가 임상적으로 유의미하다.</div>
-        </div>
+      <div class="summary-grid"><h4>논문 내용 요약</h4>
+        <div class="s-row"><div class="s-label">배경</div><div class="s-val">남성형 안드로겐성 탈모(AGA)는 전 세계 남성의 약 50%, 인도 30~50세 남성의 58%에 영향을 미치는 가장 흔한 탈모로, 외모뿐 아니라 자존감 저하·우울·사회불안 등 심리적 삶의 질을 크게 훼손한다. 현재 FDA 승인 치료는 외용 미녹시딜과 경구 피나스테리드(1mg/일) 두 가지뿐이며, 피나스테리드는 환자의 30~50%가 임상적 개선에 실패하고 경구 사용 시 성기능장애·성욕감소·우울 등 전신 부작용이 장기 사용을 제한한다. 두타스테리드는 1형·2형 5알파환원효소를 모두 억제(피나스테리드보다 2형 3배, 1형 100배 강력)해 더 우수하나, 경구 제형의 전신 부작용 문제로 국소 흡수가 최소화된 외용 두타스테리드 제형의 미충족 수요가 크다.</div></div>
+        <div class="s-row"><div class="s-label">방법</div><div class="s-val">인도 6개 기관, Phase II, 무작위·이중맹검·이중더미·평행군·활성/위약 대조 시험(CTRI/2021/03/032173). AGA 남성 135명(20~60세, Norwood-Hamilton III vertex·IV·V형)을 2:2:2:2:1 비율로 5군 배정 — 두타스테리드 0.01% 외용액(n=30), 0.02%(n=30), 0.05%(n=30)+경구 피나스테리드 위약; 두타스테리드 위약 외용액+경구 피나스테리드 1mg 정(n=30); 두타스테리드 위약 외용액+경구 위약(n=15). 12개월 내 두타·피나 미사용자 대상, 자가면역·내분비성 탈모, 모발이식·레이저, 항안드로겐제 사용자 등 제외. 중재는 1mL 외용액을 두정부 1.9cm² 탈모 부위에 1일 1회 24주간 도포(6~8시간 잔류). 1차 평가변수는 24주 시점 두정부 1cm² 내 목표부위 모발수(TAHC). 2차는 12주 TAHC, 12·24주 목표부위 모발굵기(TAHW), 남성모발성장설문(MHGQ), 연구자 전반사진평가(GPA, 7점 척도 ≥+2), 혈청 테스토스테론·DHT, 0.05% 약동학. 총 28주(선별 2주+치료 24주+추적 28주), 127명이 완료.</div></div>
+        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">24주 TAHC는 모든 활성군에서 기저 대비 유의 증가(전부 p≤0.01). 두타스테리드 0.05%군이 +75.52(SEM 8.96, t=8.43, p=0.0001)로 최대 증가를 보여 위약(+0.07, p=0.9957) 및 피나스테리드(+41.21, p=0.0001) 대비 우수. 1차 평가변수 — 0.05% 두타 vs 피나스테리드 직접비교 +34.30(SEM 12.78, t=2.68, p=0.0083)로 유의하게 우월. 위약 대비 0.05% 두타 차이 -75.45(p=0.0001), 0.01% 두타 -32.25(p=0.0388). 12주 시점에도 0.05% 두타가 위약 대비 유의(차이 -31.80, p=0.038). TAHW(모발굵기) 24주: 0.05% 두타 +11.59(p=0.0001)로 위약 대비 유의(차이 -7.59, p=0.0185), 피나스테리드도 위약 대비 유의(p=0.0387); 0.05% 두타 vs 피나 차이는 +0.91(p=0.7322)로 동등. 연구자 GPA ≥+2 달성률(24주): 0.05% 두타 68.97% &gt; 0.02% 51.85% &gt; 피나 21.43% = 0.01% 21.43% &gt; 위약 13.33%. MHGQ 만족(점수≤2, 전반 모발, 24주): 0.05% 두타 93.1%, 0.02% 100%, 피나 71.43%, 위약 46.67%. 호르몬 — 피나스테리드군은 테스토스테론 12주 +16%·24주 +20%, DHT 12주 -27%·24주 -11%로 중등도 변화; 0.05% 외용 두타군은 DHT 12주 -8.9%·24주 -11%로 미미한 변화(테스토·DHT 모두 유의차 없음).</div></div>
+        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">전 시험기간 동안 이상반응·중대이상반응·사망·안전성 관련 중단이 전무. 활성군 대부분(n=29, 16.96%)이 피부자극 평가에서 1점(&#x27;자극 없음&#x27;) 기록. 일부에서 &#x27;약간 윤기&#x27;, &#x27;뚜렷한 윤기&#x27;, &#x27;윤기+박리·균열&#x27; 소견이 전 군에 걸쳐 관찰되었으나 임상적으로 의미 있는 검사실 이상은 없었음. 약동학상 0.05% 외용 두타의 전신 노출은 매우 낮아 대부분 정량하한(LLOQ 50.125 pg/mL) 부근 또는 이하, Tmax 약 5시간, 24시간 내 최대 169.47 pg/mL, day168 최대 150.51 pg/mL로 AUC·반감기 산출 불가 수준. 비교 문헌상 외용 피나스테리드 스프레이는 성기능 이상반응 2.8%, 경구 피나스테리드 1mg은 10.81%로 보고되어 외용 두타의 낮은 전신 노출이 안전성 이점으로 부각됨.</div></div>
+        <div class="s-row"><div class="s-label">결론</div><div class="s-val">남성 AGA에서 두타스테리드 0.05% 외용액(0.5mg/일)은 경구 피나스테리드(1mg/일)보다 우수한 효능을 보이며, 낮은 전신 노출에 기인한 우호적 안전성·내약성을 입증했다. 한계는 인도인 단일 인종·남성 한정, 24주 단기 추적, 트리코스코피 미사용, 두타-피나 장기 비교 부재이며 대규모 Phase III가 필요하다. 헤어그로(외용 미녹시딜) 관점에서, 이 연구는 외용 5ARI(두타)가 외용 미녹시딜·경구 피나의 빈자리를 채울 차세대 국소 단독요법 후보임을 시사하나, 두타는 모발수 증가 기전이 안드로겐 차단으로 미녹시딜의 혈관확장·모낭 직접자극과 상보적이어서 향후 미녹시딜 병용·비교 데이터 확보가 임상적으로 유의미하다.</div></div>
       </div>
-
       <div class="key-nums">
-        <div class="knum">
-          <div class="val">+75.52 (SEM 8.96)</div>
-          <div class="desc">두타 0.05% 외용 24주 TAHC(모발수) 기저 대비 증가</div>
-          <div class="pval">0.0001</div>
-        </div>
-        <div class="knum">
-          <div class="val">+34.30 (SEM 12.78)</div>
-          <div class="desc">1차변수: 0.05% 두타 vs 경구 피나 24주 TAHC 차이(두타 우월)</div>
-          <div class="pval">0.0083</div>
-        </div>
-        <div class="knum">
-          <div class="val">-31.80</div>
-          <div class="desc">0.05% 두타 vs 위약 12주 TAHC 차이</div>
-          <div class="pval">0.038</div>
-        </div>
+        <div class="knum"><div class="val">+75.52 (SEM 8.96)</div><div class="desc">두타 0.05% 외용 24주 TAHC</div><div class="pval">p=0.0001</div></div>
+        <div class="knum"><div class="val">+34.30 (SEM 12.78)</div><div class="desc">1차변수: 0.05% 두타 vs 경구 피</div><div class="pval">p=0.0083</div></div>
+        <div class="knum"><div class="val">-31.80</div><div class="desc">0.05% 두타 vs 위약 12주 TAH</div><div class="pval">p=0.038</div></div>
       </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">A Randomized, Double-Blind, Placebo and Active Controlled Ph</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_1_205"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
+      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">A Randomized, Double-Blind, Placebo and Active Controlled Ph</div><div class="chart-wrap"><canvas id="chart_dr_1_100"></canvas></div></div>
+      <div class="usage"><h4>💡 활용 포인트</h4><ul>
           <li>Dutasteride 국소 제형이 finasteride 경구 대비 우위</li>
           <li>자사 finasteride 입지 재확인 및 경쟁 파이프라인 동향</li>
           <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-        </ul>
-      </div>
+        </ul></div>
     </div>
   </div>
 
-    <!-- ━━━ 논문 #2 (탈모치료) ━━━ -->
+  <!-- ━━━ 논문 #2 (탈모치료) ━━━ -->
   <div class="paper">
     <div class="paper-header">
       <span class="paper-num">■ 논문 #2</span>
       <span class="stars-mid">★★☆</span>
       <span class="tag-direct">직접근거</span>
       <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex: 1;">JMIR Dermatology | 2026-01-22</div>
+      <div class="journal-meta" style="flex:1;">JMIR Dermatology | 2026-01-22</div>
       <button class="bd-request-btn" data-title="Patient Satisfaction, Side Effects, and Other Reactions Reported by Adult Men Prescribed Compounded Topical Finasteride via a National Telehealth Platform: Retrospective Analysis of Real-World Data" data-session="탈모치료" data-num="2" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
     </div>
     <div class="paper-body">
       <p class="paper-title">Patient Satisfaction, Side Effects, and Other Reactions Reported by Adult Men Prescribed Compounded Topical Finasteride via a National Telehealth Platform: Retrospective Analysis of Real-World Data</p>
       <a href="https://pubmed.ncbi.nlm.nih.gov/41570279/" class="paper-url" target="_blank">https://pubmed.ncbi.nlm.nih.gov/41570279/</a>
       <span class="design-badge">후향적 리얼월드 데이터 분석</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">AGA는 전 세계 남성의 약 50%, 미국 약 5천만 명에 영향을 미치며 낮은 자존감·신체 불만족·사회불안 등 심리적 부담을 동반한다. FDA 승인 치료는 외용 미녹시딜과 경구 피나스테리드이며, 경구 피나스테리드는 성기능 부작용·우울 우려로 인해 잠재 수혜자의 치료 기피를 유발한다. 외용 피나스테리드는 전신 노출이 경구 대비 100배 낮고(0.25% 스프레이 vs 1mg 경구) 효능·안전성이 유망하나 FDA 미승인 조제(compounded) 약물로만 접근 가능하며, 대규모 실사용 안전성·만족도 데이터가 부족했다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">후향적 실사용 데이터 분석(대조군 없음). 미국 DTC 텔레헬스 플랫폼(Hims &amp; Hers)을 통해 2021-04-01~2025-04-30 조제 외용 피나스테리드+미녹시딜 처방받은 성인 AGA 남성 638,629명. 3개 제형 — ①외용 피나스테리드 0.3%+미녹시딜 6% 스프레이(1일 4분무), ②피나 0.3%+미녹 7%+케토코나졸 2.2%+비오틴 0.2% 스프레이, ③피나 0.3%+미녹 6% 세럼(1mL). 데이터 2종 — 치료 시작 약 130일 후 발송된 점검 설문(&#x27;치료에 만족한다&#x27; Y/N, &#x27;부작용/부정적 반응에 시달리는가&#x27; Y/N)에 응답한 151,352명(완료율 23.7%), 그리고 환자가 케어팀에 자발적으로 보낸 메시지. 평가지표는 만족도, 부작용 빈도(전체·개별), 상급 진료 의뢰율, 부작용에 의한 치료 중단율. 처방군 평균연령 39.6±11.9세, 점검 완료군 41.2±11.8세.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">점검 설문 완료자 151,352명 중 121,615명(80.4%, 95%CI 80.2~80.6%)이 치료에 만족, 4,034명(2.7%, 95%CI 2.6~2.8%)이 부작용 경험을 보고. 제형별 만족도 — 0.3%피나+6%미녹 스프레이 80.2%, +케토+비오틴 스프레이 82.6%, 세럼 80.2%; 부작용률 각 2.7%/2.3%/3.5%. 케어팀 메시지 분석 — 전체 638,629명 중 230명(0.04%, 95%CI 0.035~0.045%)만 부작용/반응 보고. 최다는 두피자극 46명(0.007%), 어지럼 33명(0.005%), 심박수 증가 21명(0.003%), 발진/알레르기 19명(0.003%), 두통 18명(0.003%). 성기능 부작용(성욕감소·발기부전) 12명(0.002%), 우울 13명(0.002%), 불안 10명(0.002%), 인지 문제 10명(0.002%). 부작용은 두피자극·발진(투여경로 관련)과 어지럼·심박수 증가·두통(미녹시딜 혈관확장 관련) 두 범주로 분류. 역사적 비교 — 경구 피나 1mg 임상시험 성기능 이상반응 3.8%·중단 1.4%, 5% 외용 미녹 두통 1.7%·소양증 1.1%·발진 1.1%.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">상급 진료(응급실·긴급진료) 의뢰를 보고한 환자 0명, 부작용으로 인한 치료 중단 보고 0명. &#x27;포스트-피나스테리드 증후군(PFS)&#x27; 보고 없음. 시험 기간 중 배우자 1명이 파트너 사망을 보고했으나 추적 결과 원인 미확인·인과관계 미성립. 전반적으로 조제 외용 피나+미녹 제형은 두피자극·발진(국소) 및 어지럼·심박증가·두통(미녹시딜성)이 주된 반응이며 성기능·정신과적 반응은 0.002%로 극히 드물어 우호적 내약성을 입증.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">국가 텔레헬스 플랫폼을 통해 외용 피나스테리드+미녹시딜 조제약을 처방받은 AGA 남성은 높은 만족도(80%)와 낮은 부작용으로 잘 견뎠다. 한계는 후향적·대조군 부재로 인과 추론 불가, 점검 완료율 23.7%에 따른 선택편향(만족·무부작용자가 응답할 가능성), 외부 의료기관 보고 미포착, 부작용 중증도 미평가. 헤어그로(외용 미녹시딜) 관점에서, 60만 명 초대규모 실사용 데이터는 외용 미녹시딜이 외용 피나와 결합된 복합제형에서 어지럼·심박수 증가·두통 등 혈관확장성 이상반응이 미미한 수준으로 잘 견뎌짐을 보여주며, 미녹시딜 기반 국소 복합요법의 실세계 안전성·소비자 만족 근거를 제공한다.</div>
-        </div>
+      <div class="summary-grid"><h4>논문 내용 요약</h4>
+        <div class="s-row"><div class="s-label">배경</div><div class="s-val">AGA는 전 세계 남성의 약 50%, 미국 약 5천만 명에 영향을 미치며 낮은 자존감·신체 불만족·사회불안 등 심리적 부담을 동반한다. FDA 승인 치료는 외용 미녹시딜과 경구 피나스테리드이며, 경구 피나스테리드는 성기능 부작용·우울 우려로 인해 잠재 수혜자의 치료 기피를 유발한다. 외용 피나스테리드는 전신 노출이 경구 대비 100배 낮고(0.25% 스프레이 vs 1mg 경구) 효능·안전성이 유망하나 FDA 미승인 조제(compounded) 약물로만 접근 가능하며, 대규모 실사용 안전성·만족도 데이터가 부족했다.</div></div>
+        <div class="s-row"><div class="s-label">방법</div><div class="s-val">후향적 실사용 데이터 분석(대조군 없음). 미국 DTC 텔레헬스 플랫폼(Hims &amp; Hers)을 통해 2021-04-01~2025-04-30 조제 외용 피나스테리드+미녹시딜 처방받은 성인 AGA 남성 638,629명. 3개 제형 — ①외용 피나스테리드 0.3%+미녹시딜 6% 스프레이(1일 4분무), ②피나 0.3%+미녹 7%+케토코나졸 2.2%+비오틴 0.2% 스프레이, ③피나 0.3%+미녹 6% 세럼(1mL). 데이터 2종 — 치료 시작 약 130일 후 발송된 점검 설문(&#x27;치료에 만족한다&#x27; Y/N, &#x27;부작용/부정적 반응에 시달리는가&#x27; Y/N)에 응답한 151,352명(완료율 23.7%), 그리고 환자가 케어팀에 자발적으로 보낸 메시지. 평가지표는 만족도, 부작용 빈도(전체·개별), 상급 진료 의뢰율, 부작용에 의한 치료 중단율. 처방군 평균연령 39.6±11.9세, 점검 완료군 41.2±11.8세.</div></div>
+        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">점검 설문 완료자 151,352명 중 121,615명(80.4%, 95%CI 80.2~80.6%)이 치료에 만족, 4,034명(2.7%, 95%CI 2.6~2.8%)이 부작용 경험을 보고. 제형별 만족도 — 0.3%피나+6%미녹 스프레이 80.2%, +케토+비오틴 스프레이 82.6%, 세럼 80.2%; 부작용률 각 2.7%/2.3%/3.5%. 케어팀 메시지 분석 — 전체 638,629명 중 230명(0.04%, 95%CI 0.035~0.045%)만 부작용/반응 보고. 최다는 두피자극 46명(0.007%), 어지럼 33명(0.005%), 심박수 증가 21명(0.003%), 발진/알레르기 19명(0.003%), 두통 18명(0.003%). 성기능 부작용(성욕감소·발기부전) 12명(0.002%), 우울 13명(0.002%), 불안 10명(0.002%), 인지 문제 10명(0.002%). 부작용은 두피자극·발진(투여경로 관련)과 어지럼·심박수 증가·두통(미녹시딜 혈관확장 관련) 두 범주로 분류. 역사적 비교 — 경구 피나 1mg 임상시험 성기능 이상반응 3.8%·중단 1.4%, 5% 외용 미녹 두통 1.7%·소양증 1.1%·발진 1.1%.</div></div>
+        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">상급 진료(응급실·긴급진료) 의뢰를 보고한 환자 0명, 부작용으로 인한 치료 중단 보고 0명. &#x27;포스트-피나스테리드 증후군(PFS)&#x27; 보고 없음. 시험 기간 중 배우자 1명이 파트너 사망을 보고했으나 추적 결과 원인 미확인·인과관계 미성립. 전반적으로 조제 외용 피나+미녹 제형은 두피자극·발진(국소) 및 어지럼·심박증가·두통(미녹시딜성)이 주된 반응이며 성기능·정신과적 반응은 0.002%로 극히 드물어 우호적 내약성을 입증.</div></div>
+        <div class="s-row"><div class="s-label">결론</div><div class="s-val">국가 텔레헬스 플랫폼을 통해 외용 피나스테리드+미녹시딜 조제약을 처방받은 AGA 남성은 높은 만족도(80%)와 낮은 부작용으로 잘 견뎠다. 한계는 후향적·대조군 부재로 인과 추론 불가, 점검 완료율 23.7%에 따른 선택편향(만족·무부작용자가 응답할 가능성), 외부 의료기관 보고 미포착, 부작용 중증도 미평가. 헤어그로(외용 미녹시딜) 관점에서, 60만 명 초대규모 실사용 데이터는 외용 미녹시딜이 외용 피나와 결합된 복합제형에서 어지럼·심박수 증가·두통 등 혈관확장성 이상반응이 미미한 수준으로 잘 견뎌짐을 보여주며, 미녹시딜 기반 국소 복합요법의 실세계 안전성·소비자 만족 근거를 제공한다.</div></div>
       </div>
-
       <div class="key-nums">
-        <div class="knum">
-          <div class="val">638,629명</div>
-          <div class="desc">조제 외용 피나+미녹 처방 AGA 남성(역대 최대 실사용 코호트)</div>
-          <div class="pval">n/a</div>
-        </div>
-        <div class="knum">
-          <div class="val">80.4% (95%CI 80.2~80.6%)</div>
-          <div class="desc">점검 설문 완료자 치료 만족률</div>
-          <div class="pval">n/a</div>
-        </div>
-        <div class="knum">
-          <div class="val">2.7% (95%CI 2.6~2.8%)</div>
-          <div class="desc">점검 설문상 부작용 경험 보고율</div>
-          <div class="pval">n/a</div>
-        </div>
+        <div class="knum"><div class="val">638,629명</div><div class="desc">조제 외용 피나+미녹 처방 AGA 남성</div><div class="pval">n/a</div></div>
+        <div class="knum"><div class="val">80.4% (95%CI 80.2~80.6%)</div><div class="desc">점검 설문 완료자 치료 만족률</div><div class="pval">n/a</div></div>
+        <div class="knum"><div class="val">2.7% (95%CI 2.6~2.8%)</div><div class="desc">점검 설문상 부작용 경험 보고율</div><div class="pval">n/a</div></div>
       </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">Patient Satisfaction, Side Effects, and Other Reactions Repo</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_2_205"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
+      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Patient Satisfaction, Side Effects, and Other Reactions Repo</div><div class="chart-wrap"><canvas id="chart_dr_2_100"></canvas></div></div>
+      <div class="usage"><h4>💡 활용 포인트</h4><ul>
           <li>역대 최대 규모 국소 finasteride RWD</li>
           <li>만족도 80 4%/부작용 2 7% 대규모 안전성 근거</li>
           <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul>
-      </div>
+        </ul></div>
     </div>
   </div>
 
-    <!-- ━━━ 논문 #3 (탈모치료) ━━━ -->
+  <!-- ━━━ 논문 #3 (탈모치료) ━━━ -->
   <div class="paper">
     <div class="paper-header">
       <span class="paper-num">■ 논문 #3</span>
       <span class="stars-high">★★★</span>
       <span class="tag-direct">직접근거</span>
       <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex: 1;">Frontiers in Pharmacology | 2025-06-03</div>
+      <div class="journal-meta" style="flex:1;">Frontiers in Pharmacology | 2025-06-03</div>
       <button class="bd-request-btn" data-title="Efficacy and safety of oral minoxidil in the treatment of alopecia: a single-arm rate meta-analysis and systematic review" data-session="탈모치료" data-num="3" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
     </div>
     <div class="paper-body">
       <p class="paper-title">Efficacy and safety of oral minoxidil in the treatment of alopecia: a single-arm rate meta-analysis and systematic review</p>
       <a href="https://pubmed.ncbi.nlm.nih.gov/40567364/" class="paper-url" target="_blank">https://pubmed.ncbi.nlm.nih.gov/40567364/</a>
       <span class="design-badge">체계적 문헌고찰 및 메타분석</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">탈모는 성인의 50% 이상이 일생 중 경험하는 흔한 미용 문제로, 1990~2019년 전 세계 원형탈모 유병률과 DALY가 약 49% 증가했으며 자존감 저하·사회불안 등 정신적 영향을 동반한다. AGA 표준 1차 치료는 외용 미녹시딜(2~5%)·경구 피나스테리드·저출력레이저다. 경구 미녹시딜은 본래 고혈압 치료제(10~40mg)였으나 다모증·발모 부작용이 우연히 발견되어 발모 용도로 재조명되었고, 1mg 경구 미녹시딜이 5% 외용과 유사한 효능·높은 안전성을 보였다는 RCT가 보고되었다. 다만 경구 미녹시딜의 탈모 치료 효능·안전성은 아직 결론에 이르지 못해 근거 통합이 필요하다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">PRISMA 준수 단일군 비율 메타분석·체계적 문헌고찰(PROSPERO CRD42024581183). PubMed·Embase·Cochrane·Web of Science에서 2024-10-01 이전 경구 미녹시딜 탈모 치료 연구 검색. PICOS — 18세 이상 의학적 확진 탈모 환자, 코호트·RCT·환자대조·성향점수매칭 연구, 경구 미녹시딜 중재군, 효능/안전성 산출 데이터 보유. 10명 미만·통계 부족·중복 제외. 총 27편(단일군 17편+RCT 10편), 2,933명 포함. 탈모 유형은 AGA·FPHL·원형탈모(AA)·휴지기탈모·전두섬유화탈모 등 다양, 용량은 0.25~5mg, 평균 투여기간 3~12개월. 효능은 증상 개선도(현저개선·개선·안정), 안전성은 이상반응·다모증·하지부종 발생률. RevMan 5.4, 비교 불가 이항데이터로 OR·95%CI 산출, I²&gt;50% 시 무작위효과모형. MINORS로 질 평가(고품질 15편·중등도 12편).</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">효능 — 현저한 증상 개선 OR 0.35(95%CI 0.22~0.49, I²=90%, p&lt;0.0001), 증상 개선 OR 0.47(95%CI 0.38~0.55, I²=82%, p&lt;0.0001), 증상 안정 OR 0.26(95%CI 0.16~0.37, I²=86%, p&lt;0.0001). 즉 참가자의 35%(95%CI 22~49%)가 현저 개선, 47%(38~55%)가 개선, 26%(16~37%)가 안정. 하위군 분석(용량별: VLDOM≤1mg / LDOM 1~2mg / HDOM&gt;2mg) — 증상 개선 OR은 LDOM·HDOM군이 VLDOM군보다 높고, 증상 안정은 HDOM이 VLDOM보다 낮았으나 세 군 간 개선도 차이는 유의하지 않음(I²=0%, p=0.89). 안전성 — 이상반응 OR 0.27(95%CI 0.18~0.36, I²=91%, p&lt;0.0001) = 발생률 27%(95%CI 18~36%); 다모증 OR 0.35(95%CI 0.22~0.48, I²=97%, p&lt;0.0001); 하지부종 OR 0.04(95%CI 0.01~0.06, I²=62%, p=0.001). HDOM군 다모증이 타군보다 높았으나 유의차 없음(p=0.06).</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">경구 미녹시딜은 양호한 내약성을 보였고 경미한 이상반응만 보고됨. 통합 이상반응률 27%, 다모증 35%, 하지부종 4%. 민감도 분석에서 하지부종 이질성의 주요 기여 연구를 제외하자 이질성이 현저히 감소(I²=4%, p&lt;0.001)하여 안전성을 재확인. 용량별 하위군에서 이상반응(I²=0%, p=0.61)·하지부종(I²=26.5%, p=0.26)·다모증 발생률에 유의한 차이 없음. 각 용량군에서 저혈압 사례가 2건씩 보고되었으나 빈도가 낮고 이로 인한 시험 탈락자 없음. 장기 사용 시 저혈압·빈맥·전신 다모증·신기능 이상·전해질 장애 가능성이 제기되나 장기 안전성 데이터는 부족.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">체계적 고찰·메타분석 결과 탈모 환자는 경구 미녹시딜로 이익을 얻을 수 있으며 특히 1mg 초과 용량에서 효과적이나, 효능·안전성 확정에는 추가 연구가 필요하다. 한계는 다수가 Letter 형식·핵심 지표/RCT 부족·효능 평가의 주관성·탈모 유형별 효과 미분석·장기 예후 보고 부족. 헤어그로(외용 미녹시딜) 관점에서, 경구 미녹시딜이 1mg 초과에서 35% 현저 개선·낮은 이상반응을 보인 점은 외용 미녹시딜 비반응자나 순응도 문제 환자에게 전신 대안이 될 수 있음을 시사하며, 외용 vs 경구 미녹시딜의 효능 동등성·안전성 프로파일 비교가 헤어그로 라인 확장의 임상적 근거가 된다.</div>
-        </div>
+      <div class="summary-grid"><h4>논문 내용 요약</h4>
+        <div class="s-row"><div class="s-label">배경</div><div class="s-val">탈모는 성인의 50% 이상이 일생 중 경험하는 흔한 미용 문제로, 1990~2019년 전 세계 원형탈모 유병률과 DALY가 약 49% 증가했으며 자존감 저하·사회불안 등 정신적 영향을 동반한다. AGA 표준 1차 치료는 외용 미녹시딜(2~5%)·경구 피나스테리드·저출력레이저다. 경구 미녹시딜은 본래 고혈압 치료제(10~40mg)였으나 다모증·발모 부작용이 우연히 발견되어 발모 용도로 재조명되었고, 1mg 경구 미녹시딜이 5% 외용과 유사한 효능·높은 안전성을 보였다는 RCT가 보고되었다. 다만 경구 미녹시딜의 탈모 치료 효능·안전성은 아직 결론에 이르지 못해 근거 통합이 필요하다.</div></div>
+        <div class="s-row"><div class="s-label">방법</div><div class="s-val">PRISMA 준수 단일군 비율 메타분석·체계적 문헌고찰(PROSPERO CRD42024581183). PubMed·Embase·Cochrane·Web of Science에서 2024-10-01 이전 경구 미녹시딜 탈모 치료 연구 검색. PICOS — 18세 이상 의학적 확진 탈모 환자, 코호트·RCT·환자대조·성향점수매칭 연구, 경구 미녹시딜 중재군, 효능/안전성 산출 데이터 보유. 10명 미만·통계 부족·중복 제외. 총 27편(단일군 17편+RCT 10편), 2,933명 포함. 탈모 유형은 AGA·FPHL·원형탈모(AA)·휴지기탈모·전두섬유화탈모 등 다양, 용량은 0.25~5mg, 평균 투여기간 3~12개월. 효능은 증상 개선도(현저개선·개선·안정), 안전성은 이상반응·다모증·하지부종 발생률. RevMan 5.4, 비교 불가 이항데이터로 OR·95%CI 산출, I²&gt;50% 시 무작위효과모형. MINORS로 질 평가(고품질 15편·중등도 12편).</div></div>
+        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">효능 — 현저한 증상 개선 OR 0.35(95%CI 0.22~0.49, I²=90%, p&lt;0.0001), 증상 개선 OR 0.47(95%CI 0.38~0.55, I²=82%, p&lt;0.0001), 증상 안정 OR 0.26(95%CI 0.16~0.37, I²=86%, p&lt;0.0001). 즉 참가자의 35%(95%CI 22~49%)가 현저 개선, 47%(38~55%)가 개선, 26%(16~37%)가 안정. 하위군 분석(용량별: VLDOM≤1mg / LDOM 1~2mg / HDOM&gt;2mg) — 증상 개선 OR은 LDOM·HDOM군이 VLDOM군보다 높고, 증상 안정은 HDOM이 VLDOM보다 낮았으나 세 군 간 개선도 차이는 유의하지 않음(I²=0%, p=0.89). 안전성 — 이상반응 OR 0.27(95%CI 0.18~0.36, I²=91%, p&lt;0.0001) = 발생률 27%(95%CI 18~36%); 다모증 OR 0.35(95%CI 0.22~0.48, I²=97%, p&lt;0.0001); 하지부종 OR 0.04(95%CI 0.01~0.06, I²=62%, p=0.001). HDOM군 다모증이 타군보다 높았으나 유의차 없음(p=0.06).</div></div>
+        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">경구 미녹시딜은 양호한 내약성을 보였고 경미한 이상반응만 보고됨. 통합 이상반응률 27%, 다모증 35%, 하지부종 4%. 민감도 분석에서 하지부종 이질성의 주요 기여 연구를 제외하자 이질성이 현저히 감소(I²=4%, p&lt;0.001)하여 안전성을 재확인. 용량별 하위군에서 이상반응(I²=0%, p=0.61)·하지부종(I²=26.5%, p=0.26)·다모증 발생률에 유의한 차이 없음. 각 용량군에서 저혈압 사례가 2건씩 보고되었으나 빈도가 낮고 이로 인한 시험 탈락자 없음. 장기 사용 시 저혈압·빈맥·전신 다모증·신기능 이상·전해질 장애 가능성이 제기되나 장기 안전성 데이터는 부족.</div></div>
+        <div class="s-row"><div class="s-label">결론</div><div class="s-val">체계적 고찰·메타분석 결과 탈모 환자는 경구 미녹시딜로 이익을 얻을 수 있으며 특히 1mg 초과 용량에서 효과적이나, 효능·안전성 확정에는 추가 연구가 필요하다. 한계는 다수가 Letter 형식·핵심 지표/RCT 부족·효능 평가의 주관성·탈모 유형별 효과 미분석·장기 예후 보고 부족. 헤어그로(외용 미녹시딜) 관점에서, 경구 미녹시딜이 1mg 초과에서 35% 현저 개선·낮은 이상반응을 보인 점은 외용 미녹시딜 비반응자나 순응도 문제 환자에게 전신 대안이 될 수 있음을 시사하며, 외용 vs 경구 미녹시딜의 효능 동등성·안전성 프로파일 비교가 헤어그로 라인 확장의 임상적 근거가 된다.</div></div>
       </div>
-
       <div class="key-nums">
-        <div class="knum">
-          <div class="val">35% (95%CI 22~49%)</div>
-          <div class="desc">경구 미녹시딜 현저한 증상 개선 환자 비율(OR 0.35, I²=90%)</div>
-          <div class="pval">&lt;0.0001</div>
-        </div>
-        <div class="knum">
-          <div class="val">47% (95%CI 38~55%)</div>
-          <div class="desc">증상 개선 환자 비율(OR 0.47, I²=82%)</div>
-          <div class="pval">&lt;0.0001</div>
-        </div>
-        <div class="knum">
-          <div class="val">26% (95%CI 16~37%)</div>
-          <div class="desc">증상 안정 환자 비율(OR 0.26, I²=86%)</div>
-          <div class="pval">&lt;0.0001</div>
-        </div>
+        <div class="knum"><div class="val">35% (95%CI 22~49%)</div><div class="desc">경구 미녹시딜 현저한 증상 개선 환자 비</div><div class="pval">&lt;0.0001</div></div>
+        <div class="knum"><div class="val">47% (95%CI 38~55%)</div><div class="desc">증상 개선 환자 비율</div><div class="pval">&lt;0.0001</div></div>
+        <div class="knum"><div class="val">26% (95%CI 16~37%)</div><div class="desc">증상 안정 환자 비율</div><div class="pval">&lt;0.0001</div></div>
       </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">Efficacy and safety of oral minoxidil in the treatment of al</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_3_205"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
+      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Efficacy and safety of oral minoxidil in the treatment of al</div><div class="chart-wrap"><canvas id="chart_dr_3_100"></canvas></div></div>
+      <div class="usage"><h4>💡 활용 포인트</h4><ul>
           <li>경구 minoxidil 메타분석 이상반응 27%로 국소 대비 높아, 국소 minoxidil 안전성 우위 포지셔닝</li>
           <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
           <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul>
-      </div>
+        </ul></div>
     </div>
   </div>
 
-    <!-- ━━━ 논문 #4 (탈모치료) ━━━ -->
+  <!-- ━━━ 논문 #4 (탈모치료) ━━━ -->
   <div class="paper">
     <div class="paper-header">
       <span class="paper-num">■ 논문 #4</span>
       <span class="stars-high">★★★</span>
       <span class="tag-direct">직접근거</span>
       <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex: 1;">Frontiers in Medicine | 2025-01-01</div>
+      <div class="journal-meta" style="flex:1;">Frontiers in Medicine | 2025-01-01</div>
       <button class="bd-request-btn" data-title="Relative efficacy of minoxidil in combination with other treatments for androgenic alopecia: a network meta-analysis based on randomized controlled trials" data-session="탈모치료" data-num="4" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
     </div>
     <div class="paper-body">
       <p class="paper-title">Relative efficacy of minoxidil in combination with other treatments for androgenic alopecia: a network meta-analysis based on randomized controlled trials</p>
       <a href="https://pubmed.ncbi.nlm.nih.gov/41041440/" class="paper-url" target="_blank">https://pubmed.ncbi.nlm.nih.gov/41041440/</a>
       <span class="design-badge">네트워크 메타분석</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">AGA는 사춘기 이후 진행성으로 악화되는 가장 흔한 탈모로, 남성에서 더 흔하고 삶의 질·자존감을 저하시킨다. FDA 승인 치료는 경구 피나스테리드와 외용 미녹시딜뿐이나 단독요법의 효능이 제한적이어서 미녹시딜과 타 치료의 병용 효과 연구가 활발하다. 그러나 다양한 미녹시딜 병용요법의 우열을 포괄적으로 비교·순위화한 문헌이 부족하여, 임상 의사결정을 위한 근거 기반 순위 제시가 미충족 수요로 남아 있었다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">베이지안 네트워크 메타분석(PRISMA-NMA, PROSPERO CRD42024623164). PubMed·Embase·Web of Science·Cochrane(2024-12-10 검색)에서 RCT만 선별. PICOS — AGA 환자, 미녹시딜+타 치료 vs 미녹시딜 단독, 1차 결과는 24주(또는 6개월) 모발밀도 변화(hairs/cm²). 총 5,025편 중 18편 선정, 환자 729명·20개 중재 비교·미녹시딜 포함 10개 병용. 병용 종류 — 저출력광치료(LMX, n=4), 폴리락트산실(PLLAMX, n=1), PRP(PMX, n=2), PRP+bFGF(PBMX, n=1), 마이크로니들링(MMX, n=4), 피나스테리드(FMX, n=3), 플루타마이드(FTMX, n=1), 세티리진(CMX, n=1), 농축성장인자(CGFMX, n=1), 스피로노락톤(SPTMX, n=1). 미녹시딜 단독을 기준군. 50,000회 반복·무작위효과모형, SUCRA 값으로 순위화, 평균차(MD)·95%CI 산출, Cochrane RoB2로 질 평가. 성별 하위군 분석 수행.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">전체 — PBMX(PRP+bFGF+미녹시딜)가 최고 효능(SUCRA 93.06%), 미녹시딜 단독 대비 모발밀도 +35.12 hairs/cm². 이어 MMX(마이크로니들+미녹) +22.64(SUCRA 74.06%), PMX(PRP+미녹) +22.14(SUCRA 71.53%). 단 PBMX·MMX·PMX 간 효능 차이는 통계적으로 유의하지 않음. 세티리진 병용(CMX)만 미녹 단독보다 낮음(SUCRA 6.90%). 남성 하위군 — 피나스테리드+미녹(FMX)이 최고(SUCRA 80.21%), 24주 모발밀도 +29.68 hairs/cm²; PMX 2위(SUCRA 73.00%, +27.18); 모든 병용이 우수했으나 미녹 단독 대비 통계적 유의차는 FMX만 달성(중등도 근거). 여성 하위군 — 마이크로니들+미녹(SUCRA 87.20%, +22.02)과 실리프팅+미녹(SUCRA 84.51%, +21.63)이 최고이며, MMX만 유의차 달성(중등도 근거); 스피로노락톤+미녹(SUCRA 56.63%), PRP+미녹(SUCRA 53.88%)도 미녹 단독(SUCRA 36.00%)보다 우수. 여성에서 저출력광치료·세티리진 병용은 단독보다 낮았음.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">본 NMA는 효능(24주 모발밀도 변화) 중심 분석으로 이상반응을 별도 통합 지표로 보고하지 않았으며, 안전성 관련 정량 데이터(국소 자극·다모증·성기능 등 발생률·중단율)는 제시되지 않았다. 근거 질은 RoB2상 대부분 항목이 낮은 비뚤림이나, 상대비교 근거 수준은 전체적으로 매우 낮음~낮음이며 일부 비교만 중등도였다(소표본·간접비교 기반). 따라서 안전성 우열 판단은 본 연구 범위 밖이다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">저자들은 미녹시딜 기반 병용요법의 임상적 효능 순위(전체 PBMX, 남성 FMX, 여성 MMX 최우선)를 제시해 피부과 의사의 AGA 관리 최적화 근거를 제공했다. 한계는 소표본·병용 간 직접비교 부족으로 인한 낮은 근거 질, AGA 중증도 분포 불명확, 두타스테리드·경구 미녹시딜 연구 미포함. 헤어그로(외용 미녹시딜) 관점에서, 미녹시딜 단독이 모든 병용요법의 공통 기반(reference)이며 PRP·마이크로니들·피나스테리드 등과 결합 시 모발밀도가 +22~35 hairs/cm² 추가 증가함을 정량화한 점은, 외용 미녹시딜을 중심축으로 한 복합 치료 패키지(특히 남성=미녹+피나, 여성=미녹+마이크로니들)의 차별화 전략에 직접 활용 가능하다.</div>
-        </div>
+      <div class="summary-grid"><h4>논문 내용 요약</h4>
+        <div class="s-row"><div class="s-label">배경</div><div class="s-val">AGA는 사춘기 이후 진행성으로 악화되는 가장 흔한 탈모로, 남성에서 더 흔하고 삶의 질·자존감을 저하시킨다. FDA 승인 치료는 경구 피나스테리드와 외용 미녹시딜뿐이나 단독요법의 효능이 제한적이어서 미녹시딜과 타 치료의 병용 효과 연구가 활발하다. 그러나 다양한 미녹시딜 병용요법의 우열을 포괄적으로 비교·순위화한 문헌이 부족하여, 임상 의사결정을 위한 근거 기반 순위 제시가 미충족 수요로 남아 있었다.</div></div>
+        <div class="s-row"><div class="s-label">방법</div><div class="s-val">베이지안 네트워크 메타분석(PRISMA-NMA, PROSPERO CRD42024623164). PubMed·Embase·Web of Science·Cochrane(2024-12-10 검색)에서 RCT만 선별. PICOS — AGA 환자, 미녹시딜+타 치료 vs 미녹시딜 단독, 1차 결과는 24주(또는 6개월) 모발밀도 변화(hairs/cm²). 총 5,025편 중 18편 선정, 환자 729명·20개 중재 비교·미녹시딜 포함 10개 병용. 병용 종류 — 저출력광치료(LMX, n=4), 폴리락트산실(PLLAMX, n=1), PRP(PMX, n=2), PRP+bFGF(PBMX, n=1), 마이크로니들링(MMX, n=4), 피나스테리드(FMX, n=3), 플루타마이드(FTMX, n=1), 세티리진(CMX, n=1), 농축성장인자(CGFMX, n=1), 스피로노락톤(SPTMX, n=1). 미녹시딜 단독을 기준군. 50,000회 반복·무작위효과모형, SUCRA 값으로 순위화, 평균차(MD)·95%CI 산출, Cochrane RoB2로 질 평가. 성별 하위군 분석 수행.</div></div>
+        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">전체 — PBMX(PRP+bFGF+미녹시딜)가 최고 효능(SUCRA 93.06%), 미녹시딜 단독 대비 모발밀도 +35.12 hairs/cm². 이어 MMX(마이크로니들+미녹) +22.64(SUCRA 74.06%), PMX(PRP+미녹) +22.14(SUCRA 71.53%). 단 PBMX·MMX·PMX 간 효능 차이는 통계적으로 유의하지 않음. 세티리진 병용(CMX)만 미녹 단독보다 낮음(SUCRA 6.90%). 남성 하위군 — 피나스테리드+미녹(FMX)이 최고(SUCRA 80.21%), 24주 모발밀도 +29.68 hairs/cm²; PMX 2위(SUCRA 73.00%, +27.18); 모든 병용이 우수했으나 미녹 단독 대비 통계적 유의차는 FMX만 달성(중등도 근거). 여성 하위군 — 마이크로니들+미녹(SUCRA 87.20%, +22.02)과 실리프팅+미녹(SUCRA 84.51%, +21.63)이 최고이며, MMX만 유의차 달성(중등도 근거); 스피로노락톤+미녹(SUCRA 56.63%), PRP+미녹(SUCRA 53.88%)도 미녹 단독(SUCRA 36.00%)보다 우수. 여성에서 저출력광치료·세티리진 병용은 단독보다 낮았음.</div></div>
+        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">본 NMA는 효능(24주 모발밀도 변화) 중심 분석으로 이상반응을 별도 통합 지표로 보고하지 않았으며, 안전성 관련 정량 데이터(국소 자극·다모증·성기능 등 발생률·중단율)는 제시되지 않았다. 근거 질은 RoB2상 대부분 항목이 낮은 비뚤림이나, 상대비교 근거 수준은 전체적으로 매우 낮음~낮음이며 일부 비교만 중등도였다(소표본·간접비교 기반). 따라서 안전성 우열 판단은 본 연구 범위 밖이다.</div></div>
+        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자들은 미녹시딜 기반 병용요법의 임상적 효능 순위(전체 PBMX, 남성 FMX, 여성 MMX 최우선)를 제시해 피부과 의사의 AGA 관리 최적화 근거를 제공했다. 한계는 소표본·병용 간 직접비교 부족으로 인한 낮은 근거 질, AGA 중증도 분포 불명확, 두타스테리드·경구 미녹시딜 연구 미포함. 헤어그로(외용 미녹시딜) 관점에서, 미녹시딜 단독이 모든 병용요법의 공통 기반(reference)이며 PRP·마이크로니들·피나스테리드 등과 결합 시 모발밀도가 +22~35 hairs/cm² 추가 증가함을 정량화한 점은, 외용 미녹시딜을 중심축으로 한 복합 치료 패키지(특히 남성=미녹+피나, 여성=미녹+마이크로니들)의 차별화 전략에 직접 활용 가능하다.</div></div>
       </div>
-
       <div class="key-nums">
-        <div class="knum">
-          <div class="val">+35.12 hairs/cm² (SUCRA 93.06%)</div>
-          <div class="desc">전체 최고: PRP+bFGF+미녹시딜(PBMX) vs 미녹 단독 모발밀도 증가</div>
-          <div class="pval">n/a</div>
-        </div>
-        <div class="knum">
-          <div class="val">+29.68 hairs/cm² (SUCRA 80.21%)</div>
-          <div class="desc">남성 최고: 피나스테리드+미녹시딜(FMX), 미녹 단독 대비 유의(중등도 근거)</div>
-          <div class="pval">&lt;0.05</div>
-        </div>
-        <div class="knum">
-          <div class="val">+22.02 hairs/cm² (SUCRA 87.20%)</div>
-          <div class="desc">여성 최고: 마이크로니들+미녹시딜(MMX), 미녹 단독 대비 유의(중등도 근거)</div>
-          <div class="pval">&lt;0.05</div>
-        </div>
+        <div class="knum"><div class="val">+35.12 hairs/cm² (SUCRA 93.06%)</div><div class="desc">전체 최고: PRP+bFGF+미녹시딜</div><div class="pval">n/a</div></div>
+        <div class="knum"><div class="val">+29.68 hairs/cm² (SUCRA 80.21%)</div><div class="desc">남성 최고: 피나스테리드+미녹시딜</div><div class="pval">&lt;0.05</div></div>
+        <div class="knum"><div class="val">+22.02 hairs/cm² (SUCRA 87.20%)</div><div class="desc">여성 최고: 마이크로니들+미녹시딜</div><div class="pval">&lt;0.05</div></div>
       </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">Relative efficacy of minoxidil in combination with other tre</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_4_205"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
+      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Relative efficacy of minoxidil in combination with other tre</div><div class="chart-wrap"><canvas id="chart_dr_4_100"></canvas></div></div>
+      <div class="usage"><h4>💡 활용 포인트</h4><ul>
           <li>finasteride+minoxidil 병용 남성 AGA NMA 최고 효능</li>
           <li>병용 처방 당위성 최상위 근거 후속 연구 동향 지속 모니터링 필요</li>
           <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul>
-      </div>
+        </ul></div>
     </div>
   </div>
 
-    <!-- ━━━ 논문 #5 (탈모치료) ━━━ -->
+  <!-- ━━━ 논문 #5 (탈모치료) ━━━ -->
   <div class="paper">
     <div class="paper-header">
       <span class="paper-num">■ 논문 #5</span>
       <span class="stars-mid">★★☆</span>
       <span class="tag-direct">직접근거</span>
       <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex: 1;">International Journal of Dermatology | 2026-01-01</div>
+      <div class="journal-meta" style="flex:1;">International Journal of Dermatology | 2026-01-01</div>
       <button class="bd-request-btn" data-title="Is the Safety of Finasteride Correlated With Its Route of Administration: Topical Versus Oral? A Pharmacovigilance Study With Data From the United States FDA Adverse Event Reporting System" data-session="탈모치료" data-num="5" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
     </div>
     <div class="paper-body">
       <p class="paper-title">Is the Safety of Finasteride Correlated With Its Route of Administration: Topical Versus Oral? A Pharmacovigilance Study With Data From the United States FDA Adverse Event Reporting System</p>
       <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12712763/" class="paper-url" target="_blank">https://pmc.ncbi.nlm.nih.gov/articles/PMC12712763/</a>
       <span class="design-badge">약물감시 연구 (FAERS)</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">AGA는 심리사회적 고통을 동반하는 흔한 탈모로, 5알파환원효소 억제제 피나스테리드(경구 1mg/일, 1997년 FDA 승인)가 테스토스테론→DHT 전환을 억제해 치료한다. 2022년 미국 약 260만 명이 탈모·전립선비대증으로 사용했다. 2012년 제기된 &#x27;포스트-피나스테리드 증후군(PFS)&#x27;은 약물 중단 후에도 지속되는 성기능·신경정신 이상반응을 지칭하나, 발기부전(40세 이상 남성 20~40%)·우울(성인 10~20%)·자살사고(연 2~5%) 등 일반 인구 기저 유병률이 높고 대부분 보고가 유전·내분비·정신과력 등 교란요인을 보정하지 않아 인과성 논란이 크다. 외용 피나스테리드(미FDA 미승인, 이탈리아·독일 등 승인)의 PFS 유사 반응 보고가 논란을 가중시켜, 투여경로에 따른 안전성 비교의 미충족 수요가 있었다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">미국 FDA 이상반응보고시스템(FAERS) 기반 약물감시 불균형분석(READUS-PV 준수, 환자 미관여). 정보성분(IC)법으로 13개 PFS 관련 이상반응(발기부전·성욕감소·자살사고 등, MedDRA v27.0) 신호 탐지. 2개 약물(피나스테리드·두타스테리드)×2개 경로(외용·경구)×2개 시기(2006~2011 PFS보고 전, 2019~2024 PFS보고 후)로 이상반응당 8개 분석. IC 95%CI 하한이 0 초과 시 신호로 판정. DEMO·DRUG·REAC 데이터셋 사용, RStudio 분석. 보고 특성(연령·체중·재투여·보고자 직업·국가)을 8개 &#x27;약물-경로&#x27; 군별로 특성화.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">외용 피나스테리드는 경구 피나스테리드보다 PFS 유사 신호가 두 시기 모두 적었고, 외용 두타스테리드는 신호가 전무(사용 자체가 매우 제한적). 발기부전은 피나스테리드 양 경로·양 시기 모두 신호 검출, 전 군에서 PFS 이상반응 중 최대 비중. 2006~2011 발기부전 — 외용 피나 1건(IC 하한 0.74), 경구 피나 209건(IC 하한 3.91). 2019~2024 발기부전 — 외용 피나 11건(IC 하한 3.32), 경구 피나 411건(IC 하한 4.32). 2019~2024 성욕감소 — 외용 5건(IC 2.83) vs 경구 181건(IC 4.76); 성욕상실 외용 7건(IC 3.75) vs 경구 237건(IC 5.71); 자살사고 외용 8건(IC 2.47) vs 경구 250건(IC 3.02). 외용 피나는 신경정신 신호가 자살사고에만 국한, 완결자살·우울성자살·자살행동·자살시도는 신호 없음. 경구 두타스테리드는 발기부전 등 다수 신호, 외용 두타는 전 항목 0건. 보고자 — PFS보고 후 경구 피나의 소비자 보고 70%(전 52%)로 증가(보고편향 시사). 외용 피나 양성 재투여율 9.4%로 낮음.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">외용 피나스테리드는 경구 대비 PFS 유사 이상반응 신호가 일관되게 적어 전신 노출 감소에 기인한 더 낮은 위험 프로파일을 시사. 외용 두타스테리드는 PFS 이상반응 보고 0건(단, 사용 극소). 두타 메조테라피(0.01%, 3개월마다)는 국소 통증 45.5%를 유발하나 전신 흡수는 미미. 그러나 발기부전·우울 등 PFS 증상이 일반 인구에 흔하고(발기부전 40세 이상 20~40%, 우울 10~20%, 자살행동 유전율 30~55%), 연령·동반질환(당뇨·고혈압·비만)·심리적 노세보 효과·2012년 이후 SNS발 보고 증가 등 교란요인이 커서 인과 귀속에 신중해야 함. FAERS 자체가 과소보고·보고편향에 취약.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">외용 피나스테리드는 경구보다 PFS 유사 이상반응 신호가 적고 외용 두타는 신호가 없으며, 이는 전신 노출 감소로 인한 더 낮은 위험 가능성을 시사한다. 다만 일반 인구의 높은 기저 유병률·교란요인·노세보 효과·유전자형/호르몬/가족력 데이터 부재로 인해 인과성 단정은 신중해야 하며, FDA·MHRA·Health Canada도 PFS를 독립 증후군으로 검증하지 않았다. 헤어그로(외용 미녹시딜) 관점에서, 본 연구는 국소(외용) 투여경로가 5ARI의 전신성 성기능·정신과 이상반응 신호를 줄인다는 약물감시 근거를 제공하며, 안전성 우려가 적은 외용 미녹시딜이 PFS 회피를 원하는 환자층에서 1차 또는 병용 기반 치료로서 차별적 안전성 메시지를 강화할 수 있음을 뒷받침한다.</div>
-        </div>
+      <div class="summary-grid"><h4>논문 내용 요약</h4>
+        <div class="s-row"><div class="s-label">배경</div><div class="s-val">AGA는 심리사회적 고통을 동반하는 흔한 탈모로, 5알파환원효소 억제제 피나스테리드(경구 1mg/일, 1997년 FDA 승인)가 테스토스테론→DHT 전환을 억제해 치료한다. 2022년 미국 약 260만 명이 탈모·전립선비대증으로 사용했다. 2012년 제기된 &#x27;포스트-피나스테리드 증후군(PFS)&#x27;은 약물 중단 후에도 지속되는 성기능·신경정신 이상반응을 지칭하나, 발기부전(40세 이상 남성 20~40%)·우울(성인 10~20%)·자살사고(연 2~5%) 등 일반 인구 기저 유병률이 높고 대부분 보고가 유전·내분비·정신과력 등 교란요인을 보정하지 않아 인과성 논란이 크다. 외용 피나스테리드(미FDA 미승인, 이탈리아·독일 등 승인)의 PFS 유사 반응 보고가 논란을 가중시켜, 투여경로에 따른 안전성 비교의 미충족 수요가 있었다.</div></div>
+        <div class="s-row"><div class="s-label">방법</div><div class="s-val">미국 FDA 이상반응보고시스템(FAERS) 기반 약물감시 불균형분석(READUS-PV 준수, 환자 미관여). 정보성분(IC)법으로 13개 PFS 관련 이상반응(발기부전·성욕감소·자살사고 등, MedDRA v27.0) 신호 탐지. 2개 약물(피나스테리드·두타스테리드)×2개 경로(외용·경구)×2개 시기(2006~2011 PFS보고 전, 2019~2024 PFS보고 후)로 이상반응당 8개 분석. IC 95%CI 하한이 0 초과 시 신호로 판정. DEMO·DRUG·REAC 데이터셋 사용, RStudio 분석. 보고 특성(연령·체중·재투여·보고자 직업·국가)을 8개 &#x27;약물-경로&#x27; 군별로 특성화.</div></div>
+        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">외용 피나스테리드는 경구 피나스테리드보다 PFS 유사 신호가 두 시기 모두 적었고, 외용 두타스테리드는 신호가 전무(사용 자체가 매우 제한적). 발기부전은 피나스테리드 양 경로·양 시기 모두 신호 검출, 전 군에서 PFS 이상반응 중 최대 비중. 2006~2011 발기부전 — 외용 피나 1건(IC 하한 0.74), 경구 피나 209건(IC 하한 3.91). 2019~2024 발기부전 — 외용 피나 11건(IC 하한 3.32), 경구 피나 411건(IC 하한 4.32). 2019~2024 성욕감소 — 외용 5건(IC 2.83) vs 경구 181건(IC 4.76); 성욕상실 외용 7건(IC 3.75) vs 경구 237건(IC 5.71); 자살사고 외용 8건(IC 2.47) vs 경구 250건(IC 3.02). 외용 피나는 신경정신 신호가 자살사고에만 국한, 완결자살·우울성자살·자살행동·자살시도는 신호 없음. 경구 두타스테리드는 발기부전 등 다수 신호, 외용 두타는 전 항목 0건. 보고자 — PFS보고 후 경구 피나의 소비자 보고 70%(전 52%)로 증가(보고편향 시사). 외용 피나 양성 재투여율 9.4%로 낮음.</div></div>
+        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">외용 피나스테리드는 경구 대비 PFS 유사 이상반응 신호가 일관되게 적어 전신 노출 감소에 기인한 더 낮은 위험 프로파일을 시사. 외용 두타스테리드는 PFS 이상반응 보고 0건(단, 사용 극소). 두타 메조테라피(0.01%, 3개월마다)는 국소 통증 45.5%를 유발하나 전신 흡수는 미미. 그러나 발기부전·우울 등 PFS 증상이 일반 인구에 흔하고(발기부전 40세 이상 20~40%, 우울 10~20%, 자살행동 유전율 30~55%), 연령·동반질환(당뇨·고혈압·비만)·심리적 노세보 효과·2012년 이후 SNS발 보고 증가 등 교란요인이 커서 인과 귀속에 신중해야 함. FAERS 자체가 과소보고·보고편향에 취약.</div></div>
+        <div class="s-row"><div class="s-label">결론</div><div class="s-val">외용 피나스테리드는 경구보다 PFS 유사 이상반응 신호가 적고 외용 두타는 신호가 없으며, 이는 전신 노출 감소로 인한 더 낮은 위험 가능성을 시사한다. 다만 일반 인구의 높은 기저 유병률·교란요인·노세보 효과·유전자형/호르몬/가족력 데이터 부재로 인해 인과성 단정은 신중해야 하며, FDA·MHRA·Health Canada도 PFS를 독립 증후군으로 검증하지 않았다. 헤어그로(외용 미녹시딜) 관점에서, 본 연구는 국소(외용) 투여경로가 5ARI의 전신성 성기능·정신과 이상반응 신호를 줄인다는 약물감시 근거를 제공하며, 안전성 우려가 적은 외용 미녹시딜이 PFS 회피를 원하는 환자층에서 1차 또는 병용 기반 치료로서 차별적 안전성 메시지를 강화할 수 있음을 뒷받침한다.</div></div>
       </div>
-
       <div class="key-nums">
-        <div class="knum">
-          <div class="val">경구 411건 vs 외용 11건</div>
-          <div class="desc">2019~2024 발기부전 보고 수(경구 IC하한 4.32 / 외용 IC하한 3.32)</div>
-          <div class="pval">신호 양성(IC하한&gt;0)</div>
-        </div>
-        <div class="knum">
-          <div class="val">경구 237건 vs 외용 7건</div>
-          <div class="desc">2019~2024 성욕상실(loss of libido) 보고 수</div>
-          <div class="pval">신호 양성</div>
-        </div>
-        <div class="knum">
-          <div class="val">경구 250건 vs 외용 8건</div>
-          <div class="desc">2019~2024 자살사고 보고 수(경구 IC 3.02 / 외용 IC 2.47)</div>
-          <div class="pval">신호 양성</div>
-        </div>
+        <div class="knum"><div class="val">경구 411건 vs 외용 11건</div><div class="desc">2019~2024 발기부전 보고 수</div><div class="pval">신호 양성(IC하한&gt;0)</div></div>
+        <div class="knum"><div class="val">경구 237건 vs 외용 7건</div><div class="desc">2019~2024 성욕상실</div><div class="pval">신호 양성</div></div>
+        <div class="knum"><div class="val">경구 250건 vs 외용 8건</div><div class="desc">2019~2024 자살사고 보고 수</div><div class="pval">신호 양성</div></div>
       </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">Is the Safety of Finasteride Correlated With Its Route of Ad</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_5_205"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
+      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Is the Safety of Finasteride Correlated With Its Route of Ad</div><div class="chart-wrap"><canvas id="chart_dr_5_100"></canvas></div></div>
+      <div class="usage"><h4>💡 활용 포인트</h4><ul>
           <li>국소 finasteride PFS 부작용 신호 경구 대비 낮음 FAERS 근거</li>
           <li>부작용 우려 해소 데이터 후속 연구 동향 지속 모니터링 필요</li>
           <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul>
-      </div>
+        </ul></div>
     </div>
   </div>
 
-    <!-- ━━━ 논문 #6 (탈모치료) ━━━ -->
+  <!-- ━━━ 논문 #6 (탈모치료) ━━━ -->
   <div class="paper">
     <div class="paper-header">
       <span class="paper-num">■ 논문 #6</span>
       <span class="stars-mid">★★☆</span>
       <span class="tag-ref">참고근거</span>
       <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex: 1;">Journal of Cosmetic Dermatology | 2025-12-01</div>
+      <div class="journal-meta" style="flex:1;">Journal of Cosmetic Dermatology | 2025-12-01</div>
       <button class="bd-request-btn" data-title="Effectiveness and Safety of Intralesional Dutasteride in Patients With Androgenic Alopecia: A Systematic Review and Meta-Analysis" data-session="탈모치료" data-num="6" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
     </div>
     <div class="paper-body">
       <p class="paper-title">Effectiveness and Safety of Intralesional Dutasteride in Patients With Androgenic Alopecia: A Systematic Review and Meta-Analysis</p>
       <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12690437/" class="paper-url" target="_blank">https://pmc.ncbi.nlm.nih.gov/articles/PMC12690437/</a>
       <span class="design-badge">체계적 문헌고찰 및 메타분석</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">AGA는 가장 흔한 탈모로 백인 남성은 70세까지 80%, 여성은 최대 40%가 징후를 보이며, 내분비·순환 안드로겐·미세염증 등 다인자성이고 DHT(5αR에 의한 테스토스테론 전환)가 핵심이다. FDA 승인 치료는 미녹시딜(원치 않는 발모 유발 가능)과 피나스테리드(2형 5αR 억제, 성기능 부작용 우려) 둘뿐이다. 두타스테리드(2세대 5αR 억제제)는 1·2형 모두 억제해 혈청 DHT를 90% 감소(피나 70%)시켜 더 효과적이나 경구 시 전신 부작용 우려가 있어, 전신 노출을 줄인 병변내(intralesional/메조테라피) 두타스테리드의 효능·안전성 근거가 미충족 수요였다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">PRISMA 준수 체계적 고찰·메타분석. PubMed·Scopus·Embase·Web of Science·Cochrane 등 검색, 18세 이상 AGA 성인의 병변내 두타스테리드 치료 연구 포함(RCT·비무작위·코호트·관찰). 총 8편 — 전향 코호트 2편, 후향 2편, RCT 3편, 증례군 1편; 표본 1~541명, 남녀 혼합, 치료기간 3개월~중앙값 17개월. 주요 결과는 모발밀도·모발굵기·사진상 발모(말단모발수·연모수 변화), 2차는 안전성(이상반응 빈도·종류). R/RStudio 무작위효과·역분산법, 개선율·이상반응·통증·전두부종은 유병률(95%CI), 모발수 변화는 평균차(95%CI). leave-one-out·약물별·기간별 하위군 분석. MINORS·Cochrane RoB로 질 평가(비무작위 8~12/16, 비교연구 19~22/24, 대부분 중등도 비뚤림; RCT는 대체로 낮은 비뚤림이나 맹검·배정은폐 불명확).</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">말단모발수(terminal hair count) 변화 통합 평균차 +8.73(95%CI -4.53~21.99, p&lt;0.0001, I²=96.3%); 약물 하위군 — 두타 단독 +3.57(95%CI -8.47~15.60), 두타+타약물 +24.25로 병용 시 더 큰 효과. 연모수(vellus) 변화 평균차 -6.04(95%CI -21.80~9.72, p&lt;0.0001, I²=93.4%). 모발밀도 변화 평균차 -1.37(95%CI -16.89~14.15)로 유의한 개선 없음. 개선율(improvement rate) 통합 유병률 75%(95%CI 0.56~0.88, p&lt;0.0001); 약물별 — 두타 단독 65%(95%CI 0.30~0.89) vs 두타+타약물 82%(95%CI 0.61~0.93, p=0.0153); 기간별 — 주 단위 74%(95%CI 0.50~0.89) vs 1년 83%(유의차 없음). 병용요법이 단독보다 개선율 높음(선행 연구와 일치, 시너지 효과 시사).</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">총 이상반응 통합 유병률 37%(95%CI 0.13~0.71, p&lt;0.0001, I²=84.2%); 약물별 — 두타 단독 11%(95%CI 0.01~0.70, p=0.0003) vs 두타+타약물 54%(95%CI 0.20~0.84, p=0.0078)로 병용 시 이상반응 증가; 기간별 — 주 단위 26%(95%CI 0.06~0.68, p=0.0008) vs 1년 61%(95%CI 0.45~0.75, 유의차 없음). 통증(pain)이 흔한 이상반응으로 통합 유병률 38%(95%CI 0.14~0.69, p&lt;0.0001); 두타 단독 16%(95%CI 0.01~0.85) vs 병용 48%(95%CI 0.16~0.81). 전두부종도 보고(메조테라피 후 첫 1~2회 세션, 1~4일 지속). 중요하게도 경구 두타에서 흔한 전신 성기능장애 등 전신 부작용은 포함 연구에서 보고되지 않아 국소 투여경로의 안전성을 뒷받침.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">병변내(메조테라피) 두타스테리드는 AGA에 효과적이고 비교적 안전한 치료로, 개선율 75%·국소 안전성(전신 부작용 부재)을 보이나, 병용요법은 개선율(82%)이 높은 대신 통증 등 국소 이상반응(54%)도 증가한다. 한계는 높은 이질성(I²&gt;90%)·소표본·프로토콜 다양성·중등도 비뚤림으로 근거가 제한적이다. 헤어그로(외용 미녹시딜) 관점에서, 다수 포함 연구가 두타+미녹시딜(메조테라피·마이크로니들 후) 병용이었고 병용이 두타 단독보다 우수했던 점은, 국소 미녹시딜이 5ARI 국소 전달요법과 결합 시 시너지를 내는 핵심 파트너임을 재확인하며 미녹시딜 기반 국소 복합 시술 포지셔닝에 활용된다.</div>
-        </div>
+      <div class="summary-grid"><h4>논문 내용 요약</h4>
+        <div class="s-row"><div class="s-label">배경</div><div class="s-val">AGA는 가장 흔한 탈모로 백인 남성은 70세까지 80%, 여성은 최대 40%가 징후를 보이며, 내분비·순환 안드로겐·미세염증 등 다인자성이고 DHT(5αR에 의한 테스토스테론 전환)가 핵심이다. FDA 승인 치료는 미녹시딜(원치 않는 발모 유발 가능)과 피나스테리드(2형 5αR 억제, 성기능 부작용 우려) 둘뿐이다. 두타스테리드(2세대 5αR 억제제)는 1·2형 모두 억제해 혈청 DHT를 90% 감소(피나 70%)시켜 더 효과적이나 경구 시 전신 부작용 우려가 있어, 전신 노출을 줄인 병변내(intralesional/메조테라피) 두타스테리드의 효능·안전성 근거가 미충족 수요였다.</div></div>
+        <div class="s-row"><div class="s-label">방법</div><div class="s-val">PRISMA 준수 체계적 고찰·메타분석. PubMed·Scopus·Embase·Web of Science·Cochrane 등 검색, 18세 이상 AGA 성인의 병변내 두타스테리드 치료 연구 포함(RCT·비무작위·코호트·관찰). 총 8편 — 전향 코호트 2편, 후향 2편, RCT 3편, 증례군 1편; 표본 1~541명, 남녀 혼합, 치료기간 3개월~중앙값 17개월. 주요 결과는 모발밀도·모발굵기·사진상 발모(말단모발수·연모수 변화), 2차는 안전성(이상반응 빈도·종류). R/RStudio 무작위효과·역분산법, 개선율·이상반응·통증·전두부종은 유병률(95%CI), 모발수 변화는 평균차(95%CI). leave-one-out·약물별·기간별 하위군 분석. MINORS·Cochrane RoB로 질 평가(비무작위 8~12/16, 비교연구 19~22/24, 대부분 중등도 비뚤림; RCT는 대체로 낮은 비뚤림이나 맹검·배정은폐 불명확).</div></div>
+        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">말단모발수(terminal hair count) 변화 통합 평균차 +8.73(95%CI -4.53~21.99, p&lt;0.0001, I²=96.3%); 약물 하위군 — 두타 단독 +3.57(95%CI -8.47~15.60), 두타+타약물 +24.25로 병용 시 더 큰 효과. 연모수(vellus) 변화 평균차 -6.04(95%CI -21.80~9.72, p&lt;0.0001, I²=93.4%). 모발밀도 변화 평균차 -1.37(95%CI -16.89~14.15)로 유의한 개선 없음. 개선율(improvement rate) 통합 유병률 75%(95%CI 0.56~0.88, p&lt;0.0001); 약물별 — 두타 단독 65%(95%CI 0.30~0.89) vs 두타+타약물 82%(95%CI 0.61~0.93, p=0.0153); 기간별 — 주 단위 74%(95%CI 0.50~0.89) vs 1년 83%(유의차 없음). 병용요법이 단독보다 개선율 높음(선행 연구와 일치, 시너지 효과 시사).</div></div>
+        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">총 이상반응 통합 유병률 37%(95%CI 0.13~0.71, p&lt;0.0001, I²=84.2%); 약물별 — 두타 단독 11%(95%CI 0.01~0.70, p=0.0003) vs 두타+타약물 54%(95%CI 0.20~0.84, p=0.0078)로 병용 시 이상반응 증가; 기간별 — 주 단위 26%(95%CI 0.06~0.68, p=0.0008) vs 1년 61%(95%CI 0.45~0.75, 유의차 없음). 통증(pain)이 흔한 이상반응으로 통합 유병률 38%(95%CI 0.14~0.69, p&lt;0.0001); 두타 단독 16%(95%CI 0.01~0.85) vs 병용 48%(95%CI 0.16~0.81). 전두부종도 보고(메조테라피 후 첫 1~2회 세션, 1~4일 지속). 중요하게도 경구 두타에서 흔한 전신 성기능장애 등 전신 부작용은 포함 연구에서 보고되지 않아 국소 투여경로의 안전성을 뒷받침.</div></div>
+        <div class="s-row"><div class="s-label">결론</div><div class="s-val">병변내(메조테라피) 두타스테리드는 AGA에 효과적이고 비교적 안전한 치료로, 개선율 75%·국소 안전성(전신 부작용 부재)을 보이나, 병용요법은 개선율(82%)이 높은 대신 통증 등 국소 이상반응(54%)도 증가한다. 한계는 높은 이질성(I²&gt;90%)·소표본·프로토콜 다양성·중등도 비뚤림으로 근거가 제한적이다. 헤어그로(외용 미녹시딜) 관점에서, 다수 포함 연구가 두타+미녹시딜(메조테라피·마이크로니들 후) 병용이었고 병용이 두타 단독보다 우수했던 점은, 국소 미녹시딜이 5ARI 국소 전달요법과 결합 시 시너지를 내는 핵심 파트너임을 재확인하며 미녹시딜 기반 국소 복합 시술 포지셔닝에 활용된다.</div></div>
       </div>
-
       <div class="key-nums">
-        <div class="knum">
-          <div class="val">+8.73 (95%CI -4.53~21.99)</div>
-          <div class="desc">병변내 두타 말단모발수(terminal) 변화 통합 평균차</div>
-          <div class="pval">&lt;0.0001</div>
-        </div>
-        <div class="knum">
-          <div class="val">75% (95%CI 0.56~0.88)</div>
-          <div class="desc">전체 개선율(improvement rate) 통합 유병률</div>
-          <div class="pval">&lt;0.0001</div>
-        </div>
-        <div class="knum">
-          <div class="val">82% vs 65%</div>
-          <div class="desc">개선율: 두타+타약물 병용 vs 두타 단독(병용 p=0.0153)</div>
-          <div class="pval">0.0153</div>
-        </div>
+        <div class="knum"><div class="val">+8.73 (95%CI -4.53~21.99)</div><div class="desc">병변내 두타 말단모발수</div><div class="pval">&lt;0.0001</div></div>
+        <div class="knum"><div class="val">75% (95%CI 0.56~0.88)</div><div class="desc">전체 개선율</div><div class="pval">&lt;0.0001</div></div>
+        <div class="knum"><div class="val">82% vs 65%</div><div class="desc">개선율: 두타+타약물 병용 vs 두타 단</div><div class="pval">p=0.0153</div></div>
       </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">Effectiveness and Safety of Intralesional Dutasteride in Pat</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_6_205"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
+      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Effectiveness and Safety of Intralesional Dutasteride in Pat</div><div class="chart-wrap"><canvas id="chart_dr_6_100"></canvas></div></div>
+      <div class="usage"><h4>💡 활용 포인트</h4><ul>
           <li>Dutasteride 다양한 투여 경로 확대 트렌드</li>
           <li>경쟁 성분 동향 모니터링 후속 연구 동향 지속 모니터링 필요</li>
           <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul>
-      </div>
+        </ul></div>
     </div>
   </div>
 
-    <!-- ━━━ 논문 #7 (탈모치료) ━━━ -->
+  <!-- ━━━ 논문 #7 (탈모치료) ━━━ -->
   <div class="paper">
     <div class="paper-header">
       <span class="paper-num">■ 논문 #7</span>
       <span class="stars-high">★★★</span>
       <span class="tag-direct">직접근거</span>
       <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex: 1;">International Journal of Molecular Sciences | 2025-01-01</div>
+      <div class="journal-meta" style="flex:1;">International Journal of Molecular Sciences | 2025-01-01</div>
       <button class="bd-request-btn" data-title="Comparative Effect of Conventional and Non-Conventional Over-the-Counter Treatments for Male Androgenetic Alopecia: A Systematic Review and Network Meta-Analysis" data-session="탈모치료" data-num="7" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
     </div>
     <div class="paper-body">
       <p class="paper-title">Comparative Effect of Conventional and Non-Conventional Over-the-Counter Treatments for Male Androgenetic Alopecia: A Systematic Review and Network Meta-Analysis</p>
       <a href="https://www.mdpi.com/1422-0067/26/16/7920" class="paper-url" target="_blank">https://www.mdpi.com/1422-0067/26/16/7920</a>
       <span class="design-badge">체계적 문헌고찰 및 네트워크 메타분석</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">남성 AGA(남성형 탈모, MPHL)는 가장 흔한 탈모로 유전·안드로겐 의존성을 가지며, DHT가 모낭 안드로겐수용체에 결합해 Wnt/β-catenin 신호를 억제하고 모낭 소형화(말단모→연모 전환)를 유발한다. 피나스테리드 등 전통 치료는 안드로겐 생화학을 표적하나, 미녹시딜(혈관확장제) 같은 안드로겐 비의존 경로 약물도 효과적이다. 미녹시딜 반응은 전구약물을 활성형(미녹시딜 설페이트)으로 전환하는 SULT1A1 효소 활성에 좌우되어 남성 AGA 환자의 20~30%가 저활성으로 비반응·저반응을 보인다. 영양제(nutraceutical) 기반 비전통 OTC 치료 문헌이 늘었으나 전통(미녹시딜) vs 비전통 OTC의 상대적 효능을 비교한 NMA가 부재했다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">베이지안 네트워크 메타분석(PRISMA-NMA, INPLASY202570087). 2025-03-30 PubMed·Scopus 검색, 남성 AGA에서 전통/비전통 OTC 단독요법 효과를 다룬 영어 시험만 포함. PICO — 남성 AGA, 전통/비전통 OTC 약제, 1차 결과는 24주(6개월) 총 모발밀도 변화(hairs/cm²). 남녀 미분리 데이터·병용요법·24주 미측정 연구 제외. 총 15편, 9개 활성 비교군 — 케토코나졸 2%(외용), 마린복합체(경구), 미녹시딜 2%(외용), 미녹시딜 5%(외용), 프로시아니딘 0.7%(외용), 로즈마리(외용), 쏘팔메토(외용), 멜라토닌(외용), 워터크레스 2%(외용); 10번째 노드는 대조(vehicle+위약 통합). 12/15편 무작위·11편 이중맹검(근거 질 중등도). RStudio·multinma, 고정효과·균등사전분포 베이지안 NMA, SUCRA·평균차(MD)·95% 신뢰구간(CrI) 산출, 중증도 보정 민감도분석.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">외용 미녹시딜 5%(1mL 1일 2회)가 가장 효과적(SUCRA 99.8%), 2위는 외용 멜라토닌(SUCRA 61.9%). 미녹시딜 5%는 멜라토닌(MD +18.96 hairs/cm², 95%CI 3.51~35.29, p&lt;0.05), 로즈마리(MD +19.53 hairs/cm², 95%CI 6.52~32.68, p&lt;0.05), 미녹시딜 2%(MD +20.48 hairs/cm², 95%CI 10.94~30.21, p&lt;0.05), 쏘팔메토(MD +30.91 hairs/cm², 95%CI 13.73~48.76, p&lt;0.05)보다 모두 유의하게 우월. 비전통 OTC 중 로즈마리(외용)는 대조 대비 우월(MD +10.63 hairs/cm², 95%CI 0.82~20.89, p&lt;0.05), 마린복합체도 대조 대비 우월(MD +9.73 hairs/cm², 95%CI 3.81~15.67, p&lt;0.05). 즉 미녹시딜 5%가 멜라토닌·로즈마리·마린복합체·미녹시딜 2%·프로시아니딘·워터크레스·케토코나졸·쏘팔메토 등 모든 비교군보다 24주 총 모발수 증가에서 유의하게 우수.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">본 NMA의 1차 결과는 24주 모발밀도 변화(효능)이며, 이상반응 발생률·중단율 등 안전성 정량 통합 지표는 별도로 보고되지 않았다. 다만 고찰에서 멜라토닌은 우호적 안전성(외용 시 경미한 두피자극, 경구 시 졸림 등 최소 부작용)을 언급했고, 비전통 OTC 연구 확대의 이점으로 안전성 데이터 축적 기회를 강조했다. 미녹시딜의 효능 추정치는 SULT1A1 비반응자(20~30%) 미보정으로 실제 모집단 효과를 20~40% 과소평가할 수 있다는 점이 한계로 지적되었다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">외용 미녹시딜 5%(1일 2회)는 남성 AGA의 OTC 치료 중 가장 효과적인 FDA 승인 외용제로 재확인되었고, 멜라토닌·로즈마리는 유망한 비전통 대안이다. 한계는 SULT1A1 활성 미측정으로 인한 미녹시딜 효능 과소평가(20~40%), 비전통 OTC의 소표본·소수 시험, 적용법·두피상태 등 교란요인, 일부 고품질 연구 배제. 헤어그로(외용 미녹시딜) 관점에서, 본 NMA는 외용 미녹시딜 5%가 압도적 1위(SUCRA 99.8%)로 미녹 2%·천연 OTC를 모두 능가함을 정량 입증해 헤어그로(5% 외용 미녹시딜) 제품의 근거 기반 우월성 마케팅을 직접 뒷받침하며, SULT1A1 유전자형 검사 도입이 비반응자를 걸러 효능 추정·개인맞춤 치료를 개선할 수 있음을 시사한다.</div>
-        </div>
+      <div class="summary-grid"><h4>논문 내용 요약</h4>
+        <div class="s-row"><div class="s-label">배경</div><div class="s-val">남성 AGA(남성형 탈모, MPHL)는 가장 흔한 탈모로 유전·안드로겐 의존성을 가지며, DHT가 모낭 안드로겐수용체에 결합해 Wnt/β-catenin 신호를 억제하고 모낭 소형화(말단모→연모 전환)를 유발한다. 피나스테리드 등 전통 치료는 안드로겐 생화학을 표적하나, 미녹시딜(혈관확장제) 같은 안드로겐 비의존 경로 약물도 효과적이다. 미녹시딜 반응은 전구약물을 활성형(미녹시딜 설페이트)으로 전환하는 SULT1A1 효소 활성에 좌우되어 남성 AGA 환자의 20~30%가 저활성으로 비반응·저반응을 보인다. 영양제(nutraceutical) 기반 비전통 OTC 치료 문헌이 늘었으나 전통(미녹시딜) vs 비전통 OTC의 상대적 효능을 비교한 NMA가 부재했다.</div></div>
+        <div class="s-row"><div class="s-label">방법</div><div class="s-val">베이지안 네트워크 메타분석(PRISMA-NMA, INPLASY202570087). 2025-03-30 PubMed·Scopus 검색, 남성 AGA에서 전통/비전통 OTC 단독요법 효과를 다룬 영어 시험만 포함. PICO — 남성 AGA, 전통/비전통 OTC 약제, 1차 결과는 24주(6개월) 총 모발밀도 변화(hairs/cm²). 남녀 미분리 데이터·병용요법·24주 미측정 연구 제외. 총 15편, 9개 활성 비교군 — 케토코나졸 2%(외용), 마린복합체(경구), 미녹시딜 2%(외용), 미녹시딜 5%(외용), 프로시아니딘 0.7%(외용), 로즈마리(외용), 쏘팔메토(외용), 멜라토닌(외용), 워터크레스 2%(외용); 10번째 노드는 대조(vehicle+위약 통합). 12/15편 무작위·11편 이중맹검(근거 질 중등도). RStudio·multinma, 고정효과·균등사전분포 베이지안 NMA, SUCRA·평균차(MD)·95% 신뢰구간(CrI) 산출, 중증도 보정 민감도분석.</div></div>
+        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">외용 미녹시딜 5%(1mL 1일 2회)가 가장 효과적(SUCRA 99.8%), 2위는 외용 멜라토닌(SUCRA 61.9%). 미녹시딜 5%는 멜라토닌(MD +18.96 hairs/cm², 95%CI 3.51~35.29, p&lt;0.05), 로즈마리(MD +19.53 hairs/cm², 95%CI 6.52~32.68, p&lt;0.05), 미녹시딜 2%(MD +20.48 hairs/cm², 95%CI 10.94~30.21, p&lt;0.05), 쏘팔메토(MD +30.91 hairs/cm², 95%CI 13.73~48.76, p&lt;0.05)보다 모두 유의하게 우월. 비전통 OTC 중 로즈마리(외용)는 대조 대비 우월(MD +10.63 hairs/cm², 95%CI 0.82~20.89, p&lt;0.05), 마린복합체도 대조 대비 우월(MD +9.73 hairs/cm², 95%CI 3.81~15.67, p&lt;0.05). 즉 미녹시딜 5%가 멜라토닌·로즈마리·마린복합체·미녹시딜 2%·프로시아니딘·워터크레스·케토코나졸·쏘팔메토 등 모든 비교군보다 24주 총 모발수 증가에서 유의하게 우수.</div></div>
+        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">본 NMA의 1차 결과는 24주 모발밀도 변화(효능)이며, 이상반응 발생률·중단율 등 안전성 정량 통합 지표는 별도로 보고되지 않았다. 다만 고찰에서 멜라토닌은 우호적 안전성(외용 시 경미한 두피자극, 경구 시 졸림 등 최소 부작용)을 언급했고, 비전통 OTC 연구 확대의 이점으로 안전성 데이터 축적 기회를 강조했다. 미녹시딜의 효능 추정치는 SULT1A1 비반응자(20~30%) 미보정으로 실제 모집단 효과를 20~40% 과소평가할 수 있다는 점이 한계로 지적되었다.</div></div>
+        <div class="s-row"><div class="s-label">결론</div><div class="s-val">외용 미녹시딜 5%(1일 2회)는 남성 AGA의 OTC 치료 중 가장 효과적인 FDA 승인 외용제로 재확인되었고, 멜라토닌·로즈마리는 유망한 비전통 대안이다. 한계는 SULT1A1 활성 미측정으로 인한 미녹시딜 효능 과소평가(20~40%), 비전통 OTC의 소표본·소수 시험, 적용법·두피상태 등 교란요인, 일부 고품질 연구 배제. 헤어그로(외용 미녹시딜) 관점에서, 본 NMA는 외용 미녹시딜 5%가 압도적 1위(SUCRA 99.8%)로 미녹 2%·천연 OTC를 모두 능가함을 정량 입증해 헤어그로(5% 외용 미녹시딜) 제품의 근거 기반 우월성 마케팅을 직접 뒷받침하며, SULT1A1 유전자형 검사 도입이 비반응자를 걸러 효능 추정·개인맞춤 치료를 개선할 수 있음을 시사한다.</div></div>
       </div>
-
       <div class="key-nums">
-        <div class="knum">
-          <div class="val">SUCRA 99.8%</div>
-          <div class="desc">외용 미녹시딜 5%(1일2회) — 전 OTC 중 최고 효능 순위</div>
-          <div class="pval">n/a</div>
-        </div>
-        <div class="knum">
-          <div class="val">+20.48 hairs/cm² (95%CI 10.94~30.21)</div>
-          <div class="desc">미녹시딜 5% vs 미녹시딜 2% 24주 모발밀도 차이</div>
-          <div class="pval">&lt;0.05</div>
-        </div>
-        <div class="knum">
-          <div class="val">+30.91 hairs/cm² (95%CI 13.73~48.76)</div>
-          <div class="desc">미녹시딜 5% vs 쏘팔메토(외용) 차이</div>
-          <div class="pval">&lt;0.05</div>
-        </div>
+        <div class="knum"><div class="val">SUCRA 99.8%</div><div class="desc">외용 미녹시딜 5%(1일2회)</div><div class="pval">n/a</div></div>
+        <div class="knum"><div class="val">+20.48 hairs/cm² (95%CI 10.94~30.21)</div><div class="desc">미녹시딜 5% vs 미녹시딜 2% 24주</div><div class="pval">&lt;0.05</div></div>
+        <div class="knum"><div class="val">+30.91 hairs/cm² (95%CI 13.73~48.76)</div><div class="desc">미녹시딜 5% vs 쏘팔메토</div><div class="pval">&lt;0.05</div></div>
       </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">Comparative Effect of Conventional and Non-Conventional Over</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_7_205"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
+      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Comparative Effect of Conventional and Non-Conventional Over</div><div class="chart-wrap"><canvas id="chart_dr_7_100"></canvas></div></div>
+      <div class="usage"><h4>💡 활용 포인트</h4><ul>
           <li>OTC 중 minoxidil 5% NMA 최고 효능</li>
           <li>대안 제품 대비 minoxidil 우위 포지셔닝</li>
           <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-        </ul>
-      </div>
+        </ul></div>
     </div>
   </div>
+        </div>
 
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-        
         <div class="legend">
             <h3>근거 분류 기준</h3>
             <div class="legend-group">
@@ -790,33 +369,17 @@
     </div>
 
 <script>
-/* 논문별 포커스 뷰 */
+/* 논문별 포커스 뷰 (#논문제목 해시) */
 (function(){
-  var h = decodeURIComponent(location.hash.slice(1));
-  if (!h) return;
-  var papers = document.querySelectorAll('.paper');
-  var found = null;
-  for (var i = 0; i < papers.length; i++) {
-    var t = papers[i].querySelector('.paper-title');
-    var txt = t ? t.textContent.trim().toLowerCase() : '';
-    if (txt.indexOf(h.toLowerCase()) !== -1) { found = papers[i]; break; }
-  }
-  if (!found) return;
-  for (var j = 0; j < papers.length; j++) {
-    if (papers[j] !== found) papers[j].style.display = 'none';
-  }
-  found.style.outline = '3px solid #E87722';
-  found.style.borderRadius = '8px';
-  found.scrollIntoView({behavior:'smooth', block:'start'});
-  var btn = document.createElement('button');
-  btn.textContent = '📋 모든 논문 보기';
-  btn.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:999;padding:10px 20px;background:#003366;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3);';
-  btn.onclick = function(){
-    for(var k=0;k<papers.length;k++) papers[k].style.display='';
-    found.style.outline='';
-    btn.remove();
-    window.scrollTo(0,0);
-  };
+  var h=decodeURIComponent(location.hash.slice(1)); if(!h) return;
+  var papers=document.querySelectorAll('.paper'),found=null;
+  for(var i=0;i<papers.length;i++){var t=papers[i].querySelector('.paper-title');var txt=t?t.textContent.trim().toLowerCase():'';if(txt.indexOf(h.toLowerCase())!==-1){found=papers[i];break;}}
+  if(!found) return;
+  for(var j=0;j<papers.length;j++){if(papers[j]!==found)papers[j].style.display='none';}
+  found.style.outline='3px solid #1A5276';found.style.borderRadius='10px';found.scrollIntoView({behavior:'smooth',block:'start'});
+  var btn=document.createElement('button');btn.textContent='📋 모든 논문 보기';
+  btn.style.cssText='position:fixed;bottom:24px;right:24px;z-index:999;padding:10px 20px;background:#003366;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3);';
+  btn.onclick=function(){for(var k=0;k<papers.length;k++)papers[k].style.display='';found.style.outline='';btn.remove();window.scrollTo(0,0);};
   document.body.appendChild(btn);
 })();
 </script>
@@ -824,296 +387,101 @@
 <script>
 if (typeof Chart !== "undefined") {
 
-
+  // 논문 #1 (탈모치료)
+  (function(){ var c=document.getElementById('chart_dr_1_100'); if(!c) return;
+    new Chart(c.getContext('2d'), { type:'bar',
+      data:{ labels:["주요결과", "참조"], datasets:[{label:"치료군",data:[68.97, 48.3],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[21.43, 15.0],backgroundColor:"#95a5a6",borderRadius:6}] },
+      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
+        plugins:{legend:{display:true,position:'top'}},
+        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
+  })();
+  // 논문 #2 (탈모치료)
+  (function(){ var c=document.getElementById('chart_dr_2_100'); if(!c) return;
+    new Chart(c.getContext('2d'), { type:'bar',
+      data:{ labels:["지표A", "지표B"], datasets:[{label:"치료군",data:[80.4, 64.32000000000001],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[2.7, 2.16],backgroundColor:"#95a5a6",borderRadius:6}] },
+      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
+        plugins:{legend:{display:true,position:'top'}},
+        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
+  })();
+  // 논문 #3 (탈모치료)
+  (function(){ var c=document.getElementById('chart_dr_3_100'); if(!c) return;
+    new Chart(c.getContext('2d'), { type:'bar',
+      data:{ labels:["결과1", "결과2"], datasets:[{label:"치료군",data:[35.0, 26.0],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[47.0, 27.0],backgroundColor:"#95a5a6",borderRadius:6}] },
+      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
+        plugins:{legend:{display:true,position:'top'}},
+        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
+  })();
+  // 논문 #4 (탈모치료)
+  (function(){ var c=document.getElementById('chart_dr_4_100'); if(!c) return;
+    new Chart(c.getContext('2d'), { type:'bar',
+      data:{ labels:["지표A", "지표B"], datasets:[{label:"치료군",data:[80.18, 64.144],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[93.06, 74.44800000000001],backgroundColor:"#95a5a6",borderRadius:6}] },
+      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
+        plugins:{legend:{display:true,position:'top'}},
+        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
+  })();
+  // 논문 #5 (탈모치료)
+  (function(){ var c=document.getElementById('chart_dr_5_100'); if(!c) return;
+    new Chart(c.getContext('2d'), { type:'bar',
+      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
+      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
+        plugins:{legend:{display:true,position:'top'}},
+        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
+  })();
+  // 논문 #6 (탈모치료)
+  (function(){ var c=document.getElementById('chart_dr_6_100'); if(!c) return;
+    new Chart(c.getContext('2d'), { type:'bar',
+      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
+      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
+        plugins:{legend:{display:true,position:'top'}},
+        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
+  })();
+  // 논문 #7 (탈모치료)
+  (function(){ var c=document.getElementById('chart_dr_7_100'); if(!c) return;
+    new Chart(c.getContext('2d'), { type:'bar',
+      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
+      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
+        plugins:{legend:{display:true,position:'top'}},
+        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
+  })();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// 논문 #1 (탈모치료) — deep research
-const ctx_chart_dr_1_205 = document.getElementById('chart_dr_1_205')?.getContext('2d');
-if (ctx_chart_dr_1_205) {
-  new Chart(ctx_chart_dr_1_205, {
-    type: 'bar',
-    data: {
-      labels: ["주요결과", "참조"],
-      datasets: [
-        { label: "치료군", data: [68.97, 48.3], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "대조군", data: [21.43, 15.0], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
-    }
-  });
-}
-
-
-// 논문 #2 (탈모치료) — deep research
-const ctx_chart_dr_2_205 = document.getElementById('chart_dr_2_205')?.getContext('2d');
-if (ctx_chart_dr_2_205) {
-  new Chart(ctx_chart_dr_2_205, {
-    type: 'bar',
-    data: {
-      labels: ["지표A", "지표B"],
-      datasets: [
-        { label: "치료군", data: [80.4, 64.32000000000001], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "대조군", data: [2.7, 2.16], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
-    }
-  });
-}
-
-
-// 논문 #3 (탈모치료) — deep research
-const ctx_chart_dr_3_205 = document.getElementById('chart_dr_3_205')?.getContext('2d');
-if (ctx_chart_dr_3_205) {
-  new Chart(ctx_chart_dr_3_205, {
-    type: 'bar',
-    data: {
-      labels: ["결과1", "결과2"],
-      datasets: [
-        { label: "치료군", data: [35.0, 26.0], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "대조군", data: [47.0, 27.0], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
-    }
-  });
-}
-
-
-// 논문 #4 (탈모치료) — deep research
-const ctx_chart_dr_4_205 = document.getElementById('chart_dr_4_205')?.getContext('2d');
-if (ctx_chart_dr_4_205) {
-  new Chart(ctx_chart_dr_4_205, {
-    type: 'bar',
-    data: {
-      labels: ["지표A", "지표B"],
-      datasets: [
-        { label: "치료군", data: [80.18, 64.144], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "대조군", data: [93.06, 74.44800000000001], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
-    }
-  });
-}
-
-
-// 논문 #5 (탈모치료) — deep research
-const ctx_chart_dr_5_205 = document.getElementById('chart_dr_5_205')?.getContext('2d');
-if (ctx_chart_dr_5_205) {
-  new Chart(ctx_chart_dr_5_205, {
-    type: 'bar',
-    data: {
-      labels: ["치료군", "대조군"],
-      datasets: [
-        { label: "치료군", data: [70, 50], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "대조군", data: [30, 50], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
-    }
-  });
-}
-
-
-// 논문 #6 (탈모치료) — deep research
-const ctx_chart_dr_6_205 = document.getElementById('chart_dr_6_205')?.getContext('2d');
-if (ctx_chart_dr_6_205) {
-  new Chart(ctx_chart_dr_6_205, {
-    type: 'bar',
-    data: {
-      labels: ["치료군", "대조군"],
-      datasets: [
-        { label: "치료군", data: [70, 50], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "대조군", data: [30, 50], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
-    }
-  });
-}
-
-
-// 논문 #7 (탈모치료) — deep research
-const ctx_chart_dr_7_205 = document.getElementById('chart_dr_7_205')?.getContext('2d');
-if (ctx_chart_dr_7_205) {
-  new Chart(ctx_chart_dr_7_205, {
-    type: 'bar',
-    data: {
-      labels: ["치료군", "대조군"],
-      datasets: [
-        { label: "치료군", data: [70, 50], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "대조군", data: [30, 50], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
-    }
-  });
-}
-
 </script>
 
 <!-- BD_REQUEST_MODAL_v2 -->
 <style>
-  .bd-request-btn {
-    background: #E87722; color: #fff; border: none; padding: 4px 10px;
-    border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; margin-left: 8px;
-  }
-  .bd-request-btn:hover { background: #d96810; }
-  .bd-request-btn:disabled { background: #95a5a6; cursor: not-allowed; }
-  #bd-modal-overlay {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-    z-index: 9998; align-items: center; justify-content: center;
-  }
-  #bd-modal {
-    background: #fff; border-radius: 8px; padding: 24px; min-width: 420px; max-width: 520px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.2); font-family: 'Malgun Gothic', sans-serif;
-  }
-  #bd-modal h3 { margin: 0 0 16px; color: #003366; border-bottom: 2px solid #E87722; padding-bottom: 8px; }
-  #bd-modal .field { margin: 12px 0; }
-  #bd-modal label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 4px; }
-  #bd-modal input, #bd-modal textarea {
-    width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;
-    box-sizing: border-box; font-family: inherit;
-  }
-  #bd-modal textarea { min-height: 60px; resize: vertical; }
-  #bd-modal .radio-row label { display: inline-block; font-weight: 400; margin-right: 16px; cursor: pointer; }
-  #bd-modal .actions { margin-top: 20px; text-align: right; }
-  #bd-modal button {
-    padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; margin-left: 8px;
-  }
-  #bd-modal .submit { background: #003366; color: #fff; font-weight: 600; }
-  #bd-modal .cancel { background: #ddd; color: #333; }
-  #bd-toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: #003366; color: #fff; padding: 12px 24px; border-radius: 6px;
-    font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999;
-    opacity: 0; transition: opacity 0.3s;
-  }
-  #bd-toast.show { opacity: 1; }
-  #bd-toast.error { background: #c0392b; }
+  #bd-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;align-items:center;justify-content:center}
+  #bd-modal{background:#fff;border-radius:8px;padding:24px;min-width:420px;max-width:520px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-family:'Malgun Gothic',sans-serif}
+  #bd-modal h3{margin:0 0 16px;color:#003366;border-bottom:2px solid #1A5276;padding-bottom:8px}
+  #bd-modal .field{margin:12px 0}
+  #bd-modal label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:4px}
+  #bd-modal input,#bd-modal textarea{width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;font-size:13px;box-sizing:border-box;font-family:inherit}
+  #bd-modal textarea{min-height:60px;resize:vertical}
+  #bd-modal .radio-row label{display:inline-block;font-weight:400;margin-right:16px;cursor:pointer}
+  #bd-modal .actions{margin-top:20px;text-align:right}
+  #bd-modal button{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:13px;margin-left:8px}
+  #bd-modal .submit{background:#003366;color:#fff;font-weight:600}#bd-modal .cancel{background:#ddd;color:#333}
+  #bd-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#003366;color:#fff;padding:12px 24px;border-radius:6px;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:9999;opacity:0;transition:opacity .3s}
+  #bd-toast.show{opacity:1}#bd-toast.error{background:#c0392b}
 </style>
-
 <div id="bd-modal-overlay" onclick="if(event.target.id==='bd-modal-overlay') closeBDModal()">
   <div id="bd-modal">
     <h3>📋 BD 제작 요청</h3>
-    <div class="field"><label>논문</label><div id="bd-modal-title" style="font-size:13px;color:#555;line-height:1.4;"></div></div>
-    <div class="field"><label>세션</label><div id="bd-modal-session" style="font-size:13px;color:#555;"></div></div>
-    <div class="field"><label>BD 포맷</label>
-      <div class="radio-row">
-        <label><input type="radio" name="bd-format" value="CLB" checked> CLB (학술브리프, 2p)</label>
-        <label><input type="radio" name="bd-format" value="BT"> BT (바이오톡, 1p)</label>
-      </div>
-    </div>
+    <div class="field"><label>논문</label><div id="bd-modal-title" style="font-size:13px;color:#555;line-height:1.4"></div></div>
+    <div class="field"><label>세션</label><div id="bd-modal-session" style="font-size:13px;color:#555"></div></div>
+    <div class="field"><label>BD 포맷</label><div class="radio-row">
+      <label><input type="radio" name="bd-format" value="CLB" checked> CLB (학술브리프)</label>
+      <label><input type="radio" name="bd-format" value="BT"> BT (바이오톡)</label></div></div>
     <div class="field"><label>요청자 이메일 *</label><input type="email" id="bd-modal-requester" placeholder="example@hanall.co.kr" required></div>
-    <div class="field"><label>메모 (선택)</label><textarea id="bd-modal-memo" placeholder="특별 요청사항이 있으면 적어주세요"></textarea></div>
-    <div class="actions">
-      <button class="cancel" onclick="closeBDModal()">취소</button>
-      <button class="submit" onclick="submitBDRequest()">요청 제출</button>
-    </div>
+    <div class="field"><label>메모 (선택)</label><textarea id="bd-modal-memo" placeholder="특별 요청사항"></textarea></div>
+    <div class="actions"><button class="cancel" onclick="closeBDModal()">취소</button><button class="submit" onclick="submitBDRequest()">요청 제출</button></div>
   </div>
 </div>
 <div id="bd-toast"></div>
-
 <script>
-const BD_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbynF7P1576GbRlzdIjBaxrOvjTU4HDP8F9jY4flxduhSqYR15Hr4AmhImuaS0wPJoOC/exec';
-let bdCurrentBtn = null;
-
-function openBDModal(btn) {
-  bdCurrentBtn = btn;
-  document.getElementById('bd-modal-title').textContent = btn.dataset.title;
-  document.getElementById('bd-modal-session').textContent = btn.dataset.session;
-  document.getElementById('bd-modal-requester').value = localStorage.getItem('bd-requester') || '';
-  document.getElementById('bd-modal-memo').value = '';
-  document.querySelector('input[name=bd-format][value=CLB]').checked = true;
-  document.getElementById('bd-modal-overlay').style.display = 'flex';
-}
-
-function closeBDModal() {
-  document.getElementById('bd-modal-overlay').style.display = 'none';
-  bdCurrentBtn = null;
-}
-
-function showToast(msg, isError) {
-  const t = document.getElementById('bd-toast');
-  t.textContent = msg;
-  t.className = isError ? 'show error' : 'show';
-  setTimeout(() => t.className = '', 3500);
-}
-
-function submitBDRequest() {
-  if (!bdCurrentBtn) return;
-  const title = bdCurrentBtn.dataset.title;
-  const session = bdCurrentBtn.dataset.session;
-  const format = document.querySelector('input[name=bd-format]:checked').value;
-  const requester = document.getElementById('bd-modal-requester').value.trim();
-  const memo = document.getElementById('bd-modal-memo').value.trim();
-  if (!requester) { showToast('요청자 이메일은 필수입니다', true); return; }
-  localStorage.setItem('bd-requester', requester);
-
-  // JSONP 호출 (CORS 우회)
-  const cb = 'bdcb_' + Date.now();
-  window[cb] = (data) => {
-    delete window[cb];
-    document.head.removeChild(s);
-    if (data.status === 'ok') {
-      showToast('✅ BD 요청 접수: ' + format + ' / ' + title.slice(0, 40) + '…');
-      bdCurrentBtn.disabled = true;
-      bdCurrentBtn.textContent = '✓ 요청됨';
-      closeBDModal();
-    } else if (data.status === 'duplicate') {
-      showToast('⚠️ 동일 요청이 이미 대기 중입니다', true);
-      closeBDModal();
-    } else {
-      showToast('❌ 오류: ' + (data.message || '알 수 없음'), true);
-    }
-  };
-  const params = new URLSearchParams({
-    action: 'requestBDQueue', title, session, format, requester, memo, callback: cb
-  });
-  const s = document.createElement('script');
-  s.src = BD_WEBHOOK_URL + '?' + params.toString();
-  s.onerror = () => {
-    delete window[cb];
-    showToast('❌ 네트워크 오류 — 잠시 후 다시 시도', true);
-  };
-  document.head.appendChild(s);
-}
+const BD_WEBHOOK_URL='https://script.google.com/macros/s/AKfycbynF7P1576GbRlzdIjBaxrOvjTU4HDP8F9jY4flxduhSqYR15Hr4AmhImuaS0wPJoOC/exec';let bdCurrentBtn=null;
+function openBDModal(b){bdCurrentBtn=b;document.getElementById('bd-modal-title').textContent=b.dataset.title;document.getElementById('bd-modal-session').textContent=b.dataset.session;document.getElementById('bd-modal-requester').value=localStorage.getItem('bd-requester')||'';document.getElementById('bd-modal-memo').value='';document.querySelector('input[name=bd-format][value=CLB]').checked=true;document.getElementById('bd-modal-overlay').style.display='flex';}
+function closeBDModal(){document.getElementById('bd-modal-overlay').style.display='none';bdCurrentBtn=null;}
+function showToast(m,e){var t=document.getElementById('bd-toast');t.textContent=m;t.className=e?'show error':'show';setTimeout(function(){t.className='';},3500);}
+function submitBDRequest(){if(!bdCurrentBtn)return;var title=bdCurrentBtn.dataset.title,session=bdCurrentBtn.dataset.session,format=document.querySelector('input[name=bd-format]:checked').value,requester=document.getElementById('bd-modal-requester').value.trim(),memo=document.getElementById('bd-modal-memo').value.trim();if(!requester){showToast('요청자 이메일은 필수입니다',true);return;}localStorage.setItem('bd-requester',requester);var cb='bdcb_'+Date.now();window[cb]=function(data){delete window[cb];document.head.removeChild(s);if(data.status==='ok'){showToast('✅ BD 요청 접수: '+format+' / '+title.slice(0,40)+'…');bdCurrentBtn.disabled=true;bdCurrentBtn.textContent='✓ 요청됨';closeBDModal();}else if(data.status==='duplicate'){showToast('⚠️ 동일 요청이 이미 대기 중입니다',true);closeBDModal();}else{showToast('❌ 오류: '+(data.message||'알 수 없음'),true);}};var params=new URLSearchParams({action:'requestBDQueue',title:title,session:session,format:format,requester:requester,memo:memo,callback:cb});var s=document.createElement('script');s.src=BD_WEBHOOK_URL+'?'+params.toString();s.onerror=function(){delete window[cb];showToast('❌ 네트워크 오류 — 잠시 후 다시 시도',true);};document.head.appendChild(s);}
 </script>
 
 </body>
