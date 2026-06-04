@@ -43,38 +43,15 @@
     </style>
 
 <style>
-/* ── 풀상세 논문 카드 (build-report.py) ── */
-.paper{background:#fff;border:1px solid #e1e8f0;border-radius:10px;margin:18px 30px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden}
-.paper-header{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 16px;background:#f5f9fc;border-bottom:1px solid #e1e8f0}
-.paper-num{font-weight:700;color:#003366;font-size:14px}
-.stars-high{color:#1A5276;font-weight:700}.stars-mid{color:#2E6DA0;font-weight:700}.stars-low{color:#95a5a6;font-weight:700}
-.tag-direct,.tag-ref,.tag-open,.tag-wall{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600}
-.tag-direct{background:#1A5276;color:#fff}.tag-ref{background:#e1e8f0;color:#456}
-.tag-open{background:#e8f5e9;color:#2e7d32}.tag-wall{background:#f0f0f0;color:#888}
-.journal-meta{font-size:12px;color:#666;text-align:right}
-.paper-body{padding:14px 18px}
-.paper-title{font-size:15px;font-weight:700;color:#1a1a1a;margin:0 0 6px;line-height:1.4}
-.paper-url{font-size:12px;color:#2E6DA0;word-break:break-all;display:inline-block;margin-bottom:6px}
-.design-badge{display:inline-block;font-size:11px;background:#eef3f8;color:#1A5276;padding:2px 10px;border-radius:10px;margin-left:6px}
-.summary-grid{margin:14px 0}
-.summary-grid h4,.viz-section h4,.usage h4{font-size:13px;color:#003366;margin:0 0 8px;padding-left:8px;border-left:3px solid #1A5276}
-.s-row{display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed #eef2f7}
-.s-label{flex:0 0 64px;font-size:12px;font-weight:700;color:#1A5276}
-.s-val{flex:1;font-size:13px;color:#222;line-height:1.65}
-.key-nums{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
-.knum{flex:1;min-width:120px;background:#f5f9fc;border:1px solid #dce6f0;border-radius:8px;padding:10px 12px;text-align:center}
-.knum .val{font-size:16px;font-weight:800;color:#1A5276;line-height:1.25}
-.knum .desc{font-size:11px;color:#555;margin-top:3px;line-height:1.3}
-.knum .pval{font-size:11px;color:#2e7d32;font-weight:600;margin-top:2px}
-.viz-section{margin:14px 0}.viz-subtitle{font-size:12px;color:#666;margin-bottom:6px}
-.chart-wrap{position:relative;height:240px}
-.usage{margin:14px 0 4px;background:#fbfcfe;border:1px solid #eef2f7;border-radius:8px;padding:10px 14px}
-.usage ul{margin:0;padding-left:18px}.usage li{font-size:13px;color:#333;line-height:1.7}
-.bd-request-btn{background:#1A5276;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;margin-left:8px}
+.bd-request-btn{background:#1A5276;color:#fff;border:none;padding:5px 12px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;margin-left:auto}
 .bd-request-btn:hover{background:#14405e}.bd-request-btn:disabled{background:#95a5a6;cursor:not-allowed}
+.paper-meta{align-items:center}
+.evidence-ref{background-color:#7f8c9b !important}
+.importance-mid{background-color:#2E6DA0 !important}.importance-low{background-color:#95a5a6 !important}
+.key-numbers h4{margin:0 0 8px;color:#003366;font-size:14px}
+.content-section-text strong{color:#1A5276}
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -104,285 +81,440 @@
         </div>
         <div class="papers">
 
-  <!-- ━━━ 논문 #1 (Gut-Liver Axis) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #1</span>
-      <span class="stars-high">★★★</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex:1;">Alimentary Pharmacology &amp; Therapeutics | 2026-05-06</div>
-      <button class="bd-request-btn" data-title="Rifaximin Improves Cognitive Performance and Reduces Cirrhosis-Related Adverse Events in Covert Hepatic Encephalopathy: A Randomized Controlled Trial" data-session="Gut-Liver Axis" data-num="1" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Rifaximin Improves Cognitive Performance and Reduces Cirrhosis-Related Adverse Events in Covert Hepatic Encephalopathy: A Randomized Controlled Trial</p>
-      <a href="https://pubmed.ncbi.nlm.nih.gov/42092293/" class="paper-url" target="_blank">https://pubmed.ncbi.nlm.nih.gov/42092293/</a>
-      <span class="design-badge">다기관 오픈라벨 RCT</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">잠재성 간성뇌증(covert hepatic encephalopathy, CHE)은 간경변 환자에서 인지장애와 불량한 임상결과를 초래하나, 치료적 개입을 뒷받침하는 무작위 근거가 제한적이라는 미충족 수요가 있다. 리팍시민(RFX)은 비흡수성 광범위 항생제로 장내 암모니아 생성균을 조절해 간성뇌증을 개선하는 것으로 알려져 있으나, CHE 단계에서의 무작위 효능 근거가 부족했다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">다기관·공개표지(open-label) 무작위대조시험. 간경변 동반 CHE 환자를 1:1로 리팍시민(RFX)군 또는 무치료(대조)군에 배정, 12주 추적. 총 N=50명 무작위배정·추적완료(군별 N은 초록 미보고, 1:1 배정). 1차 평가변수: Stroop test 수행능력 변화. 2차: NCT-B 점수, 혈청 암모니아, 간경변 관련 이상사건, 장내미생물 조성. 선정기준 세부·정확한 군별 N은 초록 미보고.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">Stroop test 수행능력은 RFX군에서 유의하게 개선(군내 p=0.006)된 반면 대조군은 비유의(p=0.400). 군간 비교에서 RFX군의 개선 폭이 더 큰 경향(ΔStroop: -4.45±7.12초 vs -0.98±5.74초; p=0.056). 특히 기저에 합성 이당류(락툴로스)를 복용하지 않던 환자에서 RFX의 개선이 유의하게 우월(ΔStroop: -3.73±5.96초 vs -0.80±5.86초; p=0.049). NCT-B 점수·혈청 암모니아는 군간 유의차 없음. 간경변 관련 이상사건은 RFX군에서 유의하게 감소(p=0.006). 전반적 장내미생물 다양성은 군간 차이 없었으나 RFX가 특정 분류군([Eubacterium] brachy group 소실 등)을 선택적으로 변화시킴.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">구체 이상반응명·발생률·중단율은 초록에 명시되지 않음(초록 미보고). 단, RFX군에서 간경변 관련 이상사건이 유의하게 감소(p=0.006)해 임상적 안전성 이점 시사.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">(초록 기반 — 전문 미접근) 저자 결론은 리팍시민이 Stroop test로 평가한 인지수행을 개선하고 CHE 환자의 간경변 관련 이상사건을 감소시켜 효과적 치료옵션이며, Stroop test가 치료반응의 민감한 평가지표라는 것. 한계: 소표본(N=50), 공개표지 설계, 단기(12주) 추적, 혈청 암모니아·NCT-B는 비유의. 노르믹스(rifaximin) 관점: 현성 간성뇌증뿐 아니라 &#x27;잠재성&#x27; CHE 단계에서도 노르믹스가 인지기능을 개선하고 간경변 합병증을 줄인다는 무작위 근거로, 조기 개입 적응증 확장 메시지를 직접 뒷받침(특히 락툴로스 미사용군에서 효과 유의).</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">p=0.006 vs p=0.400</div><div class="desc">Stroop test 군내 개선</div><div class="pval">p=0.006</div></div>
-        <div class="knum"><div class="val">-4.45±7.12 vs -0.98±5.74초</div><div class="desc">ΔStroop test 군간 비교</div><div class="pval">p=0.056</div></div>
-        <div class="knum"><div class="val">-3.73±5.96 vs -0.80±5.86초</div><div class="desc">ΔStroop</div><div class="pval">p=0.049</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Rifaximin Improves Cognitive Performance and Reduces Cirrhos</div><div class="chart-wrap"><canvas id="chart_dr_1_895"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>노르믹스 CHE 적응증 확대 가능성 Stroop 검사 기반 인지기능 개선 데이터</li>
-          <li>일본 다기관 RCT — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #1 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Rifaximin Improves Cognitive Performance and Reduces Cirrhosis-Related Adverse Events in Covert Hepatic Encephalopathy: A Randomized Controlled Trial</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Alimentary Pharmacology &amp; Therapeutics</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-05-06</div>
+                        <button class="bd-request-btn" data-title="Rifaximin Improves Cognitive Performance and Reduces Cirrhosis-Related Adverse Events in Covert Hepatic Encephalopathy: A Randomized Controlled Trial" data-session="Gut-Liver Axis" data-num="1" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42092293/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">다기관 오픈라벨 RCT</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">잠재성 간성뇌증(covert hepatic encephalopathy, CHE)은 간경변 환자에서 인지장애와 불량한 임상결과를 초래하나, 치료적 개입을 뒷받침하는 무작위 근거가 제한적이라는 미충족 수요가 있다. 리팍시민(RFX)은 비흡수성 광범위 항생제로 장내 암모니아 생성균을 조절해 간성뇌증을 개선하는 것으로 알려져 있으나, CHE 단계에서의 무작위 효능 근거가 부족했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">다기관·공개표지(open-label) 무작위대조시험. 간경변 동반 CHE 환자를 1:1로 리팍시민(RFX)군 또는 무치료(대조)군에 배정, 12주 추적. 총 N=50명 무작위배정·추적완료(군별 N은 초록 미보고, 1:1 배정). 1차 평가변수: Stroop test 수행능력 변화. 2차: NCT-B 점수, 혈청 암모니아, 간경변 관련 이상사건, 장내미생물 조성. 선정기준 세부·정확한 군별 N은 초록 미보고.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">Stroop test 수행능력은 RFX군에서 유의하게 개선(군내 p=0.006)된 반면 대조군은 비유의(p=0.400).<br/>
+군간 비교에서 RFX군의 개선 폭이 더 큰 경향(ΔStroop: -4.45±7.12초 vs -0.98±5.74초; p=0.056).<br/>
+특히 기저에 합성 이당류(락툴로스)를 복용하지 않던 환자에서 RFX의 개선이 유의하게 우월(ΔStroop: -3.73±5.96초 vs -0.80±5.86초; p=0.049).<br/>
+NCT-B 점수·혈청 암모니아는 군간 유의차 없음.<br/>
+간경변 관련 이상사건은 RFX군에서 유의하게 감소(p=0.006).<br/>
+전반적 장내미생물 다양성은 군간 차이 없었으나 RFX가 특정 분류군([Eubacterium] brachy group 소실 등)을 선택적으로 변화시킴.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">구체 이상반응명·발생률·중단율은 초록에 명시되지 않음(초록 미보고). 단, RFX군에서 간경변 관련 이상사건이 유의하게 감소(p=0.006)해 임상적 안전성 이점 시사.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">(초록 기반 — 전문 미접근) 저자 결론은 리팍시민이 Stroop test로 평가한 인지수행을 개선하고 CHE 환자의 간경변 관련 이상사건을 감소시켜 효과적 치료옵션이며, Stroop test가 치료반응의 민감한 평가지표라는 것. 한계: 소표본(N=50), 공개표지 설계, 단기(12주) 추적, 혈청 암모니아·NCT-B는 비유의. 노르믹스(rifaximin) 관점: 현성 간성뇌증뿐 아니라 &#x27;잠재성&#x27; CHE 단계에서도 노르믹스가 인지기능을 개선하고 간경변 합병증을 줄인다는 무작위 근거로, 조기 개입 적응증 확장 메시지를 직접 뒷받침(특히 락툴로스 미사용군에서 효과 유의).</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>p=0.006 vs p=0.400 — Stroop test 군내 개선 (p=0.006)</li>
+                            <li>-4.45±7.12 vs -0.98±5.74초 — ΔStroop test 군간 비교 (p=0.056)</li>
+                            <li>-3.73±5.96 vs -0.80±5.86초 — ΔStroop (p=0.049)</li>
+                            <li>유의 감소 — 간경변 관련 이상사건 (p=0.006)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #2 (Gut-Liver Axis) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #2</span>
-      <span class="stars-high">★★★</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex:1;">Journal of Hepatology | 2025-07-11</div>
-      <button class="bd-request-btn" data-title="Effect of rifaximin in patients with severe cirrhosis and ascites: A randomized double-blind placebo-controlled trial" data-session="Gut-Liver Axis" data-num="2" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Effect of rifaximin in patients with severe cirrhosis and ascites: A randomized double-blind placebo-controlled trial</p>
-      <a href="https://pubmed.ncbi.nlm.nih.gov/40653111/" class="paper-url" target="_blank">https://pubmed.ncbi.nlm.nih.gov/40653111/</a>
-      <span class="design-badge">다기관 이중맹검 위약대조 RCT</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">자발성 세균성 복막염(SBP)의 1차 예방 근거는 취약하고, 퀴놀론(노르플록사신) 사용에 따른 내성균 선택 우려가 있다. 리팍시민(RFX)은 내약성이 좋고 내성 발현 위험이 낮은 광범위 항생제로, 중증 간경변·복수 환자에서 노르플록사신의 대안으로 12개월 생존을 개선할 수 있는지가 미충족 수요였다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">프랑스 17개 기관 무작위·이중맹검·위약대조시험(NCT03069131, 2018~2022). 대상: 중증 간경변 + grade 2/3 복수 + 복수 단백 &lt;15 g/L 환자. 1:1 배정 — RFX 550mg 1일 2회 또는 위약, 12개월간 SBP 1차 예방 목적 투여. 스크리닝 1,957명 중 159명 무작위배정, modified ITT 152명 분석(위약 80명 / RFX 72명). 1차 평가변수: 12개월 생존. 2차: 3·6개월 생존, 간경변 합병증(SBP·뇌증·위장관출혈·간신증후군) 발생률, 안전성. per-protocol 분석은 약물 순응 127명.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">RFX는 12개월 생존을 개선하지 못함 — 위약 68.1%(95%CI 56.2-78.7) vs RFX 56.6%(95%CI 43.5-67.8), p=0.74. 6개월 생존(위약 71.1%[59.5-80.0] vs RFX 76.4%[64.3-84.8])·3개월 생존(75.4%[64.1-83.5] vs 82.6%[71.4-89.7])도 군간 유의차 없음. 간경변 합병증(SBP·뇌증·위장관출혈·간신증후군) 발생률도 차이 없음. 다만 per-protocol(순응 127명) 분석에서 RFX군의 12개월 간관련 사건 누적발생률이 더 낮았음 — 순응도 향상이 간관련 합병증 감소에 기여 가능.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">리팍시민은 시험 전반에 걸쳐 내약성 양호(well tolerated). 구체 이상반응명·발생률·중단율은 초록에 수치로 명시되지 않음(초록 미보고).</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">(초록 기반 — 전문 미접근) 저자 결론은 중증 간경변·저단백 복수 환자에서 리팍시민이 12개월 생존이나 간경변 합병증 발생을 개선하지 못했으나, 약물 순응이 향상되면 간관련 합병증을 줄이는 데 도움이 될 수 있다는 것. 한계: 목표 대비 적은 등록(159명), 낮은 순응으로 ITT 효과 희석, 음성 1차 결과. 노르믹스(rifaximin) 관점: 본 RCT는 SBP &#x27;1차 예방&#x27;으로서의 생존이익은 입증하지 못한 음성 결과지만, per-protocol에서 순응 시 간관련 사건 감소 신호를 보여 적응증·환자선택(순응도)의 중요성을 시사하는 근거(생존 1차 예방 적응증 확대에는 신중 필요).</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">68.1% vs 56.6%</div><div class="desc">12개월 생존율(1차 평가변수)</div><div class="pval">p=0.74</div></div>
-        <div class="knum"><div class="val">95%CI 56.2-78.7 vs 43.5-67.8</div><div class="desc">12개월 생존 95% 신뢰구간</div><div class="pval">p=0.74</div></div>
-        <div class="knum"><div class="val">152명 (위약 80 / RFX 72)</div><div class="desc">modified ITT 분석 대상 군별 </div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Effect of rifaximin in patients with severe cirrhosis and as</div><div class="chart-wrap"><canvas id="chart_dr_2_895"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>SBP 1차 예방에서 rifaximin 단독 한계</li>
-          <li>다만 순응 환자 합병증 감소는 장기 복용 관리 근거</li>
-          <li>J Hepatol 고영향력 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #2 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Effect of rifaximin in patients with severe cirrhosis and ascites: A randomized double-blind placebo-controlled trial</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Journal of Hepatology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-07-11</div>
+                        <button class="bd-request-btn" data-title="Effect of rifaximin in patients with severe cirrhosis and ascites: A randomized double-blind placebo-controlled trial" data-session="Gut-Liver Axis" data-num="2" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/40653111/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">다기관 이중맹검 위약대조 RCT</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">자발성 세균성 복막염(SBP)의 1차 예방 근거는 취약하고, 퀴놀론(노르플록사신) 사용에 따른 내성균 선택 우려가 있다. 리팍시민(RFX)은 내약성이 좋고 내성 발현 위험이 낮은 광범위 항생제로, 중증 간경변·복수 환자에서 노르플록사신의 대안으로 12개월 생존을 개선할 수 있는지가 미충족 수요였다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">프랑스 17개 기관 무작위·이중맹검·위약대조시험(NCT03069131, 2018~2022). 대상: 중증 간경변 + grade 2/3 복수 + 복수 단백 &lt;15 g/L 환자. 1:1 배정 — RFX 550mg 1일 2회 또는 위약, 12개월간 SBP 1차 예방 목적 투여. 스크리닝 1,957명 중 159명 무작위배정, modified ITT 152명 분석(위약 80명 / RFX 72명). 1차 평가변수: 12개월 생존. 2차: 3·6개월 생존, 간경변 합병증(SBP·뇌증·위장관출혈·간신증후군) 발생률, 안전성. per-protocol 분석은 약물 순응 127명.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text"><strong>RFX는 12개월 생존을 개선하지 못함:</strong> 위약 68.1%(95%CI 56.2-78.7) vs RFX 56.6%(95%CI 43.5-67.8), p=0.74. 6개월 생존(위약 71.1%[59.5-80.0] vs RFX 76.4%[64.3-84.8])·3개월 생존(75.4%[64.1-83.5] vs 82.6%[71.4-89.7])도 군간 유의차 없음.<br/>
+간경변 합병증(SBP·뇌증·위장관출혈·간신증후군) 발생률도 차이 없음.<br/>
+다만 per-protocol(순응 127명) 분석에서 RFX군의 12개월 간관련 사건 누적발생률이 더 낮았음 — 순응도 향상이 간관련 합병증 감소에 기여 가능.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">리팍시민은 시험 전반에 걸쳐 내약성 양호(well tolerated). 구체 이상반응명·발생률·중단율은 초록에 수치로 명시되지 않음(초록 미보고).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">(초록 기반 — 전문 미접근) 저자 결론은 중증 간경변·저단백 복수 환자에서 리팍시민이 12개월 생존이나 간경변 합병증 발생을 개선하지 못했으나, 약물 순응이 향상되면 간관련 합병증을 줄이는 데 도움이 될 수 있다는 것. 한계: 목표 대비 적은 등록(159명), 낮은 순응으로 ITT 효과 희석, 음성 1차 결과. 노르믹스(rifaximin) 관점: 본 RCT는 SBP &#x27;1차 예방&#x27;으로서의 생존이익은 입증하지 못한 음성 결과지만, per-protocol에서 순응 시 간관련 사건 감소 신호를 보여 적응증·환자선택(순응도)의 중요성을 시사하는 근거(생존 1차 예방 적응증 확대에는 신중 필요).</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>68.1% vs 56.6% — 12개월 생존율(1차 평가변수) (p=0.74)</li>
+                            <li>95%CI 56.2-78.7 vs 43.5-67.8 — 12개월 생존 95% 신뢰구간 (p=0.74)</li>
+                            <li>152명 (위약 80 / RFX 72) — modified ITT 분석 대상 군별 N</li>
+                            <li>71.1% vs 76.4% — 6개월 생존율</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #3 (Gut-Liver Axis) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #3</span>
-      <span class="stars-mid">★★☆</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex:1;">Euroasian Journal of Hepato-Gastroenterology | 2025-01-01</div>
-      <button class="bd-request-btn" data-title="Evaluating Clinical Outcomes of Adjunct Rifaximin Therapy in Patients with Overt Hepatic Encephalopathy: A Prospective Randomized Study" data-session="Gut-Liver Axis" data-num="3" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Evaluating Clinical Outcomes of Adjunct Rifaximin Therapy in Patients with Overt Hepatic Encephalopathy: A Prospective Randomized Study</p>
-      <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12288574/" class="paper-url" target="_blank">https://pmc.ncbi.nlm.nih.gov/articles/PMC12288574/</a>
-      <span class="design-badge">전향적 RCT</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">간성뇌증(HE)은 간기능 부전과 문맥-체순환 단락으로 암모니아 등 신경독소가 축적되어 발생하는 신경학적 합병증으로, 간경변 환자의 약 44%에서 동반되고 현성 HE(OHE)는 간경변 환자의 30~50%에 영향을 미치며 첫 발현 후 12개월 생존율이 42~44%에 그칠 만큼 예후가 나쁘다. 1차 치료제인 락툴로스는 암모니아 생성·흡수를 줄이지만 단독요법 시 최대 22%의 무반응률을 보이며, 장내 세균 과증식·내독소로 인한 전신염증 등 다인자성 기전을 완전히 해결하지 못하는 미충족 수요가 존재한다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">단일 3차의료기관(전담 간장학 서비스 보유)에서 2024년 6~11월 시행된 6개월 전향적 무작위대조시험(RCT). 18~65세 비대상성 만성간질환(DCLD)+OHE(West Haven 등급 II 이상) 성인을 추첨식 무작위배정으로 두 군에 균등 분배(분석 완료 132명). 병합요법(CT)군(n=66): 리팍시민 550mg 1일 2회 경구 + 락툴로스 30mL 1일 3회(1일 2~3회 배변 목표 적정). 락툴로스 단독(LM)군(n=66): 락툴로스 30~60mL 1일 3회 + 위약 캡슐(맹검 유지). 양군 모두 표준치료(항생제 ceftriaxone 1g IV 1일 2회, 전해질 교정, 위장관 출혈/유발인자 관리) 병행. 배정 맹검된 상급 간장전문의가 매일 신경학적 상태를 평가, 증상 완전 소실 또는 최대 10일까지 재평가. 1차 평가변수는 West Haven 기준 HE 증상의 완전 임상적 소실. 통계는 카이제곱검정(p≤0.05).</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">1차 평가변수(10일 내 HE 증상 호전): CT군 80.3%(53/66) vs LM군 56.1%(37/66), p=0.005로 CT군이 유의하게 우월. 성별 하위분석 — 남성: CT 82.5%(33/40) vs LM 57.9%(22/38), p=0.0329; 여성: CT 76.9%(20/26) vs LM 53.6%(15/28), p=0.131(유의차 없음). 연령별 하위분석 — 41~50세: CT 85.7%(6/7) vs LM 28.6%(2/7), p=0.0308; 51~60세: CT 78.1%(25/32) vs LM 54.3%(19/35), p=0.0401; 61세 초과: CT 83.3%(20/24) vs LM 54.5%(12/22), p=0.0340으로 모두 유의. 원인질환은 HCV 73.5%로 최다, 유발인자는 변비 56.8%가 최다. 저자는 CT가 패혈증 관련 사망률 감소·재원기간 단축과 연관된다고 인용 보고.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">양군 모두 내약성 양호. 중대 약물이상반응(serious adverse drug reactions)은 보고되지 않음. 소수 환자에서 복부 팽만(bloating)·복통/경련(cramping) 등 경미한 위장관 증상이 발생했으나 치료 중단을 요하지 않았음. 무반응 시 LM군은 리팍시민으로 전환, CT군은 L-aspartate·L-ornithine 추가. 탈락/추적소실 0명.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자 결론은 리팍시민+락툴로스 병합요법이 락툴로스 단독 대비 OHE에서 더 우수한 임상 회복률을 제공하며, 특히 남성·고령군에서 효과가 두드러지고 재원기간 단축·사망률 저하·의료비 절감 가능성이 있다는 것. 한계는 단일기관·단기관찰(재발/합병증 종단추적 부재), 이질적 DCLD 원인 및 다양한 Child-Pugh 등급 혼재, 퇴원 후 리팍시민 장기 사용의 경제성 문제, 비교적 작은 표본. 노르믹스(rifaximin) 관점: 급성 현성 간성뇌증의 락툴로스 표준치료에 노르믹스를 병합하면 단기 증상 소실률을 약 24%p(56.1%→80.3%) 끌어올려 표준치료에 대한 부가요법으로서의 임상적 가치를 직접 입증한 근거가 된다.</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">80.3% vs 56.1%</div><div class="desc">10일 내 HE 증상 호전율</div><div class="pval">p=0.005</div></div>
-        <div class="knum"><div class="val">82.5% vs 57.9%</div><div class="desc">남성 환자 호전율</div><div class="pval">p=0.0329</div></div>
-        <div class="knum"><div class="val">85.7% vs 28.6%</div><div class="desc">41~50세 호전율</div><div class="pval">p=0.0308</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Evaluating Clinical Outcomes of Adjunct Rifaximin Therapy in</div><div class="chart-wrap"><canvas id="chart_dr_3_895"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>노르믹스+lactulose 병용 OHE 관리 우월성</li>
-          <li>현성 뇌증 환자 임상 프레젠테이션 자료</li>
-          <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #3 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Evaluating Clinical Outcomes of Adjunct Rifaximin Therapy in Patients with Overt Hepatic Encephalopathy: A Prospective Randomized Study</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Euroasian Journal of Hepato-Gastroenterology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-01-01</div>
+                        <button class="bd-request-btn" data-title="Evaluating Clinical Outcomes of Adjunct Rifaximin Therapy in Patients with Overt Hepatic Encephalopathy: A Prospective Randomized Study" data-session="Gut-Liver Axis" data-num="3" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12288574/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">전향적 RCT</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">간성뇌증(HE)은 간기능 부전과 문맥-체순환 단락으로 암모니아 등 신경독소가 축적되어 발생하는 신경학적 합병증으로, 간경변 환자의 약 44%에서 동반되고 현성 HE(OHE)는 간경변 환자의 30~50%에 영향을 미치며 첫 발현 후 12개월 생존율이 42~44%에 그칠 만큼 예후가 나쁘다. 1차 치료제인 락툴로스는 암모니아 생성·흡수를 줄이지만 단독요법 시 최대 22%의 무반응률을 보이며, 장내 세균 과증식·내독소로 인한 전신염증 등 다인자성 기전을 완전히 해결하지 못하는 미충족 수요가 존재한다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">단일 3차의료기관(전담 간장학 서비스 보유)에서 2024년 6~11월 시행된 6개월 전향적 무작위대조시험(RCT). 18~65세 비대상성 만성간질환(DCLD)+OHE(West Haven 등급 II 이상) 성인을 추첨식 무작위배정으로 두 군에 균등 분배(분석 완료 132명). 병합요법(CT)군(n=66): 리팍시민 550mg 1일 2회 경구 + 락툴로스 30mL 1일 3회(1일 2~3회 배변 목표 적정). 락툴로스 단독(LM)군(n=66): 락툴로스 30~60mL 1일 3회 + 위약 캡슐(맹검 유지). 양군 모두 표준치료(항생제 ceftriaxone 1g IV 1일 2회, 전해질 교정, 위장관 출혈/유발인자 관리) 병행. 배정 맹검된 상급 간장전문의가 매일 신경학적 상태를 평가, 증상 완전 소실 또는 최대 10일까지 재평가. 1차 평가변수는 West Haven 기준 HE 증상의 완전 임상적 소실. 통계는 카이제곱검정(p≤0.05).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text"><strong>1차 평가변수(10일 내 HE 증상 호전):</strong> CT군 80.3%(53/66) vs LM군 56.1%(37/66), p=0.005로 CT군이 유의하게 우월.<br/>
+<strong>성별 하위분석:</strong> 남성: CT 82.5%(33/40) vs LM 57.9%(22/38), p=0.0329; 여성: CT 76.9%(20/26) vs LM 53.6%(15/28), p=0.131(유의차 없음).<br/>
+<strong>연령별 하위분석:</strong> 41~50세: CT 85.7%(6/7) vs LM 28.6%(2/7), p=0.0308; 51~60세: CT 78.1%(25/32) vs LM 54.3%(19/35), p=0.0401; 61세 초과: CT 83.3%(20/24) vs LM 54.5%(12/22), p=0.0340으로 모두 유의.<br/>
+원인질환은 HCV 73.5%로 최다, 유발인자는 변비 56.8%가 최다.<br/>
+저자는 CT가 패혈증 관련 사망률 감소·재원기간 단축과 연관된다고 인용 보고.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">양군 모두 내약성 양호. 중대 약물이상반응(serious adverse drug reactions)은 보고되지 않음. 소수 환자에서 복부 팽만(bloating)·복통/경련(cramping) 등 경미한 위장관 증상이 발생했으나 치료 중단을 요하지 않았음. 무반응 시 LM군은 리팍시민으로 전환, CT군은 L-aspartate·L-ornithine 추가. 탈락/추적소실 0명.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자 결론은 리팍시민+락툴로스 병합요법이 락툴로스 단독 대비 OHE에서 더 우수한 임상 회복률을 제공하며, 특히 남성·고령군에서 효과가 두드러지고 재원기간 단축·사망률 저하·의료비 절감 가능성이 있다는 것. 한계는 단일기관·단기관찰(재발/합병증 종단추적 부재), 이질적 DCLD 원인 및 다양한 Child-Pugh 등급 혼재, 퇴원 후 리팍시민 장기 사용의 경제성 문제, 비교적 작은 표본. 노르믹스(rifaximin) 관점: 급성 현성 간성뇌증의 락툴로스 표준치료에 노르믹스를 병합하면 단기 증상 소실률을 약 24%p(56.1%→80.3%) 끌어올려 표준치료에 대한 부가요법으로서의 임상적 가치를 직접 입증한 근거가 된다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>80.3% vs 56.1% — 10일 내 HE 증상 호전율 (p=0.005)</li>
+                            <li>82.5% vs 57.9% — 남성 환자 호전율 (p=0.0329)</li>
+                            <li>85.7% vs 28.6% — 41~50세 호전율 (p=0.0308)</li>
+                            <li>78.1% vs 54.3% — 51~60세 호전율 (p=0.0401)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #4 (Gut-Liver Axis) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #4</span>
-      <span class="stars-mid">★★☆</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex:1;">Cureus | 2025-10-27</div>
-      <button class="bd-request-btn" data-title="Lactulose Versus Rifaximin Monotherapy for Hepatic Encephalopathy Prevention: A Prospective Comparative Study in Patients With Cirrhosis" data-session="Gut-Liver Axis" data-num="4" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Lactulose Versus Rifaximin Monotherapy for Hepatic Encephalopathy Prevention: A Prospective Comparative Study in Patients With Cirrhosis</p>
-      <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12560196/" class="paper-url" target="_blank">https://pmc.ncbi.nlm.nih.gov/articles/PMC12560196/</a>
-      <span class="design-badge">전향적 다기관 비교연구</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">간성뇌증(HE)은 간경변의 주요 신경정신과적 합병증으로 삶의 질을 크게 저하시키고 의료자원 부담을 가중시키며, 선행 HE 병력이 있는 환자는 재발 위험이 높아 2차 예방이 핵심이다. 표준치료인 락툴로스(비흡수성 이당류)는 결장 산성화로 암모니아 배출을 촉진하나 잦은 위장관 부작용으로 복약순응도가 낮아 결과가 가변적이며, 특히 파키스탄 등 자원제한 지역에서 비용·접근성을 고려한 최적 전략 규명이 미충족 수요로 남아 있다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">2023년 11월~2024년 10월 파키스탄 이슬라마바드 Capital Hospital, 요르단 암만 AlBashir Hospital, 무자파라바드 Abbas Institute(주관기관) 3개 기관에서 시행된 전향적 다기관 비교연구. 18세 이상, 임상/영상학적으로 확진된 간경변 + 현성 HE(West Haven II 이상) 선행 1회 이상 병력이 있고 임상적으로 안정된 환자 236명을 단순 무작위(컴퓨터 난수) 1:1 배정. A군(n=118): 리팍시민 550mg 1일 2회. B군(n=118): 락툴로스 30mL 1일 3회(연변 2~3회 목표 적정). 마지막 HE 에피소드 후 양군 6개월 치료 + 추가 6개월 추적(총 12개월). 제외기준: 양약 동시투여, 활동성 위장관 출혈, 간세포암, 신기능부전(Cr&gt;2.0mg/dL), 중증 전해질 이상, 임신/수유. 매월 추적하며 순응도·HE 재발·입원·이상반응 평가. 1차 결과는 12개월 HE 재발률. 통계는 독립 t검정·카이제곱(p&lt;0.05).</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">양군 기저특성 균질(평균연령 54.72±9.14 vs 53.96±8.87세, p=0.478; HCV 54.2% vs 51.7%; 평균 MELD 17.25 vs 17.42, p=0.667). 12개월 HE 재발: 리팍시민 16.10%(19/118) vs 락툴로스 34.75%(41/118), χ²=10.45, p=0.001로 리팍시민군 유의하게 낮음. HE 관련 입원: 12.71%(15) vs 30.51%(36), χ²=11.88, p&lt;0.001. 평균 재발까지 기간: 5.62±1.11 vs 4.28±1.39개월, p&lt;0.001(리팍시민이 더 길게 관해 유지). 전반적 기능 호전: 79.66%(94) vs 57.63%(68), χ²=14.23, p&lt;0.001. 추적소실 2.54% vs 4.24%(p=0.472). 재발 유발인자(위장관 출혈·탈수·감염·전해질 이상) 분포는 양군 유의차 없어 치료효과가 유발인자와 무관하게 일관됨.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">리팍시민의 내약성·순응도가 우월. 순응도(≥80%): 86.44%(102) vs 72.03%(85), p=0.008. 이상반응 — 설사: 리팍시민 6.78%(8) vs 락툴로스 27.12%(32), p&lt;0.001; 복부 팽만: 5.08%(6) vs 15.25%(18), p=0.012; 오심: 3.39%(4) vs 11.86%(14), p=0.015. 부작용으로 인한 치료 중단: 리팍시민 0.85%(1) vs 락툴로스 5.93%(7), p=0.032로 리팍시민이 유의하게 낮음.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자 결론은 리팍시민 단독요법이 간경변 환자의 HE 2차 예방에서 락툴로스 대비 재발·입원 감소, 재발까지 기간 연장, 순응도·내약성 우월로 임상결과 개선과 의료부담 경감을 동시에 달성한다는 것. 한계는 단일 지역 네트워크 기반으로 외적 타당도 제한, 신경심리검사 부재로 무증상 인지호전 평가 불가, 영양상태·동반질환 등 교란인자 미통제. 노르믹스(rifaximin) 관점: 락툴로스 부작용으로 순응도가 낮은 2차 예방 상황에서 노르믹스 단독요법이 재발률을 절반 이하(34.8%→16.1%)로 낮추고 중단율도 7배 낮아, 장기 유지요법으로서 환자 친화적 대안임을 뒷받침한다.</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">16.10% vs 34.75%</div><div class="desc">12개월 HE 재발률</div><div class="pval">p=0.001</div></div>
-        <div class="knum"><div class="val">12.71% vs 30.51%</div><div class="desc">HE 관련 입원율</div><div class="pval">&lt;0.001</div></div>
-        <div class="knum"><div class="val">5.62 vs 4.28개월</div><div class="desc">평균 HE 재발까지 기간</div><div class="pval">&lt;0.001</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Lactulose Versus Rifaximin Monotherapy for Hepatic Encephalo</div><div class="chart-wrap"><canvas id="chart_dr_4_895"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>노르믹스 단독 HE 예방 lactulose 대비 우월성</li>
-          <li>환자 순응도 향상 메시지 활용 후속 연구 동향 지속 모니터링 필요</li>
-          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #4 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Lactulose Versus Rifaximin Monotherapy for Hepatic Encephalopathy Prevention: A Prospective Comparative Study in Patients With Cirrhosis</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Cureus</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-10-27</div>
+                        <button class="bd-request-btn" data-title="Lactulose Versus Rifaximin Monotherapy for Hepatic Encephalopathy Prevention: A Prospective Comparative Study in Patients With Cirrhosis" data-session="Gut-Liver Axis" data-num="4" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12560196/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">전향적 다기관 비교연구</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">간성뇌증(HE)은 간경변의 주요 신경정신과적 합병증으로 삶의 질을 크게 저하시키고 의료자원 부담을 가중시키며, 선행 HE 병력이 있는 환자는 재발 위험이 높아 2차 예방이 핵심이다. 표준치료인 락툴로스(비흡수성 이당류)는 결장 산성화로 암모니아 배출을 촉진하나 잦은 위장관 부작용으로 복약순응도가 낮아 결과가 가변적이며, 특히 파키스탄 등 자원제한 지역에서 비용·접근성을 고려한 최적 전략 규명이 미충족 수요로 남아 있다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">2023년 11월~2024년 10월 파키스탄 이슬라마바드 Capital Hospital, 요르단 암만 AlBashir Hospital, 무자파라바드 Abbas Institute(주관기관) 3개 기관에서 시행된 전향적 다기관 비교연구. 18세 이상, 임상/영상학적으로 확진된 간경변 + 현성 HE(West Haven II 이상) 선행 1회 이상 병력이 있고 임상적으로 안정된 환자 236명을 단순 무작위(컴퓨터 난수) 1:1 배정. A군(n=118): 리팍시민 550mg 1일 2회. B군(n=118): 락툴로스 30mL 1일 3회(연변 2~3회 목표 적정). 마지막 HE 에피소드 후 양군 6개월 치료 + 추가 6개월 추적(총 12개월). 제외기준: 양약 동시투여, 활동성 위장관 출혈, 간세포암, 신기능부전(Cr&gt;2.0mg/dL), 중증 전해질 이상, 임신/수유. 매월 추적하며 순응도·HE 재발·입원·이상반응 평가. 1차 결과는 12개월 HE 재발률. 통계는 독립 t검정·카이제곱(p&lt;0.05).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">양군 기저특성 균질(평균연령 54.72±9.14 vs 53.96±8.87세, p=0.478; HCV 54.2% vs 51.7%; 평균 MELD 17.25 vs 17.42, p=0.667).<br/>
+<strong>12개월 HE 재발:</strong> 리팍시민 16.10%(19/118) vs 락툴로스 34.75%(41/118), χ²=10.45, p=0.001로 리팍시민군 유의하게 낮음.<br/>
+<strong>HE 관련 입원:</strong> 12.71%(15) vs 30.51%(36), χ²=11.88, p&lt;0.001. 평균 재발까지 기간: 5.62±1.11 vs 4.28±1.39개월, p&lt;0.001(리팍시민이 더 길게 관해 유지).<br/>
+<strong>전반적 기능 호전:</strong> 79.66%(94) vs 57.63%(68), χ²=14.23, p&lt;0.001. 추적소실 2.54% vs 4.24%(p=0.472).<br/>
+재발 유발인자(위장관 출혈·탈수·감염·전해질 이상) 분포는 양군 유의차 없어 치료효과가 유발인자와 무관하게 일관됨.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">리팍시민의 내약성·순응도가 우월. 순응도(≥80%): 86.44%(102) vs 72.03%(85), p=0.008. 이상반응 — 설사: 리팍시민 6.78%(8) vs 락툴로스 27.12%(32), p&lt;0.001; 복부 팽만: 5.08%(6) vs 15.25%(18), p=0.012; 오심: 3.39%(4) vs 11.86%(14), p=0.015. 부작용으로 인한 치료 중단: 리팍시민 0.85%(1) vs 락툴로스 5.93%(7), p=0.032로 리팍시민이 유의하게 낮음.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자 결론은 리팍시민 단독요법이 간경변 환자의 HE 2차 예방에서 락툴로스 대비 재발·입원 감소, 재발까지 기간 연장, 순응도·내약성 우월로 임상결과 개선과 의료부담 경감을 동시에 달성한다는 것. 한계는 단일 지역 네트워크 기반으로 외적 타당도 제한, 신경심리검사 부재로 무증상 인지호전 평가 불가, 영양상태·동반질환 등 교란인자 미통제. 노르믹스(rifaximin) 관점: 락툴로스 부작용으로 순응도가 낮은 2차 예방 상황에서 노르믹스 단독요법이 재발률을 절반 이하(34.8%→16.1%)로 낮추고 중단율도 7배 낮아, 장기 유지요법으로서 환자 친화적 대안임을 뒷받침한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>16.10% vs 34.75% — 12개월 HE 재발률 (p=0.001)</li>
+                            <li>12.71% vs 30.51% — HE 관련 입원율 (&lt;0.001)</li>
+                            <li>5.62 vs 4.28개월 — 평균 HE 재발까지 기간 (&lt;0.001)</li>
+                            <li>79.66% vs 57.63% — 전반적 기능 호전율 (&lt;0.001)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #5 (Gut-Liver Axis) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #5</span>
-      <span class="stars-high">★★★</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex:1;">Cochrane Database of Systematic Reviews | 2025-06-01</div>
-      <button class="bd-request-btn" data-title="Silymarin for adults with metabolic dysfunction-associated steatotic liver disease" data-session="Gut-Liver Axis" data-num="5" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Silymarin for adults with metabolic dysfunction-associated steatotic liver disease</p>
-      <a href="https://pubmed.ncbi.nlm.nih.gov/40552569/" class="paper-url" target="_blank">https://pubmed.ncbi.nlm.nih.gov/40552569/</a>
-      <span class="design-badge">Cochrane 체계적 문헌고찰</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">대사이상 관련 지방간질환(MASLD)은 전 세계 성인 약 32.4%가 진단되는 주요 공중보건 문제로 유병률이 지속 증가하나, 효과가 입증된 승인 치료제가 없는 상태다. 실리마린(silymarin)은 항산화·항염증·항섬유화 작용을 가진 대표적 생약 성분으로, 단독요법 및 복합제(비타민E·포스파티딜콜린 등 가용화제와 복합) 형태로 MASLD에 잠재적 치료이점이 있어 그 유효성·안전성을 체계적으로 평가할 필요가 있었다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">코크란 체계적문헌고찰·메타분석(검색일 2024-05-15). CENTRAL·MEDLINE·Embase·LILACS·Web of Science·중국 3개 지역 DB·2개 시험등록부 검색 + 참고문헌 확인·저자 연락. 선정: 성인 MASLD에서 실리마린 단독 또는 복합제 vs 무중재·위약·기타중재를 비교한 무작위임상시험(준무작위·관찰연구 제외, 언어·연도 제한 없음). 총 17 RCT·2,069명 포함(MASLD 78명, MASH 423명, 미분류 1,568명). 4건 다기관·13건 단일기관(아시아 12·유럽 4·북미 1), 참가자 36~494명(중앙값 90), 평균연령 43.2세, 남성 55.6%, 추적 4~48주. 비뚤림은 RoB 2, 효과크기는 변량효과모형(이분형 RR, 연속형 MD, 희귀사건 Peto OR; 모두 95%CI), 확실성은 GRADE. 1차(핵심)결과: 중대이상반응·전원인사망·삶의질; 중요결과: 간효소(ALT·AST·GGT)·비중대이상반응.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">실리마린 단독 vs 무중재/위약: 중대이상반응 차이 거의 없음(Peto OR 1.55, 95%CI 0.26-9.28; 4시험 304명; 낮은 확실성). ALT를 감소시킬 수 있음(MD -7.21 U/L, 95%CI -10.62~-3.80; 6시험 409명; 매우 낮은 확실성), GGT도 감소(MD -8.30 U/L, 95%CI -12.43~-4.17; 1시험 45명). 비중대이상반응은 매우 불확실(RR 1.29, 95%CI 0.88-1.89). AST는 이질성(I²=77%)으로 메타분석 미시행. 실리마린 복합제 vs 무중재/위약: ALT(MD -1.10, 95%CI -8.12~5.92)·AST(MD 0.84, 95%CI -1.03~2.71)·GGT(MD -1.21, 95%CI -6.76~4.35) 모두 효과 매우 불확실. 복합제 vs 기타중재: 중대이상반응 거의 차이 없음(3시험 920명; 중등도 확실성, 이벤트 0건). 전원인사망·삶의질을 보고한 시험은 없음.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">전반적으로 안전한 것으로 보임. 한 시험에서 5건의 중대이상반응이 보고되었으나 어느 것도 시험약과 관련된 것으로 판정되지 않음. 920명 규모 3개 시험은 중대이상반응 0건. 비중대이상반응은 단독요법에서 위약 대비 증가 경향이나 통계적으로 불확실(RR 1.29). 전반적으로 실리마린 관련 약물 귀속 중대 안전성 문제는 확인되지 않음.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">(전문 정독) 저자 결론은 MASLD에서 실리마린의 유익성·위해성은 아직 불명확하나, 무중재/위약 대비 실리마린 &#x27;단독요법&#x27;(복합제가 아닌)이 간효소(ALT·GGT)를 낮출 수 있다는 것. 다만 근거 확실성은 표본부족·비뚤림·이질성으로 낮음~매우 낮음이며, 전원인사망·삶의질 등 환자중심 결과를 평가한 잘 설계된 대규모 시험이 필요. 하노마린(silymarin) 관점: 코크란 최고수준 근거가 실리마린이 안전하며 ALT를 평균 약 7.2 U/L, GGT를 약 8.3 U/L 낮출 수 있음을 종합 제시 — 간효소 개선·우수한 안전성 메시지를 뒷받침하되, &#x27;단독요법&#x27;에서 효과가 더 뚜렷하고 임상결과(사망·QoL) 근거는 아직 부족함을 균형 있게 활용해야 함.</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">MD -7.21 U/L (95%CI -10.62~-3.80)</div><div class="desc">실리마린 단독 vs 무중재/위약 ALT </div></div>
-        <div class="knum"><div class="val">MD -8.30 U/L (95%CI -12.43~-4.17)</div><div class="desc">실리마린 단독 vs 무중재/위약 GGT </div></div>
-        <div class="knum"><div class="val">Peto OR 1.55 (95%CI 0.26-9.28)</div><div class="desc">실리마린 단독 중대이상반응</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Silymarin for adults with metabolic dysfunction-associated s</div><div class="chart-wrap"><canvas id="chart_dr_5_895"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>하노마린(silymarin) Cochrane 리뷰</li>
-          <li>간 효소 개선 가능성 시사하나 장기 결과 데이터 필요</li>
-          <li>MASLD 포지셔닝 근거 수준 인지 필요</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #5 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Silymarin for adults with metabolic dysfunction-associated steatotic liver disease</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Cochrane Database of Systematic Reviews</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-06-01</div>
+                        <button class="bd-request-btn" data-title="Silymarin for adults with metabolic dysfunction-associated steatotic liver disease" data-session="Gut-Liver Axis" data-num="5" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/40552569/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">Cochrane 체계적 문헌고찰</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">대사이상 관련 지방간질환(MASLD)은 전 세계 성인 약 32.4%가 진단되는 주요 공중보건 문제로 유병률이 지속 증가하나, 효과가 입증된 승인 치료제가 없는 상태다. 실리마린(silymarin)은 항산화·항염증·항섬유화 작용을 가진 대표적 생약 성분으로, 단독요법 및 복합제(비타민E·포스파티딜콜린 등 가용화제와 복합) 형태로 MASLD에 잠재적 치료이점이 있어 그 유효성·안전성을 체계적으로 평가할 필요가 있었다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">코크란 체계적문헌고찰·메타분석(검색일 2024-05-15). CENTRAL·MEDLINE·Embase·LILACS·Web of Science·중국 3개 지역 DB·2개 시험등록부 검색 + 참고문헌 확인·저자 연락. 선정: 성인 MASLD에서 실리마린 단독 또는 복합제 vs 무중재·위약·기타중재를 비교한 무작위임상시험(준무작위·관찰연구 제외, 언어·연도 제한 없음). 총 17 RCT·2,069명 포함(MASLD 78명, MASH 423명, 미분류 1,568명). 4건 다기관·13건 단일기관(아시아 12·유럽 4·북미 1), 참가자 36~494명(중앙값 90), 평균연령 43.2세, 남성 55.6%, 추적 4~48주. 비뚤림은 RoB 2, 효과크기는 변량효과모형(이분형 RR, 연속형 MD, 희귀사건 Peto OR; 모두 95%CI), 확실성은 GRADE. 1차(핵심)결과: 중대이상반응·전원인사망·삶의질; 중요결과: 간효소(ALT·AST·GGT)·비중대이상반응.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text"><strong>실리마린 단독 vs 무중재/위약:</strong> 중대이상반응 차이 거의 없음(Peto OR 1.55, 95%CI 0.26-9.28; 4시험 304명; 낮은 확실성).<br/>
+ALT를 감소시킬 수 있음(MD -7.21 U/L, 95%CI -10.62~-3.80; 6시험 409명; 매우 낮은 확실성), GGT도 감소(MD -8.30 U/L, 95%CI -12.43~-4.17; 1시험 45명).<br/>
+비중대이상반응은 매우 불확실(RR 1.29, 95%CI 0.88-1.89).<br/>
+AST는 이질성(I²=77%)으로 메타분석 미시행.<br/>
+<strong>실리마린 복합제 vs 무중재/위약:</strong> ALT(MD -1.10, 95%CI -8.12~5.92)·AST(MD 0.84, 95%CI -1.03~2.71)·GGT(MD -1.21, 95%CI -6.76~4.35) 모두 효과 매우 불확실.<br/>
+<strong>복합제 vs 기타중재:</strong> 중대이상반응 거의 차이 없음(3시험 920명; 중등도 확실성, 이벤트 0건).<br/>
+전원인사망·삶의질을 보고한 시험은 없음.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">전반적으로 안전한 것으로 보임. 한 시험에서 5건의 중대이상반응이 보고되었으나 어느 것도 시험약과 관련된 것으로 판정되지 않음. 920명 규모 3개 시험은 중대이상반응 0건. 비중대이상반응은 단독요법에서 위약 대비 증가 경향이나 통계적으로 불확실(RR 1.29). 전반적으로 실리마린 관련 약물 귀속 중대 안전성 문제는 확인되지 않음.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">(전문 정독) 저자 결론은 MASLD에서 실리마린의 유익성·위해성은 아직 불명확하나, 무중재/위약 대비 실리마린 &#x27;단독요법&#x27;(복합제가 아닌)이 간효소(ALT·GGT)를 낮출 수 있다는 것. 다만 근거 확실성은 표본부족·비뚤림·이질성으로 낮음~매우 낮음이며, 전원인사망·삶의질 등 환자중심 결과를 평가한 잘 설계된 대규모 시험이 필요. 하노마린(silymarin) 관점: 코크란 최고수준 근거가 실리마린이 안전하며 ALT를 평균 약 7.2 U/L, GGT를 약 8.3 U/L 낮출 수 있음을 종합 제시 — 간효소 개선·우수한 안전성 메시지를 뒷받침하되, &#x27;단독요법&#x27;에서 효과가 더 뚜렷하고 임상결과(사망·QoL) 근거는 아직 부족함을 균형 있게 활용해야 함.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>MD -7.21 U/L (95%CI -10.62~-3.80) — 실리마린 단독 vs 무중재/위약 ALT 감소</li>
+                            <li>MD -8.30 U/L (95%CI -12.43~-4.17) — 실리마린 단독 vs 무중재/위약 GGT 감소</li>
+                            <li>Peto OR 1.55 (95%CI 0.26-9.28) — 실리마린 단독 중대이상반응</li>
+                            <li>17 RCT / 2,069명 — 포함된 무작위시험 수 / 총 참가자 수</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #6 (Gut-Liver Axis) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #6</span>
-      <span class="stars-mid">★★☆</span>
-      <span class="tag-ref">참고근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex:1;">International Journal of Molecular Sciences | 2025-06-10</div>
-      <button class="bd-request-btn" data-title="Therapeutic Efficacy of Silymarin, Vitamin E, and Essential Phospholipid Combination Therapy on Hepatic Steatosis, Fibrosis, and Metabolic Parameters in MASLD Patients: A Prospective Clinical Study" data-session="Gut-Liver Axis" data-num="6" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Therapeutic Efficacy of Silymarin, Vitamin E, and Essential Phospholipid Combination Therapy on Hepatic Steatosis, Fibrosis, and Metabolic Parameters in MASLD Patients: A Prospective Clinical Study</p>
-      <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12192674/" class="paper-url" target="_blank">https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12192674/</a>
-      <span class="design-badge">전향적 임상연구</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">대사이상 관련 지방간질환(MASLD)은 전 세계에서 가장 흔한 만성간질환으로 발생·유병률이 증가 중이며, 간세포 지방 축적으로 인한 산화스트레스가 활성산소·염증성 사이토카인을 유발해 단순 지방증에서 지방간염(MASH)·섬유화로 진행한다. 유럽 가이드라인은 지중해식 식이·체중감량을 권고하나 실제 순응이 어렵고, 실리마린·필수인지질·비타민E 등 약물이 각각 효능을 보였으나 결과가 가변적이어서, 단일제보다 병합요법이 더 나을 것이라는 가설하에 본 연구가 설계되었다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">2024년 1~12월 루마니아 2개 기관(크라이오바 의약대 위장·간장 연구센터, 콘스탄차 응급병원)에서 시행된 12개월 전향적 중재연구. 복부초음파로 지방간 확진된 성인 200명 등록, 4회 방문(visit 0/I/II/III) 모두 완료한 190명을 최종 분석. 중재: Esentin Trio(실리마린 100mg + 비타민E 150mg + 필수인지질 400mg) 1캡슐 1일 2회(BID), 반응에 따라 3개월 또는 6개월 투여. 제외기준: 국소 간병변, 음주 여성 &gt;20g/day·남성 &gt;30g/day, 메트포르민 복용, 성분 알레르기. 평가: 간기능검사(ALT·AST·GGT·ALP), 지질(TG·총콜레스테롤), 공복혈당, VCTE 기반 섬유화(LSM, kPa)·지방증(CAP, dB/m). 단독 대조군 없는 단일군 전후 비교(paired Wilcoxon 검정), 사전·6개월 변화 분석.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">기저 평균연령 47.66±10.43세, 남성 52.6%, 평균 CAP 296.05±36.82 dB/m(지방증 S2·S3 각 38.9%), LSM 6.14±6.68 kPa(F0~F1이 82.1%). 6개월 후 전 지표 유의 감소(모두 p&lt;0.0001, ALP만 p=0.022): ALT 평균 18.72±53.86% 감소(75.8% 환자 감소), AST 15.72±43.54% 감소(67.9%), GGT 6.39±76.65% 감소(70.5%), ALP 2.1±42.02% 감소, TG 3.18±39.26% 감소(58.9%), 총콜레스테롤 9.51±17.9% 감소(72.6%), 혈당 6.4±20.1% 감소(66.3%), BMI 4.1±8.4% 감소(60% 환자 감소). 섬유화(LSM): visit I→III 유의 감소(p=0.002), 1단계 이상 호전 14.21%(27명), 악화 1단계 7.4%·2단계 1.1%, 무변화 77.4%. 지방증(CAP): 유의 감소(p=0.002), 3단계 호전 2.6%(5명)·2단계 14.2%(27명)·1단계 37.9%(72명), 악화 1단계 9.5%, 무변화 35.3%. 섬유화·지방증 호전 간 상관은 약함(Spearman rho=0.197, p=0.006)으로 지방증 개선 효과가 더 뚜렷. 비음주자가 6개월 후 CAP 개선 우수(rho=0.143, p=0.049), 고혈압 부재 시 LSM 개선 우수(rho=-0.183, p=0.012).</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">전반적으로 양호하며 저자는 환자에게 유해한 이상반응 없이 제안 가능하다고 결론. 초기 등록 200명 중 5명은 visit 0·I만 참여, 5명은 visit III 미완료. 이 중 1명은 하지부종으로 약물 중단했으나 추후 심장내과 평가에서 심장기능 비대상화(cardiac decompensation)가 원인으로 밝혀져 약물과 무관. 사후검정력(G*Power) 99.4~100%.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자 결론은 실리마린·비타민E·필수인지질 3제 병합이 단기(6개월)에도 간효소·지질·혈당을 유의하게 개선하고 특히 지방증에 뚜렷한 효과를 보이며 이상반응 없이 MASLD 치료로 제안 가능하다는 것. 한계는 단일군(대조군 부재)·소표본·단기추적, 코카시안(루마니아) 단일 인종으로 일반화 제한, 식이/운동 미통제, 개별 성분 분리 비교 부재. 하노마린(silymarin) 관점: 실리마린을 핵심으로 한 항산화·항섬유화 병합요법이 MASLD 환자에서 6개월 만에 ALT·AST·CAP 등 지방간 핵심 지표를 안전하게 개선함을 보여, 하노마린의 지방간 적응 근거를 보강한다.</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">-18.72±53.86%</div><div class="desc">6개월 후 ALT 평균 감소율</div><div class="pval">&lt;0.0001</div></div>
-        <div class="knum"><div class="val">-15.72±43.54%</div><div class="desc">6개월 후 AST 평균 감소율, 67.9</div><div class="pval">&lt;0.0001</div></div>
-        <div class="knum"><div class="val">-9.51±17.9%</div><div class="desc">6개월 후 총콜레스테롤 평균 감소율, 7</div><div class="pval">&lt;0.0001</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Therapeutic Efficacy of Silymarin, Vitamin E, and Essential </div><div class="chart-wrap"><canvas id="chart_dr_6_895"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>Silymarin 포함 병용요법 MASLD 데이터</li>
-          <li>하노마린 병용 시너지 메시지 활용 후속 연구 동향 지속 모니터링 필요</li>
-          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #6 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Therapeutic Efficacy of Silymarin, Vitamin E, and Essential Phospholipid Combination Therapy on Hepatic Steatosis, Fibrosis, and Metabolic Parameters in MASLD Patients: A Prospective Clinical Study</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> International Journal of Molecular Sciences</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-06-10</div>
+                        <button class="bd-request-btn" data-title="Therapeutic Efficacy of Silymarin, Vitamin E, and Essential Phospholipid Combination Therapy on Hepatic Steatosis, Fibrosis, and Metabolic Parameters in MASLD Patients: A Prospective Clinical Study" data-session="Gut-Liver Axis" data-num="6" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12192674/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">전향적 임상연구</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">대사이상 관련 지방간질환(MASLD)은 전 세계에서 가장 흔한 만성간질환으로 발생·유병률이 증가 중이며, 간세포 지방 축적으로 인한 산화스트레스가 활성산소·염증성 사이토카인을 유발해 단순 지방증에서 지방간염(MASH)·섬유화로 진행한다. 유럽 가이드라인은 지중해식 식이·체중감량을 권고하나 실제 순응이 어렵고, 실리마린·필수인지질·비타민E 등 약물이 각각 효능을 보였으나 결과가 가변적이어서, 단일제보다 병합요법이 더 나을 것이라는 가설하에 본 연구가 설계되었다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">2024년 1~12월 루마니아 2개 기관(크라이오바 의약대 위장·간장 연구센터, 콘스탄차 응급병원)에서 시행된 12개월 전향적 중재연구. 복부초음파로 지방간 확진된 성인 200명 등록, 4회 방문(visit 0/I/II/III) 모두 완료한 190명을 최종 분석. 중재: Esentin Trio(실리마린 100mg + 비타민E 150mg + 필수인지질 400mg) 1캡슐 1일 2회(BID), 반응에 따라 3개월 또는 6개월 투여. 제외기준: 국소 간병변, 음주 여성 &gt;20g/day·남성 &gt;30g/day, 메트포르민 복용, 성분 알레르기. 평가: 간기능검사(ALT·AST·GGT·ALP), 지질(TG·총콜레스테롤), 공복혈당, VCTE 기반 섬유화(LSM, kPa)·지방증(CAP, dB/m). 단독 대조군 없는 단일군 전후 비교(paired Wilcoxon 검정), 사전·6개월 변화 분석.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">기저 평균연령 47.66±10.43세, 남성 52.6%, 평균 CAP 296.05±36.82 dB/m(지방증 S2·S3 각 38.9%), LSM 6.14±6.68 kPa(F0~F1이 82.1%).<br/>
+6개월 후 전 지표 유의 감소(모두 p&lt;0.0001, ALP만 p=0.022): ALT 평균 18.72±53.86% 감소(75.8% 환자 감소), AST 15.72±43.54% 감소(67.9%), GGT 6.39±76.65% 감소(70.5%), ALP 2.1±42.02% 감소, TG 3.18±39.26% 감소(58.9%), 총콜레스테롤 9.51±17.9% 감소(72.6%), 혈당 6.4±20.1% 감소(66.3%), BMI 4.1±8.4% 감소(60% 환자 감소).<br/>
+<strong>섬유화(LSM):</strong> visit I→III 유의 감소(p=0.002), 1단계 이상 호전 14.21%(27명), 악화 1단계 7.4%·2단계 1.1%, 무변화 77.4%.<br/>
+<strong>지방증(CAP):</strong> 유의 감소(p=0.002), 3단계 호전 2.6%(5명)·2단계 14.2%(27명)·1단계 37.9%(72명), 악화 1단계 9.5%, 무변화 35.3%.<br/>
+섬유화·지방증 호전 간 상관은 약함(Spearman rho=0.197, p=0.006)으로 지방증 개선 효과가 더 뚜렷.<br/>
+비음주자가 6개월 후 CAP 개선 우수(rho=0.143, p=0.049), 고혈압 부재 시 LSM 개선 우수(rho=-0.183, p=0.012).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">전반적으로 양호하며 저자는 환자에게 유해한 이상반응 없이 제안 가능하다고 결론. 초기 등록 200명 중 5명은 visit 0·I만 참여, 5명은 visit III 미완료. 이 중 1명은 하지부종으로 약물 중단했으나 추후 심장내과 평가에서 심장기능 비대상화(cardiac decompensation)가 원인으로 밝혀져 약물과 무관. 사후검정력(G*Power) 99.4~100%.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자 결론은 실리마린·비타민E·필수인지질 3제 병합이 단기(6개월)에도 간효소·지질·혈당을 유의하게 개선하고 특히 지방증에 뚜렷한 효과를 보이며 이상반응 없이 MASLD 치료로 제안 가능하다는 것. 한계는 단일군(대조군 부재)·소표본·단기추적, 코카시안(루마니아) 단일 인종으로 일반화 제한, 식이/운동 미통제, 개별 성분 분리 비교 부재. 하노마린(silymarin) 관점: 실리마린을 핵심으로 한 항산화·항섬유화 병합요법이 MASLD 환자에서 6개월 만에 ALT·AST·CAP 등 지방간 핵심 지표를 안전하게 개선함을 보여, 하노마린의 지방간 적응 근거를 보강한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>-18.72±53.86% — 6개월 후 ALT 평균 감소율 (&lt;0.0001)</li>
+                            <li>-15.72±43.54% — 6개월 후 AST 평균 감소율, 67.9%  (&lt;0.0001)</li>
+                            <li>-9.51±17.9% — 6개월 후 총콜레스테롤 평균 감소율, 72. (&lt;0.0001)</li>
+                            <li>54.7% — 지방증 (p=0.002)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #7 (Gut-Liver Axis) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #7</span>
-      <span class="stars-high">★★★</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex:1;">Therapeutic Advances in Gastroenterology | 2025-01-01</div>
-      <button class="bd-request-btn" data-title="Comparative efficacy of diverse therapeutic regimens for small intestinal bacterial overgrowth: a systematic network meta-analysis" data-session="Gut-Liver Axis" data-num="7" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Comparative efficacy of diverse therapeutic regimens for small intestinal bacterial overgrowth: a systematic network meta-analysis</p>
-      <a href="https://pubmed.ncbi.nlm.nih.gov/41394885/" class="paper-url" target="_blank">https://pubmed.ncbi.nlm.nih.gov/41394885/</a>
-      <span class="design-badge">네트워크 메타분석</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">소장세균과증식(SIBO)은 소장 내 대장형 세균의 과도한 집락으로 복부팽만·복통·오심·배변습관 변화를 유발하며, 과민성대장증후군·염증성장질환·간경변·당뇨·파킨슨병 등 다양한 전신질환의 병태생리에 관여하는 임상적으로 중요한 질환이다. 항생제·프로바이오틱스·식이조절·운동촉진제·분변이식 등 다수 치료법이 있으나 효능 위계에 대한 국제적 합의가 없고 기존 근거가 소규모·저질 RCT와 쌍대비교 메타분석에 국한되어, 전체 치료옵션을 동시 비교하는 미충족 수요가 존재한다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">PRISMA-NMA 지침·GRADE에 따른 베이지안 네트워크 메타분석(NMA), PROSPERO 등록(CRD420251075028). PubMed/MEDLINE·Embase·Web of Science를 2024년 12월 31일까지 검색, 성인 SIBO 치료를 비교한 RCT 포함. 최종 30편 RCT·총 1552명 분석(2군 25편·3군 5편). 12개 치료군 비교: (1)리팍시민, (2)위약, (3)프로바이오틱스, (4)메트로니다졸, (5)퀴놀론, (6)위장관 운동촉진제, (7)테트라사이클린, (8)리팍시민+운동촉진제, (9)아미노글리코사이드, (10)우르소데옥시콜산, (11)베르베린, (12)기타 병합. 1차 평가변수는 SIBO 박멸(소장세균밀도 감소/수소호기검사 정상화/SIBO 관련 지표 임상 호전). RoB 2.0로 비뚤림 평가(3편 high RoB), SUCRA로 효능 순위화. 동반질환별 사전지정 하위군: 단독 SIBO, 기능성위장장애(FGID) 동반, 만성간질환 동반.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">쌍대비교에서 리팍시민이 메트로니다졸 대비 우월(RR 1.54, 95%CI 1.17~2.02). 위약 대비 유의 개선: 리팍시민(RR 2.43, 95%CI 1.32~4.45), 프로바이오틱스(RR 3.35, 95%CI 2.29~4.89), 운동촉진제(RR 7.50, 95%CI 1.14~49.54), 아미노글리코사이드(RR 8.39, 95%CI 1.10~64.16). 리팍시민 기준 NMA에서 위약은 유의하게 낮은 효능(RR 0.11, 95%CI 0.04~0.28). 전체 SUCRA 순위: 베르베린 82.5% &gt; 기타병합 72.5% &gt; 리팍시민+운동촉진제 66.9% &gt; 퀴놀론 64.0% &gt; 아미노글리코사이드 59.4% &gt; 리팍시민 57.5% &gt; 프로바이오틱스 55.3% &gt; 운동촉진제 53.5% &gt; 메트로니다졸 40.2% &gt; UDCA 25.9% &gt; 테트라사이클린 16.5% &gt; 위약 5.9%. 하위군: ①단독 SIBO(8편 652명) — 베르베린 79.4% 최상위; ②FGID 동반(7편 383명) — 리팍시민+운동촉진제 89.0% &gt; 리팍시민 86.2%로 최상위; ③만성간질환 동반(5편 112명) — 운동촉진제 단독 79.6% 최상위.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">효능 비교에 집중하여 안전성 정식 평가는 범위를 벗어났으나, 포함 RCT의 이상반응 기록상 리팍시민의 내약성이 양호. 직접비교 RCT(Vera 등)에서 전체 부작용률은 메트로니다졸 50%·시프로플록사신 39%·리팍시민 11%로 리팍시민이 가장 낮음. 리팍시민 관련 보고된 경미 이상반응은 변비·소화불량·무력감·두통·어지럼·불면 등 소수였고, 일부 RCT는 이상반응 없음(none)으로 보고. 중대 이상반응·중단 관련 통합 수치는 제시되지 않음.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자 결론은 SIBO 치료를 동반질환에 따라 최적화할 수 있으며, 단독 SIBO에는 베르베린, FGID 동반 시 리팍시민+운동촉진제 병합, 만성간질환 동반 시 운동촉진제 단독이 각각 최상위 순위라는 것. 한계는 약 절반이 개방표지(open-label)로 수행비뚤림 우려, SIBO 진단법·기준의 이질성, 일부 하위군 표본 부족, 안전성 미평가로 결과는 가설생성적으로 해석해야 함. 노르믹스(rifaximin) 관점: 노르믹스는 위약·메트로니다졸 대비 SIBO 박멸에 유의하게 우월하고 부작용률이 가장 낮으며, 특히 FGID 동반 환자에서 운동촉진제와 병합 시 가장 높은 효능 순위(SUCRA 89%)를 보여 장표적 항생요법으로서의 입지를 뒷받침한다.</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">RR 1.54 (95%CI 1.17~2.02)</div><div class="desc">SIBO 박멸</div><div class="pval">유의(CI 1 미포함)</div></div>
-        <div class="knum"><div class="val">RR 2.43 (95%CI 1.32~4.45)</div><div class="desc">SIBO 박멸</div><div class="pval">유의(CI 1 미포함)</div></div>
-        <div class="knum"><div class="val">RR 0.11 (95%CI 0.04~0.28)</div><div class="desc">NMA에서 위약의 SIBO 박멸 효능</div><div class="pval">유의(CI 1 미포함)</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Comparative efficacy of diverse therapeutic regimens for sma</div><div class="chart-wrap"><canvas id="chart_dr_7_895"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>노르믹스 SIBO 1차 치료 metronidazole 대비 우월 NMA 근거</li>
-          <li>IBS-SIBO 동반 환자 rifaximin+운동촉진제 전략</li>
-          <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #7 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Comparative efficacy of diverse therapeutic regimens for small intestinal bacterial overgrowth: a systematic network meta-analysis</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Therapeutic Advances in Gastroenterology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-01-01</div>
+                        <button class="bd-request-btn" data-title="Comparative efficacy of diverse therapeutic regimens for small intestinal bacterial overgrowth: a systematic network meta-analysis" data-session="Gut-Liver Axis" data-num="7" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/41394885/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">네트워크 메타분석</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">소장세균과증식(SIBO)은 소장 내 대장형 세균의 과도한 집락으로 복부팽만·복통·오심·배변습관 변화를 유발하며, 과민성대장증후군·염증성장질환·간경변·당뇨·파킨슨병 등 다양한 전신질환의 병태생리에 관여하는 임상적으로 중요한 질환이다. 항생제·프로바이오틱스·식이조절·운동촉진제·분변이식 등 다수 치료법이 있으나 효능 위계에 대한 국제적 합의가 없고 기존 근거가 소규모·저질 RCT와 쌍대비교 메타분석에 국한되어, 전체 치료옵션을 동시 비교하는 미충족 수요가 존재한다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">PRISMA-NMA 지침·GRADE에 따른 베이지안 네트워크 메타분석(NMA), PROSPERO 등록(CRD420251075028). PubMed/MEDLINE·Embase·Web of Science를 2024년 12월 31일까지 검색, 성인 SIBO 치료를 비교한 RCT 포함. 최종 30편 RCT·총 1552명 분석(2군 25편·3군 5편). 12개 치료군 비교: (1)리팍시민, (2)위약, (3)프로바이오틱스, (4)메트로니다졸, (5)퀴놀론, (6)위장관 운동촉진제, (7)테트라사이클린, (8)리팍시민+운동촉진제, (9)아미노글리코사이드, (10)우르소데옥시콜산, (11)베르베린, (12)기타 병합. 1차 평가변수는 SIBO 박멸(소장세균밀도 감소/수소호기검사 정상화/SIBO 관련 지표 임상 호전). RoB 2.0로 비뚤림 평가(3편 high RoB), SUCRA로 효능 순위화. 동반질환별 사전지정 하위군: 단독 SIBO, 기능성위장장애(FGID) 동반, 만성간질환 동반.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">쌍대비교에서 리팍시민이 메트로니다졸 대비 우월(RR 1.54, 95%CI 1.17~2.02).<br/>
+<strong>위약 대비 유의 개선:</strong> 리팍시민(RR 2.43, 95%CI 1.32~4.45), 프로바이오틱스(RR 3.35, 95%CI 2.29~4.89), 운동촉진제(RR 7.50, 95%CI 1.14~49.54), 아미노글리코사이드(RR 8.39, 95%CI 1.10~64.16).<br/>
+리팍시민 기준 NMA에서 위약은 유의하게 낮은 효능(RR 0.11, 95%CI 0.04~0.28).<br/>
+<strong>전체 SUCRA 순위:</strong> 베르베린 82.5% &gt; 기타병합 72.5% &gt; 리팍시민+운동촉진제 66.9% &gt; 퀴놀론 64.0% &gt; 아미노글리코사이드 59.4% &gt; 리팍시민 57.5% &gt; 프로바이오틱스 55.3% &gt; 운동촉진제 53.5% &gt; 메트로니다졸 40.2% &gt; UDCA 25.9% &gt; 테트라사이클린 16.5% &gt; 위약 5.9%.<br/>
+<strong>하위군:</strong> ①단독 SIBO(8편 652명) — 베르베린 79.4% 최상위; ②FGID 동반(7편 383명) — 리팍시민+운동촉진제 89.0% &gt; 리팍시민 86.2%로 최상위; ③만성간질환 동반(5편 112명) — 운동촉진제 단독 79.6% 최상위.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">효능 비교에 집중하여 안전성 정식 평가는 범위를 벗어났으나, 포함 RCT의 이상반응 기록상 리팍시민의 내약성이 양호. 직접비교 RCT(Vera 등)에서 전체 부작용률은 메트로니다졸 50%·시프로플록사신 39%·리팍시민 11%로 리팍시민이 가장 낮음. 리팍시민 관련 보고된 경미 이상반응은 변비·소화불량·무력감·두통·어지럼·불면 등 소수였고, 일부 RCT는 이상반응 없음(none)으로 보고. 중대 이상반응·중단 관련 통합 수치는 제시되지 않음.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자 결론은 SIBO 치료를 동반질환에 따라 최적화할 수 있으며, 단독 SIBO에는 베르베린, FGID 동반 시 리팍시민+운동촉진제 병합, 만성간질환 동반 시 운동촉진제 단독이 각각 최상위 순위라는 것. 한계는 약 절반이 개방표지(open-label)로 수행비뚤림 우려, SIBO 진단법·기준의 이질성, 일부 하위군 표본 부족, 안전성 미평가로 결과는 가설생성적으로 해석해야 함. 노르믹스(rifaximin) 관점: 노르믹스는 위약·메트로니다졸 대비 SIBO 박멸에 유의하게 우월하고 부작용률이 가장 낮으며, 특히 FGID 동반 환자에서 운동촉진제와 병합 시 가장 높은 효능 순위(SUCRA 89%)를 보여 장표적 항생요법으로서의 입지를 뒷받침한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>RR 1.54 (95%CI 1.17~2.02) — SIBO 박멸 (유의(CI 1 미포함))</li>
+                            <li>RR 2.43 (95%CI 1.32~4.45) — SIBO 박멸 (유의(CI 1 미포함))</li>
+                            <li>RR 0.11 (95%CI 0.04~0.28) — NMA에서 위약의 SIBO 박멸 효능 (유의(CI 1 미포함))</li>
+                            <li>SUCRA 82.5% — 전체 SIBO 박멸 효능 1위</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #8 (Gut-Liver Axis) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #8</span>
-      <span class="stars-high">★★★</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex:1;">Medicine | 2025-01-31</div>
-      <button class="bd-request-btn" data-title="Efficacy of rifaximin for the prophylaxis of hepatic encephalopathy: A meta-analysis" data-session="Gut-Liver Axis" data-num="8" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Efficacy of rifaximin for the prophylaxis of hepatic encephalopathy: A meta-analysis</p>
-      <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11789876/" class="paper-url" target="_blank">https://pmc.ncbi.nlm.nih.gov/articles/PMC11789876/</a>
-      <span class="design-badge">메타분석</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">간성뇌증(HE)은 말기 간경변의 흔한 합병증으로 높은 이환·사망률과 삶의 질 저하, 보호자·의료시스템 부담을 동반하는 가역적 신경정신과적 장애다. 락툴로스·락티톨이 2차 예방 1차약으로 권고되나 과도한 단맛, 팽만·고창·예측 불가한 중증 설사 등 부작용으로 빈번한 비순응을 초래한다. 리팍시민은 낮은 전신 생체이용률로 장기 사용에 적합하나, 특히 post-TIPS 및 유발인자 없는 간경변 환자의 1차 예방에서 효과가 상충되어 본 메타분석이 HE 예방에서의 효능·안전성을 규명하고자 수행되었다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">Cochrane Handbook·PRISMA 지침에 따른 메타분석. Cochrane Library·PubMed·Web of Science·EMBASE를 2022년 3월까지 검색. 포함기준: 영문 전문 RCT, HE 없는 모든 연령·성별 간경변 환자, 리팍시민 단독 또는 락툴로스 병합을 위약 또는 락툴로스와 비교, HE율·이상반응율·사망률 보고. 최종 14편(2029명) 포함 — 12편 2군·1편 3군·1편 4군, 8편 이중/삼중맹검, 9편은 2차 예방·4편은 1차 예방·1편은 구분 안 함, 12편 리팍시민 단독·2편 리팍시민+락툴로스. RoB는 Cochrane 도구로 평가(7편 low·7편 high risk). 통계는 random-effects DerSimonian-Laird 모델로 RR(95%CI) 통합, I²로 이질성 평가. 하위분석: 중재(vs 위약/vs 락툴로스/병합 vs 락툴로스), 예방유형(1차/2차), 원인(바이러스/알코올), TIPS 여부.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">리팍시민은 HE 위험을 유의하게 감소(RR -0.47, 95%CI -0.68~-0.26, p=0.01, I²=51.40%)했으나 사망률은 감소시키지 않았고(RR 0.03, 95%CI -0.32~0.39, p=1.0, I²=0.00%), 이상반응 발생도 증가시키지 않음(RR -0.08, 95%CI 0.22~0.07, p&lt;0.001, I²=72.69%). 중재별 하위분석: 리팍시민 vs 위약 — HE 위험 유의 감소(RR -0.43, 95%CI -0.76~-0.14, p=0.01, I²=60.05%); 리팍시민 vs 락툴로스 — 우월하지 않음(RR -0.44, 95%CI -1.0~0.11, p=0.13, I²=47.58%); 리팍시민+락툴로스 vs 락툴로스 단독 — 병합이 더 효과적(RR -0.57, 95%CI -0.90~-0.24, I²=31.55%). 예방유형별: 1차 예방(RR -0.35, 95%CI -0.62~-0.08, I²=0.00%)·2차 예방(RR -0.56, 95%CI -0.85~-0.27, p&lt;0.001, I²=68.86%) 모두 유효. 환자군별: post-TIPS(RR -0.35, 95%CI -0.66~-0.05)·non-TIPS(RR -0.51, 95%CI -0.76~-0.27) 모두 유효. 원인별: 알코올성(RR -0.59, 95%CI -0.87~-0.32)·바이러스성(RR -0.41, 95%CI -0.71~-0.11) 모두 유효. 예방유형이 주된 이질성 원인으로 확인됨.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">리팍시민 예방은 이상반응 발생을 증가시키지 않음(RR -0.08, 95%CI 0.22~0.07; 10편 1520명 보고). 다수 연구에서 리팍시민이 이상반응 증가 없이 HE를 예방함을 입증했으며, 락툴로스 대비 낮은 시스템 생체이용률로 장기 사용 안전성이 우수하다고 기술. 사망률 또한 증가/감소 모두 없음(RR 0.03, 95%CI -0.32~0.39). 단, 개별 이상반응명·군별 발생률·중단율 등 세부 안전성 수치는 본 메타분석에서 통합 제시되지 않음.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자 결론은 리팍시민이 간경변 원인(바이러스/알코올)이나 TIPS 시행 여부와 무관하게 HE의 1차·2차 예방에 유익하며 락툴로스만큼 효과적이고 병합 시 락툴로스 단독보다 우수하지만, 말기 간경변 환자에서 사망률을 줄이거나 이상반응을 증가시키지는 않는다는 것. 한계는 non-TIPS 2차 예방·원인별 분석의 잔존 이질성, post-TIPS 1차 예방 연구 부족, 영문 RCT 한정. 노르믹스(rifaximin) 관점: 노르믹스는 HE 1차·2차 예방 모두에서 위약 대비 유의한 예방효과를 보이고 락툴로스에 병합 시 부가적 보호효과를 제공하며 안전성·내약성 부담이 없어, 간경변 환자의 HE 예방 유지요법으로서의 근거를 강화한다.</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">RR -0.47 (95%CI -0.68~-0.26)</div><div class="desc">리팍시민의 전체 HE 예방효과</div><div class="pval">p=0.01</div></div>
-        <div class="knum"><div class="val">RR 0.03 (95%CI -0.32~0.39)</div><div class="desc">리팍시민의 사망률 영향</div><div class="pval">p=1.0</div></div>
-        <div class="knum"><div class="val">RR -0.43 (95%CI -0.76~-0.14)</div><div class="desc">HE 예방</div><div class="pval">p=0.01</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Efficacy of rifaximin for the prophylaxis of hepatic encepha</div><div class="chart-wrap"><canvas id="chart_dr_8_895"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>노르믹스 HE 예방 독립 메타분석 기수록 PLOS One 리뷰와 다른 저널에서 유사 결론</li>
-          <li>HE 예방 근거 강화 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #8 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Efficacy of rifaximin for the prophylaxis of hepatic encephalopathy: A meta-analysis</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Medicine</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-01-31</div>
+                        <button class="bd-request-btn" data-title="Efficacy of rifaximin for the prophylaxis of hepatic encephalopathy: A meta-analysis" data-session="Gut-Liver Axis" data-num="8" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11789876/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">메타분석</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">간성뇌증(HE)은 말기 간경변의 흔한 합병증으로 높은 이환·사망률과 삶의 질 저하, 보호자·의료시스템 부담을 동반하는 가역적 신경정신과적 장애다. 락툴로스·락티톨이 2차 예방 1차약으로 권고되나 과도한 단맛, 팽만·고창·예측 불가한 중증 설사 등 부작용으로 빈번한 비순응을 초래한다. 리팍시민은 낮은 전신 생체이용률로 장기 사용에 적합하나, 특히 post-TIPS 및 유발인자 없는 간경변 환자의 1차 예방에서 효과가 상충되어 본 메타분석이 HE 예방에서의 효능·안전성을 규명하고자 수행되었다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">Cochrane Handbook·PRISMA 지침에 따른 메타분석. Cochrane Library·PubMed·Web of Science·EMBASE를 2022년 3월까지 검색. 포함기준: 영문 전문 RCT, HE 없는 모든 연령·성별 간경변 환자, 리팍시민 단독 또는 락툴로스 병합을 위약 또는 락툴로스와 비교, HE율·이상반응율·사망률 보고. 최종 14편(2029명) 포함 — 12편 2군·1편 3군·1편 4군, 8편 이중/삼중맹검, 9편은 2차 예방·4편은 1차 예방·1편은 구분 안 함, 12편 리팍시민 단독·2편 리팍시민+락툴로스. RoB는 Cochrane 도구로 평가(7편 low·7편 high risk). 통계는 random-effects DerSimonian-Laird 모델로 RR(95%CI) 통합, I²로 이질성 평가. 하위분석: 중재(vs 위약/vs 락툴로스/병합 vs 락툴로스), 예방유형(1차/2차), 원인(바이러스/알코올), TIPS 여부.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">리팍시민은 HE 위험을 유의하게 감소(RR -0.47, 95%CI -0.68~-0.26, p=0.01, I²=51.40%)했으나 사망률은 감소시키지 않았고(RR 0.03, 95%CI -0.32~0.39, p=1.0, I²=0.00%), 이상반응 발생도 증가시키지 않음(RR -0.08, 95%CI 0.22~0.07, p&lt;0.001, I²=72.69%).<br/>
+<strong>중재별 하위분석:</strong> 리팍시민 vs 위약 — HE 위험 유의 감소(RR -0.43, 95%CI -0.76~-0.14, p=0.01, I²=60.05%); 리팍시민 vs 락툴로스 — 우월하지 않음(RR -0.44, 95%CI -1.0~0.11, p=0.13, I²=47.58%); 리팍시민+락툴로스 vs 락툴로스 단독 — 병합이 더 효과적(RR -0.57, 95%CI -0.90~-0.24, I²=31.55%).<br/>
+<strong>예방유형별:</strong> 1차 예방(RR -0.35, 95%CI -0.62~-0.08, I²=0.00%)·2차 예방(RR -0.56, 95%CI -0.85~-0.27, p&lt;0.001, I²=68.86%) 모두 유효.<br/>
+<strong>환자군별:</strong> post-TIPS(RR -0.35, 95%CI -0.66~-0.05)·non-TIPS(RR -0.51, 95%CI -0.76~-0.27) 모두 유효.<br/>
+<strong>원인별:</strong> 알코올성(RR -0.59, 95%CI -0.87~-0.32)·바이러스성(RR -0.41, 95%CI -0.71~-0.11) 모두 유효.<br/>
+예방유형이 주된 이질성 원인으로 확인됨.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">리팍시민 예방은 이상반응 발생을 증가시키지 않음(RR -0.08, 95%CI 0.22~0.07; 10편 1520명 보고). 다수 연구에서 리팍시민이 이상반응 증가 없이 HE를 예방함을 입증했으며, 락툴로스 대비 낮은 시스템 생체이용률로 장기 사용 안전성이 우수하다고 기술. 사망률 또한 증가/감소 모두 없음(RR 0.03, 95%CI -0.32~0.39). 단, 개별 이상반응명·군별 발생률·중단율 등 세부 안전성 수치는 본 메타분석에서 통합 제시되지 않음.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자 결론은 리팍시민이 간경변 원인(바이러스/알코올)이나 TIPS 시행 여부와 무관하게 HE의 1차·2차 예방에 유익하며 락툴로스만큼 효과적이고 병합 시 락툴로스 단독보다 우수하지만, 말기 간경변 환자에서 사망률을 줄이거나 이상반응을 증가시키지는 않는다는 것. 한계는 non-TIPS 2차 예방·원인별 분석의 잔존 이질성, post-TIPS 1차 예방 연구 부족, 영문 RCT 한정. 노르믹스(rifaximin) 관점: 노르믹스는 HE 1차·2차 예방 모두에서 위약 대비 유의한 예방효과를 보이고 락툴로스에 병합 시 부가적 보호효과를 제공하며 안전성·내약성 부담이 없어, 간경변 환자의 HE 예방 유지요법으로서의 근거를 강화한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>RR -0.47 (95%CI -0.68~-0.26) — 리팍시민의 전체 HE 예방효과 (p=0.01)</li>
+                            <li>RR 0.03 (95%CI -0.32~0.39) — 리팍시민의 사망률 영향 (p=1.0)</li>
+                            <li>RR -0.43 (95%CI -0.76~-0.14) — HE 예방 (p=0.01)</li>
+                            <li>RR -0.44 (95%CI -1.0~0.11) — HE 예방 (p=0.13)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="legend">
@@ -404,7 +536,6 @@
     </div>
 
 <script>
-/* 논문별 포커스 뷰 (#논문제목 해시) */
 (function(){
   var h=decodeURIComponent(location.hash.slice(1)); if(!h) return;
   var papers=document.querySelectorAll('.paper'),found=null;
@@ -417,76 +548,6 @@
   btn.onclick=function(){for(var k=0;k<papers.length;k++)papers[k].style.display='';found.style.outline='';btn.remove();window.scrollTo(0,0);};
   document.body.appendChild(btn);
 })();
-</script>
-
-<script>
-if (typeof Chart !== "undefined") {
-
-  // 논문 #1 (Gut-Liver Axis)
-  (function(){ var c=document.getElementById('chart_dr_1_895'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #2 (Gut-Liver Axis)
-  (function(){ var c=document.getElementById('chart_dr_2_895'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["지표A", "지표B"], datasets:[{label:"치료군",data:[68.1, 54.48],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[56.6, 45.28],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #3 (Gut-Liver Axis)
-  (function(){ var c=document.getElementById('chart_dr_3_895'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["지표A", "지표B"], datasets:[{label:"치료군",data:[80.3, 64.24],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[56.1, 44.88],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #4 (Gut-Liver Axis)
-  (function(){ var c=document.getElementById('chart_dr_4_895'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #5 (Gut-Liver Axis)
-  (function(){ var c=document.getElementById('chart_dr_5_895'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #6 (Gut-Liver Axis)
-  (function(){ var c=document.getElementById('chart_dr_6_895'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #7 (Gut-Liver Axis)
-  (function(){ var c=document.getElementById('chart_dr_7_895'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #8 (Gut-Liver Axis)
-  (function(){ var c=document.getElementById('chart_dr_8_895'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-}
 </script>
 
 <!-- BD_REQUEST_MODAL_v2 -->
@@ -507,7 +568,7 @@ if (typeof Chart !== "undefined") {
 </style>
 <div id="bd-modal-overlay" onclick="if(event.target.id==='bd-modal-overlay') closeBDModal()">
   <div id="bd-modal">
-    <h3>📋 BD 제작 요청</h3>
+    <h3>📌 BD 제작 요청</h3>
     <div class="field"><label>논문</label><div id="bd-modal-title" style="font-size:13px;color:#555;line-height:1.4"></div></div>
     <div class="field"><label>세션</label><div id="bd-modal-session" style="font-size:13px;color:#555"></div></div>
     <div class="field"><label>BD 포맷</label><div class="radio-row">
