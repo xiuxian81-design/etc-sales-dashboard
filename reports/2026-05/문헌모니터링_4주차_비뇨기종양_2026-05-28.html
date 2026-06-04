@@ -573,7 +573,7 @@
                 </div>
             </div>
         </div>
-    <!-- ━━━ 논문 #1 (비뇨기·종양·CPP) ━━━ -->
+      <!-- ━━━ 논문 #1 (비뇨기·종양·CPP) ━━━ -->
   <div class="paper">
     <div class="paper-header">
       <span class="paper-num">■ 논문 #1</span>
@@ -634,7 +634,7 @@
         <h4>📊 핵심 비교 분석</h4>
         <div class="viz-subtitle">ARCHES 5-year Survival with Enzalutamide Plus Androgen-depri</div>
         <div class="chart-wrap">
-          <canvas id="chart_dr_1_355"></canvas>
+          <canvas id="chart_dr_1_419"></canvas>
         </div>
       </div>
 
@@ -710,7 +710,7 @@
         <h4>📊 핵심 비교 분석</h4>
         <div class="viz-subtitle">Enzalutamide plus radium-223 in metastatic castration-resist</div>
         <div class="chart-wrap">
-          <canvas id="chart_dr_2_355"></canvas>
+          <canvas id="chart_dr_2_419"></canvas>
         </div>
       </div>
 
@@ -786,7 +786,7 @@
         <h4>📊 핵심 비교 분석</h4>
         <div class="viz-subtitle">Final overall survival results from the EORTC 1333/PEACE-3 t</div>
         <div class="chart-wrap">
-          <canvas id="chart_dr_3_355"></canvas>
+          <canvas id="chart_dr_3_419"></canvas>
         </div>
       </div>
 
@@ -862,7 +862,7 @@
         <h4>📊 핵심 비교 분석</h4>
         <div class="viz-subtitle">Coronary Artery Plaque Progression After ADT in Men with Pro</div>
         <div class="chart-wrap">
-          <canvas id="chart_dr_4_355"></canvas>
+          <canvas id="chart_dr_4_419"></canvas>
         </div>
       </div>
 
@@ -938,7 +938,7 @@
         <h4>📊 핵심 비교 분석</h4>
         <div class="viz-subtitle">The efficacy and safety of enzalutamide in metastatic hormon</div>
         <div class="chart-wrap">
-          <canvas id="chart_dr_5_355"></canvas>
+          <canvas id="chart_dr_5_419"></canvas>
         </div>
       </div>
 
@@ -1014,7 +1014,7 @@
         <h4>📊 핵심 비교 분석</h4>
         <div class="viz-subtitle">Matching-adjusted indirect comparison of enzalutamide versus</div>
         <div class="chart-wrap">
-          <canvas id="chart_dr_6_355"></canvas>
+          <canvas id="chart_dr_6_419"></canvas>
         </div>
       </div>
 
@@ -1090,7 +1090,7 @@
         <h4>📊 핵심 비교 분석</h4>
         <div class="viz-subtitle">Long-term Safety, Efficacy, and PROs: Phase 3 Study of Leupr</div>
         <div class="chart-wrap">
-          <canvas id="chart_dr_7_355"></canvas>
+          <canvas id="chart_dr_7_419"></canvas>
         </div>
       </div>
 
@@ -1166,7 +1166,7 @@
         <h4>📊 핵심 비교 분석</h4>
         <div class="viz-subtitle">Metabolic changes in children with idiopathic central precoc</div>
         <div class="chart-wrap">
-          <canvas id="chart_dr_8_355"></canvas>
+          <canvas id="chart_dr_8_419"></canvas>
         </div>
       </div>
 
@@ -1180,6 +1180,8 @@
       </div>
     </div>
   </div>
+
+  
 
   
 
@@ -1276,10 +1278,18 @@ if (typeof Chart !== "undefined") {
 
 
 
+
+
+
+
+
+
+
+
 // 논문 #1 (비뇨기·종양·CPP) — deep research
-const ctx_chart_dr_1_355 = document.getElementById('chart_dr_1_355')?.getContext('2d');
-if (ctx_chart_dr_1_355) {
-  new Chart(ctx_chart_dr_1_355, {
+const ctx_chart_dr_1_419 = document.getElementById('chart_dr_1_419')?.getContext('2d');
+if (ctx_chart_dr_1_419) {
+  new Chart(ctx_chart_dr_1_419, {
     type: 'bar',
     data: {
       labels: ["주요결과", "참조"],
@@ -1298,9 +1308,9 @@ if (ctx_chart_dr_1_355) {
 
 
 // 논문 #2 (비뇨기·종양·CPP) — deep research
-const ctx_chart_dr_2_355 = document.getElementById('chart_dr_2_355')?.getContext('2d');
-if (ctx_chart_dr_2_355) {
-  new Chart(ctx_chart_dr_2_355, {
+const ctx_chart_dr_2_419 = document.getElementById('chart_dr_2_419')?.getContext('2d');
+if (ctx_chart_dr_2_419) {
+  new Chart(ctx_chart_dr_2_419, {
     type: 'bar',
     data: {
       labels: ["비교1", "비교2"],
@@ -1319,9 +1329,9 @@ if (ctx_chart_dr_2_355) {
 
 
 // 논문 #3 (비뇨기·종양·CPP) — deep research
-const ctx_chart_dr_3_355 = document.getElementById('chart_dr_3_355')?.getContext('2d');
-if (ctx_chart_dr_3_355) {
-  new Chart(ctx_chart_dr_3_355, {
+const ctx_chart_dr_3_419 = document.getElementById('chart_dr_3_419')?.getContext('2d');
+if (ctx_chart_dr_3_419) {
+  new Chart(ctx_chart_dr_3_419, {
     type: 'bar',
     data: {
       labels: ["비교1", "비교2"],
@@ -1340,9 +1350,9 @@ if (ctx_chart_dr_3_355) {
 
 
 // 논문 #4 (비뇨기·종양·CPP) — deep research
-const ctx_chart_dr_4_355 = document.getElementById('chart_dr_4_355')?.getContext('2d');
-if (ctx_chart_dr_4_355) {
-  new Chart(ctx_chart_dr_4_355, {
+const ctx_chart_dr_4_419 = document.getElementById('chart_dr_4_419')?.getContext('2d');
+if (ctx_chart_dr_4_419) {
+  new Chart(ctx_chart_dr_4_419, {
     type: 'bar',
     data: {
       labels: ["치료군", "대조군"],
@@ -1361,9 +1371,9 @@ if (ctx_chart_dr_4_355) {
 
 
 // 논문 #5 (비뇨기·종양·CPP) — deep research
-const ctx_chart_dr_5_355 = document.getElementById('chart_dr_5_355')?.getContext('2d');
-if (ctx_chart_dr_5_355) {
-  new Chart(ctx_chart_dr_5_355, {
+const ctx_chart_dr_5_419 = document.getElementById('chart_dr_5_419')?.getContext('2d');
+if (ctx_chart_dr_5_419) {
+  new Chart(ctx_chart_dr_5_419, {
     type: 'bar',
     data: {
       labels: ["치료군", "대조군"],
@@ -1382,9 +1392,9 @@ if (ctx_chart_dr_5_355) {
 
 
 // 논문 #6 (비뇨기·종양·CPP) — deep research
-const ctx_chart_dr_6_355 = document.getElementById('chart_dr_6_355')?.getContext('2d');
-if (ctx_chart_dr_6_355) {
-  new Chart(ctx_chart_dr_6_355, {
+const ctx_chart_dr_6_419 = document.getElementById('chart_dr_6_419')?.getContext('2d');
+if (ctx_chart_dr_6_419) {
+  new Chart(ctx_chart_dr_6_419, {
     type: 'bar',
     data: {
       labels: ["치료군", "대조군"],
@@ -1403,9 +1413,9 @@ if (ctx_chart_dr_6_355) {
 
 
 // 논문 #7 (비뇨기·종양·CPP) — deep research
-const ctx_chart_dr_7_355 = document.getElementById('chart_dr_7_355')?.getContext('2d');
-if (ctx_chart_dr_7_355) {
-  new Chart(ctx_chart_dr_7_355, {
+const ctx_chart_dr_7_419 = document.getElementById('chart_dr_7_419')?.getContext('2d');
+if (ctx_chart_dr_7_419) {
+  new Chart(ctx_chart_dr_7_419, {
     type: 'bar',
     data: {
       labels: ["지표A", "지표B"],
@@ -1424,9 +1434,9 @@ if (ctx_chart_dr_7_355) {
 
 
 // 논문 #8 (비뇨기·종양·CPP) — deep research
-const ctx_chart_dr_8_355 = document.getElementById('chart_dr_8_355')?.getContext('2d');
-if (ctx_chart_dr_8_355) {
-  new Chart(ctx_chart_dr_8_355, {
+const ctx_chart_dr_8_419 = document.getElementById('chart_dr_8_419')?.getContext('2d');
+if (ctx_chart_dr_8_419) {
+  new Chart(ctx_chart_dr_8_419, {
     type: 'bar',
     data: {
       labels: ["치료군", "대조군"],
