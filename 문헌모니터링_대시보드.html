@@ -432,7 +432,7 @@ main { max-width: 960px; margin: 28px auto; padding: 0 16px; }
 const CONFIG = {
   SHEET_ID      : '1TrG81tjb_8iakCm5IwwFH5EFoNUNienhyPT9aE8ya-Q',
   SHEET_NAME    : '논문DB',
-  SCRIPT_URL    : 'https://script.google.com/macros/s/AKfycbzowQMXLavFOx-6hXYn2ESwHVc6nmsFOlEx4JOyTDpONBrr4FQNaK3TRAfqi5gR2v6S/exec',
+  SCRIPT_URL    : 'https://script.google.com/macros/s/AKfycbynF7P1576GbRlzdIjBaxrOvjTU4HDP8F9jY4flxduhSqYR15Hr4AmhImuaS0wPJoOC/exec',   // v2 배포 (BD요청큐 지원) — CLAUDE.md/Python 과 동일 URL 로 통일
   DEFAULT_FORMAT: 'CLB'   // 기본 BD 포맷 (CLB 또는 BT)
 };
 
@@ -869,6 +869,12 @@ function submitBDModal() {
   btn.textContent = '신청 중…';
   btn.classList.add('loading');
 
+  // 색상테마·PM요청사항을 큐의 memo 필드에 보존 (구 requestBD 는 이 둘을 버렸음)
+  const memoParts = [];
+  if (colorTheme && colorTheme !== '기본') memoParts.push('색상:' + colorTheme);
+  if (pmRequest) memoParts.push('요청:' + pmRequest);
+  const memo = memoParts.join(' / ');
+
   const cbName = '_bdCb_' + Date.now();
   window[cbName] = function(data) {
     if (data.status === 'ok') {
@@ -877,6 +883,12 @@ function submitBDModal() {
       btn.classList.add('done');
       btn.disabled = true;
       showToast('✅ BD 신청 완료! 색상: ' + colorTheme + (pmRequest ? ' / 요청: ' + pmRequest.substring(0,20) : ''));
+    } else if (data.status === 'duplicate') {
+      btn.textContent = '✅ 이미 신청됨';
+      btn.classList.remove('loading');
+      btn.classList.add('done');
+      btn.disabled = true;
+      showToast('이미 대기 중인 BD 신청입니다.');
     } else {
       btn.textContent = '📌 BD 신청';
       btn.classList.remove('loading');
@@ -885,12 +897,13 @@ function submitBDModal() {
     delete window[cbName];
   };
 
+  // requestBDQueue: 논문DB N열 TRUE + BD요청큐 시트에 행 append (process-bd-queue.py 가 읽는 큐)
   const sc = document.createElement('script');
-  sc.src = `${CONFIG.SCRIPT_URL}?action=requestBD` +
+  sc.src = `${CONFIG.SCRIPT_URL}?action=requestBDQueue` +
             `&title=${encodeURIComponent(title)}` +
             `&format=${encodeURIComponent(fmt)}` +
-            `&colorTheme=${encodeURIComponent(colorTheme)}` +
-            `&pmRequest=${encodeURIComponent(pmRequest)}` +
+            `&memo=${encodeURIComponent(memo)}` +
+            `&requester=${encodeURIComponent(window._currentPM || '')}` +
             `&callback=${cbName}`;
   sc.onerror = () => {
     btn.textContent = '📌 BD 신청';
