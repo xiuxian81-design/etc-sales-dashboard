@@ -77,7 +77,7 @@
             background-color: #f9f9f9;
             padding: 20px;
             margin-top: 30px;
-            border-left: 5px solid #E87722;
+            border-left: 5px solid #1A5276;
             text-align: left;
             display: inline-block;
         }
@@ -145,7 +145,7 @@
             color: white;
         }
         .importance-high {
-            background-color: #E87722;
+            background-color: #1A5276;
         }
         .importance-medium {
             background-color: #FFA500;
@@ -162,6 +162,40 @@
             margin-top: 40px;
         }
     </style>
+
+<style>
+/* ── 풀상세 논문 카드 (build-report.py) ── */
+.paper{background:#fff;border:1px solid #e1e8f0;border-radius:10px;margin:18px 30px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden}
+.paper-header{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 16px;background:#f5f9fc;border-bottom:1px solid #e1e8f0}
+.paper-num{font-weight:700;color:#003366;font-size:14px}
+.stars-high{color:#1A5276;font-weight:700}.stars-mid{color:#2E6DA0;font-weight:700}.stars-low{color:#95a5a6;font-weight:700}
+.tag-direct,.tag-ref,.tag-open,.tag-wall{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600}
+.tag-direct{background:#1A5276;color:#fff}.tag-ref{background:#e1e8f0;color:#456}
+.tag-open{background:#e8f5e9;color:#2e7d32}.tag-wall{background:#f0f0f0;color:#888}
+.journal-meta{font-size:12px;color:#666;text-align:right}
+.paper-body{padding:14px 18px}
+.paper-title{font-size:15px;font-weight:700;color:#1a1a1a;margin:0 0 6px;line-height:1.4}
+.paper-url{font-size:12px;color:#2E6DA0;word-break:break-all;display:inline-block;margin-bottom:6px}
+.design-badge{display:inline-block;font-size:11px;background:#eef3f8;color:#1A5276;padding:2px 10px;border-radius:10px;margin-left:6px}
+.summary-grid{margin:14px 0}
+.summary-grid h4,.viz-section h4,.usage h4{font-size:13px;color:#003366;margin:0 0 8px;padding-left:8px;border-left:3px solid #1A5276}
+.s-row{display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed #eef2f7}
+.s-label{flex:0 0 64px;font-size:12px;font-weight:700;color:#1A5276}
+.s-val{flex:1;font-size:13px;color:#222;line-height:1.65}
+.key-nums{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.knum{flex:1;min-width:120px;background:#f5f9fc;border:1px solid #dce6f0;border-radius:8px;padding:10px 12px;text-align:center}
+.knum .val{font-size:16px;font-weight:800;color:#1A5276;line-height:1.25}
+.knum .desc{font-size:11px;color:#555;margin-top:3px;line-height:1.3}
+.knum .pval{font-size:11px;color:#2e7d32;font-weight:600;margin-top:2px}
+.viz-section{margin:14px 0}.viz-subtitle{font-size:12px;color:#666;margin-bottom:6px}
+.chart-wrap{position:relative;height:240px}
+.usage{margin:14px 0 4px;background:#fbfcfe;border:1px solid #eef2f7;border-radius:8px;padding:10px 14px}
+.usage ul{margin:0;padding-left:18px}.usage li{font-size:13px;color:#333;line-height:1.7}
+.bd-request-btn{background:#1A5276;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;margin-left:8px}
+.bd-request-btn:hover{background:#14405e}.bd-request-btn:disabled{background:#95a5a6;cursor:not-allowed}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -198,632 +232,288 @@
             </div>
         </div>
       <!-- ━━━ 논문 #1 (골대사·신경) ━━━ -->
+        <div class="papers">
+
+  <!-- ━━━ 논문 #1 (골대사·신경) ━━━ -->
   <div class="paper">
     <div class="paper-header">
       <span class="paper-num">■ 논문 #1</span>
       <span class="stars-high">★★★</span>
       <span class="tag-direct">직접근거</span>
       <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex: 1;">Clinical Kidney Journal | 2026-03-18</div>
+      <div class="journal-meta" style="flex:1;">Clinical Kidney Journal | 2026-03-18</div>
       <button class="bd-request-btn" data-title="Alfacalcidol plus calcium versus cholecalciferol in glucocorticoid-exposed children with nephrotic syndrome: a randomized controlled trial" data-session="골대사·신경" data-num="1" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
     </div>
     <div class="paper-body">
       <p class="paper-title">Alfacalcidol plus calcium versus cholecalciferol in glucocorticoid-exposed children with nephrotic syndrome: a randomized controlled trial</p>
       <a href="https://academic.oup.com/ckj/advance-article/doi/10.1093/ckj/sfag055/8504121" class="paper-url" target="_blank">https://academic.oup.com/ckj/advance-article/doi/10.1093/ckj/sfag055/8504121</a>
       <span class="design-badge">RCT</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">소아 네프로제증후군(NS)의 1차 치료는 글루코코르티코이드(GC)이며 장기간 투여가 불가피하다. GC는 투여 2~6주 내에도 골밀도·골량을 감소시켜 GC 유발 골다공증(GIOP)과 골절 위험을 높이는데, 성장기 소아는 본래 골밀도가 증가해야 하므로 &#x27;BMD 정체·감소&#x27;만으로도 골손실 신호가 된다. 기존 가이드라인의 GIOP 예방 권고는 대부분 성인 기준이며, 활성형 비타민D(알파칼시돌)가 단순 비타민D(콜레칼시페롤)보다 우수한지에 대한 소아 근거와 단백뇨·신기능 보호 효과 근거가 매우 부족했다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">단일기관(광저우 부녀아동의료센터)·전향적·무작위 코호트 RCT(ChiCTR2200055790). 2021.1~2022.6 초발 NS 소아 86명을 알파칼시돌+칼슘군(n=43)과 콜레칼시페롤+칼슘 대조군(n=43)으로 1:1 무작위 배정(SPSS, 시드 20210101). 선정: 1~18세, 초발 NS, 등록 전 6개월 GC 미사용, 골절 기왕력 없음, 정상 간·신기능·혈압. 중재: 양군 모두 GC(프레드니손 2mg/kg, 최대 60mg/일, 4~6주 관해유도 후 격일 점감)를 받고, 알파칼시돌군은 알파칼시돌 0.05µg/kg/일(20kg 초과 시 최대 1µg/일)+칼슘 750mg(원소칼슘 300mg)/일, 대조군은 콜레칼시페롤 400IU/일+동일 칼슘. 1차 평가변수는 요추골밀도(LS-BMD, Hologic DXA)와 누적 GC 용량. 2차는 골교체표지자(흡수표지 CTX-I, 형성표지 PINP), 월별 단백/크레아티닌비, 단백뇨 음전 시간·유지기간·1년 재발률, 골절·골통 발생. ITT 분석, 추적 약 1년(중앙값 324일), 74명 완료.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">1차 평가변수 LS-BMD 변화량(ΔLS-BMD, GEE)은 알파칼시돌군 +0.027±0.008 g/cm²(95%CI 0.007~0.039) vs 대조군 -0.002±0.008(95%CI -0.017~0.014)로 알파칼시돌군이 유의하게 큰 증가(p=0.035). 다변량 선형회귀에서 알파칼시돌은 BMD의 보호인자(β=0.035, 95%CI 0.013~0.057, p=0.002), 누적 GC 용량은 위험인자(β=-0.014, 95%CI -0.020~-0.007, p&lt;0.001), 남성도 위험인자(β=-0.038, p=0.003). 골교체표지자: CTX-I(흡수) 증가폭이 알파칼시돌군에서 더 작고(p=0.032), PINP(형성) 감소폭도 더 작아(p=0.001) 골흡수 억제·골형성 촉진을 시사. 골통은 알파칼시돌군 16.3%(7/43) vs 대조군 37.2%(16/43)로 유의 저하(χ²=4.81, p=0.028), 골절은 양군 0건. 신장 관점(스테로이드 감수성 SSNS 59명): 단백뇨 음전까지 중앙값 7.0 vs 11.0일(p=0.004), 1년내 GC 중단율 67.9%(19/28) vs 38.7%(12/31)(p=0.025), 1년 단백뇨 재발률 17.9%(5/28) vs 41.9%(13/31)(p=0.045), 추적 종료시 평균 GC 용량 0.67±0.13 vs 0.75±0.18 mg/kg/일(p=0.044). 단백뇨 관해 유지기간은 297일 vs 282일로 log-rank상 유의(χ²=4.46, p=0.035)하나 월별 단백/크레아티닌비 자체의 군간차는 비유의(p=0.398).</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">추적기간 동안 치료 관련 이상반응 0건. 비타민D 독성[25(OH)D&gt;250nmol/L], 고칼슘혈증(혈청칼슘&gt;2.75mmol/L), 고인산혈증(인&gt;2.0mmol/L) 발생례 없음. GEE상 25(OH)D(p=0.645)·혈청칼슘(p=0.177)·인(p=0.656)·GFR(p=0.185)·ALT(p=0.131) 모두 군간 유의차 없이 정상범위 유지. 입원·외래 신초음파에서 신석회화증 소견도 전무. 알파칼시돌 활성형(1,25-디히드록시비타민D3)의 최고농도 도달은 8~18시간으로 보고됨.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">GC 치료 소아 NS에서 알파칼시돌+칼슘은 콜레칼시페롤보다 요추골밀도 손실을 유의하게 억제하고 골교체표지자를 개선했으며, SSNS에서는 단백뇨 조기 음전·관해 유지·GC 감량·재발 감소라는 신보호 가능성까지 보였고 안전성도 우호적이었다. 한계는 단일기관·소표본, 성인 기반 표본수 산정, 짧은 추적, 제형 차이로 인한 불완전 맹검, Z-score 미사용·PTH/요칼슘 미측정 등이다. 알파본D(alfacalcidol) 관점에서, 스테로이드를 장기 사용하는 소아·신질환 동반 환자의 골보호 1차 옵션으로 단순 비타민D 대비 차별적 근거를 제공하는 직접 인용 가능한 RCT다.</div>
-        </div>
+      <div class="summary-grid"><h4>논문 내용 요약</h4>
+        <div class="s-row"><div class="s-label">배경</div><div class="s-val">소아 네프로제증후군(NS)의 1차 치료는 글루코코르티코이드(GC)이며 장기간 투여가 불가피하다. GC는 투여 2~6주 내에도 골밀도·골량을 감소시켜 GC 유발 골다공증(GIOP)과 골절 위험을 높이는데, 성장기 소아는 본래 골밀도가 증가해야 하므로 &#x27;BMD 정체·감소&#x27;만으로도 골손실 신호가 된다. 기존 가이드라인의 GIOP 예방 권고는 대부분 성인 기준이며, 활성형 비타민D(알파칼시돌)가 단순 비타민D(콜레칼시페롤)보다 우수한지에 대한 소아 근거와 단백뇨·신기능 보호 효과 근거가 매우 부족했다.</div></div>
+        <div class="s-row"><div class="s-label">방법</div><div class="s-val">단일기관(광저우 부녀아동의료센터)·전향적·무작위 코호트 RCT(ChiCTR2200055790). 2021.1~2022.6 초발 NS 소아 86명을 알파칼시돌+칼슘군(n=43)과 콜레칼시페롤+칼슘 대조군(n=43)으로 1:1 무작위 배정(SPSS, 시드 20210101). 선정: 1~18세, 초발 NS, 등록 전 6개월 GC 미사용, 골절 기왕력 없음, 정상 간·신기능·혈압. 중재: 양군 모두 GC(프레드니손 2mg/kg, 최대 60mg/일, 4~6주 관해유도 후 격일 점감)를 받고, 알파칼시돌군은 알파칼시돌 0.05µg/kg/일(20kg 초과 시 최대 1µg/일)+칼슘 750mg(원소칼슘 300mg)/일, 대조군은 콜레칼시페롤 400IU/일+동일 칼슘. 1차 평가변수는 요추골밀도(LS-BMD, Hologic DXA)와 누적 GC 용량. 2차는 골교체표지자(흡수표지 CTX-I, 형성표지 PINP), 월별 단백/크레아티닌비, 단백뇨 음전 시간·유지기간·1년 재발률, 골절·골통 발생. ITT 분석, 추적 약 1년(중앙값 324일), 74명 완료.</div></div>
+        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">1차 평가변수 LS-BMD 변화량(ΔLS-BMD, GEE)은 알파칼시돌군 +0.027±0.008 g/cm²(95%CI 0.007~0.039) vs 대조군 -0.002±0.008(95%CI -0.017~0.014)로 알파칼시돌군이 유의하게 큰 증가(p=0.035). 다변량 선형회귀에서 알파칼시돌은 BMD의 보호인자(β=0.035, 95%CI 0.013~0.057, p=0.002), 누적 GC 용량은 위험인자(β=-0.014, 95%CI -0.020~-0.007, p&lt;0.001), 남성도 위험인자(β=-0.038, p=0.003). 골교체표지자: CTX-I(흡수) 증가폭이 알파칼시돌군에서 더 작고(p=0.032), PINP(형성) 감소폭도 더 작아(p=0.001) 골흡수 억제·골형성 촉진을 시사. 골통은 알파칼시돌군 16.3%(7/43) vs 대조군 37.2%(16/43)로 유의 저하(χ²=4.81, p=0.028), 골절은 양군 0건. 신장 관점(스테로이드 감수성 SSNS 59명): 단백뇨 음전까지 중앙값 7.0 vs 11.0일(p=0.004), 1년내 GC 중단율 67.9%(19/28) vs 38.7%(12/31)(p=0.025), 1년 단백뇨 재발률 17.9%(5/28) vs 41.9%(13/31)(p=0.045), 추적 종료시 평균 GC 용량 0.67±0.13 vs 0.75±0.18 mg/kg/일(p=0.044). 단백뇨 관해 유지기간은 297일 vs 282일로 log-rank상 유의(χ²=4.46, p=0.035)하나 월별 단백/크레아티닌비 자체의 군간차는 비유의(p=0.398).</div></div>
+        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">추적기간 동안 치료 관련 이상반응 0건. 비타민D 독성[25(OH)D&gt;250nmol/L], 고칼슘혈증(혈청칼슘&gt;2.75mmol/L), 고인산혈증(인&gt;2.0mmol/L) 발생례 없음. GEE상 25(OH)D(p=0.645)·혈청칼슘(p=0.177)·인(p=0.656)·GFR(p=0.185)·ALT(p=0.131) 모두 군간 유의차 없이 정상범위 유지. 입원·외래 신초음파에서 신석회화증 소견도 전무. 알파칼시돌 활성형(1,25-디히드록시비타민D3)의 최고농도 도달은 8~18시간으로 보고됨.</div></div>
+        <div class="s-row"><div class="s-label">결론</div><div class="s-val">GC 치료 소아 NS에서 알파칼시돌+칼슘은 콜레칼시페롤보다 요추골밀도 손실을 유의하게 억제하고 골교체표지자를 개선했으며, SSNS에서는 단백뇨 조기 음전·관해 유지·GC 감량·재발 감소라는 신보호 가능성까지 보였고 안전성도 우호적이었다. 한계는 단일기관·소표본, 성인 기반 표본수 산정, 짧은 추적, 제형 차이로 인한 불완전 맹검, Z-score 미사용·PTH/요칼슘 미측정 등이다. 알파본D(alfacalcidol) 관점에서, 스테로이드를 장기 사용하는 소아·신질환 동반 환자의 골보호 1차 옵션으로 단순 비타민D 대비 차별적 근거를 제공하는 직접 인용 가능한 RCT다.</div></div>
       </div>
-
       <div class="key-nums">
-        <div class="knum">
-          <div class="val">ΔLS-BMD +0.027 vs -0.002 g/cm²</div>
-          <div class="desc">요추골밀도 변화량(알파칼시돌 vs 대조), 95%CI 0.007~0.039 vs -0.017~0.014</div>
-          <div class="pval">0.035</div>
-        </div>
-        <div class="knum">
-          <div class="val">β=0.035 (95%CI 0.013~0.057)</div>
-          <div class="desc">다변량 회귀: 알파칼시돌의 BMD 보호효과</div>
-          <div class="pval">0.002</div>
-        </div>
-        <div class="knum">
-          <div class="val">β=-0.014 (95%CI -0.020~-0.007)</div>
-          <div class="desc">다변량 회귀: 누적 GC 용량의 BMD 악화효과</div>
-          <div class="pval">&lt;0.001</div>
-        </div>
+        <div class="knum"><div class="val">ΔLS-BMD +0.027 vs -0.002 g/cm²</div><div class="desc">요추골밀도 변화량</div><div class="pval">p=0.035</div></div>
+        <div class="knum"><div class="val">β=0.035 (95%CI 0.013~0.057)</div><div class="desc">다변량 회귀</div><div class="pval">p=0.002</div></div>
+        <div class="knum"><div class="val">β=-0.014 (95%CI -0.020~-0.007)</div><div class="desc">다변량 회귀</div><div class="pval">&lt;0.001</div></div>
       </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">Alfacalcidol plus calcium versus cholecalciferol in glucocor</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_1_282"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
+      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Alfacalcidol plus calcium versus cholecalciferol in glucocor</div><div class="chart-wrap"><canvas id="chart_dr_1_834"></canvas></div></div>
+      <div class="usage"><h4>💡 활용 포인트</h4><ul>
           <li>알파본D GC 유발 골손실 예방에 일반 비타민D보다 우월 RCT 근거</li>
           <li>후속 연구 동향 지속 모니터링 필요 후속 연구 동향 지속 모니터링 필요</li>
           <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul>
-      </div>
+        </ul></div>
     </div>
   </div>
 
-    <!-- ━━━ 논문 #2 (골대사·신경) ━━━ -->
+  <!-- ━━━ 논문 #2 (골대사·신경) ━━━ -->
   <div class="paper">
     <div class="paper-header">
       <span class="paper-num">■ 논문 #2</span>
       <span class="stars-high">★★★</span>
       <span class="tag-direct">직접근거</span>
       <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex: 1;">Journal of Diabetes Investigation | 2026-01-01</div>
+      <div class="journal-meta" style="flex:1;">Journal of Diabetes Investigation | 2026-01-01</div>
       <button class="bd-request-btn" data-title="Pregabalin efficacy in painful diabetic peripheral neuropathy: A focused analysis of optimal dosing and the relationship of baseline glycemic control" data-session="골대사·신경" data-num="2" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
     </div>
     <div class="paper-body">
       <p class="paper-title">Pregabalin efficacy in painful diabetic peripheral neuropathy: A focused analysis of optimal dosing and the relationship of baseline glycemic control</p>
       <a href="https://onlinelibrary.wiley.com/doi/10.1111/jdi.70288" class="paper-url" target="_blank">https://onlinelibrary.wiley.com/doi/10.1111/jdi.70288</a>
       <span class="design-badge">풀 분석(Pooled analysis of RCTs)</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">당뇨병 유병은 급증해 2024년 성인 약 5억8,900만명, 2050년 8억5,200만명(+45%)으로 추산되며, 통증성 당뇨병말초신경병증(pDPN)은 당뇨 환자 약 1/3에 발생해 수면·업무능력·삶의질을 떨어뜨리고 불안·우울을 동반한다. 프레가발린은 α2δ 리간드로 다수 RCT에서 일관된 효능을 보여 NeuPSIG·EFNS·ADA·AAN 가이드라인이 1차약으로 권고하나, 실제 임상에서는 이상반응 우려로 저용량(아용량)이 흔해 충분한 진통이 안 되는 경우가 많고, 혈당조절 불량 환자에서 효과가 감소하는지 근거가 부족했다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">프레가발린의 3건 무작위·이중맹검·위약대조 3상시험(Lesser 1008-029, Richter 1008-014, Rosenstock 1008-031, 모두 고정용량·1일 3회)을 통합한 사후(post hoc) 분석. 총 729명(ITT) — 위약 252명, 프레가발린 477명(75mg 77명, 150mg 79명, 300mg 157명, 600mg 164명). 선정: ≥18세 pDPN, 7일 기저기간 평균통증 NRS ≥4(0~10), SF-MPQ VAS ≥40mm, HbA1c ≤11%. 1차 평가변수는 기저~종료시점 평균통증점수 변화(11점 NRS, 일기 기록). 혈당 영향 분석을 위해 HbA1c ≤8%(n=377)·&gt;8%(n=346)로 층화. ANCOVA(공변량=기저통증, LOCF), MMRM(주별 변화), 반응자(≥30%·≥50%·≥70% 통증 감소) 분석. 추적 5~8주.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">종료시점 통증의 위약 대비 LS평균차: 프레가발린 300mg -1.38(95%CI -1.81~-0.95, p&lt;0.0001), 600mg -1.39(95%CI -1.82~-0.97, p&lt;0.0001)로 둘 다 유의하고 효과가 거의 동일. 반면 75mg -0.19(95%CI -0.75~0.37, p=0.5051), 150mg -0.54(95%CI -1.13~0.05, p=0.0711)는 비유의. ≥50% 통증감소 반응률: 300mg 42.7%(67/157), 600mg 42.1%(69/164) vs 위약 14.7%(37/252); ≥30% 반응률: 300mg 56.7%, 600mg 59.8% vs 위약 31.0%; 600mg의 약 25%가 ≥70% 감소 달성. MMRM상 300·600mg는 1주차부터 위약과 분리, 150mg는 3주차부터, 75mg는 전 시점 비유의. 혈당 층화: HbA1c ≤8%에서 위약 대비 300mg -1.69·600mg -1.71(p&lt;0.0001), &gt;8%에서 300mg -1.04·600mg -1.09(p≤0.001)로 양 층 모두 유의, 치료×HbA1c 상호작용 비유의(p=0.95) → 효과는 기저 혈당조절과 무관.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">프레가발린의 안전성 프로파일은 기존 신경병성통증 통합분석과 일치하며 이상반응은 300·600mg에서 용량의존적으로 수치상 증가. 최빈 치료발현 이상반응은 어지러움 17.8%, 졸림 11.1%, 두통 8.9%, 감염 7.8%, 말초부종 6.9%. 임상가는 &#x27;저용량으로 시작해 천천히 증량(start low, go slow)&#x27;하면서 환자별 내약성에 맞춰 300~600mg 목표용량까지 적정할 것을 권고.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">pDPN에서 프레가발린은 300·600mg에서만 위약 대비 유의·임상적으로 의미 있는 진통을 제공하고 75·150mg는 불충분하며, 효과는 기저 HbA1c와 무관하다. 따라서 혈당 우려로 증량을 주저하지 말고 효과용량까지 적정해야 한다. 한계는 사후·소표본 하위군·다중검정 미보정·단기 추적이다. 프레논OD(pregabalin) 관점에서, &#x27;300mg 이상 적정 = 충분한 진통, 혈당불량 환자도 동일 효과&#x27;라는 실용적 용량 메시지를 직접 인용 가능한 통합분석이다.</div>
-        </div>
+      <div class="summary-grid"><h4>논문 내용 요약</h4>
+        <div class="s-row"><div class="s-label">배경</div><div class="s-val">당뇨병 유병은 급증해 2024년 성인 약 5억8,900만명, 2050년 8억5,200만명(+45%)으로 추산되며, 통증성 당뇨병말초신경병증(pDPN)은 당뇨 환자 약 1/3에 발생해 수면·업무능력·삶의질을 떨어뜨리고 불안·우울을 동반한다. 프레가발린은 α2δ 리간드로 다수 RCT에서 일관된 효능을 보여 NeuPSIG·EFNS·ADA·AAN 가이드라인이 1차약으로 권고하나, 실제 임상에서는 이상반응 우려로 저용량(아용량)이 흔해 충분한 진통이 안 되는 경우가 많고, 혈당조절 불량 환자에서 효과가 감소하는지 근거가 부족했다.</div></div>
+        <div class="s-row"><div class="s-label">방법</div><div class="s-val">프레가발린의 3건 무작위·이중맹검·위약대조 3상시험(Lesser 1008-029, Richter 1008-014, Rosenstock 1008-031, 모두 고정용량·1일 3회)을 통합한 사후(post hoc) 분석. 총 729명(ITT) — 위약 252명, 프레가발린 477명(75mg 77명, 150mg 79명, 300mg 157명, 600mg 164명). 선정: ≥18세 pDPN, 7일 기저기간 평균통증 NRS ≥4(0~10), SF-MPQ VAS ≥40mm, HbA1c ≤11%. 1차 평가변수는 기저~종료시점 평균통증점수 변화(11점 NRS, 일기 기록). 혈당 영향 분석을 위해 HbA1c ≤8%(n=377)·&gt;8%(n=346)로 층화. ANCOVA(공변량=기저통증, LOCF), MMRM(주별 변화), 반응자(≥30%·≥50%·≥70% 통증 감소) 분석. 추적 5~8주.</div></div>
+        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">종료시점 통증의 위약 대비 LS평균차: 프레가발린 300mg -1.38(95%CI -1.81~-0.95, p&lt;0.0001), 600mg -1.39(95%CI -1.82~-0.97, p&lt;0.0001)로 둘 다 유의하고 효과가 거의 동일. 반면 75mg -0.19(95%CI -0.75~0.37, p=0.5051), 150mg -0.54(95%CI -1.13~0.05, p=0.0711)는 비유의. ≥50% 통증감소 반응률: 300mg 42.7%(67/157), 600mg 42.1%(69/164) vs 위약 14.7%(37/252); ≥30% 반응률: 300mg 56.7%, 600mg 59.8% vs 위약 31.0%; 600mg의 약 25%가 ≥70% 감소 달성. MMRM상 300·600mg는 1주차부터 위약과 분리, 150mg는 3주차부터, 75mg는 전 시점 비유의. 혈당 층화: HbA1c ≤8%에서 위약 대비 300mg -1.69·600mg -1.71(p&lt;0.0001), &gt;8%에서 300mg -1.04·600mg -1.09(p≤0.001)로 양 층 모두 유의, 치료×HbA1c 상호작용 비유의(p=0.95) → 효과는 기저 혈당조절과 무관.</div></div>
+        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">프레가발린의 안전성 프로파일은 기존 신경병성통증 통합분석과 일치하며 이상반응은 300·600mg에서 용량의존적으로 수치상 증가. 최빈 치료발현 이상반응은 어지러움 17.8%, 졸림 11.1%, 두통 8.9%, 감염 7.8%, 말초부종 6.9%. 임상가는 &#x27;저용량으로 시작해 천천히 증량(start low, go slow)&#x27;하면서 환자별 내약성에 맞춰 300~600mg 목표용량까지 적정할 것을 권고.</div></div>
+        <div class="s-row"><div class="s-label">결론</div><div class="s-val">pDPN에서 프레가발린은 300·600mg에서만 위약 대비 유의·임상적으로 의미 있는 진통을 제공하고 75·150mg는 불충분하며, 효과는 기저 HbA1c와 무관하다. 따라서 혈당 우려로 증량을 주저하지 말고 효과용량까지 적정해야 한다. 한계는 사후·소표본 하위군·다중검정 미보정·단기 추적이다. 프레논OD(pregabalin) 관점에서, &#x27;300mg 이상 적정 = 충분한 진통, 혈당불량 환자도 동일 효과&#x27;라는 실용적 용량 메시지를 직접 인용 가능한 통합분석이다.</div></div>
       </div>
-
       <div class="key-nums">
-        <div class="knum">
-          <div class="val">-1.38 (95%CI -1.81~-0.95)</div>
-          <div class="desc">300mg 위약 대비 통증 LS평균차</div>
-          <div class="pval">&lt;0.0001</div>
-        </div>
-        <div class="knum">
-          <div class="val">-1.39 (95%CI -1.82~-0.97)</div>
-          <div class="desc">600mg 위약 대비 통증 LS평균차</div>
-          <div class="pval">&lt;0.0001</div>
-        </div>
-        <div class="knum">
-          <div class="val">-0.54 (95%CI -1.13~0.05)</div>
-          <div class="desc">150mg 위약 대비(비유의)</div>
-          <div class="pval">0.0711</div>
-        </div>
+        <div class="knum"><div class="val">-1.38 (95%CI -1.81~-0.95)</div><div class="desc">300mg 위약 대비 통증 LS평균차</div><div class="pval">&lt;0.0001</div></div>
+        <div class="knum"><div class="val">-1.39 (95%CI -1.82~-0.97)</div><div class="desc">600mg 위약 대비 통증 LS평균차</div><div class="pval">&lt;0.0001</div></div>
+        <div class="knum"><div class="val">-0.54 (95%CI -1.13~0.05)</div><div class="desc">150mg 위약 대비</div><div class="pval">p=0.0711</div></div>
       </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">Pregabalin efficacy in painful diabetic peripheral neuropath</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_2_282"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
+      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Pregabalin efficacy in painful diabetic peripheral neuropath</div><div class="chart-wrap"><canvas id="chart_dr_2_834"></canvas></div></div>
+      <div class="usage"><h4>💡 활용 포인트</h4><ul>
           <li>프레논OD 300mg 최적 용량 근거</li>
           <li>HbA1c 불량 환자도 효과 보장 — PM 디테일링 핵심</li>
           <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-        </ul>
-      </div>
+        </ul></div>
     </div>
   </div>
 
-    <!-- ━━━ 논문 #3 (골대사·신경) ━━━ -->
+  <!-- ━━━ 논문 #3 (골대사·신경) ━━━ -->
   <div class="paper">
     <div class="paper-header">
       <span class="paper-num">■ 논문 #3</span>
       <span class="stars-high">★★★</span>
       <span class="tag-direct">직접근거</span>
       <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex: 1;">Diabetes, Obesity and Metabolism | 2026-01-01</div>
+      <div class="journal-meta" style="flex:1;">Diabetes, Obesity and Metabolism | 2026-01-01</div>
       <button class="bd-request-btn" data-title="Optimising the Therapeutic Window: A Systematic Review and Network Meta-Analysis of Pregabalin Dosing Strategies for Painful Diabetic Neuropathy" data-session="골대사·신경" data-num="3" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
     </div>
     <div class="paper-body">
       <p class="paper-title">Optimising the Therapeutic Window: A Systematic Review and Network Meta-Analysis of Pregabalin Dosing Strategies for Painful Diabetic Neuropathy</p>
       <a href="https://dom-pubs.onlinelibrary.wiley.com/doi/10.1111/dom.70748" class="paper-url" target="_blank">https://dom-pubs.onlinelibrary.wiley.com/doi/10.1111/dom.70748</a>
       <span class="design-badge">체계적 문헌고찰 + NMA</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">pDPN pregabalin 용량별 NMA.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">150mg 이하 임상 이점 미미.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">300mg부터 유의 통증 감소.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">600mg 장기 효과 최대이나 이상반응 현저 증가.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">300mg 효과-내약성 최적</div>
-        </div>
+      <div class="summary-grid"><h4>논문 내용 요약</h4>
+        <div class="s-row"><div class="s-label">배경</div><div class="s-val">pDPN pregabalin 용량별 NMA.</div></div>
+        <div class="s-row"><div class="s-label">방법</div><div class="s-val">150mg 이하 임상 이점 미미.</div></div>
+        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">300mg부터 유의 통증 감소.</div></div>
+        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">600mg 장기 효과 최대이나 이상반응 현저 증가.</div></div>
+        <div class="s-row"><div class="s-label">결론</div><div class="s-val">300mg 효과-내약성 최적</div></div>
       </div>
-
       <div class="key-nums">
-        <div class="knum">
-          <div class="val">150mg</div>
-          <div class="desc">연구 규모/투여량</div>
-          
-        </div>
-        <div class="knum">
-          <div class="val">300mg</div>
-          <div class="desc">연구 규모/투여량</div>
-          
-        </div>
-        <div class="knum">
-          <div class="val">600mg</div>
-          <div class="desc">연구 규모/투여량</div>
-          
-        </div>
+        <div class="knum"><div class="val">150mg</div><div class="desc">연구 규모/투여량</div></div>
+        <div class="knum"><div class="val">300mg</div><div class="desc">연구 규모/투여량</div></div>
+        <div class="knum"><div class="val">600mg</div><div class="desc">연구 규모/투여량</div></div>
       </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">Optimising the Therapeutic Window: A Systematic Review and N</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_3_282"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
+      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Optimising the Therapeutic Window: A Systematic Review and N</div><div class="chart-wrap"><canvas id="chart_dr_3_834"></canvas></div></div>
+      <div class="usage"><h4>💡 활용 포인트</h4><ul>
           <li>프레논OD 300mg 처방 합리성 최신 NMA 근거</li>
           <li>용량 선택 가이드라인 핵심 BD 소재 CLB 최적 후보</li>
           <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul>
-      </div>
+        </ul></div>
     </div>
   </div>
 
-    <!-- ━━━ 논문 #4 (골대사·신경) ━━━ -->
+  <!-- ━━━ 논문 #4 (골대사·신경) ━━━ -->
   <div class="paper">
     <div class="paper-header">
       <span class="paper-num">■ 논문 #4</span>
       <span class="stars-high">★★★</span>
       <span class="tag-direct">직접근거</span>
       <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex: 1;">Journal of Orthopaedic Surgery and Research | 2025-03-11</div>
+      <div class="journal-meta" style="flex:1;">Journal of Orthopaedic Surgery and Research | 2025-03-11</div>
       <button class="bd-request-btn" data-title="Efficacy and safety of pregabalin for postoperative pain after total hip and knee arthroplasty: a systematic review and meta-analysis" data-session="골대사·신경" data-num="4" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
     </div>
     <div class="paper-body">
       <p class="paper-title">Efficacy and safety of pregabalin for postoperative pain after total hip and knee arthroplasty: a systematic review and meta-analysis</p>
       <a href="https://link.springer.com/article/10.1186/s13018-025-05675-6" class="paper-url" target="_blank">https://link.springer.com/article/10.1186/s13018-025-05675-6</a>
       <span class="design-badge">체계적 문헌고찰 + 메타분석</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">고관절 골관절염 유병률은 약 9%, 슬관절은 15%(특정 하위군 20%)로 증가 추세이며, 인공관절치환술(TKA/THA) 후 절반 이상이 첫 2주에 최악의 통증을 경험하고 10~50%가 만성 신경병성 통증으로 진행한다. 다중모드 진통(서로 다른 기전의 약물 병용+오피오이드 절감)이 핵심 전략이며, 프레가발린은 전압의존성 칼슘채널 α2δ-1 결합으로 흥분성 신경전달물질 방출과 신경흥분성을 낮춘다. 다만 기존 연구·메타분석은 효과가 상충하고(즉각 효과는 있으나 6주~3개월 후 소실 보고 등) 최적 용량·투여시점 근거가 불충분했다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">PRISMA 준수 체계적문헌고찰·메타분석(PubMed·Scopus·Cochrane, 2024.10 검색). PICOS: 성인 TKA 또는 THA 환자, 중재=프레가발린, 비교=위약 또는 통상 진통제(celecoxib·duloxetine·ketamine·dexamethasone·dexmedetomidine 등), 설계=RCT만. 16개 RCT, 총 1,766명 포함(프레가발린 용량 대부분 150mg, 일부 75~300mg; 평균연령 PGB군 59.1~69세). 1차 효능변수: 안정·운동시 VAS 통증, 오피오이드 소비, 관절가동범위(ROM, 슬관절 굴곡)를 수술 후 24·48·72시간 측정. 이상반응·중단율도 수집. 통계: Review Manager 5.4.1, 이분형 OR·연속형 MD/SMD(95%CI), 이질성 I², 하위군(수술종류·투여시점), GRADE.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">운동시 VAS: 24시간 TKA MD -0.62(95%CI -1.02~-0.23, I²=65%), THA -0.80(95%CI -1.41~-0.19); 48시간 TKA -0.53(95%CI -0.90~-0.15), THA -1.15(95%CI -1.77~-0.52); 72시간 TKA -0.59(95%CI -1.05~-0.12), THA -0.66(95%CI -1.10~-0.22); 7일 THA -1.23(95%CI -2.09~-0.37). 오피오이드 소비(SMD): 24h TKA -0.50(95%CI -0.80~-0.20)·THA -0.83(-1.34~-0.32); 48h TKA -0.76(-1.34~-0.19)·THA -0.62(-1.13~-0.12); 72h TKA -1.33(95%CI -2.16~-0.49). ROM: 24·48시간은 유의차 없으나 72시간 TKA에서 SMD 1.11(95%CI 0.12~2.09, 약 10도 차이)로 유의 개선. 투여시점 하위분석: 수술 24시간 이전 투여가 72시간 운동·안정시 VAS(p=0.0004) 및 72시간 오피오이드 절감(p&lt;0.0001)에서 최대 효과. GRADE 확실성은 24h VAS·ROM·72h 오피오이드 중등도~높음, 48/72h VAS·24/48h 오피오이드는 낮음~매우낮음(출판편향 의심).</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">프레가발린은 진정(sedation)을 유의하게 증가 — TKA 24h OR 2.27(95%CI 1.13~4.56), 48h OR 2.54(95%CI 1.11~5.79). 복시·시야흐림 증가 — TKA 24h OR 9.00(95%CI 1.12~72.36), TKA+THA 24h OR 4.68(95%CI 1.37~15.99). 반면 오심(THA 24h OR 0.30, 95%CI 0.09~0.99)과 구토(TKA 48h OR 0.17, 95%CI 0.04~0.65)는 오히려 감소. 어지러움·구갈·두통·요저류·위장관 이상반응 등 나머지는 군간 유의차 없음. 이상반응 또는 기타 사유로 인한 치료 중단율은 군간 유의차 없어 내약성은 양호.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">프레가발린을 수술 전·후 투여 시 TJA 후 첫 3일 통증과 오피오이드 소비를 유의하게 줄이고 3일째 ROM을 개선하며 내약성도 양호하다(진정·시야흐림↑, 오심·구토↓). 한계는 소수 연구로 용량·안전성 정량분석 불가, 이질성·출판편향, 단기 평가, 국소침윤 등 교란변수 미보정이다. 프레논OD(pregabalin) 관점에서, 정형외과 다중모드 진통 내 오피오이드 절감 보조요법으로서 &#x27;수술 ≥24시간 전 선제 투여 시 효과 극대화&#x27;라는 임상적 함의를 직접 제공한다.</div>
-        </div>
+      <div class="summary-grid"><h4>논문 내용 요약</h4>
+        <div class="s-row"><div class="s-label">배경</div><div class="s-val">고관절 골관절염 유병률은 약 9%, 슬관절은 15%(특정 하위군 20%)로 증가 추세이며, 인공관절치환술(TKA/THA) 후 절반 이상이 첫 2주에 최악의 통증을 경험하고 10~50%가 만성 신경병성 통증으로 진행한다. 다중모드 진통(서로 다른 기전의 약물 병용+오피오이드 절감)이 핵심 전략이며, 프레가발린은 전압의존성 칼슘채널 α2δ-1 결합으로 흥분성 신경전달물질 방출과 신경흥분성을 낮춘다. 다만 기존 연구·메타분석은 효과가 상충하고(즉각 효과는 있으나 6주~3개월 후 소실 보고 등) 최적 용량·투여시점 근거가 불충분했다.</div></div>
+        <div class="s-row"><div class="s-label">방법</div><div class="s-val">PRISMA 준수 체계적문헌고찰·메타분석(PubMed·Scopus·Cochrane, 2024.10 검색). PICOS: 성인 TKA 또는 THA 환자, 중재=프레가발린, 비교=위약 또는 통상 진통제(celecoxib·duloxetine·ketamine·dexamethasone·dexmedetomidine 등), 설계=RCT만. 16개 RCT, 총 1,766명 포함(프레가발린 용량 대부분 150mg, 일부 75~300mg; 평균연령 PGB군 59.1~69세). 1차 효능변수: 안정·운동시 VAS 통증, 오피오이드 소비, 관절가동범위(ROM, 슬관절 굴곡)를 수술 후 24·48·72시간 측정. 이상반응·중단율도 수집. 통계: Review Manager 5.4.1, 이분형 OR·연속형 MD/SMD(95%CI), 이질성 I², 하위군(수술종류·투여시점), GRADE.</div></div>
+        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">운동시 VAS: 24시간 TKA MD -0.62(95%CI -1.02~-0.23, I²=65%), THA -0.80(95%CI -1.41~-0.19); 48시간 TKA -0.53(95%CI -0.90~-0.15), THA -1.15(95%CI -1.77~-0.52); 72시간 TKA -0.59(95%CI -1.05~-0.12), THA -0.66(95%CI -1.10~-0.22); 7일 THA -1.23(95%CI -2.09~-0.37). 오피오이드 소비(SMD): 24h TKA -0.50(95%CI -0.80~-0.20)·THA -0.83(-1.34~-0.32); 48h TKA -0.76(-1.34~-0.19)·THA -0.62(-1.13~-0.12); 72h TKA -1.33(95%CI -2.16~-0.49). ROM: 24·48시간은 유의차 없으나 72시간 TKA에서 SMD 1.11(95%CI 0.12~2.09, 약 10도 차이)로 유의 개선. 투여시점 하위분석: 수술 24시간 이전 투여가 72시간 운동·안정시 VAS(p=0.0004) 및 72시간 오피오이드 절감(p&lt;0.0001)에서 최대 효과. GRADE 확실성은 24h VAS·ROM·72h 오피오이드 중등도~높음, 48/72h VAS·24/48h 오피오이드는 낮음~매우낮음(출판편향 의심).</div></div>
+        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">프레가발린은 진정(sedation)을 유의하게 증가 — TKA 24h OR 2.27(95%CI 1.13~4.56), 48h OR 2.54(95%CI 1.11~5.79). 복시·시야흐림 증가 — TKA 24h OR 9.00(95%CI 1.12~72.36), TKA+THA 24h OR 4.68(95%CI 1.37~15.99). 반면 오심(THA 24h OR 0.30, 95%CI 0.09~0.99)과 구토(TKA 48h OR 0.17, 95%CI 0.04~0.65)는 오히려 감소. 어지러움·구갈·두통·요저류·위장관 이상반응 등 나머지는 군간 유의차 없음. 이상반응 또는 기타 사유로 인한 치료 중단율은 군간 유의차 없어 내약성은 양호.</div></div>
+        <div class="s-row"><div class="s-label">결론</div><div class="s-val">프레가발린을 수술 전·후 투여 시 TJA 후 첫 3일 통증과 오피오이드 소비를 유의하게 줄이고 3일째 ROM을 개선하며 내약성도 양호하다(진정·시야흐림↑, 오심·구토↓). 한계는 소수 연구로 용량·안전성 정량분석 불가, 이질성·출판편향, 단기 평가, 국소침윤 등 교란변수 미보정이다. 프레논OD(pregabalin) 관점에서, 정형외과 다중모드 진통 내 오피오이드 절감 보조요법으로서 &#x27;수술 ≥24시간 전 선제 투여 시 효과 극대화&#x27;라는 임상적 함의를 직접 제공한다.</div></div>
       </div>
-
       <div class="key-nums">
-        <div class="knum">
-          <div class="val">MD -0.62 (95%CI -1.02~-0.23)</div>
-          <div class="desc">24h 운동시 VAS, TKA</div>
-          
-        </div>
-        <div class="knum">
-          <div class="val">MD -1.15 (95%CI -1.77~-0.52)</div>
-          <div class="desc">48h 운동시 VAS, THA</div>
-          
-        </div>
-        <div class="knum">
-          <div class="val">SMD -1.33 (95%CI -2.16~-0.49)</div>
-          <div class="desc">72h 오피오이드 소비, TKA</div>
-          
-        </div>
+        <div class="knum"><div class="val">MD -0.62 (95%CI -1.02~-0.23)</div><div class="desc">24h 운동시 VAS, TKA</div></div>
+        <div class="knum"><div class="val">MD -1.15 (95%CI -1.77~-0.52)</div><div class="desc">48h 운동시 VAS, THA</div></div>
+        <div class="knum"><div class="val">SMD -1.33 (95%CI -2.16~-0.49)</div><div class="desc">72h 오피오이드 소비, TKA</div></div>
       </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">Efficacy and safety of pregabalin for postoperative pain aft</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_4_282"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
+      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Efficacy and safety of pregabalin for postoperative pain aft</div><div class="chart-wrap"><canvas id="chart_dr_4_834"></canvas></div></div>
+      <div class="usage"><h4>💡 활용 포인트</h4><ul>
           <li>인공관절 수술 후 멀티모달 진통 pregabalin 역할 입증</li>
           <li>골다공증 환자 관절수술 시 프레논OD 병용 근거</li>
           <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-        </ul>
-      </div>
+        </ul></div>
     </div>
   </div>
 
-    <!-- ━━━ 논문 #5 (골대사·신경) ━━━ -->
+  <!-- ━━━ 논문 #5 (골대사·신경) ━━━ -->
   <div class="paper">
     <div class="paper-header">
       <span class="paper-num">■ 논문 #5</span>
       <span class="stars-high">★★★</span>
       <span class="tag-direct">직접근거</span>
       <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex: 1;">The Journal of Arthroplasty | 2025-01-01</div>
+      <div class="journal-meta" style="flex:1;">The Journal of Arthroplasty | 2025-01-01</div>
       <button class="bd-request-btn" data-title="Analgesic Efficacy and Side Effects of Low-Dose Pregabalin As a Modern Multimodal Agent for Postoperative Pain Control After Total Knee Arthroplasty: A Prospective, Double-Blinded, Randomized Controlled Trial" data-session="골대사·신경" data-num="5" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
     </div>
     <div class="paper-body">
       <p class="paper-title">Analgesic Efficacy and Side Effects of Low-Dose Pregabalin As a Modern Multimodal Agent for Postoperative Pain Control After Total Knee Arthroplasty: A Prospective, Double-Blinded, Randomized Controlled Trial</p>
       <a href="https://www.arthroplastyjournal.org/article/S0883-5403(25)00819-8/abstract" class="paper-url" target="_blank">https://www.arthroplastyjournal.org/article/S0883-5403(25)00819-8/abstract</a>
       <span class="design-badge">RCT (전향적 이중맹검)</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">프레가발린은 전슬관절치환술(TKA) 후 다중모드 진통전략의 핵심 구성요소다. 현행 권고 용량은 술후 14일간 1일 150~300mg이나 어지럼·진정 등 부작용이 보고된다. 외래(당일퇴원) TKA가 늘어나는 추세에서 부작용을 줄이면서 진통효과를 유지하는 저용량 전략의 필요성이 미충족 수요로 대두되었다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">이중맹검·무작위대조시험(치료적 근거수준 Level I). 일측 일차 TKA 환자를 대상으로 술후 프레가발린 저용량 75mg/일 vs 권고용량 150mg/일을 14일간 비교. 모든 환자에 수술 중 코르티코스테로이드·척추마취·내전근관차단·관절주위 주사 등 표준화 약제 적용. 1차 평가변수: 통증(VAS, 안정 시·운동 시) — 술후 24·48시간 및 2·6·12주 측정. 2차: 모르핀 소비량, 이상반응, 보행개시 시간, 슬관절 굴곡, Knee Society Score, 2분 보행검사(2MWT), Timed Up-and-Go(TUG). 군별 N은 초록 미보고(양군 비교 설계).</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">1차 평가변수(VAS): 75mg군과 150mg군 간 술후 12주까지 모든 시점에서 통증점수에 통계적 유의차 없음 — 저용량이 권고용량과 동등한 진통효과. 부작용·기능지표에서 저용량의 이점: 어지럼 발생률 75mg군 17% vs 150mg군 61%(p&lt;0.001)로 저용량이 현저히 낮음; 보행개시 시간 27±4시간 vs 30±4시간(p&lt;0.001)으로 저용량이 더 빠름. 그 외 결과지표(모르핀 소비, KSS, 2MWT, TUG 등)는 양군 간 두드러진 차이 없음.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">핵심 안전성 결과는 어지럼(dizziness): 75mg군 17% vs 150mg군 61%(p&lt;0.001)로 저용량에서 유의하게 낮음. 진정(sedation)이 프레가발린의 알려진 부작용으로 언급됨. 구체적 중단율은 초록 미보고.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">(초록 기반 — 전문 미접근) 저자 결론은 TKA 후 14일간 프레가발린 75mg이 150mg과 유사한 통증조절을 제공하면서 더 빠른 보행과 더 낮은 어지럼이라는 이점을 가지므로, 특히 외래 TKA 증가 추세에서 75mg을 현대적 다중모드 진통요법의 구성요소로 권장한다는 것. 한계: 단일 평가, 군별 N 미공개, 12주까지의 단기 추적. 프레논OD(pregabalin) 관점: 저용량(75mg) 프레가발린이 표준용량과 동등 진통·우수 내약성(어지럼 1/3 수준)을 보인 Level I 근거로, 부작용 최소화가 중요한 외래/조기재활 환자에서 저용량 OD 제형의 임상적 가치를 직접 뒷받침.</div>
-        </div>
+      <div class="summary-grid"><h4>논문 내용 요약</h4>
+        <div class="s-row"><div class="s-label">배경</div><div class="s-val">프레가발린은 전슬관절치환술(TKA) 후 다중모드 진통전략의 핵심 구성요소다. 현행 권고 용량은 술후 14일간 1일 150~300mg이나 어지럼·진정 등 부작용이 보고된다. 외래(당일퇴원) TKA가 늘어나는 추세에서 부작용을 줄이면서 진통효과를 유지하는 저용량 전략의 필요성이 미충족 수요로 대두되었다.</div></div>
+        <div class="s-row"><div class="s-label">방법</div><div class="s-val">이중맹검·무작위대조시험(치료적 근거수준 Level I). 일측 일차 TKA 환자를 대상으로 술후 프레가발린 저용량 75mg/일 vs 권고용량 150mg/일을 14일간 비교. 모든 환자에 수술 중 코르티코스테로이드·척추마취·내전근관차단·관절주위 주사 등 표준화 약제 적용. 1차 평가변수: 통증(VAS, 안정 시·운동 시) — 술후 24·48시간 및 2·6·12주 측정. 2차: 모르핀 소비량, 이상반응, 보행개시 시간, 슬관절 굴곡, Knee Society Score, 2분 보행검사(2MWT), Timed Up-and-Go(TUG). 군별 N은 초록 미보고(양군 비교 설계).</div></div>
+        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">1차 평가변수(VAS): 75mg군과 150mg군 간 술후 12주까지 모든 시점에서 통증점수에 통계적 유의차 없음 — 저용량이 권고용량과 동등한 진통효과. 부작용·기능지표에서 저용량의 이점: 어지럼 발생률 75mg군 17% vs 150mg군 61%(p&lt;0.001)로 저용량이 현저히 낮음; 보행개시 시간 27±4시간 vs 30±4시간(p&lt;0.001)으로 저용량이 더 빠름. 그 외 결과지표(모르핀 소비, KSS, 2MWT, TUG 등)는 양군 간 두드러진 차이 없음.</div></div>
+        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">핵심 안전성 결과는 어지럼(dizziness): 75mg군 17% vs 150mg군 61%(p&lt;0.001)로 저용량에서 유의하게 낮음. 진정(sedation)이 프레가발린의 알려진 부작용으로 언급됨. 구체적 중단율은 초록 미보고.</div></div>
+        <div class="s-row"><div class="s-label">결론</div><div class="s-val">(초록 기반 — 전문 미접근) 저자 결론은 TKA 후 14일간 프레가발린 75mg이 150mg과 유사한 통증조절을 제공하면서 더 빠른 보행과 더 낮은 어지럼이라는 이점을 가지므로, 특히 외래 TKA 증가 추세에서 75mg을 현대적 다중모드 진통요법의 구성요소로 권장한다는 것. 한계: 단일 평가, 군별 N 미공개, 12주까지의 단기 추적. 프레논OD(pregabalin) 관점: 저용량(75mg) 프레가발린이 표준용량과 동등 진통·우수 내약성(어지럼 1/3 수준)을 보인 Level I 근거로, 부작용 최소화가 중요한 외래/조기재활 환자에서 저용량 OD 제형의 임상적 가치를 직접 뒷받침.</div></div>
       </div>
-
       <div class="key-nums">
-        <div class="knum">
-          <div class="val">17% vs 61%</div>
-          <div class="desc">어지럼 발생률 — 프레가발린 75mg군 vs 150mg군(저용량 유의 우월)</div>
-          <div class="pval">&lt;0.001</div>
-        </div>
-        <div class="knum">
-          <div class="val">27±4 vs 30±4시간</div>
-          <div class="desc">보행개시 시간 — 75mg군 vs 150mg군(저용량 더 빠름)</div>
-          <div class="pval">&lt;0.001</div>
-        </div>
-        <div class="knum">
-          <div class="val">유의차 없음</div>
-          <div class="desc">VAS 통증점수(안정·운동 시, 24h~12주) — 75mg vs 150mg, 동등</div>
-          <div class="pval">&gt;0.05</div>
-        </div>
+        <div class="knum"><div class="val">17% vs 61%</div><div class="desc">어지럼 발생률</div><div class="pval">&lt;0.001</div></div>
+        <div class="knum"><div class="val">27±4 vs 30±4시간</div><div class="desc">보행개시 시간</div><div class="pval">&lt;0.001</div></div>
+        <div class="knum"><div class="val">유의차 없음</div><div class="desc">VAS 통증점수(안정·운동 시, 24h~</div><div class="pval">&gt;0.05</div></div>
       </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">Analgesic Efficacy and Side Effects of Low-Dose Pregabalin A</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_5_282"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
+      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Analgesic Efficacy and Side Effects of Low-Dose Pregabalin A</div><div class="chart-wrap"><canvas id="chart_dr_5_834"></canvas></div></div>
+      <div class="usage"><h4>💡 활용 포인트</h4><ul>
           <li>프레논OD 저용량(75mg) TKA 후 전략</li>
           <li>고령 골다공증 환자 저용량 시작 근거</li>
           <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-        </ul>
-      </div>
+        </ul></div>
     </div>
   </div>
 
-    <!-- ━━━ 논문 #6 (골대사·신경) ━━━ -->
+  <!-- ━━━ 논문 #6 (골대사·신경) ━━━ -->
   <div class="paper">
     <div class="paper-header">
       <span class="paper-num">■ 논문 #6</span>
       <span class="stars-mid">★★☆</span>
       <span class="tag-direct">직접근거</span>
       <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex: 1;">Cureus | 2026-02-02</div>
+      <div class="journal-meta" style="flex:1;">Cureus | 2026-02-02</div>
       <button class="bd-request-btn" data-title="Therapeutic and Diagnostic Landscape of Diabetic Neuropathy: A Systematic Review of Clinical Studies" data-session="골대사·신경" data-num="6" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
     </div>
     <div class="paper-body">
       <p class="paper-title">Therapeutic and Diagnostic Landscape of Diabetic Neuropathy: A Systematic Review of Clinical Studies</p>
       <a href="https://www.cureus.com/articles/426413" class="paper-url" target="_blank">https://www.cureus.com/articles/426413</a>
       <span class="design-badge">체계적 문헌고찰</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">당뇨병성 신경병증(DN)은 당뇨 환자의 최대 절반에 발생하는 가장 흔한 합병증으로 장애·삶의질 저하·족부궤양 위험을 야기한다. 이질적 임상양상과 복잡한 병태생리로 진단·치료가 어렵고, 약물·신경조절·재활·창상치료 등 여러 전략의 최신 임상근거를 통합 정리할 필요가 있었다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">PRISMA 2020 준수 체계적문헌고찰(PROSPERO 미등록). PubMed·EMBASE·CENTRAL·Web of Science에서 2000~2025.3 검색(8,315건 → 중복·기간제한 후 1,478건 → 최종 76개 임상연구, 2020~2025 발표). 포함: RCT·전향/후향 코호트. PICO: 대상=모든 아형 DN, 중재=약물/수술/생활습관/대체요법 및 진단전략, 비교=위약/표준치료/타 중재, 1차 결과=12~16주 통증(VAS/NRS), 2차=기능(보행·균형)·신경전도속도·궤양치유·절단율. 일부 중재는 정량 메타분석 수행.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">약물요법 중 프레가발린·둘록세틴·α-리포산이 가장 일관된 효능. 프레가발린은 6개 RCT·총 1,450명에서 VAS 약 2.1점 감소와 수면·삶의질 개선을 보였고, 정량합성 결과 통합 VAS 감소 -2.1점(95%CI -2.6~-1.6, I²=32%)으로 둘록세틴(-1.9점, 95%CI -2.4~-1.3) 및 α-리포산보다 높은 효과크기를 보였다. 근거강도는 프레가발린·둘록세틴 모두 &#x27;High&#x27;(다수 RCT·메타분석)로 등급화. 1차약 권고는 프레가발린(150~600mg/일)·둘록세틴(60~120mg/일)·아미트립틸린(25~75mg/일), 보조로 α-리포산 600mg/일. 난치성에는 고주파(10kHz) 척수자극이 ≥50% 통증감소를 최대 12개월 지속. OPTION-DM 시험은 아미트립틸린·둘록세틴·프레가발린 순차전략 모두 임상적으로 의미 있는 진통을 제공함을 보여 개별화 치료를 지지. 신경전도검사·검증된 점수도구가 가장 신뢰할 진단수단이며 바이오마커·미세혈관 지표가 보조로 부상.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">리뷰 특성상 프레가발린 개별 이상반응 발생률은 정량 제시되지 않았으나, 본문은 프레가발린·둘록세틴의 1차약 지위가 &#x27;효능·동반질환·내약성에 따라 선택&#x27;된다고 명시하고 어지러움·졸림 등 용량 관련 이상반응을 저용량 시작·점증의 근거로 언급한다. 신규 비오피오이드(나트륨채널차단제 LX9211 등)는 수용 가능한 내약성으로 통증 감소를 보였다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">DN 1차 약물치료로 프레가발린·둘록세틴·α-리포산이 고품질 RCT로 가장 강하게 뒷받침되며, 10kHz 척수자극은 난치성에 근거기반 옵션이다. 약물·기기·재활을 통합한 다학제 경로가 권고되나 소섬유·자율신경병증 근거 공백이 크고 질병조절요법 확립을 위한 대규모 다기관 시험이 필요하다. 프레논OD(pregabalin) 관점에서, 최신(2020~2025) 근거를 종합해 프레가발린을 &#x27;High 등급·VAS 약 2.1점 감소&#x27;의 DN 1차 표준으로 재확인한 리뷰로, 포지셔닝 근거로 인용 가치가 높다.</div>
-        </div>
+      <div class="summary-grid"><h4>논문 내용 요약</h4>
+        <div class="s-row"><div class="s-label">배경</div><div class="s-val">당뇨병성 신경병증(DN)은 당뇨 환자의 최대 절반에 발생하는 가장 흔한 합병증으로 장애·삶의질 저하·족부궤양 위험을 야기한다. 이질적 임상양상과 복잡한 병태생리로 진단·치료가 어렵고, 약물·신경조절·재활·창상치료 등 여러 전략의 최신 임상근거를 통합 정리할 필요가 있었다.</div></div>
+        <div class="s-row"><div class="s-label">방법</div><div class="s-val">PRISMA 2020 준수 체계적문헌고찰(PROSPERO 미등록). PubMed·EMBASE·CENTRAL·Web of Science에서 2000~2025.3 검색(8,315건 → 중복·기간제한 후 1,478건 → 최종 76개 임상연구, 2020~2025 발표). 포함: RCT·전향/후향 코호트. PICO: 대상=모든 아형 DN, 중재=약물/수술/생활습관/대체요법 및 진단전략, 비교=위약/표준치료/타 중재, 1차 결과=12~16주 통증(VAS/NRS), 2차=기능(보행·균형)·신경전도속도·궤양치유·절단율. 일부 중재는 정량 메타분석 수행.</div></div>
+        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">약물요법 중 프레가발린·둘록세틴·α-리포산이 가장 일관된 효능. 프레가발린은 6개 RCT·총 1,450명에서 VAS 약 2.1점 감소와 수면·삶의질 개선을 보였고, 정량합성 결과 통합 VAS 감소 -2.1점(95%CI -2.6~-1.6, I²=32%)으로 둘록세틴(-1.9점, 95%CI -2.4~-1.3) 및 α-리포산보다 높은 효과크기를 보였다. 근거강도는 프레가발린·둘록세틴 모두 &#x27;High&#x27;(다수 RCT·메타분석)로 등급화. 1차약 권고는 프레가발린(150~600mg/일)·둘록세틴(60~120mg/일)·아미트립틸린(25~75mg/일), 보조로 α-리포산 600mg/일. 난치성에는 고주파(10kHz) 척수자극이 ≥50% 통증감소를 최대 12개월 지속. OPTION-DM 시험은 아미트립틸린·둘록세틴·프레가발린 순차전략 모두 임상적으로 의미 있는 진통을 제공함을 보여 개별화 치료를 지지. 신경전도검사·검증된 점수도구가 가장 신뢰할 진단수단이며 바이오마커·미세혈관 지표가 보조로 부상.</div></div>
+        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">리뷰 특성상 프레가발린 개별 이상반응 발생률은 정량 제시되지 않았으나, 본문은 프레가발린·둘록세틴의 1차약 지위가 &#x27;효능·동반질환·내약성에 따라 선택&#x27;된다고 명시하고 어지러움·졸림 등 용량 관련 이상반응을 저용량 시작·점증의 근거로 언급한다. 신규 비오피오이드(나트륨채널차단제 LX9211 등)는 수용 가능한 내약성으로 통증 감소를 보였다.</div></div>
+        <div class="s-row"><div class="s-label">결론</div><div class="s-val">DN 1차 약물치료로 프레가발린·둘록세틴·α-리포산이 고품질 RCT로 가장 강하게 뒷받침되며, 10kHz 척수자극은 난치성에 근거기반 옵션이다. 약물·기기·재활을 통합한 다학제 경로가 권고되나 소섬유·자율신경병증 근거 공백이 크고 질병조절요법 확립을 위한 대규모 다기관 시험이 필요하다. 프레논OD(pregabalin) 관점에서, 최신(2020~2025) 근거를 종합해 프레가발린을 &#x27;High 등급·VAS 약 2.1점 감소&#x27;의 DN 1차 표준으로 재확인한 리뷰로, 포지셔닝 근거로 인용 가치가 높다.</div></div>
       </div>
-
       <div class="key-nums">
-        <div class="knum">
-          <div class="val">VAS -2.1점 (95%CI -2.6~-1.6, I²=32%)</div>
-          <div class="desc">프레가발린 통합 통증 감소</div>
-          
-        </div>
-        <div class="knum">
-          <div class="val">VAS -1.9점 (95%CI -2.4~-1.3)</div>
-          <div class="desc">둘록세틴 통합 통증 감소(비교)</div>
-          
-        </div>
-        <div class="knum">
-          <div class="val">6 RCT / 1,450명</div>
-          <div class="desc">프레가발린 근거 기반</div>
-          
-        </div>
+        <div class="knum"><div class="val">VAS -2.1점 (95%CI -2.6~-1.6, I²=32%)</div><div class="desc">프레가발린 통합 통증 감소</div></div>
+        <div class="knum"><div class="val">VAS -1.9점 (95%CI -2.4~-1.3)</div><div class="desc">둘록세틴 통합 통증 감소</div></div>
+        <div class="knum"><div class="val">6 RCT / 1,450명</div><div class="desc">프레가발린 근거 기반</div></div>
       </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">Therapeutic and Diagnostic Landscape of Diabetic Neuropathy:</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_6_282"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
+      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Therapeutic and Diagnostic Landscape of Diabetic Neuropathy:</div><div class="chart-wrap"><canvas id="chart_dr_6_834"></canvas></div></div>
+      <div class="usage"><h4>💡 활용 포인트</h4><ul>
           <li>Pregabalin 당뇨병성 신경병증 1선 약물 위치 재확인</li>
           <li>전체 치료 환경 내 positioning</li>
           <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-        </ul>
-      </div>
+        </ul></div>
     </div>
   </div>
 
-    <!-- ━━━ 논문 #7 (골대사·신경) ━━━ -->
+  <!-- ━━━ 논문 #7 (골대사·신경) ━━━ -->
   <div class="paper">
     <div class="paper-header">
       <span class="paper-num">■ 논문 #7</span>
       <span class="stars-mid">★★☆</span>
       <span class="tag-ref">참고근거</span>
       <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex: 1;">Annals of Joint | 2025-01-22</div>
+      <div class="journal-meta" style="flex:1;">Annals of Joint | 2025-01-22</div>
       <button class="bd-request-btn" data-title="Expert consensus on vitamin D in osteoporosis" data-session="골대사·신경" data-num="7" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
     </div>
     <div class="paper-body">
       <p class="paper-title">Expert consensus on vitamin D in osteoporosis</p>
       <a href="https://aoj.amegroups.org/article/view/9070/html" class="paper-url" target="_blank">https://aoj.amegroups.org/article/view/9070/html</a>
       <span class="design-badge">전문가 합의문</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">골다공증은 골량 감소와 골미세구조 악화로 골절 위험이 증가하는 전신 골격질환으로, 중국 50세 여성의 약 40.9%가 잔여 생애 중 골다공증성 골절을 경험하는 등 고령화에 따른 사회·경제적 부담이 크다. 비타민D는 골건강·골다공증 예방·치료에 필수로 여겨지나, 최근 대규모 임상시험·메타분석에서 골절예방 효능이 일관되지 않고 최적 25(OH)D 수치·표준화 분석법에 대한 학회 간 권고가 엇갈려 실무 지침의 미충족 수요가 컸다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">전문가 합의문(중국 주도 + 국제 전문가 패널 검토). 방법=합의 패널·권고 등급: 1차 집필진이 개요를 작성→국제 비타민D 전문가 패널이 검토·논의→전자 커뮤니케이션으로 합의 도달→최종 승인. 근거는 PubMed/MEDLINE 검색(메타분석·RCT 체계적고찰·관찰연구)으로 수집, 근거수준 4단계(Level 1: 메타분석/RCT ~ Level 4: 증례시리즈)로 등급화, 권고강도는 GRADE 체계(강한 권고/약한 권고)로 기술. 9개 핵심 권고 + 7개 논쟁 질문에 대한 6개 국제 전문가군 의견 부록. 비영어·초록만 게재된 연구는 제외.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">9개 핵심 권고: (1) 혈청 25(OH)D가 비타민D 상태 평가 최적법(Level 1, 강한 권고); (2) 표준화 분석법 부재 시 검사실 간 25(OH)D 비교 불가(Level 2, 강한 권고); (3) 결핍 위험군은 25(OH)D 측정 권고(Level 2, 강); (4) 골다공증 환자는 25(OH)D ≥75 nmol/L 유지(Level 1, 강); (5) 골절 저위험 50세 미만 성인은 비타민D &gt;400 IU + 칼슘 &gt;1,000mg 일일 보충 비권고(Level 1, 약); (6) 결핍 고위험 50세 초과 성인은 최소 칼슘 1,200mg + 비타민D 800 IU/일 보충 권고(Level 1, 강); (7) 보충 개시 3개월 내 25(OH)D 일상 측정 불필요(Level 1, 강); (8) 지역사회 성인 1차 골절예방 목적 보충은 유익·위해 균형 고려(Level 1, 약); (9) 비타민D 결핍 환자에서 항흡수제 시작 전 적정 칼슘·비타민D 확보 필수(Level 2, 약). 근거 종합: 비타민D+칼슘 병용은 8개 RCT(n=30,970) 메타분석에서 총골절 15% 감소(RR 0.85, 95%CI 0.73-0.98)·고관절골절 30% 감소(RR 0.70, 95%CI 0.56-0.87); 항흡수제 반응 최적화 위해 비타민D 충족 필요(결핍 시 골절 보정 OR 1.77, 95%CI 1.20-2.59).</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">과보충 위해 명시: 칼슘+비타민D 병용 시 신결석 위험 17% 증가(WHI). 단회 고용량(연 500,000 IU)은 낙상·골절 위험 증가, 고용량(4,000~10,000 IU/일, 3년)은 요골 BMD를 오히려 감소. 혈청 25(OH)D &gt;220 nmol/L에서 독성(고칼슘혈증) 위험, 일일 상한섭취량 4,000 IU. 권장용량(800 IU) 범위에서는 독성 위험 낮음.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">(전문 정독) 합의문은 골다공증에서 누구를·어떻게 평가·치료할지에 초점한 실무도구로, 핵심은 골다공증 환자 25(OH)D ≥75 nmol/L 유지, 고위험 50세 초과 성인 칼슘 1,200mg+비타민D 800 IU/일, 항흡수제 전 비타민D 충족이다. 한계: 기저 25(OH)D·용량·추적기간 이질성, 분석법 차이, 비영어/초록 연구 제외로 출판편향 평가 불가. 알파본D(비타민D/alfacalcidol) 관점: 본 합의는 골다공증 치료에서 비타민D 충족(특히 ≥75 nmol/L 목표)과 항흡수제 병용의 필수성, 고위험군 800 IU/일 보충을 권고 등급으로 명문화해 활성형 비타민D 제제의 처방 근거·병용 메시지를 학술적으로 뒷받침.</div>
-        </div>
+      <div class="summary-grid"><h4>논문 내용 요약</h4>
+        <div class="s-row"><div class="s-label">배경</div><div class="s-val">골다공증은 골량 감소와 골미세구조 악화로 골절 위험이 증가하는 전신 골격질환으로, 중국 50세 여성의 약 40.9%가 잔여 생애 중 골다공증성 골절을 경험하는 등 고령화에 따른 사회·경제적 부담이 크다. 비타민D는 골건강·골다공증 예방·치료에 필수로 여겨지나, 최근 대규모 임상시험·메타분석에서 골절예방 효능이 일관되지 않고 최적 25(OH)D 수치·표준화 분석법에 대한 학회 간 권고가 엇갈려 실무 지침의 미충족 수요가 컸다.</div></div>
+        <div class="s-row"><div class="s-label">방법</div><div class="s-val">전문가 합의문(중국 주도 + 국제 전문가 패널 검토). 방법=합의 패널·권고 등급: 1차 집필진이 개요를 작성→국제 비타민D 전문가 패널이 검토·논의→전자 커뮤니케이션으로 합의 도달→최종 승인. 근거는 PubMed/MEDLINE 검색(메타분석·RCT 체계적고찰·관찰연구)으로 수집, 근거수준 4단계(Level 1: 메타분석/RCT ~ Level 4: 증례시리즈)로 등급화, 권고강도는 GRADE 체계(강한 권고/약한 권고)로 기술. 9개 핵심 권고 + 7개 논쟁 질문에 대한 6개 국제 전문가군 의견 부록. 비영어·초록만 게재된 연구는 제외.</div></div>
+        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">9개 핵심 권고: (1) 혈청 25(OH)D가 비타민D 상태 평가 최적법(Level 1, 강한 권고); (2) 표준화 분석법 부재 시 검사실 간 25(OH)D 비교 불가(Level 2, 강한 권고); (3) 결핍 위험군은 25(OH)D 측정 권고(Level 2, 강); (4) 골다공증 환자는 25(OH)D ≥75 nmol/L 유지(Level 1, 강); (5) 골절 저위험 50세 미만 성인은 비타민D &gt;400 IU + 칼슘 &gt;1,000mg 일일 보충 비권고(Level 1, 약); (6) 결핍 고위험 50세 초과 성인은 최소 칼슘 1,200mg + 비타민D 800 IU/일 보충 권고(Level 1, 강); (7) 보충 개시 3개월 내 25(OH)D 일상 측정 불필요(Level 1, 강); (8) 지역사회 성인 1차 골절예방 목적 보충은 유익·위해 균형 고려(Level 1, 약); (9) 비타민D 결핍 환자에서 항흡수제 시작 전 적정 칼슘·비타민D 확보 필수(Level 2, 약). 근거 종합: 비타민D+칼슘 병용은 8개 RCT(n=30,970) 메타분석에서 총골절 15% 감소(RR 0.85, 95%CI 0.73-0.98)·고관절골절 30% 감소(RR 0.70, 95%CI 0.56-0.87); 항흡수제 반응 최적화 위해 비타민D 충족 필요(결핍 시 골절 보정 OR 1.77, 95%CI 1.20-2.59).</div></div>
+        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">과보충 위해 명시: 칼슘+비타민D 병용 시 신결석 위험 17% 증가(WHI). 단회 고용량(연 500,000 IU)은 낙상·골절 위험 증가, 고용량(4,000~10,000 IU/일, 3년)은 요골 BMD를 오히려 감소. 혈청 25(OH)D &gt;220 nmol/L에서 독성(고칼슘혈증) 위험, 일일 상한섭취량 4,000 IU. 권장용량(800 IU) 범위에서는 독성 위험 낮음.</div></div>
+        <div class="s-row"><div class="s-label">결론</div><div class="s-val">(전문 정독) 합의문은 골다공증에서 누구를·어떻게 평가·치료할지에 초점한 실무도구로, 핵심은 골다공증 환자 25(OH)D ≥75 nmol/L 유지, 고위험 50세 초과 성인 칼슘 1,200mg+비타민D 800 IU/일, 항흡수제 전 비타민D 충족이다. 한계: 기저 25(OH)D·용량·추적기간 이질성, 분석법 차이, 비영어/초록 연구 제외로 출판편향 평가 불가. 알파본D(비타민D/alfacalcidol) 관점: 본 합의는 골다공증 치료에서 비타민D 충족(특히 ≥75 nmol/L 목표)과 항흡수제 병용의 필수성, 고위험군 800 IU/일 보충을 권고 등급으로 명문화해 활성형 비타민D 제제의 처방 근거·병용 메시지를 학술적으로 뒷받침.</div></div>
       </div>
-
       <div class="key-nums">
-        <div class="knum">
-          <div class="val">RR 0.85 (95%CI 0.73-0.98)</div>
-          <div class="desc">비타민D+칼슘 병용 총골절 15% 감소 — 8 RCT, n=30,970 메타분석</div>
-          
-        </div>
-        <div class="knum">
-          <div class="val">RR 0.70 (95%CI 0.56-0.87)</div>
-          <div class="desc">비타민D+칼슘 병용 고관절골절 30% 감소</div>
-          
-        </div>
-        <div class="knum">
-          <div class="val">≥75 nmol/L</div>
-          <div class="desc">골다공증 환자 권고 혈청 25(OH)D 목표(Level 1, 강한 권고)</div>
-          
-        </div>
+        <div class="knum"><div class="val">RR 0.85 (95%CI 0.73-0.98)</div><div class="desc">비타민D+칼슘 병용 총골절 15% 감소</div></div>
+        <div class="knum"><div class="val">RR 0.70 (95%CI 0.56-0.87)</div><div class="desc">비타민D+칼슘 병용 고관절골절 30% 감</div></div>
+        <div class="knum"><div class="val">≥75 nmol/L</div><div class="desc">골다공증 환자 권고 혈청 25</div></div>
       </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">Expert consensus on vitamin D in osteoporosis</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_7_282"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
+      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Expert consensus on vitamin D in osteoporosis</div><div class="chart-wrap"><canvas id="chart_dr_7_834"></canvas></div></div>
+      <div class="usage"><h4>💡 활용 포인트</h4><ul>
           <li>알파본D 처방 가이드라인 근거 활성형 비타민D IA 등급 권고</li>
           <li>PM 디테일링 처방 정당성 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
           <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul>
-      </div>
+        </ul></div>
     </div>
   </div>
 
-    <!-- ━━━ 논문 #8 (골대사·신경) ━━━ -->
+  <!-- ━━━ 논문 #8 (골대사·신경) ━━━ -->
   <div class="paper">
     <div class="paper-header">
       <span class="paper-num">■ 논문 #8</span>
       <span class="stars-low">★☆☆</span>
       <span class="tag-ref">참고근거</span>
       <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex: 1;">PAIN Reports | 2026-04-01</div>
+      <div class="journal-meta" style="flex:1;">PAIN Reports | 2026-04-01</div>
       <button class="bd-request-btn" data-title="Pregabalin naproxencarbil in acute post-bunionectomy pain: a randomized clinical trial" data-session="골대사·신경" data-num="8" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
     </div>
     <div class="paper-body">
       <p class="paper-title">Pregabalin naproxencarbil in acute post-bunionectomy pain: a randomized clinical trial</p>
       <a href="https://journals.lww.com/painrpts/fulltext/2026/04000/pregabalin_naproxencarbil_in_acute.21.aspx" class="paper-url" target="_blank">https://journals.lww.com/painrpts/fulltext/2026/04000/pregabalin_naproxencarbil_in_acute.21.aspx</a>
       <span class="design-badge">RCT (이중맹검 위약대조)</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">전 세계 연간 약 3억1,300만 건의 수술이 시행되고 미국 수술환자의 86%가 술후 통증, 그중 75%가 중등도 이상 통증을 겪으며 68%가 오피오이드를 사용한다. 급성 통증의 부적절한 관리는 만성 통증·재원 연장·오피오이드 장기사용·경제부담으로 이어져, 서로 다른 기전의 다중모드 진통이 권고된다. 프레가발린 나프록센카르빌(PNC)은 흡수 후 나프록센+프레가발린으로 대사되는 단일분자 프로드러그로 염증성·신경병성 통증 경로를 동시에 표적하며, PNC는 프레가발린 Cmax를 약 73%, 나프록센을 약 27% 높이고 두 성분의 Tmax를 동기화한다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">무작위·이중맹검·위약대조·평행군·용량범위 2b상 시험(미국 8개 기관). 일측 제1중족골 무지외반증절제술(bunionectomy) 예정 18~80세 450명을 1:1:1로 PNC 1250mg(n=152)·PNC 750mg(n=149)·위약(n=149)에 배정. 투약은 수술 60분 전 시작 후 12시간마다 72시간 투여(선제+치료 요법). 1차 평가변수는 수술종료~48시간 누적통증강도(SPI48, 1250mg vs 위약), 핵심 2차는 750mg vs 위약 SPI48. 기타: 첫 구제약 사용까지 시간, 48시간 구제약(트라마돌·아세트아미노펜) 소비, 환자 전반평가(PGA), 수면방해점수(SIS), 용량간 비교. 통증은 11점 NPRS로 0~72시간 다회 측정. ITT 분석, 94.4%가 72시간 완료.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">1차: SPI48 LSM 1250mg 132.6±8.0 vs 위약 286.0±8.2, LSMD -153.4(95%CI -173.8~-132.9), p&lt;0.0001 — 위약 대비 53.6% 감소. 핵심 2차: 750mg 157.9±8.3 vs 위약 289.5±8.5, LSMD -131.6(95%CI -153.1~-110.2), p&lt;0.0001 — 45.5% 감소. 용량간: 1250 vs 750mg SPI48 LSMD -22.4(95%CI -43.5~-1.3, p=0.037)로 고용량 우월(용량의존성). 첫 구제약까지 중앙값 31.5 vs 12.2 vs 4.0시간; HR 1250mg 0.18(95%CI 0.14~0.25), 750mg 0.24(95%CI 0.18~0.31)(모두 p&lt;0.0001). 72시간 무구제약 비율 42.8%(1250) vs 33.6%(750) vs 2.7%(위약). 72시간 트라마돌은 위약이 1250mg의 4.1배·750mg의 3.0배, 아세트아미노펜은 3배·2.5배. PGA·SIS 모두 24·48·72시간 위약 대비 유의 개선(p&lt;0.0001). 위약 최대 NPRS 7.2(중등도~중증) vs 1250mg 3.8(경증).</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">중대이상반응 0건. 경증 이상반응은 PNC군에서 더 흔했고(졸림·어지러움·오심·변비·구토 ≥5%), 두통은 위약에서 약간 더 많음. 구체적으로 졸림 15.1%(1250)/10.7%(750)/0%(위약), 어지러움 13.8/11.4/4.1%, 오심 15.8/10.7/12.9%, 변비 11.8/8.7/4.8%, 구토 5.9/3.4/4.1%, 시야흐림 3.3/2.0/0%, 복시 2.6/0.7/0%. 치료관련 이상반응 28.9/20.1/15.0%, 이상반응에 의한 치료중단 3.3/2.0/0.7%. 오심수치(NNRS)·Ramsay 진정척도는 군간 유사하고 검사실·활력징후·심전도 이상 없음 — 프레가발린 단독 시험 대비 졸림·어지러움 빈도가 낮았음.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">PNC는 무지외반증절제술 급성 통증·오피오이드(구제약) 사용·수면방해를 용량의존적으로 줄이며 임상적으로 수용 가능한 안전성을 보였다(2b상). 한계는 선제+치료 혼합요법, 단기(72시간) 평가, 추가 확증시험 필요다. 프레논OD(pregabalin) 관점에서, 프레가발린을 NSAID와 한 분자로 결합·약동학 동기화해 급성 술후통증에 적용한 차세대 다중모드 진통 전략으로, 프레가발린 단독 대비 낮은 졸림·어지러움 빈도와 오피오이드 절감 가능성을 보여주는 직접 참고 데이터다.</div>
-        </div>
+      <div class="summary-grid"><h4>논문 내용 요약</h4>
+        <div class="s-row"><div class="s-label">배경</div><div class="s-val">전 세계 연간 약 3억1,300만 건의 수술이 시행되고 미국 수술환자의 86%가 술후 통증, 그중 75%가 중등도 이상 통증을 겪으며 68%가 오피오이드를 사용한다. 급성 통증의 부적절한 관리는 만성 통증·재원 연장·오피오이드 장기사용·경제부담으로 이어져, 서로 다른 기전의 다중모드 진통이 권고된다. 프레가발린 나프록센카르빌(PNC)은 흡수 후 나프록센+프레가발린으로 대사되는 단일분자 프로드러그로 염증성·신경병성 통증 경로를 동시에 표적하며, PNC는 프레가발린 Cmax를 약 73%, 나프록센을 약 27% 높이고 두 성분의 Tmax를 동기화한다.</div></div>
+        <div class="s-row"><div class="s-label">방법</div><div class="s-val">무작위·이중맹검·위약대조·평행군·용량범위 2b상 시험(미국 8개 기관). 일측 제1중족골 무지외반증절제술(bunionectomy) 예정 18~80세 450명을 1:1:1로 PNC 1250mg(n=152)·PNC 750mg(n=149)·위약(n=149)에 배정. 투약은 수술 60분 전 시작 후 12시간마다 72시간 투여(선제+치료 요법). 1차 평가변수는 수술종료~48시간 누적통증강도(SPI48, 1250mg vs 위약), 핵심 2차는 750mg vs 위약 SPI48. 기타: 첫 구제약 사용까지 시간, 48시간 구제약(트라마돌·아세트아미노펜) 소비, 환자 전반평가(PGA), 수면방해점수(SIS), 용량간 비교. 통증은 11점 NPRS로 0~72시간 다회 측정. ITT 분석, 94.4%가 72시간 완료.</div></div>
+        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">1차: SPI48 LSM 1250mg 132.6±8.0 vs 위약 286.0±8.2, LSMD -153.4(95%CI -173.8~-132.9), p&lt;0.0001 — 위약 대비 53.6% 감소. 핵심 2차: 750mg 157.9±8.3 vs 위약 289.5±8.5, LSMD -131.6(95%CI -153.1~-110.2), p&lt;0.0001 — 45.5% 감소. 용량간: 1250 vs 750mg SPI48 LSMD -22.4(95%CI -43.5~-1.3, p=0.037)로 고용량 우월(용량의존성). 첫 구제약까지 중앙값 31.5 vs 12.2 vs 4.0시간; HR 1250mg 0.18(95%CI 0.14~0.25), 750mg 0.24(95%CI 0.18~0.31)(모두 p&lt;0.0001). 72시간 무구제약 비율 42.8%(1250) vs 33.6%(750) vs 2.7%(위약). 72시간 트라마돌은 위약이 1250mg의 4.1배·750mg의 3.0배, 아세트아미노펜은 3배·2.5배. PGA·SIS 모두 24·48·72시간 위약 대비 유의 개선(p&lt;0.0001). 위약 최대 NPRS 7.2(중등도~중증) vs 1250mg 3.8(경증).</div></div>
+        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">중대이상반응 0건. 경증 이상반응은 PNC군에서 더 흔했고(졸림·어지러움·오심·변비·구토 ≥5%), 두통은 위약에서 약간 더 많음. 구체적으로 졸림 15.1%(1250)/10.7%(750)/0%(위약), 어지러움 13.8/11.4/4.1%, 오심 15.8/10.7/12.9%, 변비 11.8/8.7/4.8%, 구토 5.9/3.4/4.1%, 시야흐림 3.3/2.0/0%, 복시 2.6/0.7/0%. 치료관련 이상반응 28.9/20.1/15.0%, 이상반응에 의한 치료중단 3.3/2.0/0.7%. 오심수치(NNRS)·Ramsay 진정척도는 군간 유사하고 검사실·활력징후·심전도 이상 없음 — 프레가발린 단독 시험 대비 졸림·어지러움 빈도가 낮았음.</div></div>
+        <div class="s-row"><div class="s-label">결론</div><div class="s-val">PNC는 무지외반증절제술 급성 통증·오피오이드(구제약) 사용·수면방해를 용량의존적으로 줄이며 임상적으로 수용 가능한 안전성을 보였다(2b상). 한계는 선제+치료 혼합요법, 단기(72시간) 평가, 추가 확증시험 필요다. 프레논OD(pregabalin) 관점에서, 프레가발린을 NSAID와 한 분자로 결합·약동학 동기화해 급성 술후통증에 적용한 차세대 다중모드 진통 전략으로, 프레가발린 단독 대비 낮은 졸림·어지러움 빈도와 오피오이드 절감 가능성을 보여주는 직접 참고 데이터다.</div></div>
       </div>
-
       <div class="key-nums">
-        <div class="knum">
-          <div class="val">SPI48 132.6 vs 286.0 (LSMD -153.4)</div>
-          <div class="desc">1250mg vs 위약, 53.6% 감소(95%CI -173.8~-132.9)</div>
-          <div class="pval">&lt;0.0001</div>
-        </div>
-        <div class="knum">
-          <div class="val">SPI48 157.9 vs 289.5 (LSMD -131.6)</div>
-          <div class="desc">750mg vs 위약, 45.5% 감소(95%CI -153.1~-110.2)</div>
-          <div class="pval">&lt;0.0001</div>
-        </div>
-        <div class="knum">
-          <div class="val">LSMD -22.4 (95%CI -43.5~-1.3)</div>
-          <div class="desc">1250 vs 750mg SPI48(용량의존성)</div>
-          <div class="pval">0.037</div>
-        </div>
+        <div class="knum"><div class="val">SPI48 132.6 vs 286.0 (LSMD -153.4)</div><div class="desc">1250mg vs 위약, 53.6% 감소</div><div class="pval">&lt;0.0001</div></div>
+        <div class="knum"><div class="val">SPI48 157.9 vs 289.5 (LSMD -131.6)</div><div class="desc">750mg vs 위약, 45.5% 감소</div><div class="pval">&lt;0.0001</div></div>
+        <div class="knum"><div class="val">LSMD -22.4 (95%CI -43.5~-1.3)</div><div class="desc">1250 vs 750mg SPI48</div><div class="pval">p=0.037</div></div>
       </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">Pregabalin naproxencarbil in acute post-bunionectomy pain: a</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_8_282"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
+      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Pregabalin naproxencarbil in acute post-bunionectomy pain: a</div><div class="chart-wrap"><canvas id="chart_dr_8_834"></canvas></div></div>
+      <div class="usage"><h4>💡 활용 포인트</h4><ul>
           <li>Pregabalin 성분 기반 차세대 진통제 개발 동향</li>
           <li>프레논OD 성분 약리적 가치 신약 활용 레퍼런스</li>
           <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-        </ul>
-      </div>
+        </ul></div>
     </div>
   </div>
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
+        </div>
 
         <div class="legend">
             <h3>📋 근거 분류 및 중요도 기준</h3>
@@ -858,33 +548,17 @@
     </div>
 
 <script>
-/* 논문별 포커스 뷰 */
+/* 논문별 포커스 뷰 (#논문제목 해시) */
 (function(){
-  var h = decodeURIComponent(location.hash.slice(1));
-  if (!h) return;
-  var papers = document.querySelectorAll('.paper');
-  var found = null;
-  for (var i = 0; i < papers.length; i++) {
-    var t = papers[i].querySelector('.paper-title');
-    var txt = t ? t.textContent.trim().toLowerCase() : '';
-    if (txt.indexOf(h.toLowerCase()) !== -1) { found = papers[i]; break; }
-  }
-  if (!found) return;
-  for (var j = 0; j < papers.length; j++) {
-    if (papers[j] !== found) papers[j].style.display = 'none';
-  }
-  found.style.outline = '3px solid #E87722';
-  found.style.borderRadius = '8px';
-  found.scrollIntoView({behavior:'smooth', block:'start'});
-  var btn = document.createElement('button');
-  btn.textContent = '📋 모든 논문 보기';
-  btn.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:999;padding:10px 20px;background:#003366;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3);';
-  btn.onclick = function(){
-    for(var k=0;k<papers.length;k++) papers[k].style.display='';
-    found.style.outline='';
-    btn.remove();
-    window.scrollTo(0,0);
-  };
+  var h=decodeURIComponent(location.hash.slice(1)); if(!h) return;
+  var papers=document.querySelectorAll('.paper'),found=null;
+  for(var i=0;i<papers.length;i++){var t=papers[i].querySelector('.paper-title');var txt=t?t.textContent.trim().toLowerCase():'';if(txt.indexOf(h.toLowerCase())!==-1){found=papers[i];break;}}
+  if(!found) return;
+  for(var j=0;j<papers.length;j++){if(papers[j]!==found)papers[j].style.display='none';}
+  found.style.outline='3px solid #1A5276';found.style.borderRadius='10px';found.scrollIntoView({behavior:'smooth',block:'start'});
+  var btn=document.createElement('button');btn.textContent='📋 모든 논문 보기';
+  btn.style.cssText='position:fixed;bottom:24px;right:24px;z-index:999;padding:10px 20px;background:#003366;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3);';
+  btn.onclick=function(){for(var k=0;k<papers.length;k++)papers[k].style.display='';found.style.outline='';btn.remove();window.scrollTo(0,0);};
   document.body.appendChild(btn);
 })();
 </script>
@@ -892,319 +566,109 @@
 <script>
 if (typeof Chart !== "undefined") {
 
-
+  // 논문 #1 (골대사·신경)
+  (function(){ var c=document.getElementById('chart_dr_1_834'); if(!c) return;
+    new Chart(c.getContext('2d'), { type:'bar',
+      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
+      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
+        plugins:{legend:{display:true,position:'top'}},
+        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
+  })();
+  // 논문 #2 (골대사·신경)
+  (function(){ var c=document.getElementById('chart_dr_2_834'); if(!c) return;
+    new Chart(c.getContext('2d'), { type:'bar',
+      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
+      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
+        plugins:{legend:{display:true,position:'top'}},
+        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
+  })();
+  // 논문 #3 (골대사·신경)
+  (function(){ var c=document.getElementById('chart_dr_3_834'); if(!c) return;
+    new Chart(c.getContext('2d'), { type:'bar',
+      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
+      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
+        plugins:{legend:{display:true,position:'top'}},
+        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
+  })();
+  // 논문 #4 (골대사·신경)
+  (function(){ var c=document.getElementById('chart_dr_4_834'); if(!c) return;
+    new Chart(c.getContext('2d'), { type:'bar',
+      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
+      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
+        plugins:{legend:{display:true,position:'top'}},
+        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
+  })();
+  // 논문 #5 (골대사·신경)
+  (function(){ var c=document.getElementById('chart_dr_5_834'); if(!c) return;
+    new Chart(c.getContext('2d'), { type:'bar',
+      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
+      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
+        plugins:{legend:{display:true,position:'top'}},
+        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
+  })();
+  // 논문 #6 (골대사·신경)
+  (function(){ var c=document.getElementById('chart_dr_6_834'); if(!c) return;
+    new Chart(c.getContext('2d'), { type:'bar',
+      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
+      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
+        plugins:{legend:{display:true,position:'top'}},
+        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
+  })();
+  // 논문 #7 (골대사·신경)
+  (function(){ var c=document.getElementById('chart_dr_7_834'); if(!c) return;
+    new Chart(c.getContext('2d'), { type:'bar',
+      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
+      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
+        plugins:{legend:{display:true,position:'top'}},
+        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
+  })();
+  // 논문 #8 (골대사·신경)
+  (function(){ var c=document.getElementById('chart_dr_8_834'); if(!c) return;
+    new Chart(c.getContext('2d'), { type:'bar',
+      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
+      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
+        plugins:{legend:{display:true,position:'top'}},
+        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
+  })();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// 논문 #1 (골대사·신경) — deep research
-const ctx_chart_dr_1_282 = document.getElementById('chart_dr_1_282')?.getContext('2d');
-if (ctx_chart_dr_1_282) {
-  new Chart(ctx_chart_dr_1_282, {
-    type: 'bar',
-    data: {
-      labels: ["치료군", "대조군"],
-      datasets: [
-        { label: "치료군", data: [70, 50], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "대조군", data: [30, 50], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
-    }
-  });
-}
-
-
-// 논문 #2 (골대사·신경) — deep research
-const ctx_chart_dr_2_282 = document.getElementById('chart_dr_2_282')?.getContext('2d');
-if (ctx_chart_dr_2_282) {
-  new Chart(ctx_chart_dr_2_282, {
-    type: 'bar',
-    data: {
-      labels: ["치료군", "대조군"],
-      datasets: [
-        { label: "치료군", data: [70, 50], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "대조군", data: [30, 50], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
-    }
-  });
-}
-
-
-// 논문 #3 (골대사·신경) — deep research
-const ctx_chart_dr_3_282 = document.getElementById('chart_dr_3_282')?.getContext('2d');
-if (ctx_chart_dr_3_282) {
-  new Chart(ctx_chart_dr_3_282, {
-    type: 'bar',
-    data: {
-      labels: ["치료군", "대조군"],
-      datasets: [
-        { label: "치료군", data: [70, 50], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "대조군", data: [30, 50], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
-    }
-  });
-}
-
-
-// 논문 #4 (골대사·신경) — deep research
-const ctx_chart_dr_4_282 = document.getElementById('chart_dr_4_282')?.getContext('2d');
-if (ctx_chart_dr_4_282) {
-  new Chart(ctx_chart_dr_4_282, {
-    type: 'bar',
-    data: {
-      labels: ["치료군", "대조군"],
-      datasets: [
-        { label: "치료군", data: [70, 50], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "대조군", data: [30, 50], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
-    }
-  });
-}
-
-
-// 논문 #5 (골대사·신경) — deep research
-const ctx_chart_dr_5_282 = document.getElementById('chart_dr_5_282')?.getContext('2d');
-if (ctx_chart_dr_5_282) {
-  new Chart(ctx_chart_dr_5_282, {
-    type: 'bar',
-    data: {
-      labels: ["치료군", "대조군"],
-      datasets: [
-        { label: "치료군", data: [70, 50], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "대조군", data: [30, 50], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
-    }
-  });
-}
-
-
-// 논문 #6 (골대사·신경) — deep research
-const ctx_chart_dr_6_282 = document.getElementById('chart_dr_6_282')?.getContext('2d');
-if (ctx_chart_dr_6_282) {
-  new Chart(ctx_chart_dr_6_282, {
-    type: 'bar',
-    data: {
-      labels: ["치료군", "대조군"],
-      datasets: [
-        { label: "치료군", data: [70, 50], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "대조군", data: [30, 50], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
-    }
-  });
-}
-
-
-// 논문 #7 (골대사·신경) — deep research
-const ctx_chart_dr_7_282 = document.getElementById('chart_dr_7_282')?.getContext('2d');
-if (ctx_chart_dr_7_282) {
-  new Chart(ctx_chart_dr_7_282, {
-    type: 'bar',
-    data: {
-      labels: ["치료군", "대조군"],
-      datasets: [
-        { label: "치료군", data: [70, 50], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "대조군", data: [30, 50], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
-    }
-  });
-}
-
-
-// 논문 #8 (골대사·신경) — deep research
-const ctx_chart_dr_8_282 = document.getElementById('chart_dr_8_282')?.getContext('2d');
-if (ctx_chart_dr_8_282) {
-  new Chart(ctx_chart_dr_8_282, {
-    type: 'bar',
-    data: {
-      labels: ["치료군", "대조군"],
-      datasets: [
-        { label: "치료군", data: [70, 50], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "대조군", data: [30, 50], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "수치" } } }
-    }
-  });
-}
-
 </script>
 
 <!-- BD_REQUEST_MODAL_v2 -->
 <style>
-  .bd-request-btn {
-    background: #E87722; color: #fff; border: none; padding: 4px 10px;
-    border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; margin-left: 8px;
-  }
-  .bd-request-btn:hover { background: #d96810; }
-  .bd-request-btn:disabled { background: #95a5a6; cursor: not-allowed; }
-  #bd-modal-overlay {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-    z-index: 9998; align-items: center; justify-content: center;
-  }
-  #bd-modal {
-    background: #fff; border-radius: 8px; padding: 24px; min-width: 420px; max-width: 520px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.2); font-family: 'Malgun Gothic', sans-serif;
-  }
-  #bd-modal h3 { margin: 0 0 16px; color: #003366; border-bottom: 2px solid #E87722; padding-bottom: 8px; }
-  #bd-modal .field { margin: 12px 0; }
-  #bd-modal label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 4px; }
-  #bd-modal input, #bd-modal textarea {
-    width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;
-    box-sizing: border-box; font-family: inherit;
-  }
-  #bd-modal textarea { min-height: 60px; resize: vertical; }
-  #bd-modal .radio-row label { display: inline-block; font-weight: 400; margin-right: 16px; cursor: pointer; }
-  #bd-modal .actions { margin-top: 20px; text-align: right; }
-  #bd-modal button {
-    padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; margin-left: 8px;
-  }
-  #bd-modal .submit { background: #003366; color: #fff; font-weight: 600; }
-  #bd-modal .cancel { background: #ddd; color: #333; }
-  #bd-toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: #003366; color: #fff; padding: 12px 24px; border-radius: 6px;
-    font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999;
-    opacity: 0; transition: opacity 0.3s;
-  }
-  #bd-toast.show { opacity: 1; }
-  #bd-toast.error { background: #c0392b; }
+  #bd-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;align-items:center;justify-content:center}
+  #bd-modal{background:#fff;border-radius:8px;padding:24px;min-width:420px;max-width:520px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-family:'Malgun Gothic',sans-serif}
+  #bd-modal h3{margin:0 0 16px;color:#003366;border-bottom:2px solid #1A5276;padding-bottom:8px}
+  #bd-modal .field{margin:12px 0}
+  #bd-modal label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:4px}
+  #bd-modal input,#bd-modal textarea{width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;font-size:13px;box-sizing:border-box;font-family:inherit}
+  #bd-modal textarea{min-height:60px;resize:vertical}
+  #bd-modal .radio-row label{display:inline-block;font-weight:400;margin-right:16px;cursor:pointer}
+  #bd-modal .actions{margin-top:20px;text-align:right}
+  #bd-modal button{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:13px;margin-left:8px}
+  #bd-modal .submit{background:#003366;color:#fff;font-weight:600}#bd-modal .cancel{background:#ddd;color:#333}
+  #bd-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#003366;color:#fff;padding:12px 24px;border-radius:6px;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:9999;opacity:0;transition:opacity .3s}
+  #bd-toast.show{opacity:1}#bd-toast.error{background:#c0392b}
 </style>
-
 <div id="bd-modal-overlay" onclick="if(event.target.id==='bd-modal-overlay') closeBDModal()">
   <div id="bd-modal">
     <h3>📋 BD 제작 요청</h3>
-    <div class="field"><label>논문</label><div id="bd-modal-title" style="font-size:13px;color:#555;line-height:1.4;"></div></div>
-    <div class="field"><label>세션</label><div id="bd-modal-session" style="font-size:13px;color:#555;"></div></div>
-    <div class="field"><label>BD 포맷</label>
-      <div class="radio-row">
-        <label><input type="radio" name="bd-format" value="CLB" checked> CLB (학술브리프, 2p)</label>
-        <label><input type="radio" name="bd-format" value="BT"> BT (바이오톡, 1p)</label>
-      </div>
-    </div>
+    <div class="field"><label>논문</label><div id="bd-modal-title" style="font-size:13px;color:#555;line-height:1.4"></div></div>
+    <div class="field"><label>세션</label><div id="bd-modal-session" style="font-size:13px;color:#555"></div></div>
+    <div class="field"><label>BD 포맷</label><div class="radio-row">
+      <label><input type="radio" name="bd-format" value="CLB" checked> CLB (학술브리프)</label>
+      <label><input type="radio" name="bd-format" value="BT"> BT (바이오톡)</label></div></div>
     <div class="field"><label>요청자 이메일 *</label><input type="email" id="bd-modal-requester" placeholder="example@hanall.co.kr" required></div>
-    <div class="field"><label>메모 (선택)</label><textarea id="bd-modal-memo" placeholder="특별 요청사항이 있으면 적어주세요"></textarea></div>
-    <div class="actions">
-      <button class="cancel" onclick="closeBDModal()">취소</button>
-      <button class="submit" onclick="submitBDRequest()">요청 제출</button>
-    </div>
+    <div class="field"><label>메모 (선택)</label><textarea id="bd-modal-memo" placeholder="특별 요청사항"></textarea></div>
+    <div class="actions"><button class="cancel" onclick="closeBDModal()">취소</button><button class="submit" onclick="submitBDRequest()">요청 제출</button></div>
   </div>
 </div>
 <div id="bd-toast"></div>
-
 <script>
-const BD_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbynF7P1576GbRlzdIjBaxrOvjTU4HDP8F9jY4flxduhSqYR15Hr4AmhImuaS0wPJoOC/exec';
-let bdCurrentBtn = null;
-
-function openBDModal(btn) {
-  bdCurrentBtn = btn;
-  document.getElementById('bd-modal-title').textContent = btn.dataset.title;
-  document.getElementById('bd-modal-session').textContent = btn.dataset.session;
-  document.getElementById('bd-modal-requester').value = localStorage.getItem('bd-requester') || '';
-  document.getElementById('bd-modal-memo').value = '';
-  document.querySelector('input[name=bd-format][value=CLB]').checked = true;
-  document.getElementById('bd-modal-overlay').style.display = 'flex';
-}
-
-function closeBDModal() {
-  document.getElementById('bd-modal-overlay').style.display = 'none';
-  bdCurrentBtn = null;
-}
-
-function showToast(msg, isError) {
-  const t = document.getElementById('bd-toast');
-  t.textContent = msg;
-  t.className = isError ? 'show error' : 'show';
-  setTimeout(() => t.className = '', 3500);
-}
-
-function submitBDRequest() {
-  if (!bdCurrentBtn) return;
-  const title = bdCurrentBtn.dataset.title;
-  const session = bdCurrentBtn.dataset.session;
-  const format = document.querySelector('input[name=bd-format]:checked').value;
-  const requester = document.getElementById('bd-modal-requester').value.trim();
-  const memo = document.getElementById('bd-modal-memo').value.trim();
-  if (!requester) { showToast('요청자 이메일은 필수입니다', true); return; }
-  localStorage.setItem('bd-requester', requester);
-
-  // JSONP 호출 (CORS 우회)
-  const cb = 'bdcb_' + Date.now();
-  window[cb] = (data) => {
-    delete window[cb];
-    document.head.removeChild(s);
-    if (data.status === 'ok') {
-      showToast('✅ BD 요청 접수: ' + format + ' / ' + title.slice(0, 40) + '…');
-      bdCurrentBtn.disabled = true;
-      bdCurrentBtn.textContent = '✓ 요청됨';
-      closeBDModal();
-    } else if (data.status === 'duplicate') {
-      showToast('⚠️ 동일 요청이 이미 대기 중입니다', true);
-      closeBDModal();
-    } else {
-      showToast('❌ 오류: ' + (data.message || '알 수 없음'), true);
-    }
-  };
-  const params = new URLSearchParams({
-    action: 'requestBDQueue', title, session, format, requester, memo, callback: cb
-  });
-  const s = document.createElement('script');
-  s.src = BD_WEBHOOK_URL + '?' + params.toString();
-  s.onerror = () => {
-    delete window[cb];
-    showToast('❌ 네트워크 오류 — 잠시 후 다시 시도', true);
-  };
-  document.head.appendChild(s);
-}
+const BD_WEBHOOK_URL='https://script.google.com/macros/s/AKfycbynF7P1576GbRlzdIjBaxrOvjTU4HDP8F9jY4flxduhSqYR15Hr4AmhImuaS0wPJoOC/exec';let bdCurrentBtn=null;
+function openBDModal(b){bdCurrentBtn=b;document.getElementById('bd-modal-title').textContent=b.dataset.title;document.getElementById('bd-modal-session').textContent=b.dataset.session;document.getElementById('bd-modal-requester').value=localStorage.getItem('bd-requester')||'';document.getElementById('bd-modal-memo').value='';document.querySelector('input[name=bd-format][value=CLB]').checked=true;document.getElementById('bd-modal-overlay').style.display='flex';}
+function closeBDModal(){document.getElementById('bd-modal-overlay').style.display='none';bdCurrentBtn=null;}
+function showToast(m,e){var t=document.getElementById('bd-toast');t.textContent=m;t.className=e?'show error':'show';setTimeout(function(){t.className='';},3500);}
+function submitBDRequest(){if(!bdCurrentBtn)return;var title=bdCurrentBtn.dataset.title,session=bdCurrentBtn.dataset.session,format=document.querySelector('input[name=bd-format]:checked').value,requester=document.getElementById('bd-modal-requester').value.trim(),memo=document.getElementById('bd-modal-memo').value.trim();if(!requester){showToast('요청자 이메일은 필수입니다',true);return;}localStorage.setItem('bd-requester',requester);var cb='bdcb_'+Date.now();window[cb]=function(data){delete window[cb];document.head.removeChild(s);if(data.status==='ok'){showToast('✅ BD 요청 접수: '+format+' / '+title.slice(0,40)+'…');bdCurrentBtn.disabled=true;bdCurrentBtn.textContent='✓ 요청됨';closeBDModal();}else if(data.status==='duplicate'){showToast('⚠️ 동일 요청이 이미 대기 중입니다',true);closeBDModal();}else{showToast('❌ 오류: '+(data.message||'알 수 없음'),true);}};var params=new URLSearchParams({action:'requestBDQueue',title:title,session:session,format:format,requester:requester,memo:memo,callback:cb});var s=document.createElement('script');s.src=BD_WEBHOOK_URL+'?'+params.toString();s.onerror=function(){delete window[cb];showToast('❌ 네트워크 오류 — 잠시 후 다시 시도',true);};document.head.appendChild(s);}
 </script>
 
 </body>
