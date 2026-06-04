@@ -844,6 +844,7 @@ function requestBD(evt, title) {
   document.querySelectorAll('.format-chip').forEach(c => c.classList.remove('selected'));
   document.querySelector('.format-chip[data-fmt="CLB"]').classList.add('selected');
   document.getElementById('bdPmRequest').value = '';
+  document.getElementById('bdRequester').value = localStorage.getItem('bd-requester') || '';
   document.getElementById('bdModalTitle').textContent = title.length > 60 ? title.substring(0,60)+'…' : title;
   document.getElementById('bdModal').classList.add('show');
 }
@@ -856,8 +857,17 @@ function submitBDModal() {
   const colorTheme = document.querySelector('.color-chip.selected')?.dataset.color || '기본';
   const fmt        = document.querySelector('.format-chip.selected')?.dataset.fmt  || 'CLB';
   const pmRequest  = document.getElementById('bdPmRequest').value.trim();
+  const requester  = document.getElementById('bdRequester').value.trim();
   const btn        = _bdBtn;
   const title      = _bdTitle;
+
+  // 요청자 이메일 필수 검증 (모달 닫기 전에)
+  if (!requester || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(requester)) {
+    showToast('⚠️ 요청자 이메일을 정확히 입력해주세요.');
+    document.getElementById('bdRequester').focus();
+    return;
+  }
+  localStorage.setItem('bd-requester', requester);
 
   closeBDModal();
 
@@ -903,7 +913,7 @@ function submitBDModal() {
             `&title=${encodeURIComponent(title)}` +
             `&format=${encodeURIComponent(fmt)}` +
             `&memo=${encodeURIComponent(memo)}` +
-            `&requester=${encodeURIComponent(window._currentPM || '')}` +
+            `&requester=${encodeURIComponent(requester)}` +
             `&callback=${cbName}`;
   sc.onerror = () => {
     btn.textContent = '📌 BD 신청';
@@ -984,6 +994,10 @@ document.addEventListener('DOMContentLoaded', () => {
       <span class="format-chip selected" data-fmt="CLB">CLB 학술브리프</span>
       <span class="format-chip" data-fmt="BT">BT 바이오톡</span>
     </div>
+
+    <label>요청자 이메일 <span style="font-weight:400;color:#c0392b">*</span></label>
+    <input type="email" id="bdRequester" placeholder="example@hanall.co.kr"
+      style="width:100%;padding:10px 12px;border:1px solid #d6dbe3;border-radius:8px;font-size:13px;box-sizing:border-box;font-family:inherit">
 
     <label>요청사항 <span style="font-weight:400;color:#aaa">(선택)</span></label>
     <textarea id="bdPmRequest"
