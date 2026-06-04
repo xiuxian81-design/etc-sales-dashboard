@@ -221,7 +221,7 @@
                 </div>
             </div>
         </div>
-    <!-- ━━━ 논문 #1 (탈모치료) ━━━ -->
+      <!-- ━━━ 논문 #1 (탈모치료) ━━━ -->
   <div class="paper">
     <div class="paper-header">
       <span class="paper-num">■ 논문 #1</span>
@@ -282,7 +282,7 @@
         <h4>📊 핵심 비교 분석</h4>
         <div class="viz-subtitle">A Randomized, Double-Blind, Placebo and Active Controlled Ph</div>
         <div class="chart-wrap">
-          <canvas id="chart_dr_1_103"></canvas>
+          <canvas id="chart_dr_1_205"></canvas>
         </div>
       </div>
 
@@ -358,7 +358,7 @@
         <h4>📊 핵심 비교 분석</h4>
         <div class="viz-subtitle">Patient Satisfaction, Side Effects, and Other Reactions Repo</div>
         <div class="chart-wrap">
-          <canvas id="chart_dr_2_103"></canvas>
+          <canvas id="chart_dr_2_205"></canvas>
         </div>
       </div>
 
@@ -434,7 +434,7 @@
         <h4>📊 핵심 비교 분석</h4>
         <div class="viz-subtitle">Efficacy and safety of oral minoxidil in the treatment of al</div>
         <div class="chart-wrap">
-          <canvas id="chart_dr_3_103"></canvas>
+          <canvas id="chart_dr_3_205"></canvas>
         </div>
       </div>
 
@@ -510,7 +510,7 @@
         <h4>📊 핵심 비교 분석</h4>
         <div class="viz-subtitle">Relative efficacy of minoxidil in combination with other tre</div>
         <div class="chart-wrap">
-          <canvas id="chart_dr_4_103"></canvas>
+          <canvas id="chart_dr_4_205"></canvas>
         </div>
       </div>
 
@@ -586,7 +586,7 @@
         <h4>📊 핵심 비교 분석</h4>
         <div class="viz-subtitle">Is the Safety of Finasteride Correlated With Its Route of Ad</div>
         <div class="chart-wrap">
-          <canvas id="chart_dr_5_103"></canvas>
+          <canvas id="chart_dr_5_205"></canvas>
         </div>
       </div>
 
@@ -662,7 +662,7 @@
         <h4>📊 핵심 비교 분석</h4>
         <div class="viz-subtitle">Effectiveness and Safety of Intralesional Dutasteride in Pat</div>
         <div class="chart-wrap">
-          <canvas id="chart_dr_6_103"></canvas>
+          <canvas id="chart_dr_6_205"></canvas>
         </div>
       </div>
 
@@ -738,7 +738,7 @@
         <h4>📊 핵심 비교 분석</h4>
         <div class="viz-subtitle">Comparative Effect of Conventional and Non-Conventional Over</div>
         <div class="chart-wrap">
-          <canvas id="chart_dr_7_103"></canvas>
+          <canvas id="chart_dr_7_205"></canvas>
         </div>
       </div>
 
@@ -752,6 +752,8 @@
       </div>
     </div>
   </div>
+
+  
 
   
 
@@ -831,10 +833,17 @@ if (typeof Chart !== "undefined") {
 
 
 
+
+
+
+
+
+
+
 // 논문 #1 (탈모치료) — deep research
-const ctx_chart_dr_1_103 = document.getElementById('chart_dr_1_103')?.getContext('2d');
-if (ctx_chart_dr_1_103) {
-  new Chart(ctx_chart_dr_1_103, {
+const ctx_chart_dr_1_205 = document.getElementById('chart_dr_1_205')?.getContext('2d');
+if (ctx_chart_dr_1_205) {
+  new Chart(ctx_chart_dr_1_205, {
     type: 'bar',
     data: {
       labels: ["주요결과", "참조"],
@@ -853,9 +862,9 @@ if (ctx_chart_dr_1_103) {
 
 
 // 논문 #2 (탈모치료) — deep research
-const ctx_chart_dr_2_103 = document.getElementById('chart_dr_2_103')?.getContext('2d');
-if (ctx_chart_dr_2_103) {
-  new Chart(ctx_chart_dr_2_103, {
+const ctx_chart_dr_2_205 = document.getElementById('chart_dr_2_205')?.getContext('2d');
+if (ctx_chart_dr_2_205) {
+  new Chart(ctx_chart_dr_2_205, {
     type: 'bar',
     data: {
       labels: ["지표A", "지표B"],
@@ -874,9 +883,9 @@ if (ctx_chart_dr_2_103) {
 
 
 // 논문 #3 (탈모치료) — deep research
-const ctx_chart_dr_3_103 = document.getElementById('chart_dr_3_103')?.getContext('2d');
-if (ctx_chart_dr_3_103) {
-  new Chart(ctx_chart_dr_3_103, {
+const ctx_chart_dr_3_205 = document.getElementById('chart_dr_3_205')?.getContext('2d');
+if (ctx_chart_dr_3_205) {
+  new Chart(ctx_chart_dr_3_205, {
     type: 'bar',
     data: {
       labels: ["결과1", "결과2"],
@@ -895,9 +904,9 @@ if (ctx_chart_dr_3_103) {
 
 
 // 논문 #4 (탈모치료) — deep research
-const ctx_chart_dr_4_103 = document.getElementById('chart_dr_4_103')?.getContext('2d');
-if (ctx_chart_dr_4_103) {
-  new Chart(ctx_chart_dr_4_103, {
+const ctx_chart_dr_4_205 = document.getElementById('chart_dr_4_205')?.getContext('2d');
+if (ctx_chart_dr_4_205) {
+  new Chart(ctx_chart_dr_4_205, {
     type: 'bar',
     data: {
       labels: ["지표A", "지표B"],
@@ -916,9 +925,9 @@ if (ctx_chart_dr_4_103) {
 
 
 // 논문 #5 (탈모치료) — deep research
-const ctx_chart_dr_5_103 = document.getElementById('chart_dr_5_103')?.getContext('2d');
-if (ctx_chart_dr_5_103) {
-  new Chart(ctx_chart_dr_5_103, {
+const ctx_chart_dr_5_205 = document.getElementById('chart_dr_5_205')?.getContext('2d');
+if (ctx_chart_dr_5_205) {
+  new Chart(ctx_chart_dr_5_205, {
     type: 'bar',
     data: {
       labels: ["치료군", "대조군"],
@@ -937,9 +946,9 @@ if (ctx_chart_dr_5_103) {
 
 
 // 논문 #6 (탈모치료) — deep research
-const ctx_chart_dr_6_103 = document.getElementById('chart_dr_6_103')?.getContext('2d');
-if (ctx_chart_dr_6_103) {
-  new Chart(ctx_chart_dr_6_103, {
+const ctx_chart_dr_6_205 = document.getElementById('chart_dr_6_205')?.getContext('2d');
+if (ctx_chart_dr_6_205) {
+  new Chart(ctx_chart_dr_6_205, {
     type: 'bar',
     data: {
       labels: ["치료군", "대조군"],
@@ -958,9 +967,9 @@ if (ctx_chart_dr_6_103) {
 
 
 // 논문 #7 (탈모치료) — deep research
-const ctx_chart_dr_7_103 = document.getElementById('chart_dr_7_103')?.getContext('2d');
-if (ctx_chart_dr_7_103) {
-  new Chart(ctx_chart_dr_7_103, {
+const ctx_chart_dr_7_205 = document.getElementById('chart_dr_7_205')?.getContext('2d');
+if (ctx_chart_dr_7_205) {
+  new Chart(ctx_chart_dr_7_205, {
     type: 'bar',
     data: {
       labels: ["치료군", "대조군"],
