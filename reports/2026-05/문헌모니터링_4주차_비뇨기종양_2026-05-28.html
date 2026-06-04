@@ -230,38 +230,15 @@
     </style>
 
 <style>
-/* ── 풀상세 논문 카드 (build-report.py) ── */
-.paper{background:#fff;border:1px solid #e1e8f0;border-radius:10px;margin:18px 30px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden}
-.paper-header{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 16px;background:#f5f9fc;border-bottom:1px solid #e1e8f0}
-.paper-num{font-weight:700;color:#003366;font-size:14px}
-.stars-high{color:#1A5276;font-weight:700}.stars-mid{color:#2E6DA0;font-weight:700}.stars-low{color:#95a5a6;font-weight:700}
-.tag-direct,.tag-ref,.tag-open,.tag-wall{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600}
-.tag-direct{background:#1A5276;color:#fff}.tag-ref{background:#e1e8f0;color:#456}
-.tag-open{background:#e8f5e9;color:#2e7d32}.tag-wall{background:#f0f0f0;color:#888}
-.journal-meta{font-size:12px;color:#666;text-align:right}
-.paper-body{padding:14px 18px}
-.paper-title{font-size:15px;font-weight:700;color:#1a1a1a;margin:0 0 6px;line-height:1.4}
-.paper-url{font-size:12px;color:#2E6DA0;word-break:break-all;display:inline-block;margin-bottom:6px}
-.design-badge{display:inline-block;font-size:11px;background:#eef3f8;color:#1A5276;padding:2px 10px;border-radius:10px;margin-left:6px}
-.summary-grid{margin:14px 0}
-.summary-grid h4,.viz-section h4,.usage h4{font-size:13px;color:#003366;margin:0 0 8px;padding-left:8px;border-left:3px solid #1A5276}
-.s-row{display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed #eef2f7}
-.s-label{flex:0 0 64px;font-size:12px;font-weight:700;color:#1A5276}
-.s-val{flex:1;font-size:13px;color:#222;line-height:1.65}
-.key-nums{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
-.knum{flex:1;min-width:120px;background:#f5f9fc;border:1px solid #dce6f0;border-radius:8px;padding:10px 12px;text-align:center}
-.knum .val{font-size:16px;font-weight:800;color:#1A5276;line-height:1.25}
-.knum .desc{font-size:11px;color:#555;margin-top:3px;line-height:1.3}
-.knum .pval{font-size:11px;color:#2e7d32;font-weight:600;margin-top:2px}
-.viz-section{margin:14px 0}.viz-subtitle{font-size:12px;color:#666;margin-bottom:6px}
-.chart-wrap{position:relative;height:240px}
-.usage{margin:14px 0 4px;background:#fbfcfe;border:1px solid #eef2f7;border-radius:8px;padding:10px 14px}
-.usage ul{margin:0;padding-left:18px}.usage li{font-size:13px;color:#333;line-height:1.7}
-.bd-request-btn{background:#1A5276;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;margin-left:8px}
+.bd-request-btn{background:#1A5276;color:#fff;border:none;padding:5px 12px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;margin-left:auto}
 .bd-request-btn:hover{background:#14405e}.bd-request-btn:disabled{background:#95a5a6;cursor:not-allowed}
+.paper-meta{align-items:center}
+.evidence-ref{background-color:#7f8c9b !important}
+.importance-mid{background-color:#2E6DA0 !important}.importance-low{background-color:#95a5a6 !important}
+.key-numbers h4{margin:0 0 8px;color:#003366;font-size:14px}
+.content-section-text strong{color:#1A5276}
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -293,285 +270,436 @@
         <div class="papers-section">
         <div class="papers">
 
-  <!-- ━━━ 논문 #1 (비뇨기·종양·CPP) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #1</span>
-      <span class="stars-high">★★★</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex:1;">European Urology | 2026-05-01</div>
-      <button class="bd-request-btn" data-title="ARCHES 5-year Survival with Enzalutamide Plus Androgen-deprivation Therapy in Metastatic Hormone-sensitive Prostate Cancer Patients" data-session="비뇨기·종양·CPP" data-num="1" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">ARCHES 5-year Survival with Enzalutamide Plus Androgen-deprivation Therapy in Metastatic Hormone-sensitive Prostate Cancer Patients</p>
-      <a href="https://www.europeanurology.com/article/S0302-2838(25)04876-6/fulltext" class="paper-url" target="_blank">https://www.europeanurology.com/article/S0302-2838(25)04876-6/fulltext</a>
-      <span class="design-badge">Phase 3 RCT (ARCHES) 5년 OS</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">전이성 호르몬감수성 전립선암(mHSPC)은 안드로겐차단요법(ADT) 단독으로는 결국 거세저항성으로 진행해 생존이 제한되는 단계로, 조기에 강력한 안드로겐수용체 경로 억제를 더하는 doublet 치료의 장기 생존 이득을 입증하는 것이 미충족 수요였다. ARCHES 시험은 1차 분석(rPFS, 2018)과 사전 지정 분석(OS, 2021)에서 엔잘루타미드+ADT의 이득을 보였으나, 5년 시점의 장기 생존·안전성 데이터는 부족했다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">ARCHES(NCT02677896)는 mHSPC 환자 1150명을 엔잘루타미드+ADT군과 위약+ADT군에 1:1 무작위배정한 글로벌 3상 RCT이며, 본 분석은 데이터 컷오프 2024년 7월 31일 기준의 post hoc 5년 효능·안전성 분석이다(첫 환자 무작위배정 2016년 3월 21일). 1차 분석 후 2018년 12월 10일 비맹검 전환되어 엔잘루타미드군 65%, 위약군 32%가 공개표지 연장연구에 등록(crossover 포함). 1차 평가변수는 rPFS(원 시험), 본 분석의 핵심 결과변수는 5년 전체생존(OS). 중앙 추적기간 61.4개월.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">5년 생존확률은 엔잘루타미드군 66% vs 위약군 53%(양군 모두 중앙 OS 미도달). OS HR 0.70(95% CI 0.58–0.85; p&lt;0.001, 단 post hoc·비알파보호 분석이라 명목상 p값으로 신중 해석 필요), 보정 HR 0.64(95% CI 0.51–0.75). 고용량(high-volume) 질환 환자에서 엔잘루타미드군은 위약군보다 약 36개월 더 생존했고 HR 0.70(95% CI 0.56–0.88). 다양한 환자 하위군 전반에서 일관된 생존 이득이 관찰되었다.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">61.4개월의 장기 추적에도 새로운 안전성 시그널은 나타나지 않았다(no new safety signals). 초록 수준에서는 구체적 이상반응 발생률이 보고되지 않았으나, 기존 ARCHES 안전성 프로파일(피로, 안면홍조, 고혈압, 골절·낙상 등)을 유지하며 장기 투여 시 추가 우려가 확인되지 않았음을 강조했다.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자들은 엔잘루타미드+ADT가 mHSPC의 다양한 하위군에서 장기 생존 이득을 제공함을 입증하는 강력한 데이터로, 임상 의사결정과 예후 기대 설정에 근거를 제공한다고 결론지었다. 한계는 post hoc·비알파보호 분석으로 OS p값이 명목값이라는 점과 광범위한 crossover(위약군 일부가 엔잘루타미드로 전환)로 위약군 효과가 희석되어 실제 이득이 과소평가될 수 있다는 점이다. 엔잘루타(enzalutamide) 관점에서 5년 66% 생존·고용량군 36개월 생존연장은 mHSPC 1차 doublet으로서 엘리가드(leuprolide) 등 ADT 백본 위에 엔잘루타미드를 병용하는 전략의 장기 가치를 뒷받침한다.</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">66% vs 53%</div><div class="desc">5년 생존확률</div><div class="pval">p&lt;0.001(명목)</div></div>
-        <div class="knum"><div class="val">HR 0.70 (95% CI 0.58–0.85)</div><div class="desc">전체 OS, 비보정</div><div class="pval">p&lt;0.001(명목)</div></div>
-        <div class="knum"><div class="val">보정 HR 0.64 (95% CI 0.51–0.75)</div><div class="desc">다변량 보정 OS</div><div class="pval">-</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">ARCHES 5-year Survival with Enzalutamide Plus Androgen-depri</div><div class="chart-wrap"><canvas id="chart_dr_1_554"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>mHSPC enzalutamide 조기 투여 5년 OS 이득 입증</li>
-          <li>고용량 질환 약 3년 생존 연장 — 디테일링 핵심</li>
-          <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #1 (비뇨기·종양·CPP) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">ARCHES 5-year Survival with Enzalutamide Plus Androgen-deprivation Therapy in Metastatic Hormone-sensitive Prostate Cancer Patients</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> European Urology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-05-01</div>
+                        <button class="bd-request-btn" data-title="ARCHES 5-year Survival with Enzalutamide Plus Androgen-deprivation Therapy in Metastatic Hormone-sensitive Prostate Cancer Patients" data-session="비뇨기·종양·CPP" data-num="1" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://www.europeanurology.com/article/S0302-2838(25)04876-6/fulltext" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">Phase 3 RCT (ARCHES) 5년 OS</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">전이성 호르몬감수성 전립선암(mHSPC)은 안드로겐차단요법(ADT) 단독으로는 결국 거세저항성으로 진행해 생존이 제한되는 단계로, 조기에 강력한 안드로겐수용체 경로 억제를 더하는 doublet 치료의 장기 생존 이득을 입증하는 것이 미충족 수요였다. ARCHES 시험은 1차 분석(rPFS, 2018)과 사전 지정 분석(OS, 2021)에서 엔잘루타미드+ADT의 이득을 보였으나, 5년 시점의 장기 생존·안전성 데이터는 부족했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">ARCHES(NCT02677896)는 mHSPC 환자 1150명을 엔잘루타미드+ADT군과 위약+ADT군에 1:1 무작위배정한 글로벌 3상 RCT이며, 본 분석은 데이터 컷오프 2024년 7월 31일 기준의 post hoc 5년 효능·안전성 분석이다(첫 환자 무작위배정 2016년 3월 21일). 1차 분석 후 2018년 12월 10일 비맹검 전환되어 엔잘루타미드군 65%, 위약군 32%가 공개표지 연장연구에 등록(crossover 포함). 1차 평가변수는 rPFS(원 시험), 본 분석의 핵심 결과변수는 5년 전체생존(OS). 중앙 추적기간 61.4개월.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">5년 생존확률은 엔잘루타미드군 66% vs 위약군 53%(양군 모두 중앙 OS 미도달).<br/>
+<strong>OS HR 0.70(95% CI 0.58:</strong> 0.85; p&lt;0.001, 단 post hoc·비알파보호 분석이라 명목상 p값으로 신중 해석 필요), 보정 HR 0.64(95% CI 0.51–0.75).<br/>
+고용량(high-volume) 질환 환자에서 엔잘루타미드군은 위약군보다 약 36개월 더 생존했고 HR 0.70(95% CI 0.56–0.88).<br/>
+다양한 환자 하위군 전반에서 일관된 생존 이득이 관찰되었다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">61.4개월의 장기 추적에도 새로운 안전성 시그널은 나타나지 않았다(no new safety signals). 초록 수준에서는 구체적 이상반응 발생률이 보고되지 않았으나, 기존 ARCHES 안전성 프로파일(피로, 안면홍조, 고혈압, 골절·낙상 등)을 유지하며 장기 투여 시 추가 우려가 확인되지 않았음을 강조했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 엔잘루타미드+ADT가 mHSPC의 다양한 하위군에서 장기 생존 이득을 제공함을 입증하는 강력한 데이터로, 임상 의사결정과 예후 기대 설정에 근거를 제공한다고 결론지었다. 한계는 post hoc·비알파보호 분석으로 OS p값이 명목값이라는 점과 광범위한 crossover(위약군 일부가 엔잘루타미드로 전환)로 위약군 효과가 희석되어 실제 이득이 과소평가될 수 있다는 점이다. 엔잘루타(enzalutamide) 관점에서 5년 66% 생존·고용량군 36개월 생존연장은 mHSPC 1차 doublet으로서 엘리가드(leuprolide) 등 ADT 백본 위에 엔잘루타미드를 병용하는 전략의 장기 가치를 뒷받침한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>66% vs 53% — 5년 생존확률 (p&lt;0.001(명목))</li>
+                            <li>HR 0.70 (95% CI 0.58–0.85) — 전체 OS, 비보정 (p&lt;0.001(명목))</li>
+                            <li>보정 HR 0.64 (95% CI 0.51–0.75) — 다변량 보정 OS (-)</li>
+                            <li>HR 0.70 (95% CI 0.56–0.88), 약 36개월 연장 — 고용량 질환 하위군 OS (-)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #2 (비뇨기·종양·CPP) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #2</span>
-      <span class="stars-high">★★★</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex:1;">Annals of Oncology | 2025-01-01</div>
-      <button class="bd-request-btn" data-title="Enzalutamide plus radium-223 in metastatic castration-resistant prostate cancer: results of the EORTC 1333/PEACE-3 trial" data-session="비뇨기·종양·CPP" data-num="2" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Enzalutamide plus radium-223 in metastatic castration-resistant prostate cancer: results of the EORTC 1333/PEACE-3 trial</p>
-      <a href="https://www.annalsofoncology.org/article/S0923-7534(25)00203-0/fulltext" class="paper-url" target="_blank">https://www.annalsofoncology.org/article/S0923-7534(25)00203-0/fulltext</a>
-      <span class="design-badge">Phase 3 RCT (PEACE-3)</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">골전이 동반 전이성 거세저항성 전립선암(mCRPC)은 골격관련사건과 통증 부담이 크고 예후가 불량하다. 골표적 알파선 방출체 라듐-223과 안드로겐수용체 억제제 엔잘루타미드는 작용기전이 상보적이어서, 두 약제를 병용하면 효능을 높일 수 있다는 가설하에 1차 치료에서의 병용 이득을 검증할 필요가 있었다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">EORTC 1333 &#x27;PEACE-3&#x27;은 골전이 동반 mCRPC 환자를 대상으로 한 3상 무작위 RCT로, 2015년 11월~2023년 3월 446명(아비라테론 기투여 11명 포함)을 엔잘루타미드 단독군 vs 엔잘루타미드+라듐-223 6주기(월 1회 주사)군에 무작위배정(위약 없음). 2018년 3월부터 졸레드론산 또는 데노수맙 등 골보호제(BPA) 병용이 의무화됨. 1차 평가변수는 연구자 평가 rPFS, 주요 2차 평가변수는 OS·후속 전신치료까지의 시간·통증 진행·증상성 골격사건.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">rPFS HR 0.69(95% CI 0.54–0.87, P=0.0009)로 병용군이 유의하게 우월. 중앙 rPFS는 엔잘루타미드 단독군 16.4개월(95% CI 13.8–19.2) vs 병용군 19.4개월(95% CI 17.1–25.3). 80% OS 사건 시점의 사전계획 중간분석에서 OS HR 0.69(95% CI 0.52–0.90, P=0.0031), 중앙 OS는 단독군 35.0개월(95% CI 28.8–38.9) vs 병용군 42.3개월(95% CI 36.8–49.1). 다만 비비례위험(non-proportional hazards)으로 인해 최종 OS 분석에서 추가 검증 예정.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">≥3등급 치료관련이상반응(TEAE)은 엔잘루타미드 단독군 55.8% vs 병용군 65.6%. 병용군에서 가장 흔한 ≥3등급 TEAE는 고혈압 34%, 피로 6%, 골절 5%, 빈혈 5%, 호중구감소 5%. 골절(치료중·치료후, 증상성·병적, BPA 사용 여부 무관 모두 포함)은 단독군 30명(13.4%) vs 병용군 53명(24.3%)로 병용군에서 약 2배 증가 — 라듐-223 병용 시 골보호제 병용 필요성을 시사하는 주요 안전성 시그널.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자들은 골전이 동반 mCRPC 1차 치료로 엔잘루타미드+라듐-223 병용이 rPFS를 유의하게 개선하며, OS도 중간 경계에서 유의했으나 최종 OS 분석까지 지속한다고 결론지었다. 한계는 비비례위험으로 인한 OS 추가 검증 필요성과 병용군의 골절 위험 증가다. 엔잘루타(enzalutamide) 관점에서 라듐-223과의 병용은 골전이 mCRPC에서 효능 강화 전략으로 유망하나, 골절 위험 관리(골보호제 의무 병용)가 임상 적용의 전제 조건이다.</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">HR 0.69 (95% CI 0.54–0.87)</div><div class="desc">rPFS</div><div class="pval">P=0.0009</div></div>
-        <div class="knum"><div class="val">16.4개월 vs 19.4개월</div><div class="desc">중앙 rPFS</div><div class="pval">-</div></div>
-        <div class="knum"><div class="val">HR 0.69 (95% CI 0.52–0.90)</div><div class="desc">OS 중간분석</div><div class="pval">P=0.0031</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Enzalutamide plus radium-223 in metastatic castration-resist</div><div class="chart-wrap"><canvas id="chart_dr_2_554"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>enzalutamide 기반 병용전략 확장 근거</li>
-          <li>골전이 우세 mCRPC radium-223 추가 OS 이득</li>
-          <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #2 (비뇨기·종양·CPP) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Enzalutamide plus radium-223 in metastatic castration-resistant prostate cancer: results of the EORTC 1333/PEACE-3 trial</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Annals of Oncology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-01-01</div>
+                        <button class="bd-request-btn" data-title="Enzalutamide plus radium-223 in metastatic castration-resistant prostate cancer: results of the EORTC 1333/PEACE-3 trial" data-session="비뇨기·종양·CPP" data-num="2" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://www.annalsofoncology.org/article/S0923-7534(25)00203-0/fulltext" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">Phase 3 RCT (PEACE-3)</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">골전이 동반 전이성 거세저항성 전립선암(mCRPC)은 골격관련사건과 통증 부담이 크고 예후가 불량하다. 골표적 알파선 방출체 라듐-223과 안드로겐수용체 억제제 엔잘루타미드는 작용기전이 상보적이어서, 두 약제를 병용하면 효능을 높일 수 있다는 가설하에 1차 치료에서의 병용 이득을 검증할 필요가 있었다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">EORTC 1333 &#x27;PEACE-3&#x27;은 골전이 동반 mCRPC 환자를 대상으로 한 3상 무작위 RCT로, 2015년 11월~2023년 3월 446명(아비라테론 기투여 11명 포함)을 엔잘루타미드 단독군 vs 엔잘루타미드+라듐-223 6주기(월 1회 주사)군에 무작위배정(위약 없음). 2018년 3월부터 졸레드론산 또는 데노수맙 등 골보호제(BPA) 병용이 의무화됨. 1차 평가변수는 연구자 평가 rPFS, 주요 2차 평가변수는 OS·후속 전신치료까지의 시간·통증 진행·증상성 골격사건.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text"><strong>rPFS HR 0.69(95% CI 0.54:</strong> 0.87, P=0.0009)로 병용군이 유의하게 우월.<br/>
+중앙 rPFS는 엔잘루타미드 단독군 16.4개월(95% CI 13.8–19.2) vs 병용군 19.4개월(95% CI 17.1–25.3).<br/>
+80% OS 사건 시점의 사전계획 중간분석에서 OS HR 0.69(95% CI 0.52–0.90, P=0.0031), 중앙 OS는 단독군 35.0개월(95% CI 28.8–38.9) vs 병용군 42.3개월(95% CI 36.8–49.1).<br/>
+다만 비비례위험(non-proportional hazards)으로 인해 최종 OS 분석에서 추가 검증 예정.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">≥3등급 치료관련이상반응(TEAE)은 엔잘루타미드 단독군 55.8% vs 병용군 65.6%. 병용군에서 가장 흔한 ≥3등급 TEAE는 고혈압 34%, 피로 6%, 골절 5%, 빈혈 5%, 호중구감소 5%. 골절(치료중·치료후, 증상성·병적, BPA 사용 여부 무관 모두 포함)은 단독군 30명(13.4%) vs 병용군 53명(24.3%)로 병용군에서 약 2배 증가 — 라듐-223 병용 시 골보호제 병용 필요성을 시사하는 주요 안전성 시그널.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 골전이 동반 mCRPC 1차 치료로 엔잘루타미드+라듐-223 병용이 rPFS를 유의하게 개선하며, OS도 중간 경계에서 유의했으나 최종 OS 분석까지 지속한다고 결론지었다. 한계는 비비례위험으로 인한 OS 추가 검증 필요성과 병용군의 골절 위험 증가다. 엔잘루타(enzalutamide) 관점에서 라듐-223과의 병용은 골전이 mCRPC에서 효능 강화 전략으로 유망하나, 골절 위험 관리(골보호제 의무 병용)가 임상 적용의 전제 조건이다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>HR 0.69 (95% CI 0.54–0.87) — rPFS (P=0.0009)</li>
+                            <li>16.4개월 vs 19.4개월 — 중앙 rPFS (-)</li>
+                            <li>HR 0.69 (95% CI 0.52–0.90) — OS 중간분석 (P=0.0031)</li>
+                            <li>35.0개월 vs 42.3개월 — 중앙 OS (-)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #3 (비뇨기·종양·CPP) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #3</span>
-      <span class="stars-high">★★★</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex:1;">JCO / ASCO GU 2026 | 2026-02-01</div>
-      <button class="bd-request-btn" data-title="Final overall survival results from the EORTC 1333/PEACE-3 trial: Enzalutamide with or without radium-223 in metastatic castration-resistant prostate cancer" data-session="비뇨기·종양·CPP" data-num="3" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Final overall survival results from the EORTC 1333/PEACE-3 trial: Enzalutamide with or without radium-223 in metastatic castration-resistant prostate cancer</p>
-      <a href="https://ascopubs.org/doi/10.1200/JCO.2026.44.7_suppl.15" class="paper-url" target="_blank">https://ascopubs.org/doi/10.1200/JCO.2026.44.7_suppl.15</a>
-      <span class="design-badge">Phase 3 RCT (PEACE-3) 최종 OS</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">PEACE-3 시험(골전이 동반 mCRPC에서 엔잘루타미드+라듐-223 병용)의 최종 전체생존(Final OS) 결과를 보고하는 ASCO 초록으로 추정되나, 데이터 본문을 PubMed/PMC에서 확보할 수 없어 수치 재정리가 불가하다. 본 세션의 paper #2(Annals of Oncology, PMID 40450503)가 동일 PEACE-3 시험의 정식 출판물이며 rPFS 1차 결과와 OS 중간분석을 담고 있으므로 이를 참조 권장.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">확보 불가 — 스킵.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">확보 불가 — 스킵. (정식 출판물 paper #2 참조: OS 중간분석 HR 0.69, 95% CI 0.52–0.90, P=0.0031)</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">확보 불가 — 스킵.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">ASCO 학회 초록 형식으로 PMC 미등재이며 식별자 변환 실패로 전문/초록 본문 수집이 불가했다. 엔잘루타(enzalutamide)+라듐-223 PEACE-3 최종 OS는 동일 시험 정식 논문(paper #2) 업데이트로 추적 권장.</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">38.2 vs 32.6</div><div class="desc">PEACE-3 최종 OS. 중앙OS 38</div><div class="pval">p=0.0096</div></div>
-        <div class="knum"><div class="val">19.2 vs 16.4</div><div class="desc">0.76, p=0.0096). 사망 위험</div><div class="pval">p=0.0096</div></div>
-        <div class="knum"><div class="val">HR 0.76</div><div class="desc">-3 최종 OS. 중앙OS 38.2 vs</div><div class="pval">p=0.0096</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Final overall survival results from the EORTC 1333/PEACE-3 t</div><div class="chart-wrap"><canvas id="chart_dr_3_554"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>PEACE-3 최종 결과로 enzalutamide+radium-223 OS 이득 확정</li>
-          <li>ASCO GU 2026 발표 후속 연구 동향 지속 모니터링 필요</li>
-          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #3 (비뇨기·종양·CPP) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Final overall survival results from the EORTC 1333/PEACE-3 trial: Enzalutamide with or without radium-223 in metastatic castration-resistant prostate cancer</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> JCO / ASCO GU 2026</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-02-01</div>
+                        <button class="bd-request-btn" data-title="Final overall survival results from the EORTC 1333/PEACE-3 trial: Enzalutamide with or without radium-223 in metastatic castration-resistant prostate cancer" data-session="비뇨기·종양·CPP" data-num="3" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://ascopubs.org/doi/10.1200/JCO.2026.44.7_suppl.15" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">Phase 3 RCT (PEACE-3) 최종 OS</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">PEACE-3 시험(골전이 동반 mCRPC에서 엔잘루타미드+라듐-223 병용)의 최종 전체생존(Final OS) 결과를 보고하는 ASCO 초록으로 추정되나, 데이터 본문을 PubMed/PMC에서 확보할 수 없어 수치 재정리가 불가하다. 본 세션의 paper #2(Annals of Oncology, PMID 40450503)가 동일 PEACE-3 시험의 정식 출판물이며 rPFS 1차 결과와 OS 중간분석을 담고 있으므로 이를 참조 권장.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">확보 불가 — 스킵.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text"><strong>확보 불가:</strong> 스킵.<br/>
+<strong>(정식 출판물 paper #2 참조:</strong> OS 중간분석 HR 0.69, 95% CI 0.52–0.90, P=0.0031).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">확보 불가 — 스킵.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">ASCO 학회 초록 형식으로 PMC 미등재이며 식별자 변환 실패로 전문/초록 본문 수집이 불가했다. 엔잘루타(enzalutamide)+라듐-223 PEACE-3 최종 OS는 동일 시험 정식 논문(paper #2) 업데이트로 추적 권장.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>38.2 vs 32.6 — PEACE-3 최종 OS. 중앙OS 38.2 (p=0.0096)</li>
+                            <li>19.2 vs 16.4 — 0.76, p=0.0096). 사망 위험 2 (p=0.0096)</li>
+                            <li>HR 0.76 — -3 최종 OS. 중앙OS 38.2 vs 3 (p=0.0096)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #4 (비뇨기·종양·CPP) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #4</span>
-      <span class="stars-high">★★★</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex:1;">JAMA Cardiology | 2026-02-18</div>
-      <button class="bd-request-btn" data-title="Coronary Artery Plaque Progression After ADT in Men with Prostate Cancer: A Randomized Controlled Trial Comparing Relugolix Versus Leuprolide (REVELUTION)" data-session="비뇨기·종양·CPP" data-num="4" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Coronary Artery Plaque Progression After ADT in Men with Prostate Cancer: A Randomized Controlled Trial Comparing Relugolix Versus Leuprolide (REVELUTION)</p>
-      <a href="https://doi.org/10.1001/jamacardio.2025.5586" class="paper-url" target="_blank">https://doi.org/10.1001/jamacardio.2025.5586</a>
-      <span class="design-badge">RCT (3군 비교)</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">GnRH 경로를 표적하는 안드로겐차단요법(ADT)은 전립선암 치료의 근간이며, 주사형 GnRH 작용제(예: 류프롤라이드/엘리가드 성분)가 가장 많이 처방된다. 그러나 GnRH 작용제는 유의한 심혈관(CV) 이환과 연관되어 전립선암 환자의 사망 1위 원인이 심혈관질환이 되었다. 경구 GnRH 길항제 렐루골릭스는 HERO 시험에서 류프롤라이드 대비 48주 후 주요심혈관사건(MACE) 위험을 54% 낮췄으나, GnRH 작용제가 단기 MACE 위험을 더 높이는 생물학적 기전은 불명확했다. REVELUTION은 ADT 관련 CV 위험이 가속화된 관상동맥 죽상경화로 매개되며 GnRH 작용제 류프롤라이드에서 더 두드러진다는 가설을 검증했다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">REVELUTION은 미국 애틀랜타 단일기관 산하 4개 센터의 공개표지 무작위 RCT로, 18세 이상 비전이성 전립선암(PCa)으로 골반 방사선치료(RT)+ADT 6개월 이상을 받는 남성을 대상으로 함. 등록 65명 중 62명(각 군 31명)이 기저·12개월 관상동맥 CT혈관조영(CCTA)을 완료. 1:1 무작위배정으로 렐루골릭스(경구 120mg/일, 360mg 부하 후) vs 류프롤라이드 아세테이트(주사 22.5mg/3개월). ASCVD 10년 위험점수로 층화. 1차 평가변수는 12개월 총플라크용적(TPV) 변화, 2차는 비석회화플라크용적(NCPV) 변화, 탐색적으로 석회화플라크(CPV)·저감쇠플라크(LAPV). 모든 영상은 AI 정량분석(HeartFlow)으로 치료군 맹검 분석. 평균 연령 68.5세, 56%가 스타틴 복용. 기저 플라크용적·연령·스타틴 사용 보정.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">1차 평가변수 TPV: 류프롤라이드가 렐루골릭스 대비 12개월간 유의하게 큰 증가(보정 평균차 +68.9 mm³; 95% CI 23.2–114.5; p=0.02). 2차 NCPV도 류프롤라이드가 유의하게 더 증가(+64.5 mm³; 95% CI 31.6–97.3; p=0.004). 탐색적 CPV(보정차 +13.7 mm³; 95% CI −5.6–23.0; p=0.16)와 LAPV(+0.2 mm³; 95% CI −2.5–2.9; p=0.87)는 양군 간 유의차 없음. 즉 류프롤라이드의 플라크 진행은 불안정한 비석회화 플라크 증가가 주도. 혈청 테스토스테론은 3·6개월에 양군 모두 거세 수준으로 감소했고 군간 유의차 없음 → CV 차이는 테스토스테론 억제 정도와 무관, 약물 경로 특이적.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">본 연구는 CCTA 플라크 용적이라는 대리지표를 1차 종점으로 한 영상 기반 시험으로, 임상적 MACE 발생을 측정·검증할 검정력은 없었다. 안전성 이상반응은 별도로 상세 보고되지 않았으며, 테스토스테론 억제는 류프롤라이드·렐루골릭스 양군 모두 동등하게 달성되어 효능(거세) 측면 차이는 없었다. 주요 한계는 단일지역(미국 남동부)·기저 관상동맥질환 보유 비율 높은 동반질환 코호트로 일반화 제한, 스타틴 용량 변화 미기록, 고위험 플라크 형태·hs-CRP 등 미측정.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자들은 국소 PCa 남성에서 RT+ADT 시 GnRH 작용제 류프롤라이드가 GnRH 길항제 렐루골릭스 대비 12개월 관상동맥 총플라크(특히 비석회화 플라크) 진행을 유의하게 더 일으켰으며, 이는 ADT 약물 경로 간 CV 위험 차이의 생물학적 근거를 처음으로 규명한 것이라 결론지었다. 엘리가드(leuprolide) 관점에서, 이 데이터는 류프롤라이드 등 GnRH 작용제 사용 시 심혈관 위험 평가·관리(기저 CV 위험 높은 환자에서 GnRH 길항제 고려 또는 적극적 CV 보호)가 중요함을 시사하는 음성 안전성 시그널이다.</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">+68.9 mm³ (95% CI 23.2–114.5)</div><div class="desc">TPV 12개월 변화 보정차</div><div class="pval">p=0.02</div></div>
-        <div class="knum"><div class="val">+64.5 mm³ (95% CI 31.6–97.3)</div><div class="desc">NCPV</div><div class="pval">p=0.004</div></div>
-        <div class="knum"><div class="val">+13.7 mm³ (95% CI −5.6–23.0)</div><div class="desc">CPV(석회화) 보정차</div><div class="pval">p=0.16</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Coronary Artery Plaque Progression After ADT in Men with Pro</div><div class="chart-wrap"><canvas id="chart_dr_4_554"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>leuprolide 심혈관 안전성 이슈</li>
-          <li>소규모이나 JAMA Cardiology 게재</li>
-          <li>심혈관 고위험 환자 상담 참고 경쟁사 relugolix 대비 포지셔닝 전략 재검토</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #4 (비뇨기·종양·CPP) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Coronary Artery Plaque Progression After ADT in Men with Prostate Cancer: A Randomized Controlled Trial Comparing Relugolix Versus Leuprolide (REVELUTION)</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> JAMA Cardiology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-02-18</div>
+                        <button class="bd-request-btn" data-title="Coronary Artery Plaque Progression After ADT in Men with Prostate Cancer: A Randomized Controlled Trial Comparing Relugolix Versus Leuprolide (REVELUTION)" data-session="비뇨기·종양·CPP" data-num="4" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.1001/jamacardio.2025.5586" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">RCT (3군 비교)</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">GnRH 경로를 표적하는 안드로겐차단요법(ADT)은 전립선암 치료의 근간이며, 주사형 GnRH 작용제(예: 류프롤라이드/엘리가드 성분)가 가장 많이 처방된다. 그러나 GnRH 작용제는 유의한 심혈관(CV) 이환과 연관되어 전립선암 환자의 사망 1위 원인이 심혈관질환이 되었다. 경구 GnRH 길항제 렐루골릭스는 HERO 시험에서 류프롤라이드 대비 48주 후 주요심혈관사건(MACE) 위험을 54% 낮췄으나, GnRH 작용제가 단기 MACE 위험을 더 높이는 생물학적 기전은 불명확했다. REVELUTION은 ADT 관련 CV 위험이 가속화된 관상동맥 죽상경화로 매개되며 GnRH 작용제 류프롤라이드에서 더 두드러진다는 가설을 검증했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">REVELUTION은 미국 애틀랜타 단일기관 산하 4개 센터의 공개표지 무작위 RCT로, 18세 이상 비전이성 전립선암(PCa)으로 골반 방사선치료(RT)+ADT 6개월 이상을 받는 남성을 대상으로 함. 등록 65명 중 62명(각 군 31명)이 기저·12개월 관상동맥 CT혈관조영(CCTA)을 완료. 1:1 무작위배정으로 렐루골릭스(경구 120mg/일, 360mg 부하 후) vs 류프롤라이드 아세테이트(주사 22.5mg/3개월). ASCVD 10년 위험점수로 층화. 1차 평가변수는 12개월 총플라크용적(TPV) 변화, 2차는 비석회화플라크용적(NCPV) 변화, 탐색적으로 석회화플라크(CPV)·저감쇠플라크(LAPV). 모든 영상은 AI 정량분석(HeartFlow)으로 치료군 맹검 분석. 평균 연령 68.5세, 56%가 스타틴 복용. 기저 플라크용적·연령·스타틴 사용 보정.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text"><strong>1차 평가변수 TPV:</strong> 류프롤라이드가 렐루골릭스 대비 12개월간 유의하게 큰 증가(보정 평균차 +68.9 mm³; 95% CI 23.2–114.5; p=0.02).<br/>
+2차 NCPV도 류프롤라이드가 유의하게 더 증가(+64.5 mm³; 95% CI 31.6–97.3; p=0.004).<br/>
+탐색적 CPV(보정차 +13.7 mm³; 95% CI −5.6–23.0; p=0.16)와 LAPV(+0.2 mm³; 95% CI −2.5–2.9; p=0.87)는 양군 간 유의차 없음.<br/>
+즉 류프롤라이드의 플라크 진행은 불안정한 비석회화 플라크 증가가 주도.<br/>
+혈청 테스토스테론은 3·6개월에 양군 모두 거세 수준으로 감소했고 군간 유의차 없음 → CV 차이는 테스토스테론 억제 정도와 무관, 약물 경로 특이적.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">본 연구는 CCTA 플라크 용적이라는 대리지표를 1차 종점으로 한 영상 기반 시험으로, 임상적 MACE 발생을 측정·검증할 검정력은 없었다. 안전성 이상반응은 별도로 상세 보고되지 않았으며, 테스토스테론 억제는 류프롤라이드·렐루골릭스 양군 모두 동등하게 달성되어 효능(거세) 측면 차이는 없었다. 주요 한계는 단일지역(미국 남동부)·기저 관상동맥질환 보유 비율 높은 동반질환 코호트로 일반화 제한, 스타틴 용량 변화 미기록, 고위험 플라크 형태·hs-CRP 등 미측정.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 국소 PCa 남성에서 RT+ADT 시 GnRH 작용제 류프롤라이드가 GnRH 길항제 렐루골릭스 대비 12개월 관상동맥 총플라크(특히 비석회화 플라크) 진행을 유의하게 더 일으켰으며, 이는 ADT 약물 경로 간 CV 위험 차이의 생물학적 근거를 처음으로 규명한 것이라 결론지었다. 엘리가드(leuprolide) 관점에서, 이 데이터는 류프롤라이드 등 GnRH 작용제 사용 시 심혈관 위험 평가·관리(기저 CV 위험 높은 환자에서 GnRH 길항제 고려 또는 적극적 CV 보호)가 중요함을 시사하는 음성 안전성 시그널이다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>+68.9 mm³ (95% CI 23.2–114.5) — TPV 12개월 변화 보정차 (p=0.02)</li>
+                            <li>+64.5 mm³ (95% CI 31.6–97.3) — NCPV (p=0.004)</li>
+                            <li>+13.7 mm³ (95% CI −5.6–23.0) — CPV(석회화) 보정차 (p=0.16)</li>
+                            <li>+0.2 mm³ (95% CI −2.5–2.9) — LAPV(저감쇠) 보정차 (p=0.87)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #5 (비뇨기·종양·CPP) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #5</span>
-      <span class="stars-high">★★★</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex:1;">International Urology and Nephrology | 2025-07-01</div>
-      <button class="bd-request-btn" data-title="The efficacy and safety of enzalutamide in metastatic hormone-sensitive prostate cancer: a meta-analysis based on subgroups and reconstructed individual patient data" data-session="비뇨기·종양·CPP" data-num="5" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">The efficacy and safety of enzalutamide in metastatic hormone-sensitive prostate cancer: a meta-analysis based on subgroups and reconstructed individual patient data</p>
-      <a href="https://link.springer.com/article/10.1007/s11255-025-04663-3" class="paper-url" target="_blank">https://link.springer.com/article/10.1007/s11255-025-04663-3</a>
-      <span class="design-badge">메타분석 (하위그룹 + IPD 재구축)</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">전이성 호르몬감수성 전립선암(mHSPC)은 전립선암 관리의 핵심 단계이며, 두 건의 주요 3상 시험(ARCHES, ENZAMET)에서 엔잘루타미드의 생존 이득이 입증되었다. 다만 어떤 하위군에서 이득이 더 큰지, 환자수준 데이터 기반의 통합 추정치는 부족해, 하위군 분석과 재구성 개별환자데이터(IPD)를 활용한 효능·안전성 종합평가가 필요했다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">PubMed·Embase·Cochrane·ClinicalTrials.gov를 검색한 메타분석으로, 총 2275명 환자 데이터를 분석. 1차 결과는 전체생존(OS), 2차는 PSA 무진행생존(pPFS)·영상학적 무진행생존(rPFS)·이상반응(AE). 효과크기는 위험비(RR)와 95% CI로 산출하고, Cochran&#x27;s Q로 하위군 차이를 검정했으며, 재구성 IPD에 Cox 위험모형으로 생존분석 수행. I²≤50%를 낮은 이질성으로 간주.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">엔잘루타미드는 대조군 대비 사망위험을 33% 감소시켰다. 질환용적별로 저용량군 사망위험 0.64, 고용량군 0.84로 유의한 하위군 차이(P=0.0346) — 저용량에서 이득이 더 큼. 내장전이별로는 내장전이 없는 군 0.73, 내장전이 동반군 1.06으로 유의한 하위군 차이(P=0.0124) — 내장전이 동반 시 OS 이득이 소실. 지역·Gleason 점수·수행상태·도세탁셀 사용 여부 하위군에서는 일관된 효과. pPFS·rPFS도 개선.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">엔잘루타미드군의 3–4등급 이상반응 위험은 대조군 대비 RR 1.44로 증가했다. 유의한 이질성은 관찰되지 않았다. 초록 수준에서 개별 이상반응명·군별 발생률·중단율은 상세 보고되지 않았으나, 고등급 AE 위험이 약 44% 높음을 정량적으로 제시했다.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자들은 엔잘루타미드가 mHSPC에서 OS·pPFS·rPFS를 개선하며, 특히 저용량·내장전이 없는 환자에서 더 큰 OS 이득을 제공한다고 결론지었다. 한계는 RCT 하위군·재구성 IPD 기반이라는 점, 실제임상 검증 필요, 장기효과·병용요법 추가 탐색 필요다. 엔잘루타(enzalutamide) 관점에서 질환용적·내장전이 여부에 따른 환자 선택이 효능 극대화에 중요하며, 고등급 AE 위험 44% 증가는 도입 시 안전성 모니터링 근거가 된다.</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">사망위험 33% 감소</div><div class="desc">전체 OS</div><div class="pval">-</div></div>
-        <div class="knum"><div class="val">0.64 vs 0.84</div><div class="desc">사망위험 RR</div><div class="pval">P=0.0346</div></div>
-        <div class="knum"><div class="val">0.73 vs 1.06</div><div class="desc">사망위험 RR</div><div class="pval">P=0.0124</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">The efficacy and safety of enzalutamide in metastatic hormon</div><div class="chart-wrap"><canvas id="chart_dr_5_554"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>enzalutamide mHSPC 전 하위군 적용 근거 체계적 정리</li>
-          <li>환자군별 맞춤 근거 제시 후속 연구 동향 지속 모니터링 필요</li>
-          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #5 (비뇨기·종양·CPP) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">The efficacy and safety of enzalutamide in metastatic hormone-sensitive prostate cancer: a meta-analysis based on subgroups and reconstructed individual patient data</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> International Urology and Nephrology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-07-01</div>
+                        <button class="bd-request-btn" data-title="The efficacy and safety of enzalutamide in metastatic hormone-sensitive prostate cancer: a meta-analysis based on subgroups and reconstructed individual patient data" data-session="비뇨기·종양·CPP" data-num="5" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://link.springer.com/article/10.1007/s11255-025-04663-3" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">메타분석 (하위그룹 + IPD 재구축)</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">전이성 호르몬감수성 전립선암(mHSPC)은 전립선암 관리의 핵심 단계이며, 두 건의 주요 3상 시험(ARCHES, ENZAMET)에서 엔잘루타미드의 생존 이득이 입증되었다. 다만 어떤 하위군에서 이득이 더 큰지, 환자수준 데이터 기반의 통합 추정치는 부족해, 하위군 분석과 재구성 개별환자데이터(IPD)를 활용한 효능·안전성 종합평가가 필요했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">PubMed·Embase·Cochrane·ClinicalTrials.gov를 검색한 메타분석으로, 총 2275명 환자 데이터를 분석. 1차 결과는 전체생존(OS), 2차는 PSA 무진행생존(pPFS)·영상학적 무진행생존(rPFS)·이상반응(AE). 효과크기는 위험비(RR)와 95% CI로 산출하고, Cochran&#x27;s Q로 하위군 차이를 검정했으며, 재구성 IPD에 Cox 위험모형으로 생존분석 수행. I²≤50%를 낮은 이질성으로 간주.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">엔잘루타미드는 대조군 대비 사망위험을 33% 감소시켰다.<br/>
+질환용적별로 저용량군 사망위험 0.64, 고용량군 0.84로 유의한 하위군 차이(P=0.0346) — 저용량에서 이득이 더 큼.<br/>
+내장전이별로는 내장전이 없는 군 0.73, 내장전이 동반군 1.06으로 유의한 하위군 차이(P=0.0124) — 내장전이 동반 시 OS 이득이 소실.<br/>
+지역·Gleason 점수·수행상태·도세탁셀 사용 여부 하위군에서는 일관된 효과.<br/>
+pPFS·rPFS도 개선.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">엔잘루타미드군의 3–4등급 이상반응 위험은 대조군 대비 RR 1.44로 증가했다. 유의한 이질성은 관찰되지 않았다. 초록 수준에서 개별 이상반응명·군별 발생률·중단율은 상세 보고되지 않았으나, 고등급 AE 위험이 약 44% 높음을 정량적으로 제시했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 엔잘루타미드가 mHSPC에서 OS·pPFS·rPFS를 개선하며, 특히 저용량·내장전이 없는 환자에서 더 큰 OS 이득을 제공한다고 결론지었다. 한계는 RCT 하위군·재구성 IPD 기반이라는 점, 실제임상 검증 필요, 장기효과·병용요법 추가 탐색 필요다. 엔잘루타(enzalutamide) 관점에서 질환용적·내장전이 여부에 따른 환자 선택이 효능 극대화에 중요하며, 고등급 AE 위험 44% 증가는 도입 시 안전성 모니터링 근거가 된다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>사망위험 33% 감소 — 전체 OS (-)</li>
+                            <li>0.64 vs 0.84 — 사망위험 RR (P=0.0346)</li>
+                            <li>0.73 vs 1.06 — 사망위험 RR (P=0.0124)</li>
+                            <li>RR 1.44 — 3–4등급 이상반응 위험 (-)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #6 (비뇨기·종양·CPP) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #6</span>
-      <span class="stars-mid">★★☆</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex:1;">Future Oncology | 2025-01-01</div>
-      <button class="bd-request-btn" data-title="Matching-adjusted indirect comparison of enzalutamide versus darolutamide doublet in mHSPC" data-session="비뇨기·종양·CPP" data-num="6" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Matching-adjusted indirect comparison of enzalutamide versus darolutamide doublet in mHSPC</p>
-      <a href="https://www.tandfonline.com/doi/full/10.1080/14796694.2025.2526324" class="paper-url" target="_blank">https://www.tandfonline.com/doi/full/10.1080/14796694.2025.2526324</a>
-      <span class="design-badge">MAIC (간접비교)</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">전립선암 질병부담이 전 세계적으로 증가하는 가운데, mHSPC에는 ADT에 안드로겐수용체 경로억제제(ARPI)를 더한 doublet 치료(엔잘루타미드·아비라테론·아팔루타미드·다롤루타미드)가 가이드라인 권고된다. 그러나 엔잘루타미드+ADT와 다롤루타미드+ADT를 직접 비교한 head-to-head RCT가 없어, 상대 효능을 추정할 간접비교가 필요했다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">ARCHES(엔잘루타미드+ADT vs 위약+ADT, N=1150)의 개별환자데이터(IPD)에 가중치를 적용해 ARANOTE(다롤루타미드+ADT vs 위약+ADT, N=669)의 공개 집계 기저특성에 매칭한 앵커드 매칭보정간접비교(MAIC). 공통비교군(위약+ADT)에 앵커링하여 엔잘루타미드 vs 다롤루타미드의 매칭보정 위험비(HR)를 산출. 보정 효과변경인자: 연령, 내장전이, 초기진단 전이상태(de novo/재발), 질환용적(고/저), Gleason 점수, 인종, 지역. ITT 및 도세탁셀-naive 하위군에서 분석. 결과변수: rPFS(1차), 거세저항까지의 시간, PSA 진행까지의 시간, 신규 항종양치료 개시까지의 시간. ARCHES는 crossover 혼란을 피하기 위해 1차분석(중앙추적 14.4개월) 데이터 사용, ARANOTE는 1차분석(25.3개월) 사용. 매칭 후 ARCHES 유효표본수(ESS)는 ITT 319명·도세탁셀-naive 263명.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">ITT 모집단에서 엔잘루타미드+ADT는 다롤루타미드+ADT 대비 영상학적 진행/사망 위험이 유의하게 낮음(HR 0.54; 95% CI 0.32–0.93; p=0.03, 약 46% 감소)하고 거세저항 진행 위험도 유의하게 낮음(HR 0.57; 95% CI 0.34–0.94; p=0.03, 약 43% 감소). 도세탁셀-naive 모집단에서 더 우호적: rPFS HR 0.47(95% CI 0.26–0.84; p=0.01, 53% 감소), 거세저항 HR 0.46(95% CI 0.27–0.79; p=0.01, 54% 감소). PSA 진행까지의 시간은 엔잘루타미드 우호적이나 비유의(HR 0.61; 95% CI 0.29–1.30; p=0.20; 도세탁셀-naive HR 0.48; 95% CI 0.21–1.10; p=0.08). 신규 항종양치료 개시까지의 시간도 비유의(HR 0.65; 95% CI 0.34–1.24; p=0.19). 모집단 차이를 보정하지 않는 Bucher 분석도 대체로 일관. 비례위험 가정은 모든 결과·모집단에서 타당.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">본 MAIC는 효능에 초점을 두었고 안전성 결과는 비교하지 않았다(한계로 명시). ARANOTE의 노출보정 안전성 데이터(전체 AE/TEAE, ≥3등급 AE/TEAE)가 없어 두 약제의 안전성 프로파일을 정량 비교할 수 없었다. 참고로 본문 도입부에서 AE로 인한 중단율은 엔잘루타미드+ADT 7.2% vs 다롤루타미드+ADT 6.1%로 유사하다고 인용되었다.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자들은 mHSPC에서 엔잘루타미드+ADT가 다롤루타미드+ADT 대비 영상학적 진행/사망 및 거세저항 진행 위험을 유의하게 낮춘 첫 MAIC라고 결론지었다. 한계는 미지의 효과변경인자 가능성, 기저 PSA 중앙값의 큰 차이(ARANOTE가 ADT 타이밍으로 더 높음)를 보정 불가, 효과변경인자 보정으로 ESS가 72% 감소(좌편향 가중치 분포), OS 미분석(ARCHES crossover 31.3%·ARANOTE OS 미성숙으로 편향 위험), 안전성 미비교다. 엔잘루타(enzalutamide) 관점에서 본 간접비교는 다롤루타미드 대비 무진행 이득의 근거를 제공하나, head-to-head RCT 부재·간접비교 한계로 해석에 주의가 필요하다.</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">HR 0.54 (95% CI 0.32–0.93)</div><div class="desc">rPFS ITT</div><div class="pval">p=0.03</div></div>
-        <div class="knum"><div class="val">HR 0.57 (95% CI 0.34–0.94)</div><div class="desc">거세저항까지 시간 ITT, 43% 감소</div><div class="pval">p=0.03</div></div>
-        <div class="knum"><div class="val">HR 0.47 (95% CI 0.26–0.84)</div><div class="desc">rPFS 도세탁셀-naive, 53% 감</div><div class="pval">p=0.01</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Matching-adjusted indirect comparison of enzalutamide versus</div><div class="chart-wrap"><canvas id="chart_dr_6_554"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>enzalutamide가 darolutamide 대비 rPFS·거세저항 전환시간 우위</li>
-          <li>경쟁약제(뉴베카) 대비 차별적 우위 후속 연구 동향 지속 모니터링 필요</li>
-          <li>PM 학술 디테일링 시 근거 자료로 활용 가능. 후속 연구 동향 지속 모니터링 필요</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #6 (비뇨기·종양·CPP) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Matching-adjusted indirect comparison of enzalutamide versus darolutamide doublet in mHSPC</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Future Oncology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-01-01</div>
+                        <button class="bd-request-btn" data-title="Matching-adjusted indirect comparison of enzalutamide versus darolutamide doublet in mHSPC" data-session="비뇨기·종양·CPP" data-num="6" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://www.tandfonline.com/doi/full/10.1080/14796694.2025.2526324" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">MAIC (간접비교)</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">전립선암 질병부담이 전 세계적으로 증가하는 가운데, mHSPC에는 ADT에 안드로겐수용체 경로억제제(ARPI)를 더한 doublet 치료(엔잘루타미드·아비라테론·아팔루타미드·다롤루타미드)가 가이드라인 권고된다. 그러나 엔잘루타미드+ADT와 다롤루타미드+ADT를 직접 비교한 head-to-head RCT가 없어, 상대 효능을 추정할 간접비교가 필요했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">ARCHES(엔잘루타미드+ADT vs 위약+ADT, N=1150)의 개별환자데이터(IPD)에 가중치를 적용해 ARANOTE(다롤루타미드+ADT vs 위약+ADT, N=669)의 공개 집계 기저특성에 매칭한 앵커드 매칭보정간접비교(MAIC). 공통비교군(위약+ADT)에 앵커링하여 엔잘루타미드 vs 다롤루타미드의 매칭보정 위험비(HR)를 산출. 보정 효과변경인자: 연령, 내장전이, 초기진단 전이상태(de novo/재발), 질환용적(고/저), Gleason 점수, 인종, 지역. ITT 및 도세탁셀-naive 하위군에서 분석. 결과변수: rPFS(1차), 거세저항까지의 시간, PSA 진행까지의 시간, 신규 항종양치료 개시까지의 시간. ARCHES는 crossover 혼란을 피하기 위해 1차분석(중앙추적 14.4개월) 데이터 사용, ARANOTE는 1차분석(25.3개월) 사용. 매칭 후 ARCHES 유효표본수(ESS)는 ITT 319명·도세탁셀-naive 263명.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">ITT 모집단에서 엔잘루타미드+ADT는 다롤루타미드+ADT 대비 영상학적 진행/사망 위험이 유의하게 낮음(HR 0.54; 95% CI 0.32–0.93; p=0.03, 약 46% 감소)하고 거세저항 진행 위험도 유의하게 낮음(HR 0.57; 95% CI 0.34–0.94; p=0.03, 약 43% 감소).<br/>
+<strong>도세탁셀-naive 모집단에서 더 우호적:</strong> rPFS HR 0.47(95% CI 0.26–0.84; p=0.01, 53% 감소), 거세저항 HR 0.46(95% CI 0.27–0.79; p=0.01, 54% 감소).<br/>
+PSA 진행까지의 시간은 엔잘루타미드 우호적이나 비유의(HR 0.61; 95% CI 0.29–1.30; p=0.20; 도세탁셀-naive HR 0.48; 95% CI 0.21–1.10; p=0.08).<br/>
+신규 항종양치료 개시까지의 시간도 비유의(HR 0.65; 95% CI 0.34–1.24; p=0.19).<br/>
+모집단 차이를 보정하지 않는 Bucher 분석도 대체로 일관.<br/>
+비례위험 가정은 모든 결과·모집단에서 타당.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">본 MAIC는 효능에 초점을 두었고 안전성 결과는 비교하지 않았다(한계로 명시). ARANOTE의 노출보정 안전성 데이터(전체 AE/TEAE, ≥3등급 AE/TEAE)가 없어 두 약제의 안전성 프로파일을 정량 비교할 수 없었다. 참고로 본문 도입부에서 AE로 인한 중단율은 엔잘루타미드+ADT 7.2% vs 다롤루타미드+ADT 6.1%로 유사하다고 인용되었다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 mHSPC에서 엔잘루타미드+ADT가 다롤루타미드+ADT 대비 영상학적 진행/사망 및 거세저항 진행 위험을 유의하게 낮춘 첫 MAIC라고 결론지었다. 한계는 미지의 효과변경인자 가능성, 기저 PSA 중앙값의 큰 차이(ARANOTE가 ADT 타이밍으로 더 높음)를 보정 불가, 효과변경인자 보정으로 ESS가 72% 감소(좌편향 가중치 분포), OS 미분석(ARCHES crossover 31.3%·ARANOTE OS 미성숙으로 편향 위험), 안전성 미비교다. 엔잘루타(enzalutamide) 관점에서 본 간접비교는 다롤루타미드 대비 무진행 이득의 근거를 제공하나, head-to-head RCT 부재·간접비교 한계로 해석에 주의가 필요하다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>HR 0.54 (95% CI 0.32–0.93) — rPFS ITT (p=0.03)</li>
+                            <li>HR 0.57 (95% CI 0.34–0.94) — 거세저항까지 시간 ITT, 43% 감소 (p=0.03)</li>
+                            <li>HR 0.47 (95% CI 0.26–0.84) — rPFS 도세탁셀-naive, 53% 감소 (p=0.01)</li>
+                            <li>HR 0.46 (95% CI 0.27–0.79) — 거세저항 도세탁셀-naive, 54% 감소 (p=0.01)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #7 (비뇨기·종양·CPP) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #7</span>
-      <span class="stars-high">★★★</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex:1;">Journal of the Endocrine Society | 2026-01-30</div>
-      <button class="bd-request-btn" data-title="Long-term Safety, Efficacy, and PROs: Phase 3 Study of Leuprolide Acetate 6-month IM Depot in Central Precocious Puberty" data-session="비뇨기·종양·CPP" data-num="7" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Long-term Safety, Efficacy, and PROs: Phase 3 Study of Leuprolide Acetate 6-month IM Depot in Central Precocious Puberty</p>
-      <a href="https://academic.oup.com/jes/article/10/2/bvaf224/8445231" class="paper-url" target="_blank">https://academic.oup.com/jes/article/10/2/bvaf224/8445231</a>
-      <span class="design-badge">Phase 3 단일군 장기 추적 (144주)</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">중추성 성조숙증(CPP)은 GnRH 축 억제로 사춘기 진행을 멈추고 성인키 잠재력을 보존하기 위해 20년 이상 GnRH 작용제(GnRHa)를 표준치료로 사용해왔다. 주사 빈도를 줄이는 장기 제형이 도입되었으나, 류프롤라이드 아세테이트(LA) 45mg 6개월 IM 데포 제형의 장기(48주 초과) 안전성·효능과 환자/보호자 보고결과(PRO)는 규명되지 않았다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">3상, 단일군, 공개표지, 다기관(16개소) 시험(NCT03695237)으로, CPP 아동에게 LA 45mg 6개월 IM 데포를 24주마다 최대 6회(144주) 투여. 등록 45명 = 치료경험군(previously treated) 18명 + 치료경험 없음(treatment-naive) 27명(연령 7.8±1.27세; 여아 41명·남아 4명). Part 1(0–48주, 기보고) 후 48주에 3차 투여하며 연장. 효능 결과: 자극후 최고 LH 억제(&lt;4 mIU/mL), 기저 에스트라디올(&lt;20 pg/mL)·테스토스테론(&lt;30 ng/dL) 억제, Tanner 단계 등 신체 사춘기 징후, 키 관련 지표(키속도·골연령/역연령·예측성인키 PAH), PRO(PedsQL·PROMIS), 안전성. 정식 표본수 산정 없이 40명이면 충분(±16.7% 정밀도)으로 간주, 기술통계 위주(결측 미대치). 첫 환자 2018-10-24, 마지막 2023-11-29. 28명이 Part 2 완료.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">자극후 최고 LH가 &lt;4 mIU/mL로 억제된 비율은 72·96·120·144주에 각각 93%(40/43)·95%(36/38)·100%(35/35)·100%(23/23)(비결측 데이터 기준). 기저 성호르몬은 전 아동에서 억제 — 여아 에스트라디올 &lt;20 pg/mL: 24주 97.4%, 48–144주 100%. 남아 테스토스테론: 전 시점 &lt;30 ng/dL 달성(치료naive 남아 기저 255.1→&lt;10 ng/dL 유지). 신체 사춘기 징후 억제: 72–144주 여아 86.4–94.9%, 남아 50.0–75.0%. 48주 이후 키속도 안정, 골연령/역연령 비 평균 1.2(골성숙 지연), &gt;95% 아동이 72–144주에 골연령/역연령 감소. PAH 연간 변화는 48주에 최대 +4.9 cm/년(95% CI −1.1–10.9) 후 안정, 144주 +1.4 cm/년(95% CI −1.4–4.3, 약 3년간 5.2cm). 144주 여아 평균 PAH는 중간부모키와 유사(치료naive 여아 절대 PAH +6.1cm, 치료경험 여아 +3.8cm). 건강관련 삶의질(PedsQL·PROMIS) 유지.</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">전 아동이 이상반응(AE) 보고 — 가장 흔한 것은 주사부위통증 42/45명(93.3%) 및 기타 주사부위반응(ISR; 프로토콜상 모든 ISR을 AE로 의무 보고하여 빈도 높음). 대부분 경증·중등도, 연구자가 약물과 무관 판정. 중증 AE: Part 1에서 치료naive 2명(파괴적기분조절장애·기분변화 1명 — 약물관련, 치료지속 중 소실 / 간헐적 발모벽 1명 — 무관), Part 2에서 치료경험 1명 경골골절(약물무관). 사망·약물중단 초래 AE 없음. 중대이상반응(SAE) 1건: 치료naive 8세 남아의 기분변화(155일째, 170일 소실, 약물관련 가능, 2차 투여 전 회복). 특별관심이상반응(AESI): 치료naive 8세 여아 자살관념 1건(413일째 발생, 840일 소실, 약물관련 가능성, 약물중단 없음). 골절 드묾, 경련·골단분리증 0건. 새 안전성 우려 없음.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자들은 LA 6개월 IM 데포 144주 치료가 CPP 아동에서 GnRH 축의 지속적 억제와 양호한 안전성을 보였고, 삶의 질 유지·약 3년간 PAH 개선을 입증했다고 결론지었다. 한계는 활성대조군 부재(희귀질환·표본 한계), Part 2 완료 환자수 감소, 남아 소수, 연령군별 PRO의 정식 통계비교 불가다. 엘리가드(leuprolide) 관점에서, 동일 6개월 데포 제형(전립선암 승인 제형과 동일, 1.5mL)이 소아 CPP에서 6개월 1회 주사로 3년간 효능·안전성을 유지함은 주사 빈도를 크게 낮추는 장기 GnRH 작용제 가치를 직접 뒷받침한다.</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">93%/95%/100%/100%</div><div class="desc">자극후 최고 LH &lt;4 mIU/mL 억제</div><div class="pval">-</div></div>
-        <div class="knum"><div class="val">여아 100% (48–144주)</div><div class="desc">기저 에스트라디올 &lt;20 pg/mL 억제</div><div class="pval">-</div></div>
-        <div class="knum"><div class="val">남아 전원 &lt;30 ng/dL</div><div class="desc">기저 테스토스테론 억제</div><div class="pval">-</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Long-term Safety, Efficacy, and PROs: Phase 3 Study of Leupr</div><div class="chart-wrap"><canvas id="chart_dr_7_554"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>leuprolide 6개월 제형 CPP 장기 안전성·유효성</li>
-          <li>주사 빈도 감소(연 2회) + 장기 효과 유지 근거</li>
-          <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #7 (비뇨기·종양·CPP) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Long-term Safety, Efficacy, and PROs: Phase 3 Study of Leuprolide Acetate 6-month IM Depot in Central Precocious Puberty</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Journal of the Endocrine Society</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-01-30</div>
+                        <button class="bd-request-btn" data-title="Long-term Safety, Efficacy, and PROs: Phase 3 Study of Leuprolide Acetate 6-month IM Depot in Central Precocious Puberty" data-session="비뇨기·종양·CPP" data-num="7" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://academic.oup.com/jes/article/10/2/bvaf224/8445231" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">Phase 3 단일군 장기 추적 (144주)</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">중추성 성조숙증(CPP)은 GnRH 축 억제로 사춘기 진행을 멈추고 성인키 잠재력을 보존하기 위해 20년 이상 GnRH 작용제(GnRHa)를 표준치료로 사용해왔다. 주사 빈도를 줄이는 장기 제형이 도입되었으나, 류프롤라이드 아세테이트(LA) 45mg 6개월 IM 데포 제형의 장기(48주 초과) 안전성·효능과 환자/보호자 보고결과(PRO)는 규명되지 않았다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">3상, 단일군, 공개표지, 다기관(16개소) 시험(NCT03695237)으로, CPP 아동에게 LA 45mg 6개월 IM 데포를 24주마다 최대 6회(144주) 투여. 등록 45명 = 치료경험군(previously treated) 18명 + 치료경험 없음(treatment-naive) 27명(연령 7.8±1.27세; 여아 41명·남아 4명). Part 1(0–48주, 기보고) 후 48주에 3차 투여하며 연장. 효능 결과: 자극후 최고 LH 억제(&lt;4 mIU/mL), 기저 에스트라디올(&lt;20 pg/mL)·테스토스테론(&lt;30 ng/dL) 억제, Tanner 단계 등 신체 사춘기 징후, 키 관련 지표(키속도·골연령/역연령·예측성인키 PAH), PRO(PedsQL·PROMIS), 안전성. 정식 표본수 산정 없이 40명이면 충분(±16.7% 정밀도)으로 간주, 기술통계 위주(결측 미대치). 첫 환자 2018-10-24, 마지막 2023-11-29. 28명이 Part 2 완료.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">자극후 최고 LH가 &lt;4 mIU/mL로 억제된 비율은 72·96·120·144주에 각각 93%(40/43)·95%(36/38)·100%(35/35)·100%(23/23)(비결측 데이터 기준).<br/>
+<strong>기저 성호르몬은 전 아동에서 억제:</strong> 여아 에스트라디올 &lt;20 pg/mL: 24주 97.4%, 48–144주 100%.<br/>
+<strong>남아 테스토스테론:</strong> 전 시점 &lt;30 ng/dL 달성(치료naive 남아 기저 255.1→&lt;10 ng/dL 유지).<br/>
+<strong>신체 사춘기 징후 억제:</strong> 72–144주 여아 86.4–94.9%, 남아 50.0–75.0%.<br/>
+48주 이후 키속도 안정, 골연령/역연령 비 평균 1.2(골성숙 지연), &gt;95% 아동이 72–144주에 골연령/역연령 감소.<br/>
+PAH 연간 변화는 48주에 최대 +4.9 cm/년(95% CI −1.1–10.9) 후 안정, 144주 +1.4 cm/년(95% CI −1.4–4.3, 약 3년간 5.2cm).<br/>
+144주 여아 평균 PAH는 중간부모키와 유사(치료naive 여아 절대 PAH +6.1cm, 치료경험 여아 +3.8cm).<br/>
+건강관련 삶의질(PedsQL·PROMIS) 유지.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">전 아동이 이상반응(AE) 보고 — 가장 흔한 것은 주사부위통증 42/45명(93.3%) 및 기타 주사부위반응(ISR; 프로토콜상 모든 ISR을 AE로 의무 보고하여 빈도 높음). 대부분 경증·중등도, 연구자가 약물과 무관 판정. 중증 AE: Part 1에서 치료naive 2명(파괴적기분조절장애·기분변화 1명 — 약물관련, 치료지속 중 소실 / 간헐적 발모벽 1명 — 무관), Part 2에서 치료경험 1명 경골골절(약물무관). 사망·약물중단 초래 AE 없음. 중대이상반응(SAE) 1건: 치료naive 8세 남아의 기분변화(155일째, 170일 소실, 약물관련 가능, 2차 투여 전 회복). 특별관심이상반응(AESI): 치료naive 8세 여아 자살관념 1건(413일째 발생, 840일 소실, 약물관련 가능성, 약물중단 없음). 골절 드묾, 경련·골단분리증 0건. 새 안전성 우려 없음.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 LA 6개월 IM 데포 144주 치료가 CPP 아동에서 GnRH 축의 지속적 억제와 양호한 안전성을 보였고, 삶의 질 유지·약 3년간 PAH 개선을 입증했다고 결론지었다. 한계는 활성대조군 부재(희귀질환·표본 한계), Part 2 완료 환자수 감소, 남아 소수, 연령군별 PRO의 정식 통계비교 불가다. 엘리가드(leuprolide) 관점에서, 동일 6개월 데포 제형(전립선암 승인 제형과 동일, 1.5mL)이 소아 CPP에서 6개월 1회 주사로 3년간 효능·안전성을 유지함은 주사 빈도를 크게 낮추는 장기 GnRH 작용제 가치를 직접 뒷받침한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>93%/95%/100%/100% — 자극후 최고 LH &lt;4 mIU/mL 억제율 (-)</li>
+                            <li>여아 100% (48–144주) — 기저 에스트라디올 &lt;20 pg/mL 억제율 (-)</li>
+                            <li>남아 전원 &lt;30 ng/dL — 기저 테스토스테론 억제 (-)</li>
+                            <li>+4.9 cm/년 (95% CI −1.1–10.9) — 48주 PAH 연간 변화 (-)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <!-- ━━━ 논문 #8 (비뇨기·종양·CPP) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #8</span>
-      <span class="stars-mid">★★☆</span>
-      <span class="tag-ref">참고근거</span>
-      <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex:1;">Frontiers in Pediatrics | 2025-08-29</div>
-      <button class="bd-request-btn" data-title="Metabolic changes in children with idiopathic central precocious puberty after gonadotrophin-releasing hormone agonist therapy: a meta-analysis" data-session="비뇨기·종양·CPP" data-num="8" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Metabolic changes in children with idiopathic central precocious puberty after gonadotrophin-releasing hormone agonist therapy: a meta-analysis</p>
-      <a href="https://www.frontiersin.org/journals/pediatrics/articles/10.3389/fped.2025.1519746/full" class="paper-url" target="_blank">https://www.frontiersin.org/journals/pediatrics/articles/10.3389/fped.2025.1519746/full</a>
-      <span class="design-badge">메타분석 (19개 연구 1,553명)</span>
-      <div class="summary-grid"><h4>논문 내용 요약</h4>
-        <div class="s-row"><div class="s-label">배경</div><div class="s-val">특발성 중추성 성조숙증(ICPP) 아동은 최종 성인키 손실 외에도 행동문제·유방암·비만·대사질환 위험이 높아 GnRH 작용제(GnRHa) 치료가 시행된다. 그러나 GnRHa 치료가 비만·인슐린저항성·이상지질혈증 등 대사 이상을 유발하는지에 대해서는 연구마다 상반된 결과가 보고되어, 이를 종합 평가할 메타분석이 필요했다.</div></div>
-        <div class="s-row"><div class="s-label">방법</div><div class="s-val">PRISMA 지침에 따른 메타분석(PROSPERO CRD42023410554)으로, PubMed·EMBASE·Cochrane·Web of Science를 2024-10-15까지 검색. 최종 19개 비무작위 비교임상시험(CCT, 2000–2024년), 총 1553명 ICPP 아동 포함(9개 연구는 전 체중, 10개는 과체중/비만; 12개는 GnRHa 비교·7개는 무치료 비교; 평균연령 5.0–9.43세). 1차 결과는 BMI 표준편차점수(BMISDS) 차이, 2차는 중성지방(TG)·총콜레스테롤(TC)·LDL·HDL 차이. 효과크기는 가중평균차(WMD)와 95% CI, 랜덤효과모형(DerSimonian-Laird). 이질성은 I²&gt;50% 기준, 하위군·메타회귀·누적·영향·출판편향(Begg/Egger) 분석 수행. MINORS 평균 16.42점.</div></div>
-        <div class="s-row"><div class="s-label">핵심결과</div><div class="s-val">전체 분석에서 GnRHa 투여 후 BMISDS는 유의한 변화 없음(WMD −0.08; 95% CI −0.22–0.06; p=0.269; I²=80.0%). TC(WMD 1.94 mg/dL; 95% CI −10.29–14.17; p=0.756), TG(WMD −5.31; 95% CI −26.92–16.29; p=0.630), LDL(WMD −9.63; 95% CI −40.09–20.83; p=0.535) 모두 유의차 없음. 반면 HDL은 GnRHa 투여 후 유의하게 7.07 mg/dL 상승(95% CI 3.00–11.14; p=0.001; I²=0.0%). 하위군: 과체중/비만 아동은 BMISDS 유의 감소(WMD −0.25; 95% CI −0.41~−0.10; p=0.001) vs 전 체중군(WMD 0.15; p=0.174); 표본≥30(WMD −0.17; p=0.014)·연령≥8세(WMD −0.23; p=0.010)에서 유의 감소. 지역·치료기간·GnRHa 사용상태별 유의차 없음. 출판편향 낮음(Egger p=0.801).</div></div>
-        <div class="s-row"><div class="s-label">안전성</div><div class="s-val">본 연구는 대사지표(BMISDS·지질) 변화 자체가 안전성 평가의 핵심으로, GnRHa 치료가 BMI·지질대사를 악화시키지 않음(BMISDS·TC·TG·LDL 무변화, HDL 오히려 개선)을 보였다. 별도 이상반응·중단율은 메타분석 범위 밖이며, 주요 한계로 윤리상 RCT 부재(전부 관찰연구)·지질 지표 연구수 부족·HbA1c·HOMA-IR 미보고·소표본·높은 이질성(I²=80%)을 명시했다.</div></div>
-        <div class="s-row"><div class="s-label">결론</div><div class="s-val">저자들은 GnRHa 치료가 ICPP 아동의 BMI·지질대사를 비만 여부와 무관하게 증가시키지 않았으며 오히려 HDL을 높였다고 결론지었다. 다만 임상의는 치료 중 BMI·지질 프로파일 변화를 면밀히 모니터링하고 과잉치료를 피하기 위한 전문가 평가를 선행해야 한다. 엘리가드(leuprolide) 관점에서, 류프롤라이드를 포함한 GnRHa 계열의 소아 CPP 장기 사용이 대사적으로 안전(체중·지질 악화 없음)하다는 근거로, 안전성 우려를 완화하는 메타분석 데이터다.</div></div>
-      </div>
-      <div class="key-nums">
-        <div class="knum"><div class="val">WMD −0.08 (95% CI −0.22–0.06)</div><div class="desc">BMISDS 변화(GnRHa vs 대조)</div><div class="pval">p=0.269</div></div>
-        <div class="knum"><div class="val">WMD +7.07 mg/dL (95% CI 3.00–11.14)</div><div class="desc">HDL 변화</div><div class="pval">p=0.001</div></div>
-        <div class="knum"><div class="val">WMD 1.94 mg/dL (95% CI −10.29–14.17)</div><div class="desc">총콜레스테롤</div><div class="pval">p=0.756</div></div>
-      </div>
-      <div class="viz-section"><h4>📊 핵심 비교 분석</h4><div class="viz-subtitle">Metabolic changes in children with idiopathic central precoc</div><div class="chart-wrap"><canvas id="chart_dr_8_554"></canvas></div></div>
-      <div class="usage"><h4>💡 활용 포인트</h4><ul>
-          <li>GnRHa CPP 치료 대사 부작용 불식 근거</li>
-          <li>보호자 상담 시 체중증가·대사이상 우려 해소</li>
-          <li>후속 연구 동향 지속 모니터링 필요 — PM 학술 디테일링 시 핵심 근거 자료로 활용 가능</li>
-        </ul></div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #8 (비뇨기·종양·CPP) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Metabolic changes in children with idiopathic central precocious puberty after gonadotrophin-releasing hormone agonist therapy: a meta-analysis</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Frontiers in Pediatrics</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-08-29</div>
+                        <button class="bd-request-btn" data-title="Metabolic changes in children with idiopathic central precocious puberty after gonadotrophin-releasing hormone agonist therapy: a meta-analysis" data-session="비뇨기·종양·CPP" data-num="8" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://www.frontiersin.org/journals/pediatrics/articles/10.3389/fped.2025.1519746/full" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">메타분석 (19개 연구 1,553명)</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">특발성 중추성 성조숙증(ICPP) 아동은 최종 성인키 손실 외에도 행동문제·유방암·비만·대사질환 위험이 높아 GnRH 작용제(GnRHa) 치료가 시행된다. 그러나 GnRHa 치료가 비만·인슐린저항성·이상지질혈증 등 대사 이상을 유발하는지에 대해서는 연구마다 상반된 결과가 보고되어, 이를 종합 평가할 메타분석이 필요했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">PRISMA 지침에 따른 메타분석(PROSPERO CRD42023410554)으로, PubMed·EMBASE·Cochrane·Web of Science를 2024-10-15까지 검색. 최종 19개 비무작위 비교임상시험(CCT, 2000–2024년), 총 1553명 ICPP 아동 포함(9개 연구는 전 체중, 10개는 과체중/비만; 12개는 GnRHa 비교·7개는 무치료 비교; 평균연령 5.0–9.43세). 1차 결과는 BMI 표준편차점수(BMISDS) 차이, 2차는 중성지방(TG)·총콜레스테롤(TC)·LDL·HDL 차이. 효과크기는 가중평균차(WMD)와 95% CI, 랜덤효과모형(DerSimonian-Laird). 이질성은 I²&gt;50% 기준, 하위군·메타회귀·누적·영향·출판편향(Begg/Egger) 분석 수행. MINORS 평균 16.42점.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">전체 분석에서 GnRHa 투여 후 BMISDS는 유의한 변화 없음(WMD −0.08; 95% CI −0.22–0.06; p=0.269; I²=80.0%).<br/>
+TC(WMD 1.94 mg/dL; 95% CI −10.29–14.17; p=0.756), TG(WMD −5.31; 95% CI −26.92–16.29; p=0.630), LDL(WMD −9.63; 95% CI −40.09–20.83; p=0.535) 모두 유의차 없음.<br/>
+반면 HDL은 GnRHa 투여 후 유의하게 7.07 mg/dL 상승(95% CI 3.00–11.14; p=0.001; I²=0.0%).<br/>
+<strong>하위군:</strong> 과체중/비만 아동은 BMISDS 유의 감소(WMD −0.25; 95% CI −0.41~−0.10; p=0.001) vs 전 체중군(WMD 0.15; p=0.174); 표본≥30(WMD −0.17; p=0.014)·연령≥8세(WMD −0.23; p=0.010)에서 유의 감소.<br/>
+지역·치료기간·GnRHa 사용상태별 유의차 없음.<br/>
+출판편향 낮음(Egger p=0.801).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">본 연구는 대사지표(BMISDS·지질) 변화 자체가 안전성 평가의 핵심으로, GnRHa 치료가 BMI·지질대사를 악화시키지 않음(BMISDS·TC·TG·LDL 무변화, HDL 오히려 개선)을 보였다. 별도 이상반응·중단율은 메타분석 범위 밖이며, 주요 한계로 윤리상 RCT 부재(전부 관찰연구)·지질 지표 연구수 부족·HbA1c·HOMA-IR 미보고·소표본·높은 이질성(I²=80%)을 명시했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 GnRHa 치료가 ICPP 아동의 BMI·지질대사를 비만 여부와 무관하게 증가시키지 않았으며 오히려 HDL을 높였다고 결론지었다. 다만 임상의는 치료 중 BMI·지질 프로파일 변화를 면밀히 모니터링하고 과잉치료를 피하기 위한 전문가 평가를 선행해야 한다. 엘리가드(leuprolide) 관점에서, 류프롤라이드를 포함한 GnRHa 계열의 소아 CPP 장기 사용이 대사적으로 안전(체중·지질 악화 없음)하다는 근거로, 안전성 우려를 완화하는 메타분석 데이터다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>WMD −0.08 (95% CI −0.22–0.06) — BMISDS 변화(GnRHa vs 대조) (p=0.269)</li>
+                            <li>WMD +7.07 mg/dL (95% CI 3.00–11.14) — HDL 변화 (p=0.001)</li>
+                            <li>WMD 1.94 mg/dL (95% CI −10.29–14.17) — 총콜레스테롤 (p=0.756)</li>
+                            <li>WMD −5.31 mg/dL (95% CI −26.92–16.29) — 중성지방 (p=0.630)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="legend">
@@ -607,7 +735,6 @@
     </div>
 
 <script>
-/* 논문별 포커스 뷰 (#논문제목 해시) */
 (function(){
   var h=decodeURIComponent(location.hash.slice(1)); if(!h) return;
   var papers=document.querySelectorAll('.paper'),found=null;
@@ -620,76 +747,6 @@
   btn.onclick=function(){for(var k=0;k<papers.length;k++)papers[k].style.display='';found.style.outline='';btn.remove();window.scrollTo(0,0);};
   document.body.appendChild(btn);
 })();
-</script>
-
-<script>
-if (typeof Chart !== "undefined") {
-
-  // 논문 #1 (비뇨기·종양·CPP)
-  (function(){ var c=document.getElementById('chart_dr_1_554'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["주요결과", "참조"], datasets:[{label:"치료군",data:[83.0, 58.1],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[47.67, 33.4],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #2 (비뇨기·종양·CPP)
-  (function(){ var c=document.getElementById('chart_dr_2_554'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["비교1", "비교2"], datasets:[{label:"치료군",data:[19.4, 42.3],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[16.4, 35.0],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #3 (비뇨기·종양·CPP)
-  (function(){ var c=document.getElementById('chart_dr_3_554'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["비교1", "비교2"], datasets:[{label:"치료군",data:[38.2, 19.2],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[32.6, 16.4],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #4 (비뇨기·종양·CPP)
-  (function(){ var c=document.getElementById('chart_dr_4_554'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #5 (비뇨기·종양·CPP)
-  (function(){ var c=document.getElementById('chart_dr_5_554'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #6 (비뇨기·종양·CPP)
-  (function(){ var c=document.getElementById('chart_dr_6_554'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #7 (비뇨기·종양·CPP)
-  (function(){ var c=document.getElementById('chart_dr_7_554'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["지표A", "지표B"], datasets:[{label:"치료군",data:[100.0, 80.0],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[94.9, 75.92],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-  // 논문 #8 (비뇨기·종양·CPP)
-  (function(){ var c=document.getElementById('chart_dr_8_554'); if(!c) return;
-    new Chart(c.getContext('2d'), { type:'bar',
-      data:{ labels:["치료군", "대조군"], datasets:[{label:"치료군",data:[70, 50],backgroundColor:"#1A5276",borderRadius:6},{label:"대조군",data:[30, 50],backgroundColor:"#95a5a6",borderRadius:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'x',
-        plugins:{legend:{display:true,position:'top'}},
-        scales:{ y:{beginAtZero:true,title:{display:true,text:"수치"}} } } });
-  })();
-}
 </script>
 
 <!-- BD_REQUEST_MODAL_v2 -->
@@ -710,7 +767,7 @@ if (typeof Chart !== "undefined") {
 </style>
 <div id="bd-modal-overlay" onclick="if(event.target.id==='bd-modal-overlay') closeBDModal()">
   <div id="bd-modal">
-    <h3>📋 BD 제작 요청</h3>
+    <h3>📌 BD 제작 요청</h3>
     <div class="field"><label>논문</label><div id="bd-modal-title" style="font-size:13px;color:#555;line-height:1.4"></div></div>
     <div class="field"><label>세션</label><div id="bd-modal-session" style="font-size:13px;color:#555"></div></div>
     <div class="field"><label>BD 포맷</label><div class="radio-row">
