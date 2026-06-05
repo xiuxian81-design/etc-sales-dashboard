@@ -78,6 +78,13 @@ header h1 { font-size: 17px; font-weight: 700; letter-spacing: -.3px; }
   white-space: nowrap;
 }
 .bd-folder-link:hover { background: #fff; }
+/* BD 검토 신청 — 강조 (주황) */
+.bd-review-link {
+  background: #ff7a18;
+  color: #fff !important;
+  box-shadow: 0 1px 4px rgba(255,122,24,.4);
+}
+.bd-review-link:hover { background: #ff8c33; }
 
 /* ─── 세션 탭 ─── */
 .tabs-wrap {
@@ -413,6 +420,7 @@ main { max-width: 960px; margin: 28px auto; padding: 0 16px; }
     <h1>ETC 문헌모니터링</h1>
   </div>
   <div class="header-right">
+    <a class="bd-folder-link bd-review-link" href="https://docs.google.com/forms/d/e/1FAIpQLSehcYzCTz5OM2nGpW_VpQG73ujhm76Vt0vOtG4gVrrsIT4mTQ/viewform" target="_blank" title="제작한 BD를 외부 배포 전 학술 검토 신청 (24h 내 회신)">🔎 BD 검토 신청</a>
     <a class="bd-folder-link" href="https://drive.google.com/drive/folders/1QwDTVM5f7MtDvGb5Uwql_8SU6S8LMjM0" target="_blank" title="제작 완료된 BD 소재 폴더 열기">📁 제작된 BD 소재</a>
     <select class="month-select" id="monthSelect" onchange="onMonthChange()">
       <option value="">전체 보기</option>
