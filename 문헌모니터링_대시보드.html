@@ -859,6 +859,7 @@ function requestBD(evt, title) {
   document.querySelector('.format-chip[data-fmt="CLB"]').classList.add('selected');
   document.getElementById('bdPmRequest').value = '';
   document.getElementById('bdRequester').value = localStorage.getItem('bd-requester') || '';
+  document.getElementById('bdRequesterEmail').value = localStorage.getItem('bd-requester-email') || '';
   document.getElementById('bdModalTitle').textContent = title.length > 60 ? title.substring(0,60)+'…' : title;
   document.getElementById('bdModal').classList.add('show');
 }
@@ -872,16 +873,28 @@ function submitBDModal() {
   const fmt        = document.querySelector('.format-chip.selected')?.dataset.fmt  || 'CLB';
   const pmRequest  = document.getElementById('bdPmRequest').value.trim();
   const requester  = document.getElementById('bdRequester').value.trim();
+  const email      = document.getElementById('bdRequesterEmail').value.trim();
   const btn        = _bdBtn;
   const title      = _bdTitle;
 
-  // 요청자 이름 필수 검증 (모달 닫기 전에)
+  // 필수 검증 (모달 닫기 전에)
   if (!requester) {
     showToast('⚠️ 요청자 이름을 입력해주세요.');
     document.getElementById('bdRequester').focus();
     return;
   }
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    showToast('⚠️ 완성 BD를 받으실 이메일을 정확히 입력해주세요.');
+    document.getElementById('bdRequesterEmail').focus();
+    return;
+  }
+  if (!pmRequest) {
+    showToast('⚠️ 제작목적(강조하고 싶은 메시지)을 한 줄 적어주세요.');
+    document.getElementById('bdPmRequest').focus();
+    return;
+  }
   localStorage.setItem('bd-requester', requester);
+  localStorage.setItem('bd-requester-email', email);
 
   closeBDModal();
 
@@ -928,6 +941,7 @@ function submitBDModal() {
             `&format=${encodeURIComponent(fmt)}` +
             `&memo=${encodeURIComponent(memo)}` +
             `&requester=${encodeURIComponent(requester)}` +
+            `&email=${encodeURIComponent(email)}` +
             `&callback=${cbName}`;
   sc.onerror = () => {
     btn.textContent = '📌 BD 신청';
@@ -1013,9 +1027,13 @@ document.addEventListener('DOMContentLoaded', () => {
     <input type="text" id="bdRequester" placeholder="예) 박지현"
       style="width:100%;padding:10px 12px;border:1px solid #d6dbe3;border-radius:8px;font-size:13px;box-sizing:border-box;font-family:inherit">
 
-    <label>요청사항 <span style="font-weight:400;color:#aaa">(선택)</span></label>
+    <label>이메일 (완성 BD 자동 수신) <span style="font-weight:400;color:#c0392b">*</span></label>
+    <input type="email" id="bdRequesterEmail" placeholder="예) pjh@hanall.co.kr"
+      style="width:100%;padding:10px 12px;border:1px solid #d6dbe3;border-radius:8px;font-size:13px;box-sizing:border-box;font-family:inherit">
+
+    <label>제작목적 · 강조 메시지 <span style="font-weight:400;color:#c0392b">*</span></label>
     <textarea id="bdPmRequest"
-      placeholder="예) 3페이지로 확장 / 특정 수치 강조 / 그림 추가 / 한글 번역본 필요..."></textarea>
+      placeholder="강조하고 싶은 핵심 메시지를 적어주세요 (예: PSA 상승 시점 ADT timing 정당화 / 외용 미녹시딜 우월성). 특정 수치 강조·그림 추가 등 요청도 함께."></textarea>
 
     <div class="bd-modal-actions">
       <button class="btn btn-outline" onclick="closeBDModal()">취소</button>
