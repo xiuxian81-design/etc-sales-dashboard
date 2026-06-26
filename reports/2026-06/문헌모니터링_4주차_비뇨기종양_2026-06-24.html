@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>[문헌모니터링] 4주차 비뇨기·종양 (2026.04.27)</title>
+<title>[문헌모니터링] 4주차 비뇨기·종양 (2026.06.27)</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -73,14 +73,37 @@ body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; font-size:
 }
 </style>
 
-<style>
-.bd-request-btn{background:#1A5276;color:#fff;border:none;padding:5px 12px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;margin-left:auto}
-.bd-request-btn:hover{background:#14405e}.bd-request-btn:disabled{background:#95a5a6;cursor:not-allowed}
-.paper-meta{align-items:center}
-.evidence-ref{background-color:#7f8c9b !important}
-.importance-mid{background-color:#2E6DA0 !important}.importance-low{background-color:#95a5a6 !important}
-.key-numbers h4{margin:0 0 8px;color:#003366;font-size:14px}
-.content-section-text strong{color:#1A5276}
+<style>/*BR_EXTRA_CSS*/
+.papers{max-width:920px;margin:0 auto;padding:0 8px}
+.paper{border:1px solid #e3e7ee;border-radius:14px;margin:0 auto 26px;box-shadow:0 3px 12px rgba(0,0,0,.07);overflow:hidden;background:#fff}
+.paper-header{background:linear-gradient(135deg,#1A5276,#003366);color:#fff;padding:18px 22px}
+.paper-header .paper-title{color:#fff;font-size:16px;font-weight:800;line-height:1.5;margin:0 0 12px}
+.paper-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:#e3ecf6}
+.paper-meta-item{display:flex;align-items:center;gap:4px}
+.paper-meta-item strong{color:#fff;font-weight:600}
+.importance-badge{padding:3px 11px;border-radius:20px;font-weight:800;color:#1a1a2e}
+.importance-high{background:#FFD54F}.importance-mid{background:#90CAF9;color:#0d2b45}.importance-low{background:#cfd8dc;color:#37474f}
+.evidence-tag{padding:3px 11px;border-radius:20px;font-weight:700;color:#fff;background:#2E8B72}
+.evidence-ref{background:#8896a5}
+.bd-request-btn{background:#fff;color:#003366;border:none;padding:7px 16px;border-radius:7px;font-size:12.5px;font-weight:800;cursor:pointer;margin-left:auto;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.bd-request-btn:hover{background:#ffe9b3}.bd-request-btn:disabled{background:#b9c2cc;color:#fff;cursor:not-allowed}
+.paper-header a,.paper-url{color:#cfe0f5 !important;font-size:11px;word-break:break-all}
+.paper-content{padding:18px 22px}
+.content-section{border-left:4px solid #d3dce6;padding:6px 0 6px 16px;margin:0 0 12px}
+.content-section-title{font-size:13px;font-weight:800;color:#1A5276;margin-bottom:4px;letter-spacing:.2px}
+.content-section-text{font-size:13.5px;line-height:1.7;color:#2b2b38}
+.content-section-text strong{color:#003366}
+.content-section.cs-key{border-left-color:#003366;background:#f3f8fd;border-radius:8px;padding:11px 16px}
+.content-section.cs-key .content-section-title{color:#003366}
+.key-numbers{background:#fff8e6;border:1px solid #f1dea0;border-radius:10px;padding:13px 18px;margin:14px 0}
+.key-numbers h4{margin:0 0 8px;color:#8a6a00;font-size:13.5px}
+.key-numbers ul{margin:0;padding-left:20px}.key-numbers li{font-size:13px;line-height:1.55;margin:4px 0;color:#5a4600}
+.viz-section{background:#f5f9fd;border:1px solid #d9e6f2;border-radius:10px;padding:15px 18px;margin:14px 0}
+.viz-section h4{margin:0 0 10px;color:#003366;font-size:13.5px}
+.usage-box{background:#ecf7f3;border:1px solid #bfe2d7;border-left:5px solid #2E8B72;border-radius:10px;padding:14px 18px;margin:14px 0}
+.usage-box h4{margin:0 0 8px;color:#1d6b59;font-size:13.5px}
+.usage-head{font-weight:800;color:#135344;font-size:13.5px;line-height:1.55;margin-bottom:7px;padding-bottom:7px;border-bottom:1px dashed #bfe2d7}
+.usage-box ul{margin:0;padding-left:20px}.usage-box li{font-size:13px;line-height:1.6;margin:5px 0;color:#244b43}
 </style>
 
 </head>
@@ -93,7 +116,7 @@ body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; font-size:
   <h1>[문헌모니터링] 4주차 엘리가드 + 엔잘루타</h1>
   <div class="meta">
     <span>담당 PM: 김지완</span>
-    <span>발행: 2026.04.27</span>
+    <span>발행: 2026.06.27</span>
     <span>신규 논문: 5건</span>
   </div>
 </div>
@@ -121,19 +144,19 @@ body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; font-size:
                     <div><a href="https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(25)00684-1/abstract" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">Phase 3 RCT</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">전이성 거세저항성 전립선암(mCRPC)은 안드로겐 차단요법(ADT)에도 진행하는 불치성 단계로, 신규 안드로겐수용체 경로 억제제(엔잘루타미드 등) 시대에도 결국 내성이 생겨 사망에 이른다. 환자의 약 20~25%는 BRCA1/2를 포함한 상동재조합복구(HRR) 유전자 변이를 가지며 이들에서 질환이 특히 공격적이어서, PARP 억제제와 호르몬치료의 병용이라는 새로운 기전 조합의 필요성이 컸다. TALAPRO-2 1차 분석에서 탈라조파립+엔잘루타미드 병용이 HRR 변이 비선택 코호트에서 영상학적 무진행생존(rPFS)을 유의하게 연장했으나, 당시 전체생존(OS) 자료는 미성숙했다. 본 논문은 HRR 비선택(genetically unselected) 코호트의 사전 지정 최종 OS 분석과 갱신된 rPFS·안전성을 보고하여 &#x27;OS 이득이 실재하는가&#x27;라는 핵심 질문에 답한다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">국제 무작위·이중맹검·위약대조 3상(NCT03395197). 26개국 200개 기관의 HRR 비선택 코호트에서 ADT 유지 중이며 거세저항 단계 생명연장 전신치료 경험이 없는 무증상~경증 mCRPC 성인 남성을 대상으로, 2019.1.7~2020.9.20 사이 805명을 1:1 무작위 배정(탈라조파립+엔잘루타미드 402명 vs 엔잘루타미드+위약 403명). HRR 변이 상태(결핍 vs 비결핍/미상)와 거세민감 단계 치료력으로 층화. 중재는 경구 1일1회 탈라조파립 0.5mg + 엔잘루타미드 160mg, 비교군은 엔잘루타미드 160mg + 위약(엔잘루타미드는 공개표지). 1차 평가변수는 맹검 독립중앙판독 rPFS, OS는 α-보호 핵심 2차변수(최종 OS 분석 양측 α 임계치 0.022)로 둘 다 ITT 집단에서 평가. OS 추적은 사전계획 최종분석까지 지속, 안전성은 1회 이상 투약군에서 평가.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">중앙추적 52.5개월(IQR 48.6-56.0) 시점에서 병용군이 OS를 유의하게 개선했다 — HR 0.80(95% CI 0.66-0.96), p=0.016(임계치 0.022 통과).<br/>
 중앙 OS는 병용군 45.8개월(95% CI 39.4-50.8) vs 대조군 37.0개월(34.1-40.4)로 약 8.8개월 연장.<br/>
@@ -141,11 +164,11 @@ HRR-결핍 하위군(n=169)에서 효과가 더 컸고(HR 0.55, 0.36-0.83, p=0.0
 갱신된 rPFS도 병용군에 유리 — HR 0.67(0.55-0.81), p&lt;0.0001, 중앙 rPFS 33.1개월 vs 19.5개월(약 13.6개월 연장).<br/>
 별도 발표된 HRR-결핍 전용 코호트(n=399)에서는 OS HR 0.62(0.48-0.81), p=0.0005, 중앙 OS 45.1 vs 31.1개월, BRCA1/2 변이 하위군(n=155)은 OS HR 0.50(0.32-0.78), 4년 생존율 53% vs 23%로 가장 큰 이득을 보였다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">안전성은 탈라조파립의 기존 프로파일과 일치했으며 새 신호는 없었다. 비선택 코호트에서 3등급 이상 빈혈이 병용군 195명(49%) vs 대조군 18명(4%)으로 가장 흔했고, 3등급 이상 호중구감소증은 77명(19%) vs 6명(1%)이었다. 빈혈은 대부분 치료 초기에 발생해 용량조절·수혈로 관리되었으며 PARP 억제제 계열의 예측 가능한 골수억제 독성이다. HRR-결핍 전용 코호트에서도 동일하게 3등급 이상 빈혈 86명(43%)·호중구감소증 39명(20%)이 주된 중증 이상반응이었다. 빈혈·호중구감소 등 혈액학적 독성에 대한 정기 혈액검사 모니터링과 용량조절이 핵심 관리 전략이다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자들은 탈라조파립+엔잘루타미드 병용이 HRR 비선택 mCRPC에서 OS를 유의하게 연장하여(중앙 45.8 vs 37.0개월) 이 조합을 1차 표준치료 선택지로 뒷받침한다고 결론지었다. 한계로는 OS 이득이 주로 HRR-결핍 환자에서 견인되고 HRR-비결핍군에서는 통계적 유의성에 못 미쳤다는 점(이질적 효과), 엔잘루타미드 공개표지 설계, 빈혈 등 골수억제 독성 부담 증가로 환자 선택·모니터링이 필요하다는 점이 있다. 엘리가드(류프로라이드)/엔잘루타(엔잘루타미드) 관점: 엘리가드 ADT 백본 위에서 엔잘루타미드+PARP 억제제 병용이 1차 OS 연장을 입증했으므로, 거세저항 진입 시점에 HRR/BRCA 변이 검사를 동반한 엔잘루타미드 기반 병용 전략이 디테일링의 강력한 근거가 된다.</div>
                     </div>
@@ -156,6 +179,26 @@ HRR-결핍 하위군(n=169)에서 효과가 더 컸고(HR 0.55, 0.36-0.83, p=0.0
                             <li>rPFS 33.1 vs 19.5개월, HR 0.67(0.55-0.81), p&lt;0.0001</li>
                             <li>HRR-결핍 OS HR 0.55(0.36-0.83), BRCA1/2 4년 생존율 53% vs 23%</li>
                         </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: mCRPC: 탈라조파립+엔잘루타미드 vs 엔잘루타미드 — OS·rPFS↑</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart1"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart1"), {
+                            type: "bar",
+                            data: { labels: ["중앙 OS(개월)", "중앙 rPFS(개월)"], datasets: [
+                              { label: "병용(탈라+엔잘)", data: [45.8, 33.1], backgroundColor: "#1A5276" },
+                              { label: "엔잘루타미드", data: [37.0, 19.5], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: TALAPRO-2 최종 분석에서 탈라조파립+엔잘루타미드 병용이 mCRPC 1차 OS를 45.8 vs 37.0개월(HR 0.80, p=0.016)로 유의하게 연장 — 엘리가드 ADT 백본 위 엔잘루타 기반 병용 1차 표준치료 근거</div><ul><li>비뇨기과·종양내과 디테일링 시 &#x27;엔잘루타미드 단독 대비 병용이 OS 8.8개월 연장, HRR-결핍은 HR 0.55·BRCA1/2는 4년 생존 2배&#x27;라는 수치로 1차 치료 시점의 유전자검사+병용 전략을 설득</li><li>안전성 메시지: 3등급 이상 빈혈 49% vs 4%로 골수억제 증가가 핵심 관리 포인트 — 정기 혈액검사·용량조절로 관리 가능함을 함께 제시해 처방 안심감 확보</li></ul>
                     </div>
                 </div>
             </div>
@@ -174,19 +217,19 @@ HRR-결핍 하위군(n=169)에서 효과가 더 컸고(HR 0.55, 0.36-0.83, p=0.0
                     <div><a href="https://www.nature.com/articles/s41391-025-01067-3" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">리얼월드 코호트</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">전이성 호르몬감수성 전립선암(mHSPC)은 진단 시점부터 이미 원격전이를 동반하거나 국소치료 후 전이가 진행된 단계로, ADT 단독 치료 시 결국 거세저항성으로 진행해 예후가 제한적이다. 차세대 안드로겐수용체(AR) 억제제 엔잘루타미드는 ARCHES·ENZAMET 등 3상에서 ADT 병용 시 OS·rPFS를 유의하게 개선해 mHSPC 표준치료로 자리 잡았으나, 무작위 임상은 엄격한 선정기준 탓에 고령·동반질환·다양한 전이패턴을 가진 실제 진료현장 환자를 충분히 반영하지 못한다는 한계가 있다. 또한 어떤 임상·생화학적 인자(전이부위·종양부담·PSA 반응 깊이)가 실제 치료 지속과 생존을 예측하는지에 대한 리얼월드 근거가 부족하다. ARON-3는 이 미충족 수요를 메우고자 9개국 29개 암센터의 실제 mHSPC 진료 데이터를 통합 분석한 국제 다기관 리얼월드 연구다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">설계: 후향적 국제 다기관 관찰코호트(ARON-3 프로젝트, 9개국 29개 암센터). 대상: 엔잘루타미드로 치료받은 mHSPC 환자 총 424명. 중재: 엔잘루타미드(표준용량 160mg/일, 환자의 93%가 전량 투여·7%는 초기 감량 시작)+ADT, 의무기록 기반 실투여. 환자 특성: 중앙연령 72세(42~91), 기저 PSA 중앙값 18.3ng/mL, ECOG 0이 55%(233명), Grade Group 4-5가 63%(271명), 동시성(synchronous/de novo) 전이 64%(273명)·이시성(metachronous) 36%(151명), 저종양부담 54%(228명)·고종양부담 46%(196명), 사전 도세탁셀 투여 17%(71명). 전이패턴: 림프절 단독(M1a) 19%(80명), 골 단독(M1b) 63%(265명), 내장전이(M1c) 12%(50명; 폐 47명·간 11명·뇌 1명). 평가변수: OS(엔잘루타미드 시작~전사인 사망), 치료지속기간 ToT(시작~중단), PSA90(기저 대비 ≥90% 감소), PSA0.2(초저 PSA ≤0.2ng/mL 도달). 이상반응은 CTCAE v5.0 기준. 중앙추적 18.7개월.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">전체 추적 18.7개월 시점 OS 중앙값 미도달(NR), 2년 OS 85%, 사망 53명(13%).<br/>
 치료지속기간(ToT) 중앙값 31.8개월(95%CI 26.6~45.0).<br/>
@@ -201,11 +244,11 @@ ToT도 M1a NR vs M1b/M1c 28.8개월(p=0.004).<br/>
 ▶사전 도세탁셀군 ToT 23.0개월 vs 미투여 36.1개월(HR 1.78, 1.11~2.85, p=0.016).<br/>
 다변량분석에서 연령과 PSA0.2 도달이 OS 독립예측인자로 확인됨.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">전체 Grade 3-4 이상반응은 9%로 낮았고, 연령군 간 차이 미미(&lt;70세 9% vs ≥70세 10%). 가장 흔한 중증 이상반응은 피로(fatigue)로 9%(고령군에서 G3-4 피로 10%), 고혈압 G3-4는 2%였다. 용량 측면에서 환자의 93%가 표준 전량(160mg)을 유지했고 7%만 초기 감량 시작, 치료 중 용량감량은 42명(9%)에서 발생했다. 고령(≥70세)에서도 중증 이상반응·내약성이 젊은 군과 유사해 노쇠한 실제 환자에서도 표준용량 유지가 대체로 가능함을 시사한다. 다만 후향적 의무기록 기반이라 경증·주관적 이상반응(안면홍조, 인지저하 등)은 과소보고 가능성이 있다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자들은 실제 진료현장에서도 엔잘루타미드가 mHSPC에서 ARCHES·ENZAMET 등 3상과 일관된 효과(ToT 중앙값 31.8개월, 2년 OS 85%)와 양호한 안전성(G3-4 9%)을 보였다고 결론지었고, 특히 림프절 단독전이·깊은 PSA 반응(PSA90·PSA0.2)·치료 지속이 더 긴 생존과 연관됨을 강조했다. 한계는 후향적 관찰설계로 인한 선택·보고 편향, 비교군 부재(엔잘루타미드 단일군), 중앙추적 18.7개월의 단기성과 OS 중앙값 미도달로 장기 생존 해석이 제한된다는 점이다. 엘리가드(류프로라이드)/엔잘루타(엔잘루타미드) 관점에서, 본 리얼월드 데이터는 ADT 백본(엘리가드) 위에 엔잘루타미드를 조기 병용해 PSA0.2 같은 깊은 반응을 끌어내는 것이 고령·다양한 전이패턴의 실제 환자에서도 생존 이득과 직결됨을 디테일링 근거로 제시한다.</div>
                     </div>
@@ -216,6 +259,26 @@ ToT도 M1a NR vs M1b/M1c 28.8개월(p=0.004).<br/>
                             <li>PSA0.2 달성군 OS NR vs 미달성 44.4개월, HR 0.29(0.17~0.51), p&lt;0.001</li>
                             <li>Grade 3-4 이상반응 9%(&lt;70세) vs 10%(≥70세), 가장 흔한 중증 AE 피로 9%</li>
                         </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: mHSPC 엔잘루타미드: PSA≤0.2 도달 시 2년 생존 우위</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart2"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart2"), {
+                            type: "bar",
+                            data: { labels: ["2년 OS(%)"], datasets: [
+                              { label: "PSA≤0.2 달성", data: [96], backgroundColor: "#1A5276" },
+                              { label: "미달성", data: [78], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 9개국 424명 리얼월드(ARON-3)에서 엔잘루타미드+ADT는 ToT 31.8개월·2년 OS 85%로 3상 효과를 재현, 깊은 PSA 반응(PSA0.2 HR 0.29)이 생존과 직결 — 엘리가드 백본 위 엔잘루타 조기병용의 실제 근거</div><ul><li>고령(≥70세)·다양한 전이패턴 환자에서도 93%가 표준용량 유지·G3-4 AE 10%로 내약성 양호 → 동반질환 많은 실제 처방군에서 엔잘루타 적극 사용을 뒷받침</li><li>림프절 단독전이·PSA0.2 도달 환자가 가장 긴 생존(2년 OS 96~98%) → 엘리가드+엔잘루타 조기병용으로 PSA를 ≤0.2ng/mL까지 빠르게 끌어내리는 치료목표 제시에 활용</li></ul>
                     </div>
                 </div>
             </div>
@@ -234,19 +297,19 @@ ToT도 M1a NR vs M1b/M1c 28.8개월(p=0.004).<br/>
                     <div><a href="https://ascopubs.org/doi/10.1200/JCO.2026.44.17_suppl.LBA5007" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">Phase 3 RCT</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">전이성 거세민감성 전립선암(mCSPC)은 안드로겐 박탈요법(ADT)에 ARPI(엔잘루타미드 등)를 더하는 병용요법이 표준으로 자리잡았으나, 상당수 환자가 결국 거세저항성으로 진행하여 추가 치료 옵션이 필요한 미충족 수요가 크다. 특히 mCSPC 환자의 약 25~30%는 BRCA1/2를 포함한 상동재조합복구(HRR) 유전자 변이를 동반하며, 이들은 예후가 더 나쁜 고위험군으로 분류된다. PARP 억제제는 HRR 결손 종양에서 합성치사(synthetic lethality) 기전으로 효과를 보이고, 이미 거세저항성(mCRPC) 단계에서 탈라조파립+엔잘루타미드(TALAPRO-2)가 입증되어 있었으나, 더 앞단계인 거세민감성에서 PARP 억제제를 ARPI에 더하는 전략의 유효성은 미확립 상태였다. TALAPRO-3는 HRR 변이 mCSPC 1차 치료에서 이 병용의 가치를 검증하기 위해 설계되었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">글로벌 무작위·이중맹검·위약대조 Phase 3 RCT. HRR 유전자 변이를 동반한 mCSPC 환자 총 599명을 1:1로 무작위배정(병용군 약 300명 vs 위약군 약 299명). 선정기준: 조직학적으로 확인된 선암 mCSPC, HRR 유전자 변이 동반, ECOG 0~1, 영상학적으로 확인된 전이, mCSPC에 대한 사전 전신치료 ≤3개월(ADT±ARPI)로 제한. 중재: 시험군은 탈라조파립 0.5mg/일 + 엔잘루타미드 160mg/일, 대조군은 위약 + 엔잘루타미드 160mg/일, 양군 모두 ADT 백본 위에서 투여. 층화인자: de novo vs 재발 전이, 고용량(high-volume) vs 저용량 질환, BRCA 변이 vs 비BRCA HRR 변이. 1차 평가변수: 연구자 평가 영상학적 무진행생존(rPFS, RECIST v1.1/PCWG3 기준). 주요 2차 변수: 전체생존(OS), PSA 진행까지의 시간, 후속 항암치료까지의 시간, ORR, DOR. 추적기간 중앙값은 병용군 37.6개월, 위약군 37.7개월.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">1차 변수 rPFS에서 병용군이 통계적으로 유의하고 임상적으로 의미 있는 개선을 달성.<br/>
 rPFS 중앙값은 병용군 도달 안 됨(NR) vs 위약군 45.8개월(약 46개월), HR 0.481(95% CI 0.357~0.647; p&lt;0.0001)로 영상학적 진행 또는 사망 위험을 약 52% 감소시켰다.<br/>
@@ -256,11 +319,11 @@ rPFS 중앙값은 병용군 도달 안 됨(NR) vs 위약군 45.8개월(약 46개
 전체생존(OS)은 중간분석 시점 양군 모두 중앙값 미도달이며 HR 0.77(95% CI 0.56~1.04; p=0.09)로 개선 경향을 보였으나 데이터 미성숙으로 정식 통계적 유의성은 아직 미달.<br/>
 ORR·DOR 등 나머지 2차 변수도 rPFS 이득과 방향성 일치.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">안전성 프로파일은 두 약물의 기존 프로파일과 일치했고 새로운 안전성 신호는 없었으나, PARP 억제제 특유의 혈액학적 독성이 두드러졌다. 전등급 이상반응(병용군 vs 위약군): 빈혈 79% vs 34%, 호중구수 감소 60% vs 18%, 혈소판수 감소 45% vs 8%, 피로 49% vs 40%. Grade 3 이상 치료관련 이상반응은 병용군 79% vs 위약군 41%로 발생했고, 가장 흔한 중증 혈액학적 사건은 Grade 3/4 빈혈 51%(위약군 3%), 호중구감소증 약 19~20%, 혈소판감소증 약 9%였다. 병용군 빈혈 관리로 40%가 적혈구 수혈을 받았으며(중앙값 환자당 2회), 프로토콜 기반 용량조절이 시행되었다. 탈라조파립/위약 용량중단(interruption) 69%, 용량감량 60%로 빈번했다. 이상반응으로 인한 탈라조파립/위약 영구중단은 병용군 19% vs 위약군 10%였고, 빈혈로 인한 영구중단은 5%였다. 다만 병용군 80% 이상이 영구중단 없이 치료를 지속할 수 있었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자(Neeraj Agarwal 등)는 HRR 변이 mCSPC 1차 치료에서 탈라조파립+엔잘루타미드 병용이 엔잘루타미드 단독 대비 rPFS를 52% 개선하며 BRCA·비BRCA 모두에서 일관된 이득과 관리 가능한 안전성을 보였다고 결론지었고, 이는 PARP 억제제+호르몬치료 병용이 거세민감성 단계에서 효과를 입증한 두 번째 Phase 3(AMPLITUDE/니라파립에 이어)으로서 조기 개입과 HRR 유전자 검사의 중요성을 뒷받침한다고 강조했다. 한계: OS 데이터 미성숙(HR 0.77, p=0.09로 아직 유의성 미달)으로 생존 이득은 추가 추적이 필요하고, 빈혈 등 혈액학적 독성으로 수혈·용량조절·19% 영구중단이 요구되어 환자 선별과 모니터링이 필수다. 엘리가드(류프로라이드)/엔잘루타(엔잘루타미드) 관점: 본 연구는 ADT 백본(류프로라이드 등 LHRH 작용제) 위에 엔잘루타미드를 더하는 mCSPC 표준 병용을 재확인하는 동시에, HRR 변이를 동반한 고위험 mCSPC에서 엔잘루타미드 기반 치료에 PARP 억제제를 조기 병용하면 진행 위험을 절반으로 낮출 수 있어, 엘리가드+엔잘루타 병용 처방 환자에서 HRR 유전자 검사 기반 치료 강화 전략의 근거가 된다.</div>
                     </div>
@@ -271,6 +334,26 @@ ORR·DOR 등 나머지 2차 변수도 rPFS 이득과 방향성 일치.</div>
                             <li>3년 rPFS 76.6% vs 56%; BRCA HR 0.37, 비BRCA HR 0.57</li>
                             <li>Grade 3/4 빈혈 51% vs 3%, AE로 인한 영구중단 19% vs 10%</li>
                         </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: mCSPC HRR변이: 탈라조파립+엔잘루타미드 vs 위약 — 3년 rPFS</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart3"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart3"), {
+                            type: "bar",
+                            data: { labels: ["3년 rPFS(%)"], datasets: [
+                              { label: "병용", data: [76.6], backgroundColor: "#1A5276" },
+                              { label: "위약+엔잘", data: [56], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: HRR 변이 mCSPC 1차 치료에서 탈라조파립+엔잘루타미드가 rPFS를 52% 개선(HR 0.481), 엔잘루타+엘리가드 처방 환자의 HRR 검사 기반 치료 강화 근거</div><ul><li>엔잘루타(엔잘루타미드)+ADT(엘리가드) 표준 병용을 받는 mCSPC 환자에서 HRR/BRCA 유전자 검사로 고위험군을 선별하면, BRCA(HR 0.37)·비BRCA(HR 0.57) 모두에서 진행 위험을 절반으로 낮추는 PARP 병용 강화 옵션을 제시할 수 있다는 디테일링 포인트</li><li>다만 Grade 3/4 빈혈 51%·수혈 40%·영구중단 19% 등 혈액학적 독성 관리가 필요하므로, 정기 혈구검사 모니터링과 용량조절 프로토콜을 함께 안내하는 것이 현장 신뢰 확보에 유효</li></ul>
                     </div>
                 </div>
             </div>
@@ -289,19 +372,19 @@ ORR·DOR 등 나머지 2차 변수도 rPFS 이득과 방향성 일치.</div>
                     <div><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12114795/" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">체계적 문헌고찰</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">전립선암은 전 세계 남성 암 발생 2위·암 사망 5위로 2022년 신규 150만 명 이상, 사망 39.7만 명에 달하며, 안드로겐 박탈요법(ADT) 시작 후 상당수가 3년 내 거세저항성 전립선암(CRPC)으로 진행한다. 엔잘루타미드(엔잘루타)는 안드로겐 수용체(AR) 차단제로 CRPC 표준용량이 160mg/일이나, 환자의 최대 90%가 피로·요통·안면홍조 등 이상반응을 겪어 투여 중단이나 용량 감량으로 이어진다. 한편 160mg 미만 저용량에서도 AR 포화가 달성되어 효능 손실이 거의 없을 수 있다는 약리학적 근거가 보고되어 왔다. 그러나 용량 감량이 효능을 유지하면서 내약성을 개선하는지에 대한 근거가 정리되지 않아, 저자들은 저용량 vs 표준용량 엔잘루타미드의 안전성·효능을 체계적으로 종합하고자 했다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">체계적 문헌고찰(Cochrane Handbook·PRISMA 준수, PROSPERO CRD42024567029 등록). PubMed·Scopus·Web of Science·Cochrane를 2024년 7월까지 검색해, 성인 CRPC 환자에서 저용량과 표준용량 엔잘루타미드를 보고한 RCT 또는 코호트 연구를 영어 논문에 한해 포함했다. 최종 10편(후향적 코호트 7편, 전향적 시험 2편, 전향적 코호트 1편), 총 2,481명을 포함했으며 지역은 일본 5·미국 2·프랑스 2·네덜란드 1편이었다. 환자 중앙연령 68~85세, 9편은 CRPC 단독·1편은 호르몬감수성 동반. 저용량 regimen은 최소 30mg/일, 흔히 80mg·120mg/일, 일부는 80mg→160mg 점증요법을 사용했고 비교군은 표준 160mg/일이었다. 1차 평가변수는 무진행생존(PFS)·전체생존(OS), 2차는 PSA 반응·이상반응·치료순응도. 중앙 추적기간은 9.9개월~30개월 이상. 이질성이 커 메타분석은 시행하지 않고 서술적 종합(narrative synthesis)으로 분석했다(통합효과크기 산출 없음). 질평가: 관찰연구 Newcastle-Ottawa, RCT는 RoB2(고품질 4편·중간 4편).</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">OS·PFS와 엔잘루타미드 용량 간 일관된 관계는 확인되지 않았다(서술적 종합, 통합 HR 없음).<br/>
 <strong>PFS:</strong> Yamada 2022에서 저용량 7.2개월 vs 표준 12.1개월(p=0.037)로 감량 시 짧았으나, Vinh-Hung 2020은 11.2 vs 11.9개월로 차이 없음, Boerrigter 2024는 120mg 8.8개월 vs 160mg 22.8개월이나 통계적 유의성 없음(p=0.14), Tsuzuki 2021은 6 vs 8개월(p=0.1, 추세).<br/>
@@ -310,11 +393,11 @@ ORR·DOR 등 나머지 2차 변수도 rPFS 이득과 방향성 일치.</div>
 점증요법(Miura 2021)은 치료실패까지 기간(TTF) 18.0개월 vs 표준 10.4개월로 우월.<br/>
 다만 최대 연구 Freedland 2021(n=1,375)에서 상대용량강도(RDI) 80% 미만은 PSA 진행 위험을 유의하게 높였다(HR=1.258, p=0.003).</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">저용량/점증요법은 이상반응을 일관되게 줄였다. 가장 흔한 이상반응은 피로로 최대 34%에서 발생하며 용량 의존적(투여 약 4주째 정상상태 도달 시점에 출현, 감량 후 수주 내 소실)이고, Boerrigter 2024에서 120mg군이 160mg군보다 피로 보고가 유의하게 적었다. Miura 2021 점증 vs 표준: 전체 이상반응 63.3% vs 88.2%, Grade≥3 이상반응 6.7% vs 23.5%, 이상반응에 의한 중단 12.2% vs 35.3%(중단 차이 p=0.028). Tsuzuki 2021은 이상반응 22.6%(저용량) vs 34.4%(표준)(유의차 없음), Terada 2016은 고령자에서 저용량군 이상반응이 적고 표준용량군 이상반응 49%·중단 18%였다. 기타 보고된 이상반응은 요통·안면홍조·고혈압·식욕저하·오심·인지장애·우울이며, 표준용량 11% 수준의 Grade3~4 피로(Scher)도 보고되었다. 전반적으로 저용량은 특히 고령 환자에서 독성을 낮추고 순응도를 개선했다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자들은 저용량 엔잘루타미드가 선택된 환자군에서 치료 효능을 보존하면서 이상반응을 유의하게 줄이고 내약성을 개선할 수 있으나, 후향적 설계·이질적 방법론·낮은 통계검정력으로 결과가 일관되지 않으며 OS 비열등성을 단정할 근거는 부족하다고 결론지었다. 한계는 대부분 후향연구의 선택편향, 용량감량 프로토콜·결과정의의 이질성, 작은 표본, 전향적 무작위 비열등성 시험 부재, 기저 예후인자(PSA·수행도·선행치료) 교란이며, 80mg→160mg 점증요법이 유망하나 검증이 필요하다(진행 중 ANZadapt 2상 NCT05393791 주목). 엘리가드(류프로라이드)/엔잘루타(엔잘루타미드) 관점: ADT 백본(엘리가드) 위에 엔잘루타를 병용할 때, 피로 등 내약성 문제로 임의 감량 시 RDI 80% 미만에서 PSA 진행 위험이 1.26배 높아지므로(HR=1.258, p=0.003) 무분별한 감량보다 표준 160mg 유지 또는 80→160mg 점증 전략으로 용량강도를 지키는 것이 효능 보존에 유리하다는 디테일링 근거가 된다.</div>
                     </div>
@@ -325,6 +408,10 @@ ORR·DOR 등 나머지 2차 변수도 rPFS 이득과 방향성 일치.</div>
                             <li>점증요법 TTF 18.0 vs 표준 10.4개월, 이상반응 63.3% vs 88.2%, Grade≥3 6.7% vs 23.5%</li>
                             <li>OS 34 vs 31.4개월 p=0.97 (저용량 vs 표준, 유의차 없음)</li>
                         </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: CRPC에서 엔잘루타미드 저용량은 고령자 내약성을 높이나 RDI 80% 미만 감량 시 PSA 진행 위험 1.26배(HR=1.258)로, 엘리가드+엔잘루타 병용 시 용량강도 유지가 효능 보존 관건</div><ul><li>내약성 차별화: 점증요법(80→160mg)이 표준 대비 이상반응 63.3% vs 88.2%·중단 12.2% vs 35.3%로 줄여, 피로로 고민하는 고령 CRPC 환자에서 임의 중단 대신 점증 유지 전략을 제안하는 근거</li><li>효능 방어 메시지: OS는 용량 무관하게 유사(34 vs 31.4개월 p=0.97)하나 PFS·PSA 반응은 표준용량 우월 사례가 있고 RDI&lt;80%에서 진행 위험 상승 → &#x27;내약성 위해 감량하되 80% 이상 용량강도는 사수&#x27; 균형 디테일링</li></ul>
                     </div>
                 </div>
             </div>
@@ -343,19 +430,19 @@ ORR·DOR 등 나머지 2차 변수도 rPFS 이득과 방향성 일치.</div>
                     <div><a href="https://www.bayer.com/en/us/news-stories/new-findings-for-nubeqa" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">Phase 2 비교시험</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">진행성 전립선암 치료에서 안드로겐수용체경로억제제(ARPI)는 생존을 크게 개선했으나, 장기 사용 환자가 늘면서 &#x27;치료가 환자의 일상 인지기능에 미치는 영향&#x27;이 새로운 임상 의사결정 변수로 부상했다. 엔잘루타미드 등 1세대 ARPI는 혈액뇌장벽(BBB)을 상대적으로 높게 통과해 피로·인지저하·집중력 저하(&#x27;브레인 포그&#x27;)·낙상 등 중추신경계(CNS) 관련 이상반응을 유발하는 것으로 알려져 있으나, 두 약제를 인지기능을 1차 평가변수로 직접 비교한 전향적 무작위 시험은 없었다. 다로루타미드는 구조적으로 BBB 투과가 낮아 CNS 노출이 적을 것으로 기대되어 왔으며, ARACOG(AFT-47) 시험은 이 가설을 헤드투헤드로 검증하기 위해 설계되었다. 이는 생존·질병조절을 넘어 &#x27;삶의 질·인지보존&#x27;까지 고려하는 치료선택 흐름에 직접적 근거를 제공하려는 연구다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">Alliance for Clinical Trials in Oncology가 주관한 전향적·무작위·공개라벨(open-label) Phase II 시험(ARACOG, AFT-47). 총 111명을 1:1 무작위 배정 — 다로루타미드군 n=55, 엔잘루타미드군 n=56(1차 평가변수 분석 가능 95명: 다로루타미드 48명, 엔잘루타미드 47명). 대상은 전이성 호르몬감수성(mHSPC/mCSPC), 전이성 거세저항성(mCRPC), 비전이성 거세저항성(nmCRPC) 전립선암 남성. 등록기간 2021-08-17~2025-03-11, 중앙연령 71세, 83%가 백인. 중재 — 다로루타미드 600mg 1일 2회, 엔잘루타미드 160mg 1일 1회. 인지평가는 검증된 컴퓨터기반 플랫폼 CANTAB로 5개 인지영역(실행기능·작업기억·시각기억·주의력·기억회상 등)을 베이스라인, 12주, 24주, 48주에 측정. 1차 평가변수: 베이스라인 대비 24주 시점 &#x27;최대변화 인지영역(MCCD, maximally changed cognitive domain)&#x27;의 백분율 변화. 2차 평가변수: 교차(crossover)율, 피로·삶의질 등 환자보고결과(PROM, FACT-Cog·FACIT-Fatigue·우울 척도 포함).</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">1차 평가변수에서 다로루타미드가 인지보존 우위를 통계적으로 유의하게 입증했다.<br/>
 24주 MCCD 중앙값 변화 — 다로루타미드 -15.8%(IQR -38.8, -2.6) vs 엔잘루타미드 -36.1%(IQR -59.3, -16.7), p=0.009. 즉 엔잘루타미드군의 인지저하 폭이 다로루타미드군의 약 2배였다.<br/>
@@ -365,11 +452,11 @@ ORR·DOR 등 나머지 2차 변수도 rPFS 이득과 방향성 일치.</div>
 교차사유는 객관적 인지검사 저하 14명, 주관적 인지호소 11명, CNS 관련 이상반응(낙상 포함)이었다.<br/>
 PROM·48주 장기 인지추적은 분석 진행 중.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">ARACOG 자체의 군별 이상반응 발생률·중대이상반응·중단율 수치는 본 보도자료에 상세 공개되지 않았으며, 안전성 신호는 주로 교차사유로 간접 확인된다 — 엔잘루타미드군에서 객관적 인지저하(14명)·주관적 인지호소(11명)·낙상 등 CNS 관련 이상반응으로 인한 다로루타미드로의 교차가 발생한 반면, 다로루타미드군에서는 교차가 0명이었다. 다로루타미드는 BBB 투과가 낮아 CNS 노출이 적다는 기전이 이 차이를 설명한다. 참고로 다로루타미드(NUBEQA)의 기존 대규모 시험(ARAMIS·ARASENS 등)에서 보고된 안전성 신호로는 허혈성심질환(3.2~3.4% vs 위약 2%), 발작(0.2~0.8%) 등이 있다. ARACOG는 인지·삶의질을 1차로 한 시험으로, 약물 자체의 전형적 종양학적 이상반응 프로파일을 새로 평가하기보다 인지·CNS 관용성 비교에 초점을 두었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자(주연구자 Alicia K. Morgans)는 진행성 전립선암에서 다로루타미드가 엔잘루타미드 대비 24주 객관적 인지저하를 유의하게 적게 유발했으며(-15.8% vs -36.1%, p=0.009), 교차가 전원 엔잘루타미드→다로루타미드 단방향이었던 점이 임상적 의미를 강화한다고 결론지었다. 한계는 ① 공개라벨 설계에서 교차기준에 주관적 결과가 포함되어 편향 가능성, ② CANTAB는 연구도구로 임상진단용이 아님, ③ N=111의 Phase II 규모·미국 백인 중심(83%) 코호트로 일반화 제한, ④ 48주 장기추적·PROM 분석 미완. 엘리가드(류프로라이드)/엔잘루타(엔잘루타미드) 관점의 임상 함의: 본 헤드투헤드 근거는 ADT 백본(류프로라이드) 위에 ARPI를 얹을 때 인지·일상기능 보존이 중요한 환자(고령·인지취약·운전/직무수행 필요군)에서 약제 선택 시 CNS 관용성을 핵심 차별화 변수로 부각시킨다.</div>
                     </div>
@@ -380,6 +467,10 @@ PROM·48주 장기 인지추적은 분석 진행 중.</div>
                             <li>교차 23명 전원 엔잘루타미드→다로루타미드(반대방향 0명)</li>
                             <li>총 N=111(다로 55 vs 엔잘 56), 분석가능 95명, 중앙연령 71세</li>
                         </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: ARACOG Phase II 헤드투헤드에서 다로루타미드가 24주 인지저하 -15.8% vs 엔잘루타미드 -36.1%(p=0.009)로 절반 수준, 교차 전원이 엔잘→다로 단방향 — 엔잘루타와 류프로라이드 병용 ARPI 선택 시 CNS 관용성을 차별화 포인트로 제시</div><ul><li>고령·인지취약 또는 운전·직무수행이 중요한 진행성 전립선암 환자 상담 시 &#x27;생존뿐 아니라 인지·일상기능 보존&#x27;을 함께 고려하는 흐름을 근거로 제시(엔잘루타 BBB 투과·브레인포그 이슈 대비 다로루타미드의 낮은 CNS 노출 기전)</li><li>ADT 백본(엘리가드/류프로라이드)에 ARPI를 얹는 조합요법 설계 시, 실행기능·작업기억 보존이 핵심인 환자군에서 약제별 인지 프로파일 차이를 디테일링 근거로 활용 — 단 Phase II·공개라벨·백인 83% 코호트라는 한계 함께 안내</li></ul>
                     </div>
                 </div>
             </div>
@@ -398,19 +489,19 @@ PROM·48주 장기 인지추적은 분석 진행 중.</div>
                     <div><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12323909/" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">메타분석</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">중추성 성조숙증(CPP)은 시상하부-뇌하수체-생식샘(HPG) 축의 조기 활성화로 발생하며, 전 세계적으로 발생률이 뚜렷이 증가하는 추세다. 여아는 100,000명당 200~410.6건, 남아는 10.9~50건으로 여아 발생률이 남아의 약 10배에 달하고, 초경 평균 연령도 수십 년간 점점 어려지고 있다. 치료하지 않으면 골단 조기 융합으로 인한 최종 저신장(short stature)과 함께 심각한 심리사회적 문제를 초래한다. GnRH 작용제(GnRHa)가 표준 치료(gold-standard)이나, 발병 연령 6세 이상 환아(특히 8세 이상)에서의 최종신장(FH) 개선 효과는 연구마다 상충되고, rhGH 병용의 추가 이득과 장기 안전성(대사 변화·PCOS 위험)에 대한 근거도 불충분해 이를 통합 정량화할 필요가 있었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">설계: 체계적 문헌고찰 및 메타분석(PROSPERO CRD42022377476). 7개 DB(PubMed 1946~2023.12, Embase, CENTRAL, CNKI, CBM, VIP, WanFang)와 2개 등록처(ClinicalTrials.gov, WHO ICTRP)를 언어 제한 없이 검색. 포함 연구 총 55편(RCT 11편 + 비무작위 코호트 44편), 총 N=4,633명(여아 4,516명 97.47%, 남아 117명 2.53%), 13개국(중국 19·이탈리아 9·프랑스 6·이스라엘 4·한국 4편 등). 선정기준: 최소 1년 이상 치료한 연구로 &#x27;GnRHa+rhGH vs GnRHa 단독&#x27; 또는 &#x27;GnRHa vs 무치료&#x27; 비교. 제외: 신장에 영향을 주는 이차질환(성장호르몬결핍·특발성저신장·SGA). 중재: GnRHa 단독(류프로렐린·트립토렐린·고세렐린·히스트렐린), GnRHa+rhGH 병용, 무치료 대조. 1차변수=최종신장(FH; 골연령&gt;15세 또는 성장속도&lt;1cm/년 또는 초경 후 2년 시점), 신장이득(FH-PAH), FH-SDS, FH-목표신장(TH). 안전성=최종신장 시점 BMI·골밀도(BMD)·PCOS 발생·대사 이상반응. 비뚤림: RCT는 Cochrane ROB 2.0, 비무작위는 ROBINS-I, 근거수준은 GRADE.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">[GnRHa 단독 vs 무치료, 여아] 최종신장(FH): 32편·N=2,995, 통합 MD +2.51cm(95%CI 1.26~3.76, p&lt;0.001, I²=97%) — 단 RCT만으로는 MD +0.54cm(95%CI -2.15~3.23, p=0.69)로 비유의, 비무작위연구에서만 +2.63cm(p&lt;0.001).<br/>
 신장이득(FH-PAH): 8편·N=897, MD +3.25cm(95%CI 1.96~4.55, p&lt;0.001, I²=89%).<br/>
@@ -424,11 +515,11 @@ PROM·48주 장기 인지추적은 분석 진행 중.</div>
 [남아] FH 3편·N=80, MD +7.06cm(95%CI -9.07~23.18, p=0.39, I²=97%)로 비유의 — 데이터 부족.<br/>
 이질성 원인은 메타회귀상 &#x27;집단 차이(baseline population difference)&#x27;만 p&lt;0.001로 유의(지역·설계·표본크기·비뚤림은 모두 비유의).</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">최종신장 시점 BMI: GnRHa vs 대조 12편·N=1,238에서 통합 MD -0.06(95%CI -0.50~0.38, p=0.78, I²=48%)으로 차이 없음 — 약물치료가 BMI에 미치는 영향은 미미. 골밀도(BMD): Pasquino 연구에서 치료군 0.82±0.01 vs 대조군 1.001±0.11(p&lt;0.001)로 치료 중 낮았으나 Magiakou 연구는 비유의(p=0.713). PCOS 발생: GnRHa vs 대조 8편·N=850에서 통합 RR 1.93(95%CI 1.26~2.98, p=0.003, I²=0%)으로 GnRHa군에서 유의하게 증가 — 다만 저자는 PCOS가 치료보다 질환 자체와 관련될 가능성을 지적. rhGH 병용 시 IGF-1 상승 약 19%(Li 4/21·Zheng 5/26), 공복 인슐린 상승 14~15%. 중대 이상반응·주사부위반응·중단율은 포함 연구에서 거의 보고되지 않음 — 저자는 특히 rhGH 병용의 안전성 데이터가 매우 부족하다고 명시.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">GnRHa는 CPP 여아의 최종신장을 평균 2.51cm 개선하며 특히 8세 이전 치료 개시 시 이득이 크고(6~8세 발병군 +4.83cm), 8세 이후 발병 환아는 약물 이득이 불확실하다. rhGH 병용은 단독 대비 +1.58cm의 추가 신장이득을 주지만 2년 이상 치료 시에만 유의하며, 고가 비용과 반복 주사 부담을 고려하면 일률적 병용의 필요성은 근거가 충분치 않다. 한계로는 포함 연구의 97%가 여아·비무작위연구 비중이 높아 이질성(I² 최대 98%)과 비뚤림이 크고(RCT 64%가 high risk), 남아·안전성 데이터가 빈약하며 GRADE 근거수준이 낮음~매우 낮음이라는 점이 있다. 엘리가드(류프로라이드)/엔잘루타(엔잘루타미드) 관점: GnRHa 류프로라이드는 본 메타분석에서 입증된 HPG 축 억제 효능과 BMI에 미치는 영향이 미미하다는 안전성 프로파일을 근거로 성조숙증의 표준 안드로겐/성호르몬 차단 치료로서 입지를 확인하며, 동일 호르몬 차단 기전을 공유하는 엔잘루타미드(AR 차단)와 함께 &#x27;조기·정밀한 호르몬 축 제어&#x27;라는 비뇨기·종양 영역 메시지의 임상적 일관성을 보강한다.</div>
                     </div>
@@ -439,6 +530,26 @@ PROM·48주 장기 인지추적은 분석 진행 중.</div>
                             <li>GnRHa+rhGH 병용 추가 신장이득 MD +1.58cm(95%CI 0.66~2.51, p&lt;0.001, 16편·N=1,181)</li>
                             <li>PCOS 발생 RR 1.93(95%CI 1.26~2.98, p=0.003), 단 8세 이후 발병군 FH MD +0.28cm로 비유의</li>
                         </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 성조숙증(CPP): GnRHa 치료 최종신장 이득(cm, 메타분석)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart6"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart6"), {
+                            type: "bar",
+                            data: { labels: ["GnRHa 단독", "+rhGH 병용"], datasets: [
+                              { label: "최종신장 이득(cm)", data: [2.51, 4.09], backgroundColor: "#1A5276" },
+                              { label: " ", data: [0, 0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: GnRHa(류프로라이드)는 CPP 여아 최종신장을 +2.51cm 유의 개선하고 8세 이전 치료에서 이득이 극대화(6~8세군 +4.83cm)되며 BMI 영향은 미미 — 엘리가드의 조기·정밀 호르몬 축 억제 효능·안전성을 뒷받침</div><ul><li>치료 타이밍 디테일: &#x27;8세 이전 개시 시 단독요법 +6.50cm, 8세 이후 발병은 비유의(+0.28cm)&#x27;를 활용해 조기 진단·조기 GnRHa 개시의 임상적 가치를 강조</li><li>안전성 균형 메시지: BMI 변화 없음(MD -0.06, p=0.78)과 표준치료 지위를 부각하되, PCOS RR 1.93·rhGH 병용 안전성 데이터 부족은 일률적 병용을 지양하는 근거로 제시</li></ul>
                     </div>
                 </div>
             </div>
@@ -457,30 +568,30 @@ PROM·48주 장기 인지추적은 분석 진행 중.</div>
                     <div><a href="https://www.frontiersin.org/journals/endocrinology/articles/10.3389/fendo.2025.1662808/full" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">메타분석</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">중추성 성조숙증(CPP)은 시상하부-뇌하수체-생식샘 축의 조기 활성화로 골연령이 빠르게 진행되어 최종 성인키(FAH)가 손상될 수 있는 질환이다. 표준 1차 치료인 GnRHa(류프로라이드 등) 단독요법은 사춘기 진행을 효과적으로 억제하지만, 진단 지연·역연령 고령·치료 시작 시 이미 진행된 골연령을 가진 환아에서는 최종 성인키 개선 효과가 일관되지 않다는 한계가 있다. 특히 GnRHa로 사춘기를 억제하는 동안 성장속도가 둔화되는 현상이 자주 관찰되어, IGF-1을 자극해 장골 성장을 촉진하는 성장호르몬(GH)을 병용해 키 잠재력을 보강하려는 시도가 이어져 왔다. 그러나 병용요법이 실제 최종 성인키 개선으로 이어지는지에 대한 근거는 소규모 단일연구에 흩어져 있어, 본 연구는 이를 통합 정량화하기 위해 수행되었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">설계는 체계적 문헌고찰 및 메타분석으로, PubMed·Embase·Web of Science·Cochrane Library를 검색 시작 시점부터 2025년 5월까지 검색했다. 최종 9편(RCT 1편, 환자-대조군 연구 3편, 후향적 비교연구 5편; 한국 4·이탈리아 2·중국 2·네덜란드 1, 2000~2024년 발표)이 포함되었다. 대상은 특발성 CPP로 진단된 여아로, 중재군은 GnRHa+GH 병용(군별 N 10~46명), 비교군은 GnRHa 단독(군별 N 10~188명)이었다. 기질적 원인(뇌종양·시상하부 과오종)이나 아로마타제 억제제 병용은 제외했다. GnRHa는 60~150µg/kg 또는 고정용량(예: 3.75mg/28일), GH는 0.25mg/kg/주~4IU/m²/일 용량이었고, GnRHa 선행치료 수개월~2년, 병용치료 기간은 1.9~3년이었다. 1차 평가변수는 최종키·최종키-목표키(FH–TH)·예측성인키(PAH), 2차 변수는 키증가량·치료중 키변화·성장속도(cm/년)·골성숙(ΔBA/ΔCA)이었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">예측성인키(PAH)는 병용군이 단독군 대비 WMD +4.27cm(95%CI 3.47~5.08, p&lt;0.0001, 9편, I²=43%)로 가장 일관된 개선을 보였다(임상시험 하위군 +5.19cm, 후향연구 +3.92cm 모두 p&lt;0.00001).<br/>
 키증가량은 +3.45cm(95%CI 1.73~5.17, p&lt;0.0001, 8편, I²=80%), 치료중 키변화는 +3.31cm(95%CI 1.76~4.86, p&lt;0.0001, 6편, I²=0%), 성장속도는 +1.40cm/년(95%CI 0.90~1.91, p&lt;0.0001, 6편, I²=0%)으로 모두 유의했다.<br/>
 그러나 핵심 임상지표인 최종 성인키는 WMD +0.14cm(95%CI –1.66~1.94, p=0.88, 8편, I²=81%)로 군간 차이가 없었으며, 하위군 간 방향이 엇갈렸다(임상시험 +2.14cm p=0.07 경향, 후향연구 –1.75cm p=0.0001).<br/>
 최종키-목표키(FH–TH)는 전체 +1.01cm(95%CI 0.28~1.73, p=0.006, 7편, I²=49%)로 유의했으나 이 역시 임상시험 +2.35cm(p=0.0006) vs 후향연구 +0.39cm(p=0.38)로 설계별 차이가 컸다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">병용요법의 안전성은 주로 골성숙 지표(ΔBA/ΔCA, 골연령 변화/역연령 변화 비율)로 평가되었다. 병용군과 단독군 간 ΔBA/ΔCA는 WMD +0.01(95%CI –0.05~0.07, p=0.77, 7편, I²=0%)로 차이가 없어, GH 추가가 골연령 진행을 가속하지 않음을 시사했다(임상시험 하위군 0.00 p=0.98, 후향연구 +0.03 p=0.62). 즉 GH 병용이 사춘기 억제 중 골성숙을 추가로 촉진하는 안전성 신호는 관찰되지 않았다. 다만 포함 연구들은 구체적 이상반응명·발생률·중대이상반응·중단율을 일관되게 보고하지 않아 통합 정량화가 불가능했다. 저자들은 안전성·효과 균형 측면에서 GH의 높은 비용, 장기 주사 부담, 보조치료 없이도 수용 가능한 성인키에 도달할 수 있는 아동에 대한 과잉치료 위험을 신중히 고려해야 한다고 명시했다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자 결론은 GnRHa에 GH를 병용하면 골성숙을 가속하지 않으면서 예측성인키(+4.27cm)·키증가량(+3.45cm)·성장속도(+1.40cm/년) 등 중간 성장지표는 유의하게 개선되나, 이 단기 이득이 최종 성인키 개선(+0.14cm, p=0.88)으로는 일관되게 전환되지 않으므로 신중한 해석과 개별화된 치료 결정이 필요하다는 것이다. 한계로는 9편 중 RCT가 1편뿐이고 다수가 후향적·환자대조군이어서 편향 위험이 크며, 최종키(I²=81%)·키증가량(I²=80%)의 이질성이 높고, 연령층화(&lt;10 vs ≥10세)·GH 투여 시점·고위험 하위군 분석에 필요한 데이터가 부족했다는 점이 지적된다. 엘리가드(류프로라이드)/엔잘루타(엔잘루타미드) 관점에서, 본 결과는 CPP 여아의 류프로라이드 GnRHa 치료에서 GH 병용을 일률적으로 권하기보다 baseline PAH가 낮거나 단독요법 중 성장속도가 부진한 선별 환자에 한정해 고려해야 함을 시사한다.</div>
                     </div>
@@ -491,6 +602,26 @@ PROM·48주 장기 인지추적은 분석 진행 중.</div>
                             <li>최종 성인키 WMD +0.14cm (95%CI –1.66~1.94, p=0.88, I²=81%, 차이없음)</li>
                             <li>성장속도 WMD +1.40cm/년 (95%CI 0.90~1.91, p&lt;0.0001) · 골성숙 ΔBA/ΔCA +0.01 (p=0.77, 가속없음)</li>
                         </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 성조숙증 여아: GnRHa+GH 병용 — 예측키·성장속도 이득</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart7"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart7"), {
+                            type: "bar",
+                            data: { labels: ["예측성인키(cm)", "성장속도(cm/년)"], datasets: [
+                              { label: "병용 추가이득", data: [4.27, 1.4], backgroundColor: "#1A5276" },
+                              { label: " ", data: [0, 0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: CPP 여아 GnRHa+GH 병용 메타분석(9편) — PAH +4.27cm 등 중간지표는 개선하나 최종 성인키는 +0.14cm(p=0.88)로 차이 없어, 류프로라이드 치료 시 GH 병용은 선별 환자에 한정 고려</div><ul><li>디테일링 활용: GnRHa(엘리가드/류프로라이드) 단독으로도 골성숙 가속 없이(ΔBA/ΔCA 차이 p=0.77) 사춘기 억제가 가능하며, GH 추가의 최종키 이득이 입증되지 않았으므로 비용·장기주사 부담을 근거로 무분별한 병용 권유에 대한 균형 잡힌 응대 가능</li><li>타깃팅 활용: baseline PAH가 낮거나 GnRHa 단독요법 중 성장속도가 부진한 고위험 여아에 한해 GH 병용을 논의하는 개별화 접근 — 소아내분비 처방 상담 시 근거 기반 환자 선별 메시지로 활용</li></ul>
                     </div>
                 </div>
             </div>
@@ -509,19 +640,19 @@ PROM·48주 장기 인지추적은 분석 진행 중.</div>
                     <div><a href="https://www.urotoday.com/conference-highlights/asco-2026/asco-2026-prostate-cancer/169495" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">Phase 3 RCT</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">고위험 국소·국소진행성 전립선암은 근치적 전립선절제술(RP) 후에도 절반 이상이 재발하며, 전이가 발생하면 전이 시점부터 사망까지 중앙값 3~5년으로 예후가 급격히 나빠진다. 그러나 수십 년간 RP 전후로 시행한 수술전후(perioperative) 전신요법은 임상적으로 의미 있는 결과 개선에 모두 실패해 왔고, 이 환자군에서 표준치료는 사실상 수술 단독이었다. 차세대 안드로겐수용체 억제제 아팔루타미드(ERLEADA)는 전이성 거세민감성/비전이성 거세저항성 전립선암에서 입증된 효능을 바탕으로, 수술 전후 국소 고위험 환자에 적용 시 미세전이를 조기에 박멸해 전이·사망을 줄일 수 있다는 가설하에 PROTEUS가 설계되었다. 본 연구는 이 환자군에서 전신요법이 전이무진행생존을 개선함을 입증한 최초의 무작위 3상이라는 점에서 패러다임 전환적 의미를 갖는다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">국제 다기관(18개국 118개 기관) 무작위·이중맹검·위약대조 3상. 신규 진단된 고위험 국소 또는 국소진행성 전립선암 환자 총 2,109명을 1:1 무작위 배정(병용군 vs 위약군). 대상자 특성은 Gleason 8~10이 95% 초과, 기저 PSA&gt;20 ng/mL 약 40%, ≥cT3 35%, 통상영상상 림프절 침범 12%, 중앙연령 66세. 중재(병용군): 아팔루타미드 240mg/일 + ADT(LHRH 작용제/길항제 또는 AR 차단제). 수술전(neoadjuvant) 6개월 투여 후 2주 휴약하고 RP 시행, 수술 후 4주 휴약 후 수술후(adjuvant) 6개월 추가 투여(필요 시 보조/구제 방사선요법 허용). 위약군은 동일 ADT에 위약을 동일 일정으로 투여. 이중 1차 평가변수: 병리학적 완전관해/최소잔존질환(pCR/MRD, ≤ypT2이며 잔존종양 ≤5mm·림프절 음성)과 전이무진행생존(MFS, 맹검 독립중앙평가). 2차변수: 무사건생존(EFS), 후속치료까지의 시간, 원격전이, 전체생존. 추적 중앙값 61.7개월.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">두 1차 평가변수 모두 충족.<br/>
 (1) pCR/MRD: 병용군 8.9% vs 위약군 1.0%(약 9배), 오즈비 10.17(95%CI 5.27~19.64; p&lt;0.0001), 반응자의 50% 초과가 완전관해.<br/>
@@ -534,11 +665,11 @@ PROM·48주 장기 인지추적은 분석 진행 중.</div>
 후속 전신요법 시행률 26.7% vs 36.4%, 수술후 방사선요법 13.0% vs 18.4%.<br/>
 전체생존은 본 분석에서 미보고.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">전반적으로 관리 가능한 안전성. Grade 3~4 치료관련 이상반응 병용군 27.5% vs 위약군 18.9%, Grade 3~4 치료응급 이상반응 39.6% vs 31.0%. 치료응급 이상반응으로 인한 중단율 7.4% vs 2.7%. 아팔루타미드 특징적 이상반응인 피부발진은 전등급 33.0% vs 15.3%, Grade 3 이상 5.9% vs 0.3%였으나 관리 알고리즘으로 대부분 투여 지속 가능. 치료관련 사망 0.7% vs 0.1%로 병용군에서 다소 높았으나, 선별·수술 1개월 전 심혈관 위험평가를 의무화한 프로토콜 개정 이후 양군 모두 추가 치료관련 사망 없음. 용량 감량·중단은 드물었고 예상치 못한 새로운 안전성 신호는 없었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자(Taplin 등)는 수술전후 아팔루타미드+ADT 병용이 고위험 국소 전립선암의 새로운 표준치료가 될 수 있다고 결론지었다 — 수술 시점 잔존암이 거의 없을 확률이 약 9배 높고, 전이·사망 위험을 20% 낮췄으며, 후속치료를 약 3년 지연시켰다. 한계로는 전체생존 데이터가 미성숙(미보고)하고, 통상영상 단독 MFS는 통계적 유의성에 미달(HR 0.84, p=0.15)했으며, 추적이 61.7개월로 장기 내구성·삶의질 결과는 후속 분석이 필요하다. 엘리가드(류프로라이드)/엔잘루타(엔잘루타미드) 관점에서, PROTEUS는 ADT 백본(엘리가드 등 LHRH 작용제) 위에 강력한 AR 표적억제제를 수술전후로 얹는 전략의 임상가치를 입증한 것으로, 동일 계열 AR 차단제인 엔잘루타미드의 국소 고위험 영역 확장 근거와 ADT 병용의 표준화를 뒷받침하는 디테일링 포인트가 된다.</div>
                     </div>
@@ -549,6 +680,10 @@ PROM·48주 장기 인지추적은 분석 진행 중.</div>
                             <li>pCR/MRD 8.9% vs 1.0%, 오즈비 10.17 (95%CI 5.27~19.64), p&lt;0.0001</li>
                             <li>EFS 중앙값 57.1 vs 38.4개월, HR 0.71, p&lt;0.0001</li>
                         </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: PROTEUS 3상 — 수술전후 아팔루타미드+ADT가 고위험 국소 전립선암에서 5년 MFS 78.2% vs 73.5%(HR 0.80), pCR/MRD 9배 개선으로 ADT 백본 위 AR표적 병용 전략의 첫 무작위 입증 → 엘리가드 ADT 병용 표준화·엔잘루타 국소 확장 근거</div><ul><li>ADT 백본(엘리가드 등 LHRH 작용제)에 강력 AR 억제제를 더하는 전략이 전이·사망을 줄인다는 근거로, 고위험 국소 환자에서 ADT 단독 대비 병용요법 가치를 디테일링</li><li>동일 계열 AR 차단제 엔잘루타미드(엔잘루타)의 국소 고위험·수술전후 영역 확장 가능성과 후속치료 약 3년 지연(74.2 vs 41.5개월) 같은 환자 부담 경감 메시지로 활용</li></ul>
                     </div>
                 </div>
             </div>
