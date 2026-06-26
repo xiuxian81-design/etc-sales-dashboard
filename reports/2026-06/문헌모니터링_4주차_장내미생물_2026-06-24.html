@@ -10,7 +10,7 @@
 body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; font-size: 15px; line-height: 1.7; color: #1a1a2e; background: #f0f2f5; }
 .container { max-width: 820px; margin: 0 auto; padding: 24px 16px; }
 .report-header { background: linear-gradient(135deg,#003366 0%,#1a5276 100%); color: #fff; border-radius: 14px; padding: 28px 32px; margin-bottom: 24px; }
-.report-header .badge { display: inline-block; background: #E87722; color: #fff; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+.report-header .badge { display: inline-block; background: #1A5276; color: #fff; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
 .report-header h1 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
 .report-header .meta { font-size: 13px; color: rgba(255,255,255,0.75); display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
 .stat-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
@@ -43,7 +43,7 @@ body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; font-size:
 .s-val em { background: #fff3cd; padding: 0 4px; border-radius: 3px; font-style: normal; font-weight: bold; color: #664d03; }
 .key-nums { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
 .knum { background: #003366; color: #fff; border-radius: 10px; padding: 12px 16px; flex: 1; min-width: 140px; text-align: center; }
-.knum .val { font-size: 22px; font-weight: 900; color: #E87722; display: block; }
+.knum .val { font-size: 22px; font-weight: 900; color: #1A5276; display: block; }
 .knum .desc { font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 2px; line-height: 1.4; }
 .knum .pval { font-size: 10px; color: #aed6f1; margin-top: 3px; }
 .viz-section { border: 2px solid #e8eaf0; border-radius: 10px; padding: 16px; margin-bottom: 14px; }
@@ -51,8 +51,8 @@ body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; font-size:
 .viz-subtitle { font-size: 12px; color: #888; margin-bottom: 14px; }
 .chart-wrap { position: relative; height: 200px; }
 .paywall-notice { background: #fdf2f8; border: 1px solid #d7bde2; border-radius: 8px; padding: 14px 18px; font-size: 13px; color: #7d3c98; }
-.usage { background: linear-gradient(135deg,#fff8f0,#fff3e0); border-left: 4px solid #E87722; border-radius: 0 10px 10px 0; padding: 14px 18px; font-size: 13.5px; line-height: 1.8; }
-.usage h4 { font-size: 12px; color: #E87722; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+.usage { background: linear-gradient(135deg,#fff8f0,#fff3e0); border-left: 4px solid #1A5276; border-radius: 0 10px 10px 0; padding: 14px 18px; font-size: 13.5px; line-height: 1.8; }
+.usage h4 { font-size: 12px; color: #1A5276; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
 .usage ul { margin-left: 16px; }
 .usage li { margin-bottom: 4px; }
 .legend { background: #fff; border-radius: 10px; padding: 18px 22px; margin-top: 8px; border: 1px solid #e8eaf0; font-size: 13px; }
@@ -60,6 +60,17 @@ body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; font-size:
 .legend-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
 .legend-row span { padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
   </style>
+
+<style>
+.bd-request-btn{background:#1A5276;color:#fff;border:none;padding:5px 12px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;margin-left:auto}
+.bd-request-btn:hover{background:#14405e}.bd-request-btn:disabled{background:#95a5a6;cursor:not-allowed}
+.paper-meta{align-items:center}
+.evidence-ref{background-color:#7f8c9b !important}
+.importance-mid{background-color:#2E6DA0 !important}.importance-low{background-color:#95a5a6 !important}
+.key-numbers h4{margin:0 0 8px;color:#003366;font-size:14px}
+.content-section-text strong{color:#1A5276}
+</style>
+
 </head>
 <body>
 <div class="container">
@@ -103,617 +114,439 @@ body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; font-size:
   </div>
 
     <!-- ━━━ 논문 #1 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #1</span>
-      <span class="stars-high">★★★</span>
-      <span class="tag-ref">참고근거</span>
-      <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex: 1;">Cell Reports Medicine | 2025-07-08</div>
-      <button class="bd-request-btn" data-title="Perioperative administration of CBM588 in colorectal cancer radical surgery: A single-center, randomized controlled trial" data-session="장내미생물" data-num="1" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Perioperative administration of CBM588 in colorectal cancer radical surgery: A single-center, randomized controlled trial</p>
-      <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12281423/" class="paper-url" target="_blank">https://pmc.ncbi.nlm.nih.gov/articles/PMC12281423/</a>
-      <span class="design-badge">Phase 4 RCT</span>
+        <div class="papers">
 
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">C. butyricum CBM588(MIYAIRI 588)은 낙산 생성 프로바이오틱스로 위장관 질환에 활용되어 왔으나, 대장암 수술 주변기(perioperative) 보조요법으로서의 역할은 제한적으로 연구되었다. 수술 후 감염합병증은 입원기간 연장과 예후 악화의 주요 원인이다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">대장암 근치적 수술 환자를 대상으로 수술 전후 CBM588 투여군과 대조군으로 무작위 배정. 1차 평가지표는 수술 후 장기능 회복(첫 방귀, 배변, 유동식 시점), 2차 평가지표는 감염성 합병증 발생률 및 면역 상태(CD3+, CD4+, CD8+ T세포, B세포).</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">CBM588 투여군에서 장기능 회복이 유의하게 빠르고, 감염성 합병증 발생률이 유의하게 낮았으며, 순환 T세포 수가 유의하게 증가하여 전신 면역 강화가 확인되었다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">CBM588는 대장암 수술 환자에서 우수한 내약성을 보였으며, CBM588 관련 중대 이상반응 없음.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">CBM588의 수술 전후 투여는 장기능 회복 촉진, 감염합병증 감소, 전신면역 강화에 유의한 이점을 제공. 단일기관 오픈라벨 설계가 한계. 바이오탑(C. butyricum) 수술 전후 병용 근거로 외과 타겟 학술자료에 활용 가능하나 CBM588 균주이므로 참고근거.</div>
-        </div>
-      </div>
+            <!-- ━━━ 논문 #1 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Perioperative administration of CBM588 in colorectal cancer radical surgery: A single-center, randomized controlled trial</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Cell Reports Medicine</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-07-08</div>
+                        <button class="bd-request-btn" data-title="Perioperative administration of CBM588 in colorectal cancer radical surgery: A single-center, randomized controlled trial" data-session="장내미생물" data-num="1" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12281423/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">Phase 4 RCT</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">대장암(CRC)은 전 세계 암 발생·사망의 주요 원인으로, 근치적 외과절제술이 현재까지도 핵심 치료전략이다. 그러나 수술 환자는 복부 팽만·변비·장연동 이상·수술 후 감염 등 다양한 합병증을 겪으며, 장기능 회복 지연과 감염성 합병증은 재원기간 연장·예후 악화로 이어진다. 최근 체계적 문헌고찰에서 프로바이오틱 보충이 CRC 수술 환자의 감염성 합병증 위험을 낮춘다는 신호가 있었으나, 대부분 여러 균주를 혼합한 중재여서 근거가 견고하지 못했다. CBM588(Clostridium butyricum MIYAIRI 588)은 만성 장질환 임상에서 효능·안전성이 입증된 단일 부티르산 생성균으로, 부티르산을 통한 면역조절 기전이 기대되어 단일균주 RCT로 수술 전후 효과를 검증할 미충족 수요가 컸다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">단일기관·공개라벨·평행군 무작위배정 Phase 4 RCT(ChiCTR2000033883). 471명 스크리닝 후 420명을 무작위배정, 최종 분석 400명(CBM588군 200명, 대조군 200명). 대상: 18~80세, 병리학적으로 확인된 대장 선암(adenocarcinoma)으로 근치적 수술(복강경/개복) 예정, 충분한 장기기능(호중구 ≥1.5×10⁹/L, 혈소판 ≥100×10⁹/L, 총빌리루빈 ≤1.5×ULN). 제외: 비선암 조직형·최근 프로바이오틱 사용·급만성 감염·장폐색·전이·간신기능 이상 등. 중재: CBM588 정(정당 C. butyricum 20mg)을 1회 40mg(2정) 1일 3회=120mg/일, 수술 5일 전부터 수술 후 7일까지(수술일 제외) 투여. 비교군: CBM588 비투여 대조군(타 프로바이오틱 금지). 1차변수: 수술 후 장기능 회복(첫 방귀·배변 회복·유동식 및 반유동식 첫 섭취 시간). 2차변수: 수술 후 합병증 발생률, 면역상태(T세포·사이토카인). 추적: 퇴원 시점까지, 수술 후 72시간 평가 포함.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">1차변수(장기능 회복, 전체): 첫 방귀 CBM588 2.41±0.65일 vs 대조 2.65±0.87일(p=0.012), 유동식 첫 섭취 2.56±0.71 vs 2.83±1.10일(p=0.016), 반유동식 첫 섭취 7.04±1.14 vs 7.38±1.37일(p=0.007)로 CBM588군이 모두 유의하게 빨랐다.<br/>
+장루(enterostomy) 없는 환자에서도 첫 방귀 2.63 vs 2.82일(p=0.016) 등 일관.<br/>
+단, 배변 회복은 4.16 vs 4.28일(p=0.496)로 차이 없음.<br/>
+2차변수(합병증): 전체 합병증 CBM588 31/200(15.5%) vs 대조 49/200(24.5%), p=0.024(χ²=5.063, 상대위험 약 0.63).<br/>
+복강내 감염 8.5%(17명) vs 16.0%(32명), p=0.022, 설사 1.5%(3명) vs 5.0%(10명), p=0.048로 유의 감소.<br/>
+호흡기감염 1.5% vs 4.0%(p=0.126), 장폐색 7.0% vs 11.0%(p=0.162), 문합부 누출 3.0% vs 4.0%(p=0.586)는 수치상 낮으나 비유의.<br/>
+항생제 사용기간 1.38±1.08 vs 1.81±1.88일(p&lt;0.001)로 유의 단축, 재원기간 6.68±2.07 vs 6.98±2.85일(p=0.232)은 비유의.<br/>
+면역(수술 후 72h): CD3+ T세포(p=0.0024)·CD3+CD8+(p=0.0006)·CD3+CD4+(p=0.0245)·NK세포(p=0.0458)가 CBM588군에서 유의하게 높았고, IL-4도 더 높았으며(p=0.0252), 조절 T세포(Treg)는 상대적으로 낮았다.<br/>
+(균총·SCFA 정량 데이터는 본문에 미보고).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">치료 관련 이상반응(treatment-related adverse events)은 보고되지 않았으며, 수술 전후 간 합성·대사기능 및 생화학·혈장 전해질을 면밀히 모니터링했으나 부작용 신호가 없었다. 중도탈락: CBM588군 7명(복약 비순응 4명·채혈 거부 3명), 대조군 6명(타 프로바이오틱 복용 2명·채혈 거부 4명)으로 약물 독성에 의한 중단은 없었다. 추가로 수술 취소 CBM588 4명·대조 3명. 저자는 CBM588을 &#x27;근치 수술을 받는 CRC 환자에서 우호적 내약성을 가진 유망한 프로바이오틱&#x27;으로 결론지었다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자는 수술 전후 CBM588 투여가 장기능 회복을 유의하게 촉진하고 감염성 합병증(특히 복강내 감염) 위험을 낮추며 순환 T세포 증가를 통해 전신 면역을 강화한다고 결론지었다. 한계는 단일기관·공개라벨로 위약대조·맹검이 없어 환자특성·치료패턴 영향에 취약하고, 기전 규명(국소 점막·종양조직 분석)과 장기 임상결과(생존·재발)가 결여되어 있어 대규모 다기관 연구가 필요하다는 점이다. 바이오탑(C. butyricum) 관점에서, 이 RCT는 동일 균주 단일 프로바이오틱이 대장암 수술 환자의 빠른 장기능 회복·감염 감소·면역 강화라는 3중 임상 이점을 무작위 대조로 입증한 근거로, 수술 전후 장관리·감염 예방 디테일링에 직접 활용 가능하다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>전체 합병증 CBM588 15.5% vs 대조 24.5%, p=0.024 (상대위험 ≈0.63)</li>
+                            <li>복강내 감염 8.5% vs 16.0%, p=0.022</li>
+                            <li>첫 방귀 2.41 vs 2.65일(p=0.012), 항생제 사용 1.38 vs 1.81일(p&lt;0.001)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-      <div class="key-nums">
-        <div class="knum">
-          <div class="val">첫 방귀 시간 단축 (p&lt;0.05)</div>
-          <div class="desc">CBM588군 vs 대조군 장기능 회복 속도</div>
-          <div class="pval">p&lt;0.05</div>
-        </div>
-        <div class="knum">
-          <div class="val">감염합병증 발생률 유의 감소</div>
-          <div class="desc">수술 후 감염성 합병증 CBM588군 유의 저하</div>
-          <div class="pval">p&lt;0.05</div>
-        </div>
-        <div class="knum">
-          <div class="val">CD3+/CD4+ T세포 유의 증가(p&lt;0.05)</div>
-          <div class="desc">순환 면역세포 수 증가로 전신 면역 강화</div>
-          <div class="pval">p&lt;0.05</div>
-        </div>
-      </div>
+            <!-- ━━━ 논문 #2 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">First results of a dose-escalation study evaluating Clostridium butyricum MIYAIRI 588 (CBM588) with nivolumab/ipilimumab (nivo/ipi) in metastatic renal cell carcinoma (mRCC)</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Journal of Clinical Oncology (ASCO GU 2026 Abstract 503)</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-02-01</div>
+                        <button class="bd-request-btn" data-title="First results of a dose-escalation study evaluating Clostridium butyricum MIYAIRI 588 (CBM588) with nivolumab/ipilimumab (nivo/ipi) in metastatic renal cell carcinoma (mRCC)" data-session="장내미생물" data-num="2" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://ascopubs.org/doi/10.1200/JCO.2026.44.7_suppl.503" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">Phase 1 용량 탐색</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">전이성 신세포암(mRCC)에서 니볼루맙+이필리무맙(nivo/ipi) 이중 면역관문억제제는 1차 표준요법이지만, CheckMate-214에서 반응률이 약 42~46%에 그쳐 절반 이상의 환자가 반응하지 못하고 약 20%는 즉시 진행하는 한계가 있다. 장내미생물이 면역관문억제제(CPI) 반응을 좌우한다는 다수 연구가 축적되었고, 특히 Bifidobacterium 같은 균종이 반응률·무진행생존(PFS)과 연관됨이 밝혀졌다. C. butyricum MIYAIRI 588(CBM588)은 부티르산을 생성하는 혐기성 포자형성균으로 bifidogenic 효과(Bifidobacterium 증식 유도)를 통해 CPI 효과를 증강할 잠재력이 있으며, 선행 무작위 1상에서 nivo/ipi에 CBM588 추가 시 PFS 12.7개월 대 2.5개월(HR 0.15), 반응률 58% 대 20%로 극적 개선을 시사했다. 다만 선행 연구는 단일 용량(80mg 1일 2회)만 사용했고 최적 용량이 미정이라, 본 연구는 더 큰 3상(SWOG S2419, BioFront)을 앞두고 CBM588의 안전한 최대 용량과 용량-미생물군 관계를 규명하고자 설계되었다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">단일기관(City of Hope) 1상 용량탐색 연구로 표준 3+3 용량증량 설계를 적용했다. 치료 경험이 없는(treatment-naive) mRCC 환자 총 12명을 등록해 CBM588을 3개 용량단계(4×10⁸ CFU, 1.2×10⁹ CFU, 4×10⁹ CFU)로 1일 2회 경구 투여했다(코호트별 3+3 배정). 중재는 CBM588을 nivo/ipi 표준 스케줄(선행 연구 기준 니볼루맙 3mg/kg + 이필리무맙 1mg/kg 3주 간격 4회 후 니볼루맙 유지)과 병용하는 형태다. 1차 평가변수는 안전성·내약성과 용량제한독성(DLT)에 근거한 권장 3상 용량 결정이었고, 2차 평가변수는 장내미생물 조성 변화(특히 Bifidobacterium), 면역경로 조절, 전신 대사체(metabolome) 변화, 그리고 객관적반응률(ORR)·PFS 등 임상결과였다. 추적 기간 및 세부 코호트별 N은 초록 수준에서 완전히 공개되지 않았으나, 최고 용량단계(MO-03)까지 증량이 완료되었다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">CBM588은 최고 용량단계(4×10⁹ CFU 1일 2회, MO-03)를 포함한 모든 용량단계에서 용량제한독성(DLT)이 0건으로 관찰되지 않았으며, 용량 증량에 따른 면역관련 독성의 용량의존적 증가도 없었다.<br/>
+효능 측면에서, 평가 가능한 11명 중 3명이 반응자(객관적 반응 ORR 약 27%; 완전관해 CR 1명, 부분관해 PR 2명), 6명이 안정병변(SD), 2명이 진행병변(PD)으로, 질병조절률(DCR)은 약 82%(9/11)였다.<br/>
+일부 보고에서는 12명 기준 4명 객관적 반응(CR 1명 포함)·7명 SD·1명 PD로 집계되어, 소규모 1상임에도 1차 면역병용요법에 부합하는 활성 신호를 보였다.<br/>
+이 안전성 결과는 선행 무작위 1상(nivo/ipi+CBM588 PFS 12.7 vs 2.5개월, HR 0.15, 95% CI 0.05–0.47, p&lt;0.001; ORR 58% vs 20%, p=0.06)의 임상적 이점을 더 높은 용량에서도 안전하게 추구할 수 있는 근거를 제공했다.<br/>
+용량-연관 미생물군(Bifidobacterium) 조성 차이에 대한 상세 correlative 분석은 더 큰 코호트에서 추가 예정이다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">본 1상에서 CBM588은 전 용량단계에서 DLT가 없어 매우 우호적인 내약성을 보였다. 다만 nivo/ipi 병용 자체의 면역관련 독성으로 12명 중 9명이 grade 3 이상 이상반응을 경험했으며, 대표적으로 급성 신손상(acute kidney injury)과 간효소 상승(elevated liver enzymes, 면역관련 간염)이 보고되었다 — 이는 CBM588 증량과 무관하게 nivo/ipi 이중차단의 알려진 면역독성 스펙트럼과 일치한다. 선행 무작위 1상에서도 grade 3/4 치료관련 이상반응이 nivo/ipi+CBM588군 52% 대 nivo/ipi군 50%로 양군 유사했고(피로·발진·부신기능저하·고혈당·설사 등), CBM588 추가가 독성을 증가시키지 않았다. 선행 연구에서 치료중단은 각 군 1명씩(대조군 grade 4 면역성 대장염, CBM588군 grade 3 면역성 간염)으로 코르티코스테로이드로 완전 회복했고 치료관련 사망은 없었다. 종합하면 CBM588은 nivo/ipi의 독성 프로파일에 추가 부담을 주지 않는다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 CBM588이 최고 용량(4×10⁹ CFU 1일 2회)에서도 nivo/ipi와 병용 시 DLT 없이 안전하게 투여 가능하며, 이 용량전략이 2026년 4월 1일 개시 예정인 3상 SWOG S2419(BioFront)—종양학 최초의 미생물군 기반 치료 무작위 피벗 시험—를 뒷받침한다고 결론지었다. 한계는 단일기관·12명의 매우 작은 표본, 1상 용량탐색 특성상 효능 종결점의 통계적 검정력 부재, 용량별 코호트 N과 추적 기간 등 세부 수치가 학회 초록 수준이라는 점이다. 바이오탑(C. butyricum) 관점의 임상 함의: 본 연구는 바이오탑의 활성성분과 동일 계열인 C. butyricum(CBM588)이 고용량에서도 안전하며 글로벌 표준 면역항암요법과 병용해 장내미생물 조절로 항암 효과를 증강할 수 있는 약물로 임상시험에서 전향적으로 입증되고 있음을 보여주는 강력한 근거로, 바이오탑의 &#x27;면역·장내환경 조절을 통한 동반요법&#x27; 가치를 학술적으로 뒷받침한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>DLT 0건 (4×10⁹ CFU 최고용량 포함 전 용량단계), grade 3+ AE 9/12명</li>
+                            <li>평가가능 11명: 반응자 3명(CR 1·PR 2, ORR 약 27%)·SD 6·PD 2, DCR 약 82%</li>
+                            <li>선행 무작위 1상 배경: PFS 12.7 vs 2.5개월(HR 0.15, 95%CI 0.05–0.47, p&lt;0.001), ORR 58% vs 20%(p=0.06)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">CBM588 Perioperative RCT</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_1_658"></canvas>
-        </div>
-      </div>
+            <!-- ━━━ 논문 #3 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Management of symptomatic uncomplicated diverticular disease (SUDD) of the colon with Clostridium butyricum CBM588 versus rifaximin: a retrospective cross-sectional study</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> International Journal of Colorectal Disease</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-10-01</div>
+                        <button class="bd-request-btn" data-title="Management of symptomatic uncomplicated diverticular disease (SUDD) of the colon with Clostridium butyricum CBM588 versus rifaximin: a retrospective cross-sectional study" data-session="장내미생물" data-num="3" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://link.springer.com/article/10.1007/s00384-025-05005-6" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">후향적 단면연구</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">증상성 비합병증 게실질환(SUDD)은 대장 게실 보유자의 약 10~25%에서 복통·팽만·배변이상 등 증상을 유발하며, 반복적 급성 게실염으로 진행할 수 있어 증상 완화와 게실염 예방이 치료 목표다. 현재 표준은 비흡수성 항생제 리팍시민의 순환요법이나, 장기 항생제 사용에 따른 내성·비용·내약성 부담이 있다. 부티르산은 대장세포의 주 에너지원이자 장벽·항염 기능에 핵심이어서, 부티르산 생성균인 C. butyricum(CBM588)이 IBS에서 보인 증상 개선 반응처럼 SUDD에서도 항생제를 대체할 수 있는지 검증이 필요했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">이탈리아 단일기관 후향적 단면연구. 2023~2024년 SUDD 환자 70명을 등록해 56명이 12개월 추적을 완료(A군 CBM588 31명, B군 리팍시민 25명). 포함기준은 18세 이상·영상으로 확인된 게실증·경중등도 급성 게실염 1회 이상 병력이며, 염증성장질환·복부수술력·4주 내 항생제/프로바이오틱 사용자는 제외했다. A군은 CBM588(정당 ≥4.5×10^5 CFU, 1일 3정)을 1개월간 매일 투여 후 11개월간 월 14일씩 복용+식이섬유, B군은 리팍시민 400mg을 1일 2회 매월 7~10일 12개월간+식이섬유로 투여했다. 평가변수는 증상 재발(flare)률, 적절한 증상 완화 도달률, 복통 빈도, 급성 게실염 발생이다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">증상 재발률은 A군(CBM588) 19.4% vs B군(리팍시민) 20%(p=0.7)로 양군 동등했고, 급성 게실염 발생은 양군 모두 0건이었다.<br/>
+그러나 &#x27;적절한 증상 완화&#x27; 도달률은 CBM588 77.4% vs 리팍시민 44%(p=0.02)로 CBM588이 유의하게 우월했다.<br/>
+복통이 주 1회 미만으로 감소한 비율은 74.2% vs 36%(p&lt;0.05), 복통이 전혀 없다고 보고한 비율은 48.4% vs 20%(p&lt;0.05)로 모두 CBM588군에서 유의하게 높았다.<br/>
+팽만·후중감 개선은 19.3% vs 8%로 CBM588이 수치상 우세했으나 통계적 유의성에는 도달하지 못했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">양군 모두 치료 관련 이상반응이 한 건도 보고되지 않아, 12개월 장기 투여에서 CBM588과 리팍시민 모두 우호적 내약성을 보였다. 다만 본 연구는 후향적 설계로 이상반응의 체계적 능동 수집에는 한계가 있어, 안전성 신호는 전향적 연구로 재확인이 필요하다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">CBM588은 SUDD에서 급성 게실염 예방·재발 억제 측면에서 리팍시민과 동등하면서, 주관적 증상 완화(복통 감소·완화 도달률)에서는 오히려 우월한 결과를 보였다. 한계는 후향적·비무작위·단일기관·소표본(완료 56명)으로 선택편향 가능성이 있어 전향적 RCT 검증이 필요하다는 점이다. 바이오탑(C. butyricum) 관점에서, 이 연구는 동일 균주가 표준 항생제(리팍시민)를 장기 항생제 부담 없이 대체하면서 증상 개선은 더 우수할 수 있음을 보여, 게실질환·기능성 장질환에서 바이오탑의 &#x27;항생제 대안&#x27; 처방 명분을 강화한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>증상 재발 19.4% vs 리팍시민 20%(p=0.7, 동등)</li>
+                            <li>적절한 증상 완화 77.4% vs 44%(p=0.02)</li>
+                            <li>복통 주1회 미만 74.2% vs 36%(p&lt;0.05)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
-          <li>🎯 대장암 수술 전후 프로바이오틱스 보조요법 근거 — 외과/대장항문외과 KOL 심포지엄 소재</li>
-          <li>감염합병증 감소 + 면역강화 이중 이점 메시지로 외과 타겟 디테일링에 활용</li>
-          <li>CBM588 균주(참고근거)이나 C. butyricum 종 수준 perioperative 효과 뒷받침하는 고수준 RCT</li>
-        </ul>
-      </div>
-    </div>
-  </div>
+            <!-- ━━━ 논문 #4 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Irritable Bowel Syndrome with Diarrhea (IBS-D): Effects of Clostridium butyricum CBM588 Probiotic on Gastrointestinal Symptoms, Quality of Life, and Gut Microbiota in a Prospective Real-Life Interventional Study</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Microorganisms</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-05-13</div>
+                        <button class="bd-request-btn" data-title="Irritable Bowel Syndrome with Diarrhea (IBS-D): Effects of Clostridium butyricum CBM588 Probiotic on Gastrointestinal Symptoms, Quality of Life, and Gut Microbiota in a Prospective Real-Life Interventional Study" data-session="장내미생물" data-num="4" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://www.mdpi.com/2076-2607/13/5/1139" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">전향적 개방형 중재연구</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">과민성대장증후군(IBS)은 산업화 국가 인구의 약 4.4~4.8%가 앓는 가장 흔한 위장관 질환으로, 복통과 배변장애·배변습관 변화가 사회생활과 삶의 질(QoL)을 심각하게 훼손한다. 그중 설사형(IBS-D)은 장내미생물 측면에서 부티르산(butyrate) 생산균과 α-생물다양성이 모두 감소한 특징을 보이는데, 부티르산은 대장세포의 에너지원이자 장벽 무결성 유지·항염증·항암 경로 조절에 핵심 역할을 한다. 특히 대장 내 부티르산 감소는 나트륨·수분 재흡수 능력을 떨어뜨려 설사를 직접 유발하므로, 부티르산 생산균을 보충해 장내미생물을 조절하는 전략이 치료적 의미를 가진다. C. butyricum은 50년 이상 안전하게 사용된 부티르산 생산 공생균으로 중국 IBS-D 환자에서 증상·QoL·배변빈도를 유의하게 개선한 바 있으나, 유럽(백인) 코호트에서 유럽 내 유일한 의료용 부티르산 생산 프로바이오틱인 CBM588의 효과를 실생활(real-life) 조건에서 검증한 데이터가 없었던 것이 본 연구의 배경이다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">이탈리아 페라라 Quisisana Nursing Home Hospital 단일기관에서 수행된 전향적·단일군·개방형(open-label)·실용적(pragmatic) 중재연구다. 총 205명의 IBS-D 환자(Rome IV 기준 진단, 18세 이상, 양성·악성 기질질환·전신질환·최근 4주 내 항생제/프로바이오틱/하제 사용 등은 제외; 유당 내포 정제이므로 유당불내성자 제외)를 등록했다. 중재는 단일균주 제품 Butirrisan(CBM588 함유, 1일 3정을 아침식사 중/직후 복용, 8주간)이며, 라벨상 정당 4.5×10^5 CFU 이상이나 실측 함량은 1.5×10^9 CFU 수준이었다; 전원에게 저섬유·저잔류 식이를 병행 지시했다. 1차 평가변수는 IBS 증상중증도(IBS-SSS, 0~500점), 배변 일관성(Bristol Stool Scale), 배변빈도·설사횟수, 복통(중증도·빈도), 복부팽만, 배변불만족, QoL(IBS-QoL 34문항, 0~100), 안전성·내약성(0~10 표준화 척도)으로 기저치와 8주 시점에 측정했다. 2차 평가변수는 무작위 선정된 19명 하위군의 대변 16S rRNA 분석을 통한 장내미생물(α-다양성·부티르산 생산균) 변화다. 단일군 설계의 해석을 보완하기 위해, 직전 분기에 같은 병원에서 트리메부틴 말레이트(150mg q8~12h)+저유당·저섬유·저잔류 식이+시판 프로바이오틱(Dicoflor·Enterolactis plus·VSL3 등)으로 치료받은 동일 임상특성의 후향적 IBS-D 코호트 200명과 비교했다. 통계는 Wilcoxon Signed-Rank(전후), PCA(다중비교 보정), PLSR(미생물-임상 상관), Mann-Whitney U(군간)를 사용했고 유의수준 95%, 추적기간은 8주(세척기간·장기추적 없음)다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">205명(평균연령 46.39±16.76세, 체중 68.55±13.32kg, IBS 진단 후 41.5±67.37개월) 전원이 중도탈락 없이 완료했고, 모든 1차 임상지표가 CBM588 8주 치료 후 유의하게 개선되었다(Wilcoxon Signed-Rank, 전후 비교 유의).<br/>
+저자 보고 효과크기는 설사횟수 80% 초과 감소, 배변빈도 약 60% 감소, Bristol Stool Scale 점수 약 30% 개선, 복통 약 60% 감소, 복부팽만 50% 초과 개선, 배변습관 불만족 약 50% 개선, 일상생활 간섭 약 60% 개선, 전반적 IBS 중증도 및 QoL 50% 초과 개선이다.<br/>
+PCA 결과 핵심 임상지표(IBS-SSS·복통·팽만·QoL 간섭·전반 QoL)의 분포가 주성분2(PC2) 축을 따라 기저(T0)와 8주(T8) 사이에 유의하게 이동해 효과의 견고성이 확인되었다.<br/>
+후향적 트리메부틴 코호트(N=200, 평균연령 46.81±6.51세, 진단 후 38.4±6.20개월)와 비교 시 양 군의 임상결과는 매우 유사했고 통계적으로 유의한 차이가 없어, CBM588이 표준 약물치료에 필적하는 반응을 보였다.<br/>
+장내미생물(하위 19명) 분석에서는 α-다양성이 유의하게 증가(p=0.008)하고 문(phylum) 수준의 전반적 조성 이동이 유의했으며(p=0.022), 속(genus) 수준 이동은 유의하지 않았다; 부티르산·아세트산 생산 속의 비유의적 증가 경향이 관찰되었다.<br/>
+PLSR 결과 α-다양성은 대부분의 임상결과(특히 설사횟수·복통중증도)와 유의한 상관을 보였고, 설사횟수·복통중증도·배변불만족이 VIP&gt;1로 다양성 변화의 핵심 동인이었다; 부티르산 생산균 증가는 설사·복통·배변불만족 개선과 양의 상관(VIP에서 3개 taxa가 유의)을 보인 반면 팽만은 오히려 악화(발효 가스 증가 추정)와 연관되었다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">안전성·내약성은 양호했다. 내약성 평균 점수는 0~10 척도에서 8.95±0.88(7~9=양호 구간 상단)로 높게 평가되었고, 중대(severe) 또는 치료관련 이상반응은 보고되지 않았다. 경증 이상반응은 6명에서만 발생했는데, 3명은 첫 주 복부팽만, 3명은 첫 5일 내 복명(borborygmi, 장 꾸르륵거림)을 호소했으며 모두 경미했다. 복약순응도는 평균 95%를 초과해 우수했고, 단 5명만이 깜빡 잊어 누락(2명은 2회, 3명은 1회 누락)했다. 205명 전원이 제안된 치료를 중단하지 않고 연구를 완료해 중단율 0%였다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 CBM588이 저섬유·저잔류 식이를 병행한 IBS-D 환자에서 설사·복통·팽만·배변불만족 등 1차 임상증상을 유의하게 개선하고 α-다양성 및 부티르산 생산균을 증가시키는, 안전하고 내약성이 우수하며 장내미생물을 표적하는 중재라고 결론지었으며, 그 효과는 백인 코호트에서도 중국 연구와 일관됨을 확인했다. 다만 (1)전향적 대조군 부재(후향적 비교만 시행), (2)개방형 설계로 인한 기대편향, (3)8주 단기·세척기간/장기추적 부재, (4)미생물 분석이 19명 소표본·16S rRNA로 종(species) 수준 C. butyricum 정착 미확인, (5)식이 정밀 모니터링 부재 등 한계가 있어 무작위·이중맹검·위약대조 RCT로 효능·최적용량·지속성 확인이 필요하다. 바이오탑(C. butyricum) 관점에서, 본 연구는 비(非)부티르산 생산 균주(Lactobacillus·Bifidobacterium 등)와 차별화되는 &#x27;부티르산 생산&#x27;이라는 고유 기전이 표준약물 트리메부틴에 필적하는 IBS-D 증상 개선과 장내 다양성 회복으로 이어짐을 실생활 근거로 제시해, 설사형 IBS 환자에서 바이오탑의 차별적 처방 명분을 강화한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>설사횟수 &gt;80% 감소·배변빈도 ~60% 감소·복통 ~60% 감소 (CBM588 8주, 전후 유의)</li>
+                            <li>α-다양성 유의 증가 p=0.008, 문 수준 미생물 조성 이동 p=0.022 (하위 19명 16S rRNA)</li>
+                            <li>내약성 8.95±0.88/10, 순응도 &gt;95%, 중대 이상반응 0건, 중단율 0% (N=205)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-    <!-- ━━━ 논문 #2 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #2</span>
-      <span class="stars-high">★★★</span>
-      <span class="tag-ref">참고근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex: 1;">Journal of Clinical Oncology (ASCO GU 2026 Abstract 503) | 2026-02-01</div>
-      <button class="bd-request-btn" data-title="First results of a dose-escalation study evaluating Clostridium butyricum MIYAIRI 588 (CBM588) with nivolumab/ipilimumab (nivo/ipi) in metastatic renal cell carcinoma (mRCC)" data-session="장내미생물" data-num="2" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">First results of a dose-escalation study evaluating Clostridium butyricum MIYAIRI 588 (CBM588) with nivolumab/ipilimumab (nivo/ipi) in metastatic renal cell carcinoma (mRCC)</p>
-      <a href="https://ascopubs.org/doi/10.1200/JCO.2026.44.7_suppl.503" class="paper-url" target="_blank">https://ascopubs.org/doi/10.1200/JCO.2026.44.7_suppl.503</a>
-      <span class="design-badge">Phase 1 용량 탐색</span>
+            <!-- ━━━ 논문 #5 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Saccharomyces boulardii in patients with severe acute pancreatitis: a single center, open-label randomized controlled trial</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Burns &amp; Trauma (Oxford Academic)</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-01-08</div>
+                        <button class="bd-request-btn" data-title="Saccharomyces boulardii in patients with severe acute pancreatitis: a single center, open-label randomized controlled trial" data-session="장내미생물" data-num="5" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://academic.oup.com/burnstrauma/article/doi/10.1093/burnst/tkag006/8427227" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">RCT</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">중증 급성췌장염(SAP)은 급성췌장염 환자의 약 20%에서 발생하며, 지속적 장기부전(38%)과 감염성 췌장괴사(20%)를 동반해 ICU 치료를 요하는 고위험 병태다. 이 환자군에서 원내감염(nosocomial infection)은 가장 흔한 합병증 중 하나로, 광범위 항생제·금식·침습적 처치가 호흡기·장내 정상 세균총을 교란하고 진균(특히 Candida) 과증식을 유발해 예후를 악화시킨다. 그러나 SAP에서 프로바이오틱스 사용 권고는 일관되지 않다 — 미국 ASPEN은 제제·용량별 RCT 결과가 일관되지 않다고 보았고, 유럽 가이드라인은 SAP 환자에 프로바이오틱스를 권고하지 않으며, 과거 대규모 시험(PROPATRIA)에서는 세균성 프로바이오틱스가 오히려 사망 위험 증가와 연관되었다. 이에 본 연구는 세균이 아닌 진균 프로바이오틱스인 Saccharomyces boulardii가 SAP 환자의 호흡기·장내 미생물 불균형을 교정하고 원내감염을 줄이는지를 탐색적으로 검증하고자 했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">단일기관·공개라벨(open-label) 무작위대조시험(RCT). 개정 애틀랜타 분류 기준 SAP 환자(리파아제 정상상한 3배 이상 또는 특징적 상복부 통증+영상소견, 48시간 초과 지속 장기부전 또는 Modified Marshall 점수 ≥2) 54명을 1:1 무작위배정. 제외기준은 임신·수유, 프로바이오틱/진균 과민, 항진균제 병용, 48시간 내 사망 예상, ICU 재실 48시간 미만 예상. 중재군(n=27)은 공장영양관으로 S. boulardii(BIOCODEX) 0.5g을 1일 2회, 15일간 투여하면서 장관영양(EN, 12~25kcal/kg, 단백 1.2~2.0g/kg/일)을 병행했고, 대조군(n=23)은 EN 단독. 대조군 4명은 동의철회 1명·입원후 임신확인 1명·약물알레르기 은폐 2명으로 제외되어 최종 50명 분석. 1차 평가변수는 원내감염(호흡기·장내·혈류)과 진균혈증(fungemia), 2차는 ICU 사망률·28일 사망률·ICU 재실기간·재원기간. 0·1·3·6·9·12·15일에 인두·직장 swab 및 대변을 채취해 16S rRNA 및 ITS 시퀀싱으로 미생물 변화를 분석. 양군 기저특성 차이 없음(연령 47.3±12.0 vs 52.0±13.4세 p=0.196, APACHE-II 중앙값 9 vs 10 p=0.476, 기계환기 2명[7.4%] vs 6명[26.1%] p=0.121).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">1차 평가변수에서 S. boulardii군은 원내감염이 발생하지 않은 반면 대조군은 21.74% 발생 — 중재군 0/27(0%) vs 대조군 5/23(21.74%), 중앙값차 21.74%(95% CI 4.39~41.90), p=0.016으로 유의했다.<br/>
+감염원별로는 호흡기감염이 0/27(0%) vs 4/23(17.39%), 중앙값차 17.39%(95% CI 1.16~37.14), p=0.038로 유의했고, 카테터관련 혈류감염 0% vs 3/23(13.04%, 중앙값차 13.04%, 95% CI -2.04~32.13, p=0.09), 혈류감염 0% vs 1/23(4.35%, p=0.46), 장내감염 0% vs 1/23(4.35%, p=0.46)이었다.<br/>
+진균혈증은 0/27 vs 1/23(4.35%, 중앙값차 4.35%, 95% CI -8.61~20.99, p=0.46).<br/>
+2차 변수인 ICU 사망률·28일 사망률은 양군 모두 0%로 차이 없었고, ICU 재실(중앙값 7.0일[6.0~9.0] vs 7.0일[5.0~12.0], p=0.769)·재원기간(19일[14~42] vs 27일[12~46], p=0.838)도 통계적 차이는 없었으나 재원기간은 중재군이 8일 짧은 경향.<br/>
+미생물 분석에서 중재군은 Firmicutes:Bacteroidetes 비가 유의하게 감소(p=0.0116)했고, 병원성 우세균인 Enterococcus와 Candida 과증식이 억제(LDA&gt;5log).<br/>
+특히 장내 진균 ITS2 지수는 원내감염의 강력한 예측인자로, 로지스틱회귀에서 회귀계수 B=-1.923, p=0.014, OR=0.146(95% CI 0.031~0.681)이었으며 ROC 곡선 AUC 0.950(p=0.0159)으로 매우 높은 변별력을 보였다.<br/>
+Candida 존재량은 동맥혈 젖산(lactate) 수치와 양의 상관을 보여 진균총 교란이 예후 악화와 연결됨을 시사했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">S. boulardii에 직접 기인한 이상반응이나 진균혈증은 한 건도 보고되지 않았다 — 중재군에서 진균 혈류감염(fungal BSI)은 0/27(0%)로 대조군의 1/23(4.35%)보다 오히려 낮았다. 중재군에서는 치료 관련 중도탈락이 없었고(0/27), 대조군 4명 제외 사유(동의철회·입원후 임신확인·약물알레르기 은폐 2명)는 모두 프로바이오틱 관련 이상반응이 아니었다. 다만 저자들은 중환자에서 진균 프로바이오틱 사용 시 침상 조제 과정의 과립(granule)으로 인한 오염·진균혈증 위험을 최소화하도록 제형을 신중히 고려해야 한다고 경고했으며, 과거 Lactobacillus GG 보충 시 균혈증 1.1%(비보충군 0.009%) 보고를 인용해 면밀한 모니터링 필요성을 강조했다. 본 시험 규모에서는 S. boulardii의 안전성 신호가 관찰되지 않았다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 진균 프로바이오틱 S. boulardii가 SAP 환자에서 다른 치료로 인해 발생하는 호흡기·장내 세균총 불균형에 영향을 주어 원내감염 발생(0% vs 21.7%, p=0.016)과 호흡기감염(0% vs 17.4%, p=0.038)을 유의하게 줄였고, 장내 진균 조성을 보존함으로써 동맥혈 젖산과 밀접히 연관된 예후 개선에 기여할 수 있다고 결론지었다. 한계는 단일기관·소규모(n=50)·공개라벨 탐색적 설계, 등록까지 발병-등록 기간이 비교적 길어 예방효과가 과소평가되었을 가능성, 기계환기 비율 불균형(대조군 26.1% vs 중재군 7.4%)에 따른 잔존 교란, 연령·성별·면역상태 등 미생물총 교란요인, 정밀 면역기전 미규명 등이며 대규모 다기관 RCT와 추가 안전성 평가가 필요하다고 밝혔다. 바이오탑(C. butyricum) 관점에서, 본 연구는 프로바이오틱이 SAP 같은 중증 병태에서 장내·호흡기 진균/병원균 과증식을 억제해 원내감염을 차단할 수 있음을 ITS2 예측력(AUC 0.95)과 함께 입증한 것으로, 균종은 다르지만 &#x27;장내 미생물총 보존을 통한 감염·예후 개선&#x27;이라는 기전적 근거를 디테일링에 활용할 수 있다(단 균종·적응증 직접 외삽은 경계).</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>원내감염 0% vs 21.7%, 중앙값차 21.74%(95%CI 4.39~41.90), p=0.016</li>
+                            <li>호흡기감염 0% vs 17.4%, 중앙값차 17.39%(95%CI 1.16~37.14), p=0.038</li>
+                            <li>장내 진균 ITS2 원내감염 예측 AUC 0.950(p=0.0159), OR 0.146(95%CI 0.031~0.681)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">이전 Phase 1b에서 CBM588+nivolumab/ipilimumab 병용 시 전이성 신세포암에서 유망한 PFS 개선 신호가 보고되었으나 최적 용량이 미확립. SWOG S2419 BioFront Phase 3 시험 용량 결정을 위한 용량탐색 연구.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">미치료 mRCC 환자 12명, CBM588 3단계 용량(4×10⁸, 1.2×10⁹, 4×10⁹ CFU) 1일 2회 경구 + nivolumab(3mg/kg q3w×4 → 480mg q4w) + ipilimumab(1mg/kg q3w×4). 1차 목표: 안전성/MTD 결정.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">모든 용량에서 DLT 없음. 12명 중 4명 객관적 반응(완전관해 1명 포함), 7명 안정 병변, 1명 진행. BioFront Phase 3 시험(최초 장내미생물 개입 Phase 3 항암 임상)의 용량 선정 근거 제공.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">CBM588 최고 용량에서도 면역관련 독성 증가 없이 내약성 우수. Grade 3+ 이상반응 9/12명이나 nivo/ipi 자체 부작용과 유사.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">향후 SWOG S2419 BioFront Phase 3(2026년 4월 가동 예정)의 용량 선정 근거 확보. 소규모 Phase 1 한계. 장내미생물 개입 최초 Phase 3 항암 임상으로 이어지는 핵심 데이터.</div>
-        </div>
-      </div>
+            <!-- ━━━ 논문 #6 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Clostridium butyricum enhances cognitive function in APP/PS1 mice by modulating neuropathology and regulating acetic acid levels in the gut microbiota</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Microbiology Spectrum (ASM)</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-07-07</div>
+                        <button class="bd-request-btn" data-title="Clostridium butyricum enhances cognitive function in APP/PS1 mice by modulating neuropathology and regulating acetic acid levels in the gut microbiota" data-session="장내미생물" data-num="6" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.1128/spectrum.00178-25" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">전임상 동물연구</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">알츠하이머병(AD)은 아밀로이드베타(Aβ) 플라크 침착과 타우 과인산화를 특징으로 하는 신경퇴행성 질환으로 효과적 치료제가 제한적이다. 최근 장내미생물 불균형(dysbiosis)이 장-뇌 축을 통해 AD 병리에 기여한다는 근거가 축적되었고, 부티르산·아세트산 등 단쇄지방산(SCFA)을 생성하는 C. butyricum이 신경염증·장벽 기능 개선을 통해 인지기능을 보호할 잠재력이 제시되어, AD 모델에서 직접 검증이 필요했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">APP/PS1 이중형질전환 AD 모델 마우스 대상 전임상 연구. 3군 각 n=8 — 야생형 대조(WT), 미처리 형질전환(Tg), CBM588 처리(Tg+CB). CBM588 현탁액(2×10^8 CFU/회) 또는 PBS 부형제를 4주간 매일 경구 위관투여했다. 평가: 모리스 수중미로(공간학습·기억), 16S rDNA 시퀀싱, GC-MS 기반 SCFA 정량, 웨스턴블롯·면역조직화학·전자현미경·유세포분석·RNA-seq. 추가로 LPS 자극 BV2 미세아교세포에 아세트산나트륨(NaAc)을 처리해 기전을 검증했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">인지기능(수중미로): Tg는 WT보다 도피잠시(escape latency)가 길었고(2일차 p&lt;0.001, 4~5일차 p&lt;0.05), Tg+CB는 Tg 대비 도피잠시 단축(2·5일차 p&lt;0.05), 플랫폼 통과 횟수 증가(p&lt;0.05), 목표사분면 체류시간 증가(p&lt;0.05).<br/>
+<strong>장벽:</strong> Tg+CB에서 밀착연접단백(Claudin-1·ZO-1·Occludin) 발현 증가(p&lt;0.05~0.01), 대장 염증 mRNA(IL-6 p&lt;0.001, TNF-α p&lt;0.05, IL-1β p&lt;0.05) 감소, 혈청 LPS 감소(p&lt;0.001).<br/>
+<strong>뇌병리:</strong> Congo red Aβ 플라크 감소, p-Tau(Ser396)/Tau 비 감소(p&lt;0.05), p-JNK/JNK 비 감소(p&lt;0.01), 뇌 IL-6·TNF-α mRNA 감소(각 p&lt;0.001, p&lt;0.01).<br/>
+<strong>신경세포자멸:</strong> Bax/Bcl-2 비가 Tg에서 상승·Tg+CB에서 감소(p&lt;0.01).<br/>
+<strong>미생물·대사체:</strong> α-다양성은 군간 차이 없음, β-다양성은 SCFA 생성균 우위로 이동; 대장 변 아세트산 증가(p&lt;0.05), 뇌조직 아세트산은 Tg에서 감소(p&lt;0.001 vs WT)·Tg+CB에서 회복(p&lt;0.01 vs Tg); Acetatifactor·Lactobacillus 증가, Bacteroides·Duncaniella 감소.<br/>
+<strong>BV2 기전:</strong> NaAc가 LPS 유발 세포자멸 감소(p&lt;0.05), p-JAK(p&lt;0.001)·p-STAT3(p&lt;0.05)·IL-6(p&lt;0.001)·Aβ/p-Tau(p&lt;0.05) 감소 → JAK/STAT 억제 경로 확인.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">전임상 동물연구로 임상 안전성 데이터는 없으나, 4주 CBM588 투여 동안 동물에서 특기할 독성·체중감소 등 이상소견은 보고되지 않았다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">CBM588은 장내미생물 조성을 조절해 아세트산 생성을 늘리고, 장·전신·뇌 염증과 신경세포자멸을 JAK/STAT 경로 억제를 통해 줄여 APP/PS1 마우스의 인지기능을 개선했다. 한계는 전임상 동물모델·소표본(군당 8), 부티르산이 유의하게 증가하지 않아(아세트산 매개) 기전의 추가 규명이 필요한 점, 임상 외삽 제한이다. 바이오탑(C. butyricum) 관점에서, 동일 균주가 장-뇌 축을 통해 신경염증·인지에 미치는 영향을 기전 수준에서 입증한 근거로, 바이오탑의 적용 스토리를 소화기를 넘어 &#x27;장-뇌 축&#x27;으로 확장하는 학술적 토대를 제공한다(단, 전임상 한계 명시).</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>수중미로 도피잠시 Tg+CB가 Tg 대비 단축(2·5일차 p&lt;0.05), 목표사분면 체류 증가(p&lt;0.05)</li>
+                            <li>뇌 아세트산 Tg 감소(p&lt;0.001) → CBM588 회복(p&lt;0.01), 대장 변 아세트산 증가(p&lt;0.05)</li>
+                            <li>p-Tau/Tau↓(p&lt;0.05)·뇌 IL-6 mRNA↓(p&lt;0.001)·Bax/Bcl-2↓(p&lt;0.01)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-      <div class="key-nums">
-        <div class="knum">
-          <div class="val">0건 DLT</div>
-          <div class="desc">3단계 용량 모두에서 용량제한독성 미발생</div>
-          
-        </div>
-        <div class="knum">
-          <div class="val">4/12명 (33%)</div>
-          <div class="desc">객관적 반응률(완전관해 1명 포함)</div>
-          
-        </div>
-        <div class="knum">
-          <div class="val">Phase 3 BioFront</div>
-          <div class="desc">최초 장내미생물 개입 Phase 3 항암 임상 진입 근거</div>
-          
-        </div>
-      </div>
+            <!-- ━━━ 논문 #7 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Clostridium butyricum ameliorates Toxoplasma gondii-induced neuropsychiatric disorders by attenuating glial-mediated synaptic pruning via the gut-brain axis</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Journal of Neuroinflammation</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-04-01</div>
+                        <button class="bd-request-btn" data-title="Clostridium butyricum ameliorates Toxoplasma gondii-induced neuropsychiatric disorders by attenuating glial-mediated synaptic pruning via the gut-brain axis" data-session="장내미생물" data-num="7" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://link.springer.com/article/10.1186/s12974-026-03761-y" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">전임상 동물연구</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">톡소플라스마 곤디(T. gondii) 만성 감염은 뇌에 잠복하며 미세아교세포·별아교세포 활성화와 신경염증을 유발해 불안·인지저하 등 신경정신 증상과 연관된다. 글리아세포 매개 시냅스 가지치기(synaptic pruning) 과잉이 이 병리의 핵심 기전으로 지목되나, 장내미생물을 표적한 개입이 이를 완화할 수 있는지는 불분명했다. 부티르산 생성균 C. butyricum이 장-뇌 축을 통해 신경염증·시냅스 병리를 교정할 수 있는지 검증이 필요했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">마우스 전임상 연구. T. gondii 감염으로 신경정신 모델을 유도하고 C. butyricum 투여군과 비교했으며, 감염 마우스의 장내미생물을 수여 마우스에 옮기는 분변미생물이식(FMT) 실험으로 인과성을 검증했다. 행동평가, 신경세포 수상돌기(dendrite) 길이·형태 복잡도(Sholl 분석), 미세아교세포 활성·보체 매개 시냅스 가지치기 마커, 사이토카인, 장내미생물·SCFA 분석을 시행했다. (※ 원문이 페이월이어서 군별 정확한 N과 일부 정량 p값은 확보하지 못함)</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">C. butyricum 정착은 T. gondii로 손상된 신경세포의 수상돌기 성장·형태 복잡도를 회복시켰다 — 총 수상돌기 길이 증가, 세포체로부터 최대 교차점까지의 거리 증가, 분지 수·교차 횟수 증가가 일관되게 관찰되었다.<br/>
+또한 감염 마우스의 장내미생물을 수여받은 마우스에서 동일한 신경병리(미세아교세포 매개 시냅스 소실·신경염증)가 유발된 반면, C. butyricum 개입군에서는 이 병리가 완화되어, 장내미생물 교란이 신경정신 병리의 원인이며 C. butyricum이 이를 되돌린다는 인과적 근거를 제시했다.<br/>
+(정량 효과크기·p값은 원문 접근 제한으로 일부 미수록).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">전임상 동물연구로 별도의 임상 안전성·이상반응 데이터는 보고되지 않았다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">C. butyricum은 장-뇌 축을 통해 장내미생물 항상성을 회복하고, 글리아 매개 과잉 시냅스 가지치기와 신경염증을 줄여 T. gondii 유발 신경정신 장애를 완화했다. 한계는 전임상 동물모델·기전연구로 임상 외삽이 제한되며, 본 요약은 원문 페이월로 일부 정량 수치를 확보하지 못한 점이다. 바이오탑(C. butyricum) 관점에서, 감염·신경염증 맥락에서도 동일 균주의 장-뇌 축 신경보호 기전을 보탠 근거로, 바이오탑의 기전 스토리(장내미생물–신경염증)를 보강한다(전임상·근거수준 한계 명시).</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>C. butyricum 정착 → 수상돌기 총길이·분지수·교차수 증가(T. gondii 손상 회복)</li>
+                            <li>감염 마우스 미생물 이식 시 신경병리 유발 → C. butyricum이 완화(FMT 인과 검증)</li>
+                            <li>※ 원문 페이월 — 정량 효과크기·p값 일부 미확보</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">CBM588 Dose-Escalation in mRCC</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_2_658"></canvas>
+            <!-- ━━━ 논문 #8 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">The role of Clostridium butyricum and its metabolites in modulating gut mucosal immunity: implications for viral infections and inflammatory diseases</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-low">★☆☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Frontiers in Immunology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-06-01</div>
+                        <button class="bd-request-btn" data-title="The role of Clostridium butyricum and its metabolites in modulating gut mucosal immunity: implications for viral infections and inflammatory diseases" data-session="장내미생물" data-num="8" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://www.frontiersin.org/journals/immunology/articles/10.3389/fimmu.2026.1763817/full" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">서술적 종설</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">신종 바이러스 출현·항바이러스 내성 증가와 함께, C. butyricum이 &#x27;장-면역 축(gut-immune axis)&#x27;을 어떻게 조절하는지에 대한 통합적 이해가 부족했다. 특히 바이러스 감염·염증질환에서의 기전은 추가 규명이 필요해, 본 미니리뷰는 C. butyricum과 그 대사산물(SCFA)이 장 점막면역을 강화하는 기전을 종합했다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">서술적 미니리뷰. C. butyricum과 단쇄지방산(부티르산·아세트산·프로피온산)이 장벽 강화, 면역세포(T·B세포·수지상세포) 조절, 바이러스 복제 억제에 작용하는 기전을 정리했다. 핵심 기전축으로 HDAC 억제, G단백연결수용체(GPR43·GPR109a·GPR120) 활성화, 인터페론 경로 조절을 다룬다. (체계적 메타분석이 아닌 종설이므로 통합 효과크기는 산출되지 않음)</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text"><strong>장벽:</strong> SCFA가 저산소유도인자(HIF) 활성을 통해 밀착연접단백(ZO-1·occludin·cadherin)을 상향조절.<br/>
+<strong>면역조절:</strong> GPR41 신호로 조절T세포 확장·IL-22 생성 증가, Aicda·Prdm1 유전자 상향으로 B세포 분화 지원.<br/>
+항바이러스(예시): 인플루엔자에서 아세트산-GPR43-NLRP3-MAVS-I형 인터페론 경로 활성화; SARS-CoV-2에서 부티르산이 Adam17 상향으로 ACE2 결합 방해·HMGB1 억제; RSV에서 아세트산이 RIG-I 상향으로 바이러스 RNA 인식 강화.<br/>
+<strong>염증:</strong> NF-κB·TLR4 억제로 IL-1β·IL-6 감소, 급성췌장염 모델에서 NLRP3 인플라마좀 억제.<br/>
+(종설로 통합 p값은 제시되지 않으며 인용 근거 대부분이 동물모델).</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">리뷰는 양면성을 지적한다 — 보툴리눔 신경독소E 생성 병원성 균주나 CB1002(신생아 괴사성 장염) 같은 균주의 존재, 부티르산이 HDAC 억제로 HIV 진행을 촉진할 가능성, 특정 맥락에서 SCFA의 호중구 항균기능 저해 가능성을 언급했다. 또한 임상 용량 조절의 어려움·실온 보관 불안정·대규모 임상시험 부재를 한계로 들었다.</div>
+                    </div>
+                    <div class="content-section">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 장벽 무결성·미생물 균형·점막면역을 바이러스 저항성의 결정인자로 보는 &#x27;장 중심(gut-centric) 가설&#x27;을 제시하며, C. butyricum이 치료적 잠재력을 갖되 맥락 의존적 양면효과(항염/촉염)와 대규모 인체시험 필요성을 인정했다. 바이오탑(C. butyricum) 관점에서, 본 종설은 동일 균주의 점막면역·항바이러스·항염 기전을 분자수준에서 폭넓게 정리해, 바이오탑을 &#x27;장 건강을 넘어선 면역 조절자&#x27;로 포지셔닝하는 학술적 배경으로 활용 가능하다(단, 종설·전임상 근거 수준 명시).</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>기전축: HDAC 억제, GPR43/109a/120 활성, 인터페론 경로 조절</li>
+                            <li>장벽 ZO-1·occludin↑(HIF 경유), Treg·IL-22↑(GPR41), B세포 Aicda/Prdm1↑</li>
+                            <li>항바이러스: 인플루엔자(아세트산-GPR43-IFN-I)·SARS-CoV-2(부티르산-ADAM17-ACE2 방해)·RSV(아세트산-RIG-I)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
 
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
-          <li>🎯 장내미생물 개입의 면역항암 Phase 3(BioFront) 진입 근거 — 최신성 최상(ASCO GU 2026)</li>
-          <li>바이오탑 포함 프로바이오틱스의 항암보조 가능성 KOL 심포지엄 소재</li>
-          <li>CBM588 균주(참고근거)이나 C. butyricum 종의 면역항암 시너지 방향성 제시</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-    <!-- ━━━ 논문 #3 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #3</span>
-      <span class="stars-mid">★★☆</span>
-      <span class="tag-ref">참고근거</span>
-      <span class="tag-wall">🔒 페이월</span>
-      <div class="journal-meta" style="flex: 1;">International Journal of Colorectal Disease | 2025-10-01</div>
-      <button class="bd-request-btn" data-title="Management of symptomatic uncomplicated diverticular disease (SUDD) of the colon with Clostridium butyricum CBM588 versus rifaximin: a retrospective cross-sectional study" data-session="장내미생물" data-num="3" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Management of symptomatic uncomplicated diverticular disease (SUDD) of the colon with Clostridium butyricum CBM588 versus rifaximin: a retrospective cross-sectional study</p>
-      <a href="https://link.springer.com/article/10.1007/s00384-025-05005-6" class="paper-url" target="_blank">https://link.springer.com/article/10.1007/s00384-025-05005-6</a>
-      <span class="design-badge">후향적 단면연구</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">증상성 비합병증 게실질환(SUDD)에서 리팍시민 순환요법이 표준치료로 사용되나 프로바이오틱스 역할에 대한 근거가 필요했다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">2023~2024년 SUDD 환자 70명(완료 56명)을 A군(CBM588 매일 12개월, n=31)과 B군(리팍시민 400mg bid 월7일 순환투여, n=25)으로 나누어 후향적 비교.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">Flare 빈도는 양군 유의차 없음(19.4% vs 20%, p=0.7). 적절한 증상 경감 비율은 CBM588군에서 유의하게 높음(77.4% vs 44%, p&lt;0.05).</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">CBM588군에서 12개월 투여 기간 중 중대 이상반응 보고 없음. 내약성 양호.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">CBM588 장기 투여는 리팍시민 대비 급성 게실염 예방 동등, 증상 경감에서 우월. 후향적·단일기관 한계. 바이오탑과 노르믹스 비교 포지셔닝에 활용 가능하나 CBM588 균주로 참고근거.</div>
-        </div>
-      </div>
-
-      <div class="key-nums">
-        <div class="knum">
-          <div class="val">77.4% vs 44%</div>
-          <div class="desc">적절한 증상 경감 비율(CBM588 vs 리팍시민)</div>
-          <div class="pval">p&lt;0.05</div>
-        </div>
-        <div class="knum">
-          <div class="val">19.4% vs 20%</div>
-          <div class="desc">Flare 빈도(양군 유의차 없음)</div>
-          <div class="pval">p=0.7</div>
-        </div>
-        <div class="knum">
-          <div class="val">12개월 추적</div>
-          <div class="desc">장기 투여 안전성 확인 기간</div>
-          
-        </div>
-      </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">CBM588 vs Rifaximin in SUDD</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_3_658"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
-          <li>🎯 게실질환에서 C. butyricum vs 리팍시민 직접 비교 — 바이오탑+노르믹스 병용 시너지 근거</li>
-          <li>증상 경감 77.4% vs 44%로 프로바이오틱스 우위 수치 활용</li>
-          <li>소화기내과 타겟 디테일링 소재로 적합</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-    <!-- ━━━ 논문 #4 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #4</span>
-      <span class="stars-mid">★★☆</span>
-      <span class="tag-ref">참고근거</span>
-      <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex: 1;">Microorganisms | 2025-05-13</div>
-      <button class="bd-request-btn" data-title="Irritable Bowel Syndrome with Diarrhea (IBS-D): Effects of Clostridium butyricum CBM588 Probiotic on Gastrointestinal Symptoms, Quality of Life, and Gut Microbiota in a Prospective Real-Life Interventional Study" data-session="장내미생물" data-num="4" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Irritable Bowel Syndrome with Diarrhea (IBS-D): Effects of Clostridium butyricum CBM588 Probiotic on Gastrointestinal Symptoms, Quality of Life, and Gut Microbiota in a Prospective Real-Life Interventional Study</p>
-      <a href="https://www.mdpi.com/2076-2607/13/5/1139" class="paper-url" target="_blank">https://www.mdpi.com/2076-2607/13/5/1139</a>
-      <span class="design-badge">전향적 개방형 중재연구</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">IBS-D는 장운동 변화, 복통, 장내미생물 다양성 감소를 특징으로 하며 낙산 생성균 감소가 보고되어 왔다.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">이탈리아 205명 IBS-D 환자 대상, 저섬유·저잔류물 식이 + CBM588 8주 보충. IBS-SSS, Bristol Stool Scale, 배변빈도, 복통, 복부팽만, 삶의 질 평가.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">설사 에피소드 80%↑ 감소, 배변빈도 60% 감소, BSS 30% 개선, 복통 60% 감소, 복부팽만 50%↑ 감소. 장내 낙산 생성균 증가.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">내약성 점수 8.95/10(±0.88), 순응도 95%↑, 중대 이상반응 없음.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">CBM588는 IBS-D 환자에서 증상 전반과 삶의 질 유의 개선. 단일군 오픈라벨 설계 한계. 205명 대규모 리얼월드 데이터.</div>
-        </div>
-      </div>
-
-      <div class="key-nums">
-        <div class="knum">
-          <div class="val">80%↑ 감소</div>
-          <div class="desc">설사 에피소드 감소율</div>
-          
-        </div>
-        <div class="knum">
-          <div class="val">60% 감소</div>
-          <div class="desc">복통 감소율</div>
-          
-        </div>
-        <div class="knum">
-          <div class="val">205명</div>
-          <div class="desc">대규모 리얼월드 연구 표본</div>
-          
-        </div>
-      </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">CBM588 in IBS-D (N=205)</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_4_658"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
-          <li>🎯 IBS-D 환자 205명 대규모 리얼월드 데이터 — 설사 80% 감소, 복통 60% 감소</li>
-          <li>소화기내과 디테일링 핵심 수치로 바이오탑 IBS-D 처방명분 확장</li>
-          <li>CBM588 균주(참고근거)이나 C. butyricum 종 IBS-D 효과 방향성 뒷받침</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-    <!-- ━━━ 논문 #5 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #5</span>
-      <span class="stars-high">★★★</span>
-      <span class="tag-ref">참고근거</span>
-      <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex: 1;">Burns &amp; Trauma (Oxford Academic) | 2026-01-08</div>
-      <button class="bd-request-btn" data-title="Saccharomyces boulardii in patients with severe acute pancreatitis: a single center, open-label randomized controlled trial" data-session="장내미생물" data-num="5" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Saccharomyces boulardii in patients with severe acute pancreatitis: a single center, open-label randomized controlled trial</p>
-      <a href="https://academic.oup.com/burnstrauma/article/doi/10.1093/burnst/tkag006/8427227" class="paper-url" target="_blank">https://academic.oup.com/burnstrauma/article/doi/10.1093/burnst/tkag006/8427227</a>
-      <span class="design-badge">RCT</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">중증 급성 췌장염(SAP) 환자에서 원내감염은 주요 사망 원인이며, 장-폐 축(gut-lung axis) 관점에서 프로바이오틱스의 감염 예방 효과 검증 필요.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">SAP 환자 50명을 S. boulardii+경장영양군(n=27) vs 경장영양 단독군(n=23)으로 무작위 배정. ICU 0~15일 인두·직장 검체 16S rRNA 및 ITS 시퀀싱. 1차 평가: 원내감염 및 진균혈증.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">원내감염 0건(0/27) vs 5건(5/23), p&lt;0.05. S. boulardii는 장내 Enterococcus 억제, 장·기도 Candida 억제. 장내 진균 지수가 원내감염 위험 예측(AUC=0.95).</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">프로바이오틱군(S. boulardii)에서 진균혈증 발생 0건. 대조군 대비 안전성 우수.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">S. boulardii+경장영양은 SAP의 원내감염을 유의 감소. 장-폐 미생물 축 안정화 메커니즘 규명. 단일기관 소규모 RCT 한계.</div>
-        </div>
-      </div>
-
-      <div class="key-nums">
-        <div class="knum">
-          <div class="val">0/27 vs 5/23</div>
-          <div class="desc">원내감염 발생(프로바이오틱 vs 대조)</div>
-          <div class="pval">p&lt;0.05</div>
-        </div>
-        <div class="knum">
-          <div class="val">AUC 0.95</div>
-          <div class="desc">장내 진균 지수의 원내감염 예측력</div>
-          
-        </div>
-        <div class="knum">
-          <div class="val">50명 RCT</div>
-          <div class="desc">중증 급성 췌장염 대상 무작위 시험</div>
-          
-        </div>
-      </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">S. boulardii in SAP</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_5_658"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
-          <li>🎯 S. boulardii 중환자 원내감염 예방 RCT — 0/27 vs 5/23 극적 차이</li>
-          <li>바이오탑 S. boulardii 성분의 중환자/소화기내과 타겟 감염예방 메시지 활용</li>
-          <li>AUC 0.95 바이오마커 결과로 학술적 설득력 높음</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-    <!-- ━━━ 논문 #6 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #6</span>
-      <span class="stars-mid">★★☆</span>
-      <span class="tag-ref">참고근거</span>
-      <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex: 1;">Microbiology Spectrum (ASM) | 2025-07-07</div>
-      <button class="bd-request-btn" data-title="Clostridium butyricum enhances cognitive function in APP/PS1 mice by modulating neuropathology and regulating acetic acid levels in the gut microbiota" data-session="장내미생물" data-num="6" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Clostridium butyricum enhances cognitive function in APP/PS1 mice by modulating neuropathology and regulating acetic acid levels in the gut microbiota</p>
-      <a href="https://doi.org/10.1128/spectrum.00178-25" class="paper-url" target="_blank">https://doi.org/10.1128/spectrum.00178-25</a>
-      <span class="design-badge">전임상 동물연구</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">알츠하이머병(AD) 장-뇌 축에서 C. butyricum의 구체적 기전이 불명확. SCFA와 인지기능 관계 규명 필요.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">APP/PS1 형질전환 AD 마우스에 CBM588 4주 투여. 인지기능, Aβ 플라크, Tau 인산화, 장내미생물, SCFA 분석. BV2 세포주에서 소듐 아세테이트 효과 확인.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">CBM588 투여 후 인지기능 개선, Aβ 플라크 감소, JNK/CDK5/GSK-3β 경로 억제. 장벽 단백질 상향조절, 염증사이토카인 감소. 장내 아세테이트 증가.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">동물실험(APP/PS1 마우스)으로 인체 안전성 데이터 해당 없음. 마우스 모델에서 독성 보고 없음.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">CBM588는 장내미생물 조절 및 아세테이트 생산 증가로 AD 병태생리 개선. 전임상 한계. 뇌-장 축 신규 적용영역 가능성.</div>
-        </div>
-      </div>
-
-      <div class="key-nums">
-        <div class="knum">
-          <div class="val">Aβ 플라크 유의 감소(p&lt;0.05)</div>
-          <div class="desc">CBM588 투여 후 뇌 아밀로이드 축적 감소</div>
-          <div class="pval">p&lt;0.05</div>
-        </div>
-        <div class="knum">
-          <div class="val">아세테이트 2배↑ 증가</div>
-          <div class="desc">장내 아세테이트 생성균 및 SCFA 수준 상승</div>
-          
-        </div>
-        <div class="knum">
-          <div class="val">행동실험 인지기능 유의 개선(p&lt;0.05)</div>
-          <div class="desc">Morris water maze 및 Y-maze 결과</div>
-          <div class="pval">p&lt;0.05</div>
-        </div>
-      </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">C. butyricum in AD Mice</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_6_658"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
-          <li>🎯 C. butyricum 뇌-장 축 인지기능 개선 기전 규명 — 전임상 단계</li>
-          <li>바이오탑 장내미생물 조절 효과의 신경계 확장 가능성 시사</li>
-          <li>향후 인지기능/치매 영역 KOL 자문 및 학술 심포지엄 소재</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-  <!-- ━━━ 논문 #7 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #7</span>
-      <span class="stars-mid">★★☆</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex: 1;">Journal of Neuroinflammation | 2026-04-01</div>
-      <button class="bd-request-btn" data-title="Clostridium butyricum ameliorates Toxoplasma gondii-induced neuropsychiatric disorders by attenuating glial-mediated synaptic pruning via the gut-brain axis" data-session="장내미생물" data-num="7" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">Clostridium butyricum ameliorates Toxoplasma gondii-induced neuropsychiatric disorders by attenuating glial-mediated synaptic pruning via the gut-brain axis</p>
-      <a href="https://link.springer.com/article/10.1186/s12974-026-03761-y" class="paper-url" target="_blank">https://link.springer.com/article/10.1186/s12974-026-03761-y</a>
-      <span class="design-badge">전임상 동물연구</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">톡소플라스마 감염에 의한 신경정신 증상(인지장애, 불안, 우울)에서 장내미생물 변성이 관여하나 기전 불명확. 낙산 생성균 감소가 AD 및 T. gondii 감염 모델에서 일관 관찰.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">T. gondii 감염 마우스에 C. butyricum 보충 후 장내미생물, 장벽기능, 전신 염증, 뇌 시냅스 구조/글리아 활성화 종합 분석.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">C. butyricum 보충 → 장내미생물 불균형 회복, 장벽파괴·염증 개선, 내독소혈증 감소. 뇌에서 마이크로글리아·아스트로사이트 활성화 억제, 시냅스 소실 구출, 인지장애·불안·우울 완화.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">동물실험(T. gondii 감염 마우스 모델)으로 인체 안전성 데이터 해당 없음. 실험군 독성 보고 없음.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">C. butyricum은 장-뇌 축 통해 글리아 매개 시냅스 가지치기 조절로 감염 유발 신경정신장애 개선. 균주 비의존적 종 수준 효과(낙산 생성, 장벽 보호)로 직접근거 분류.</div>
-        </div>
-      </div>
-
-      <div class="key-nums">
-        <div class="knum">
-          <div class="val">시냅스 밀도 보존(p&lt;0.01)</div>
-          <div class="desc">C. butyricum 보충 후 시냅스 초미세구조 보존</div>
-          <div class="pval">p&lt;0.01</div>
-        </div>
-        <div class="knum">
-          <div class="val">혈중 LPS 50%↓ 감소</div>
-          <div class="desc">장벽 보호를 통한 내독소혈증 경감</div>
-          <div class="pval">p&lt;0.05</div>
-        </div>
-        <div class="knum">
-          <div class="val">불안/우울 행동 유의 개선(p&lt;0.05)</div>
-          <div class="desc">감염 유발 신경정신 증상 완화</div>
-          <div class="pval">p&lt;0.05</div>
-        </div>
-      </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">C. butyricum in T. gondii Model</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_7_658"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
-          <li>🎯 C. butyricum 종 수준 낙산 생성 → 신경보호 기전 — TO-A 적용 가능 직접근거</li>
-          <li>장-뇌 축 통한 정신건강 보조 효과로 바이오탑 적용영역 확장 근거</li>
-          <li>학술 자문에서 &#x27;장내미생물 조절 → 뇌건강&#x27; 메시지 활용</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-  <!-- ━━━ 논문 #8 (장내미생물) ━━━ -->
-  <div class="paper">
-    <div class="paper-header">
-      <span class="paper-num">■ 논문 #8</span>
-      <span class="stars-low">★☆☆</span>
-      <span class="tag-direct">직접근거</span>
-      <span class="tag-open">🔓 오픈액세스</span>
-      <div class="journal-meta" style="flex: 1;">Frontiers in Immunology | 2026-06-01</div>
-      <button class="bd-request-btn" data-title="The role of Clostridium butyricum and its metabolites in modulating gut mucosal immunity: implications for viral infections and inflammatory diseases" data-session="장내미생물" data-num="8" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📋 BD 요청</button>
-    </div>
-    <div class="paper-body">
-      <p class="paper-title">The role of Clostridium butyricum and its metabolites in modulating gut mucosal immunity: implications for viral infections and inflammatory diseases</p>
-      <a href="https://www.frontiersin.org/journals/immunology/articles/10.3389/fimmu.2026.1763817/full" class="paper-url" target="_blank">https://www.frontiersin.org/journals/immunology/articles/10.3389/fimmu.2026.1763817/full</a>
-      <span class="design-badge">서술적 종설</span>
-
-      <div class="summary-grid">
-        <h4>논문 내용 요약</h4>
-        <div class="s-row">
-          <div class="s-label">배경</div>
-          <div class="s-val">C. butyricum의 낙산 생성을 통한 장점막 면역 조절 기전에 대한 종합적 검토 부재.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">방법</div>
-          <div class="s-val">C. butyricum과 대사산물(낙산)의 항바이러스(인플루엔자, SARS-CoV-2, HIV 등) 및 항염증(IBD, 간염, 패혈증 등) 활성 종합 문헌검토.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">핵심결과</div>
-          <div class="s-val">C. butyricum은 Type I/III 인터페론 반응 조절로 바이러스 복제 억제, 장벽 보호 강화. SCFA(낙산)가 장-간 축 면역경로 활성화, CD8 T세포 발현 조절. 장 중심 가설 제안.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">안전성</div>
-          <div class="s-val">종설 논문으로 개별 안전성 데이터 해당 없음. 리뷰 대상 연구들에서 C. butyricum 전반적 안전성 양호.</div>
-        </div>
-        <div class="s-row">
-          <div class="s-label">결론</div>
-          <div class="s-val">C. butyricum은 항바이러스·항염증 이중 활성을 가진 유망 치료 타겟. 대규모 임상, 균주 특이적 연구 필요. 서술적 종설로 체계적 고찰 수준 미달.</div>
-        </div>
-      </div>
-
-      <div class="key-nums">
-        <div class="knum">
-          <div class="val">IFN-I/III 반응 조절(다수 연구 확인)</div>
-          <div class="desc">바이러스 복제 억제 메커니즘 종합</div>
-          
-        </div>
-        <div class="knum">
-          <div class="val">낙산 SCFA 매개 면역 조절(5건↑ 연구)</div>
-          <div class="desc">장-간 축 면역경로 활성화 근거</div>
-          
-        </div>
-        <div class="knum">
-          <div class="val">항바이러스+항염증 이중 효과(종합)</div>
-          <div class="desc">C. butyricum 종 수준 면역 기전 정리</div>
-          
-        </div>
-      </div>
-
-      <div class="viz-section">
-        <h4>📊 핵심 비교 분석</h4>
-        <div class="viz-subtitle">C. butyricum Mucosal Immunity Review</div>
-        <div class="chart-wrap">
-          <canvas id="chart_dr_8_658"></canvas>
-        </div>
-      </div>
-
-      <div class="usage">
-        <h4>💡 활용 포인트</h4>
-        <ul>
-          <li>🎯 C. butyricum 종 수준 면역조절 종합 리뷰 — 바이오탑 면역 메시지 학술적 배경</li>
-          <li>인플루엔자·호흡기 감염 시즌 &#x27;장내미생물 면역력 강화&#x27; 근거</li>
-          <li>모니터링 수준이나 후속 임상 설계 참고자료로 가치</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  
-
-  
-
-  <!-- ━━━ 범례 및 주의사항 ━━━ -->
-  <div class="legend">
+        <div class="legend">
     <h4>근거 분류 기준</h4>
     <div class="legend-row">
       <span class="tag-direct">직접근거</span>
@@ -750,481 +583,56 @@ body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; font-size:
 </div>
 
 <script>
-// Chart.js 설정
-Chart.defaults.font.family = "'Malgun Gothic','Apple SD Gothic Neo',sans-serif";
-Chart.defaults.color = '#888';
-
-// 논문 #1: 낙산 생성량 비교
-const ctx1 = document.getElementById('chart1')?.getContext('2d');
-if (ctx1) {
-  new Chart(ctx1, {
-    type: 'bar',
-    data: {
-      labels: ['PY 단독', 'PY+DL', 'PY+AD'],
-      datasets: [{
-        label: '낙산 (mM)',
-        data: [2.59, 4.94, 7.54],
-        backgroundColor: ['#e8eaf0', '#e67e22', '#c0392b'],
-        borderRadius: 6,
-        borderSkipped: false
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      indexAxis: 'y',
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { beginAtZero: true, max: 8, title: { display: true, text: '낙산 농도 (mM)' } }
-      }
-    }
-  });
-}
-
-// 논문 #2: TIPS 후 OHE 발생률
-const ctx2 = document.getElementById('chart2')?.getContext('2d');
-if (ctx2) {
-  new Chart(ctx2, {
-    type: 'bar',
-    data: {
-      labels: ['1개월', '3개월'],
-      datasets: [
-        { label: '대조군', data: [26.5, 34.7], backgroundColor: '#e8eaf0' },
-        { label: '시험군', data: [8.2, 10.2], backgroundColor: '#c0392b' }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { position: 'top' } },
-      scales: { y: { beginAtZero: true, max: 40, title: { display: true, text: 'OHE 발생률 (%)' } } }
-    }
-  });
-}
-
-// 논문 #3: IBS-D 증상 개선율
-const ctx3 = document.getElementById('chart3')?.getContext('2d');
-if (ctx3) {
-  new Chart(ctx3, {
-    type: 'bar',
-    data: {
-      labels: ['설사 에피소드', '배변 빈도·복부통증', '팽만감·배변불만족', '삶의질(QoL)'],
-      datasets: [{
-        label: '개선율 (%)',
-        data: [80, 60, 50, 50],
-        backgroundColor: '#e67e22',
-        borderRadius: 6,
-        borderSkipped: false
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      indexAxis: 'y',
-      plugins: { legend: { display: false } },
-      scales: { x: { beginAtZero: true, max: 100, title: { display: true, text: '개선율 (%)' } } }
-    }
-  });
-}
-
-// 논문 #4: 종양 크기 (모식)
-const ctx4 = document.getElementById('chart4')?.getContext('2d');
-if (ctx4) {
-  new Chart(ctx4, {
-    type: 'bar',
-    data: {
-      labels: ['대조군', 'aPD-1 단독', 'C. butyricum + aPD-1'],
-      datasets: [{
-        label: '종양 크기 (상대값)',
-        data: [100, 60, 30],
-        backgroundColor: ['#e8eaf0', '#e67e22', '#c0392b'],
-        borderRadius: 6,
-        borderSkipped: false
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, max: 120, title: { display: true, text: '상대 종양 크기' } } }
-    }
-  });
-}
-
-// 논문 #5: H. pylori 박멸률 및 부작용
-const ctx5 = document.getElementById('chart5')?.getContext('2d');
-if (ctx5) {
-  new Chart(ctx5, {
-    type: 'bar',
-    data: {
-      labels: ['H. pylori 박멸률', '전체 부작용', '설사', '복부팽만감'],
-      datasets: [
-        { label: '대조군 기저 (%)', data: [80, 100, 60, 40], backgroundColor: '#e8eaf0' },
-        { label: 'S. boulardii (%)', data: [91, 49, 21, 19], backgroundColor: '#c0392b' }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { position: 'top' } },
-      scales: { y: { beginAtZero: true, max: 100, title: { display: true, text: '발생률/효과 (%)' } } }
-    }
-  });
-}
-
-// 논문 #6: 소아 AAD 발생률
-const ctx6 = document.getElementById('chart6')?.getContext('2d');
-if (ctx6) {
-  new Chart(ctx6, {
-    type: 'bar',
-    data: {
-      labels: ['요거트\n(대조)', 'S. boulardii', 'Bifidobacterium'],
-      datasets: [{
-        label: 'AAD 발생률 (%)',
-        data: [20, 10, 16],
-        backgroundColor: ['#e8eaf0', '#c0392b', '#e67e22'],
-        borderRadius: 6,
-        borderSkipped: false
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, max: 25, title: { display: true, text: '발생률 (%)' } } }
-    }
-  });
-}
-
-// 논문 #1 (장내미생물) — deep research
-const ctx_chart_dr_1_658 = document.getElementById('chart_dr_1_658')?.getContext('2d');
-if (ctx_chart_dr_1_658) {
-  new Chart(ctx_chart_dr_1_658, {
-    type: 'bar',
-    data: {
-      labels: ["장기능 회복", "감염합병증", "면역강화"],
-      datasets: [
-        { label: "CBM588군", data: [85, 25, 80], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "대조군", data: [60, 45, 55], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "" } } }
-    }
-  });
-}
-
-
-// 논문 #2 (장내미생물) — deep research
-const ctx_chart_dr_2_658 = document.getElementById('chart_dr_2_658')?.getContext('2d');
-if (ctx_chart_dr_2_658) {
-  new Chart(ctx_chart_dr_2_658, {
-    type: 'bar',
-    data: {
-      labels: ["객관적반응", "안정병변", "진행"],
-      datasets: [
-        { label: "CBM588+nivo/ipi", data: [33, 58, 8], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "", data: [0, 0, 0], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "환자 비율(%)" } } }
-    }
-  });
-}
-
-
-// 논문 #3 (장내미생물) — deep research
-const ctx_chart_dr_3_658 = document.getElementById('chart_dr_3_658')?.getContext('2d');
-if (ctx_chart_dr_3_658) {
-  new Chart(ctx_chart_dr_3_658, {
-    type: 'bar',
-    data: {
-      labels: ["증상경감률", "Flare빈도"],
-      datasets: [
-        { label: "CBM588", data: [77, 19], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "Rifaximin", data: [44, 20], backgroundColor: "#1A5276", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "%" } } }
-    }
-  });
-}
-
-
-// 논문 #4 (장내미생물) — deep research
-const ctx_chart_dr_4_658 = document.getElementById('chart_dr_4_658')?.getContext('2d');
-if (ctx_chart_dr_4_658) {
-  new Chart(ctx_chart_dr_4_658, {
-    type: 'bar',
-    data: {
-      labels: ["설사", "복통", "팽만", "BSS"],
-      datasets: [
-        { label: "증상감소율(%)", data: [80, 60, 50, 30], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "", data: [0, 0, 0, 0], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "증상 개선 비율(%)" } } }
-    }
-  });
-}
-
-
-// 논문 #5 (장내미생물) — deep research
-const ctx_chart_dr_5_658 = document.getElementById('chart_dr_5_658')?.getContext('2d');
-if (ctx_chart_dr_5_658) {
-  new Chart(ctx_chart_dr_5_658, {
-    type: 'bar',
-    data: {
-      labels: ["원내감염(%)", "진균혈증(%)"],
-      datasets: [
-        { label: "S.boulardii군", data: [0, 0], backgroundColor: "#2E7D32", borderRadius: 6 },
-        { label: "대조군", data: [22, 8], backgroundColor: "#CC0000", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "" } } }
-    }
-  });
-}
-
-
-// 논문 #6 (장내미생물) — deep research
-const ctx_chart_dr_6_658 = document.getElementById('chart_dr_6_658')?.getContext('2d');
-if (ctx_chart_dr_6_658) {
-  new Chart(ctx_chart_dr_6_658, {
-    type: 'bar',
-    data: {
-      labels: ["인지기능", "Aβ 플라크", "염증"],
-      datasets: [
-        { label: "CBM588군", data: [75, 40, 35], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "대조군", data: [45, 70, 65], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "상대값" } } }
-    }
-  });
-}
-
-
-// 논문 #7 (장내미생물) — deep research
-const ctx_chart_dr_7_658 = document.getElementById('chart_dr_7_658')?.getContext('2d');
-if (ctx_chart_dr_7_658) {
-  new Chart(ctx_chart_dr_7_658, {
-    type: 'bar',
-    data: {
-      labels: ["장벽기능", "시냅스보존", "인지기능"],
-      datasets: [
-        { label: "C.butyricum군", data: [80, 75, 70], backgroundColor: "#2E7D32", borderRadius: 6 },
-        { label: "감염대조군", data: [40, 35, 30], backgroundColor: "#CC0000", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "상대값" } } }
-    }
-  });
-}
-
-
-// 논문 #8 (장내미생물) — deep research
-const ctx_chart_dr_8_658 = document.getElementById('chart_dr_8_658')?.getContext('2d');
-if (ctx_chart_dr_8_658) {
-  new Chart(ctx_chart_dr_8_658, {
-    type: 'bar',
-    data: {
-      labels: ["항바이러스", "항염증", "장벽보호"],
-      datasets: [
-        { label: "근거 축적도", data: [70, 75, 80], backgroundColor: "#E87722", borderRadius: 6 },
-        { label: "", data: [0, 0, 0], backgroundColor: "#95a5a6", borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'x',
-      plugins: { legend: { display: true, position: 'top' } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "" } } }
-    }
-  });
-}
-
-</script>
-
-
-<script>
-/* 논문별 포커스 뷰 */
 (function(){
-  var h = decodeURIComponent(location.hash.slice(1));
-  if (!h) return;
-  var papers = document.querySelectorAll('.paper');
-  var found = null;
-  for (var i = 0; i < papers.length; i++) {
-    var t = papers[i].querySelector('.paper-title');
-    var txt = t ? t.textContent.trim().toLowerCase() : '';
-    if (txt.indexOf(h.toLowerCase()) !== -1) { found = papers[i]; break; }
-  }
-  if (!found) return;
-  for (var j = 0; j < papers.length; j++) {
-    if (papers[j] !== found) papers[j].style.display = 'none';
-  }
-  found.style.outline = '3px solid #E87722';
-  found.style.borderRadius = '8px';
-  found.scrollIntoView({behavior:'smooth', block:'start'});
-  var btn = document.createElement('button');
-  btn.textContent = '📋 모든 논문 보기';
-  btn.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:999;padding:10px 20px;background:#003366;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3);';
-  btn.onclick = function(){
-    for(var k=0;k<papers.length;k++) papers[k].style.display='';
-    found.style.outline='';
-    btn.remove();
-    window.scrollTo(0,0);
-  };
+  var h=decodeURIComponent(location.hash.slice(1)); if(!h) return;
+  var papers=document.querySelectorAll('.paper'),found=null;
+  for(var i=0;i<papers.length;i++){var t=papers[i].querySelector('.paper-title');var txt=t?t.textContent.trim().toLowerCase():'';if(txt.indexOf(h.toLowerCase())!==-1){found=papers[i];break;}}
+  if(!found) return;
+  for(var j=0;j<papers.length;j++){if(papers[j]!==found)papers[j].style.display='none';}
+  found.style.outline='3px solid #1A5276';found.style.borderRadius='10px';found.scrollIntoView({behavior:'smooth',block:'start'});
+  var btn=document.createElement('button');btn.textContent='📋 모든 논문 보기';
+  btn.style.cssText='position:fixed;bottom:24px;right:24px;z-index:999;padding:10px 20px;background:#003366;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3);';
+  btn.onclick=function(){for(var k=0;k<papers.length;k++)papers[k].style.display='';found.style.outline='';btn.remove();window.scrollTo(0,0);};
   document.body.appendChild(btn);
 })();
 </script>
 
-
 <!-- BD_REQUEST_MODAL_v2 -->
 <style>
-  .bd-request-btn {
-    background: #E87722; color: #fff; border: none; padding: 4px 10px;
-    border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; margin-left: 8px;
-  }
-  .bd-request-btn:hover { background: #d96810; }
-  .bd-request-btn:disabled { background: #95a5a6; cursor: not-allowed; }
-  #bd-modal-overlay {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-    z-index: 9998; align-items: center; justify-content: center;
-  }
-  #bd-modal {
-    background: #fff; border-radius: 8px; padding: 24px; min-width: 420px; max-width: 520px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.2); font-family: 'Malgun Gothic', sans-serif;
-  }
-  #bd-modal h3 { margin: 0 0 16px; color: #003366; border-bottom: 2px solid #E87722; padding-bottom: 8px; }
-  #bd-modal .field { margin: 12px 0; }
-  #bd-modal label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 4px; }
-  #bd-modal input, #bd-modal textarea {
-    width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;
-    box-sizing: border-box; font-family: inherit;
-  }
-  #bd-modal textarea { min-height: 60px; resize: vertical; }
-  #bd-modal .radio-row label { display: inline-block; font-weight: 400; margin-right: 16px; cursor: pointer; }
-  #bd-modal .actions { margin-top: 20px; text-align: right; }
-  #bd-modal button {
-    padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; margin-left: 8px;
-  }
-  #bd-modal .submit { background: #003366; color: #fff; font-weight: 600; }
-  #bd-modal .cancel { background: #ddd; color: #333; }
-  #bd-toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: #003366; color: #fff; padding: 12px 24px; border-radius: 6px;
-    font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999;
-    opacity: 0; transition: opacity 0.3s;
-  }
-  #bd-toast.show { opacity: 1; }
-  #bd-toast.error { background: #c0392b; }
+  #bd-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;align-items:center;justify-content:center}
+  #bd-modal{background:#fff;border-radius:8px;padding:24px;min-width:420px;max-width:520px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-family:'Malgun Gothic',sans-serif}
+  #bd-modal h3{margin:0 0 16px;color:#003366;border-bottom:2px solid #1A5276;padding-bottom:8px}
+  #bd-modal .field{margin:12px 0}
+  #bd-modal label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:4px}
+  #bd-modal input,#bd-modal textarea{width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;font-size:13px;box-sizing:border-box;font-family:inherit}
+  #bd-modal textarea{min-height:60px;resize:vertical}
+  #bd-modal .radio-row label{display:inline-block;font-weight:400;margin-right:16px;cursor:pointer}
+  #bd-modal .actions{margin-top:20px;text-align:right}
+  #bd-modal button{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:13px;margin-left:8px}
+  #bd-modal .submit{background:#003366;color:#fff;font-weight:600}#bd-modal .cancel{background:#ddd;color:#333}
+  #bd-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#003366;color:#fff;padding:12px 24px;border-radius:6px;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:9999;opacity:0;transition:opacity .3s}
+  #bd-toast.show{opacity:1}#bd-toast.error{background:#c0392b}
 </style>
-
 <div id="bd-modal-overlay" onclick="if(event.target.id==='bd-modal-overlay') closeBDModal()">
   <div id="bd-modal">
-    <h3>📋 BD 제작 요청</h3>
-    <div class="field"><label>논문</label><div id="bd-modal-title" style="font-size:13px;color:#555;line-height:1.4;"></div></div>
-    <div class="field"><label>세션</label><div id="bd-modal-session" style="font-size:13px;color:#555;"></div></div>
-    <div class="field"><label>BD 포맷</label>
-      <div class="radio-row">
-        <label><input type="radio" name="bd-format" value="CLB" checked> CLB (학술브리프, 2p)</label>
-        <label><input type="radio" name="bd-format" value="BT"> BT (바이오톡, 1p)</label>
-      </div>
-    </div>
+    <h3>📌 BD 제작 요청</h3>
+    <div class="field"><label>논문</label><div id="bd-modal-title" style="font-size:13px;color:#555;line-height:1.4"></div></div>
+    <div class="field"><label>세션</label><div id="bd-modal-session" style="font-size:13px;color:#555"></div></div>
+    <div class="field"><label>BD 포맷</label><div class="radio-row">
+      <label><input type="radio" name="bd-format" value="CLB" checked> CLB (학술브리프)</label>
+      <label><input type="radio" name="bd-format" value="BT"> BT (바이오톡)</label></div></div>
     <div class="field"><label>요청자 이메일 *</label><input type="email" id="bd-modal-requester" placeholder="example@hanall.co.kr" required></div>
-    <div class="field"><label>메모 (선택)</label><textarea id="bd-modal-memo" placeholder="특별 요청사항이 있으면 적어주세요"></textarea></div>
-    <div class="actions">
-      <button class="cancel" onclick="closeBDModal()">취소</button>
-      <button class="submit" onclick="submitBDRequest()">요청 제출</button>
-    </div>
+    <div class="field"><label>메모 (선택)</label><textarea id="bd-modal-memo" placeholder="특별 요청사항"></textarea></div>
+    <div class="actions"><button class="cancel" onclick="closeBDModal()">취소</button><button class="submit" onclick="submitBDRequest()">요청 제출</button></div>
   </div>
 </div>
 <div id="bd-toast"></div>
-
 <script>
-const BD_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbynF7P1576GbRlzdIjBaxrOvjTU4HDP8F9jY4flxduhSqYR15Hr4AmhImuaS0wPJoOC/exec';
-let bdCurrentBtn = null;
-
-function openBDModal(btn) {
-  bdCurrentBtn = btn;
-  document.getElementById('bd-modal-title').textContent = btn.dataset.title;
-  document.getElementById('bd-modal-session').textContent = btn.dataset.session;
-  document.getElementById('bd-modal-requester').value = localStorage.getItem('bd-requester') || '';
-  document.getElementById('bd-modal-memo').value = '';
-  document.querySelector('input[name=bd-format][value=CLB]').checked = true;
-  document.getElementById('bd-modal-overlay').style.display = 'flex';
-}
-
-function closeBDModal() {
-  document.getElementById('bd-modal-overlay').style.display = 'none';
-  bdCurrentBtn = null;
-}
-
-function showToast(msg, isError) {
-  const t = document.getElementById('bd-toast');
-  t.textContent = msg;
-  t.className = isError ? 'show error' : 'show';
-  setTimeout(() => t.className = '', 3500);
-}
-
-function submitBDRequest() {
-  if (!bdCurrentBtn) return;
-  const title = bdCurrentBtn.dataset.title;
-  const session = bdCurrentBtn.dataset.session;
-  const format = document.querySelector('input[name=bd-format]:checked').value;
-  const requester = document.getElementById('bd-modal-requester').value.trim();
-  const memo = document.getElementById('bd-modal-memo').value.trim();
-  if (!requester) { showToast('요청자 이메일은 필수입니다', true); return; }
-  localStorage.setItem('bd-requester', requester);
-
-  // JSONP 호출 (CORS 우회)
-  const cb = 'bdcb_' + Date.now();
-  window[cb] = (data) => {
-    delete window[cb];
-    document.head.removeChild(s);
-    if (data.status === 'ok') {
-      showToast('✅ BD 요청 접수: ' + format + ' / ' + title.slice(0, 40) + '…');
-      bdCurrentBtn.disabled = true;
-      bdCurrentBtn.textContent = '✓ 요청됨';
-      closeBDModal();
-    } else if (data.status === 'duplicate') {
-      showToast('⚠️ 동일 요청이 이미 대기 중입니다', true);
-      closeBDModal();
-    } else {
-      showToast('❌ 오류: ' + (data.message || '알 수 없음'), true);
-    }
-  };
-  const params = new URLSearchParams({
-    action: 'requestBDQueue', title, session, format, requester, memo, callback: cb
-  });
-  const s = document.createElement('script');
-  s.src = BD_WEBHOOK_URL + '?' + params.toString();
-  s.onerror = () => {
-    delete window[cb];
-    showToast('❌ 네트워크 오류 — 잠시 후 다시 시도', true);
-  };
-  document.head.appendChild(s);
-}
+const BD_WEBHOOK_URL='https://script.google.com/macros/s/AKfycbynF7P1576GbRlzdIjBaxrOvjTU4HDP8F9jY4flxduhSqYR15Hr4AmhImuaS0wPJoOC/exec';let bdCurrentBtn=null;
+function openBDModal(b){bdCurrentBtn=b;document.getElementById('bd-modal-title').textContent=b.dataset.title;document.getElementById('bd-modal-session').textContent=b.dataset.session;document.getElementById('bd-modal-requester').value=localStorage.getItem('bd-requester')||'';document.getElementById('bd-modal-memo').value='';document.querySelector('input[name=bd-format][value=CLB]').checked=true;document.getElementById('bd-modal-overlay').style.display='flex';}
+function closeBDModal(){document.getElementById('bd-modal-overlay').style.display='none';bdCurrentBtn=null;}
+function showToast(m,e){var t=document.getElementById('bd-toast');t.textContent=m;t.className=e?'show error':'show';setTimeout(function(){t.className='';},3500);}
+function submitBDRequest(){if(!bdCurrentBtn)return;var title=bdCurrentBtn.dataset.title,session=bdCurrentBtn.dataset.session,format=document.querySelector('input[name=bd-format]:checked').value,requester=document.getElementById('bd-modal-requester').value.trim(),memo=document.getElementById('bd-modal-memo').value.trim();if(!requester){showToast('요청자 이메일은 필수입니다',true);return;}localStorage.setItem('bd-requester',requester);var cb='bdcb_'+Date.now();window[cb]=function(data){delete window[cb];document.head.removeChild(s);if(data.status==='ok'){showToast('✅ BD 요청 접수: '+format+' / '+title.slice(0,40)+'…');bdCurrentBtn.disabled=true;bdCurrentBtn.textContent='✓ 요청됨';closeBDModal();}else if(data.status==='duplicate'){showToast('⚠️ 동일 요청이 이미 대기 중입니다',true);closeBDModal();}else{showToast('❌ 오류: '+(data.message||'알 수 없음'),true);}};var params=new URLSearchParams({action:'requestBDQueue',title:title,session:session,format:format,requester:requester,memo:memo,callback:cb});var s=document.createElement('script');s.src=BD_WEBHOOK_URL+'?'+params.toString();s.onerror=function(){delete window[cb];showToast('❌ 네트워크 오류 — 잠시 후 다시 시도',true);};document.head.appendChild(s);}
 </script>
 
 </body>
