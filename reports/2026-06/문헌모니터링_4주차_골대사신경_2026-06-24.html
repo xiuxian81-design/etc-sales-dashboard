@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>[문헌모니터링] 2주차 골대사·신경 (2026.04.13)</title>
+<title>[문헌모니터링] 4주차 골대사·신경 (2026.06.13)</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -56,14 +56,37 @@
   .legend td { padding: 6px 8px; border-bottom: 1px solid #f0f0f0; }
 </style>
 
-<style>
-.bd-request-btn{background:#1A5276;color:#fff;border:none;padding:5px 12px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;margin-left:auto}
-.bd-request-btn:hover{background:#14405e}.bd-request-btn:disabled{background:#95a5a6;cursor:not-allowed}
-.paper-meta{align-items:center}
-.evidence-ref{background-color:#7f8c9b !important}
-.importance-mid{background-color:#2E6DA0 !important}.importance-low{background-color:#95a5a6 !important}
-.key-numbers h4{margin:0 0 8px;color:#003366;font-size:14px}
-.content-section-text strong{color:#1A5276}
+<style>/*BR_EXTRA_CSS*/
+.papers{max-width:920px;margin:0 auto;padding:0 8px}
+.paper{border:1px solid #e3e7ee;border-radius:14px;margin:0 auto 26px;box-shadow:0 3px 12px rgba(0,0,0,.07);overflow:hidden;background:#fff}
+.paper-header{background:linear-gradient(135deg,#1A5276,#003366);color:#fff;padding:18px 22px}
+.paper-header .paper-title{color:#fff;font-size:16px;font-weight:800;line-height:1.5;margin:0 0 12px}
+.paper-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:#e3ecf6}
+.paper-meta-item{display:flex;align-items:center;gap:4px}
+.paper-meta-item strong{color:#fff;font-weight:600}
+.importance-badge{padding:3px 11px;border-radius:20px;font-weight:800;color:#1a1a2e}
+.importance-high{background:#FFD54F}.importance-mid{background:#90CAF9;color:#0d2b45}.importance-low{background:#cfd8dc;color:#37474f}
+.evidence-tag{padding:3px 11px;border-radius:20px;font-weight:700;color:#fff;background:#2E8B72}
+.evidence-ref{background:#8896a5}
+.bd-request-btn{background:#fff;color:#003366;border:none;padding:7px 16px;border-radius:7px;font-size:12.5px;font-weight:800;cursor:pointer;margin-left:auto;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.bd-request-btn:hover{background:#ffe9b3}.bd-request-btn:disabled{background:#b9c2cc;color:#fff;cursor:not-allowed}
+.paper-header a,.paper-url{color:#cfe0f5 !important;font-size:11px;word-break:break-all}
+.paper-content{padding:18px 22px}
+.content-section{border-left:4px solid #d3dce6;padding:6px 0 6px 16px;margin:0 0 12px}
+.content-section-title{font-size:13px;font-weight:800;color:#1A5276;margin-bottom:4px;letter-spacing:.2px}
+.content-section-text{font-size:13.5px;line-height:1.7;color:#2b2b38}
+.content-section-text strong{color:#003366}
+.content-section.cs-key{border-left-color:#003366;background:#f3f8fd;border-radius:8px;padding:11px 16px}
+.content-section.cs-key .content-section-title{color:#003366}
+.key-numbers{background:#fff8e6;border:1px solid #f1dea0;border-radius:10px;padding:13px 18px;margin:14px 0}
+.key-numbers h4{margin:0 0 8px;color:#8a6a00;font-size:13.5px}
+.key-numbers ul{margin:0;padding-left:20px}.key-numbers li{font-size:13px;line-height:1.55;margin:4px 0;color:#5a4600}
+.viz-section{background:#f5f9fd;border:1px solid #d9e6f2;border-radius:10px;padding:15px 18px;margin:14px 0}
+.viz-section h4{margin:0 0 10px;color:#003366;font-size:13.5px}
+.usage-box{background:#ecf7f3;border:1px solid #bfe2d7;border-left:5px solid #2E8B72;border-radius:10px;padding:14px 18px;margin:14px 0}
+.usage-box h4{margin:0 0 8px;color:#1d6b59;font-size:13.5px}
+.usage-head{font-weight:800;color:#135344;font-size:13.5px;line-height:1.55;margin-bottom:7px;padding-bottom:7px;border-bottom:1px dashed #bfe2d7}
+.usage-box ul{margin:0;padding-left:20px}.usage-box li{font-size:13px;line-height:1.6;margin:5px 0;color:#244b43}
 </style>
 
 </head>
@@ -72,17 +95,17 @@
 <div class="info-box">
   <h2>📧 메일 발송 안내</h2>
   <div style="margin: 8px 0;"><strong>수신자:</strong> aaaa81@hanall.co.kr</div>
-  <div style="margin: 8px 0;"><strong>제목:</strong> <span id="mailSubject">[문헌모니터링] 2주차 골대사·신경 (2026.04.13)</span></div>
+  <div style="margin: 8px 0;"><strong>제목:</strong> <span id="mailSubject">[문헌모니터링] 4주차 골대사·신경 (2026.06.13)</span></div>
   <button class="copy-btn" onclick="copyText()">본문 복사</button>
 </div>
 
 <div class="mail-body">
   <div id="mailContent">
     <div class="report-header">
-      <span style="display:inline-block; background: #1A5276; color: #fff; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px;">2주차 골대사·신경</span>
+      <span style="display:inline-block; background: #1A5276; color: #fff; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px;">4주차 골대사·신경</span>
       <h1>알파본D + 프레논OD 월간 업데이트</h1>
       <div style="font-size: 13px; color: rgba(255,255,255,0.75); margin-top: 12px; display: flex; gap: 16px; flex-wrap: wrap;">
-        <span>📅 2026.04.13</span>
+        <span>📅 2026.06.13</span>
         <span>🏥 신경병증성 통증·골대사</span>
       </div>
       <div class="stat-row">
@@ -113,19 +136,19 @@
                     <div><a href="https://onlinelibrary.wiley.com/doi/10.1111/papr.70061" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">다기관 이중맹검 RCT</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">당뇨병성 말초신경병증(DPN)은 당뇨 환자의 약 절반에서 발생하는 가장 흔한 만성 합병증으로, 작열감·저림·전격통 등 신경병성 통증을 유발해 수면 장애와 삶의 질 저하를 초래한다. 프레가발린은 칼슘채널 α2-δ 소단위에 결합해 흥분성 신경전달물질 방출을 억제하는 1차 권장 약물이지만, 기존 속방형(IR) 제형은 1일 2~3회 분복이 필요해 복약 순응도가 떨어지고, 용량 적정 과정에서 어지럼·졸림 등 용량 의존적 이상반응이 순응을 더 제한한다. 이에 1일 1회 투여로 순응도를 높일 수 있는 서방형(PR, prolonged-release) 프레가발린이 개발되었으나, DPN 환자에서 기존 속방형 대비 동등한 효능·안전성을 입증한 대규모 무작위 임상 근거가 부족했다. 본 연구는 이 미충족 수요를 해결하기 위해 1일 1회 PR 제형이 1일 2회 IR 제형(오리지널 Lyrica)에 비열등한지를 위약 대조하에 검증하고자 수행되었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">다기관·무작위·이중맹검·이중위약(double-dummy)·평행 3군 비열등성 임상(active 및 placebo controlled)으로, DPN 환자 총 453명을 1:1:1로 ① 프레가발린 PR 정제군, ② 프레가발린 IR 경질캡슐군(레퍼런스, Lyrica), ③ 위약군에 무작위 배정했다. 용량은 개별 환자의 반응과 내약성에 따라 적정(optimized dose)하는 방식으로 13주간 투여했다. 1차 평가변수는 기저치 대비 치료 종료 시점의 주간 평균 통증점수(mean weekly pain score) 변화량이었고, 분석은 per protocol(PP) 집합에서의 비열등성 검정과 Full Analysis Set(FAS)에서의 위약 대비 우월성 검정으로 구성되었다. 비열등성 평가는 PP 분석에서 시험군-레퍼런스군 간 최소제곱평균(LSM) 차이와 그 95% 신뢰구간을 사전 설정 마진과 비교하는 방식으로 판정했다. 인도 등 다수 기관이 참여한 다기관 연구이며 추적기간은 13주 치료기간에 걸쳐 이루어졌다(세부 군별 등록 N·이상반응 개별 발생수는 본문 표가 유료 접근으로 미확보).</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">1차 비열등성(PP 분석): 주간 통증점수 기저치 대비 변화량에서 시험군(PR) - 레퍼런스군(IR)의 LSM 차이는 0.06 (95% CI -0.28~0.41, p=0.7121)으로, 신뢰구간 상한이 사전 설정 비열등성 마진 이내에 들어 PR이 IR에 비열등함이 입증되었다(군간 통증 감소 폭 차이가 사실상 0에 수렴).<br/>
 위약 대비 우월성(FAS 분석): 주간 평균 통증점수 변화량의 LSM은 시험군(PR) -3.43, 레퍼런스군(IR) -3.49, 위약군 -3.04로, 시험군과 레퍼런스군 모두 위약 대비 통계적으로 유의하게 우월했다(PR vs 위약 p=0.0158, IR vs 위약 p=0.0047).<br/>
@@ -133,11 +156,11 @@
 (책임저자 결론상 효능은 두 활성군이 &#x27;comparable&#x27;함.<br/>
 50% 반응자율·수면간섭점수·PGIC 등 2차 변수의 군별 수치는 본문 표가 유료 장벽으로 확보되지 않아 본 요약에 미반영.).</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">저자 결론은 PR 제형의 안전성이 IR 제형과 &#x27;comparable(동등)&#x27;하다는 것으로, 두 활성군 간 안전성 프로파일에 임상적으로 의미 있는 차이가 없었다. 프레가발린의 DPN 적응증에서 알려진 대표적 이상반응은 어지럼(dizziness)과 졸림(somnolence)이며, 기존 임상 자료 기준 DPN에서 각각 약 24.6%, 25.7% 수준으로 보고되는 용량 의존적 중추신경계 반응이다(말초부종·체중증가·구갈도 흔함). 본 연구는 용량을 개별 내약성에 따라 적정하는 설계로 이러한 이상반응을 관리했다. (각 군별 정확한 이상반응 발생률·중대 이상반응 건수·투여 중단율은 본문 표가 유료 접근으로 미확보 — &#x27;검증 안 함&#x27;으로 명시. 다만 PR이 IR 대비 안전성에서 열등하지 않았다는 점은 본문 결론에서 확인됨.)</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자들은 1일 1회 서방형(PR) 프레가발린이 1일 2회 속방형(IR, Lyrica) 대비 DPN 통증 치료에서 효능·안전성이 동등(comparable)하며 비열등성을 충족했다고 결론지었다(PP LSM 차이 0.06, 95% CI -0.28~0.41). 한계는 ① 13주의 단기 추적으로 장기 효능·안전성 미확인, ② 다기관이나 주로 인도 인구 기반으로 인종·지역 일반화 제한, ③ 통증점수라는 주관적 자가보고 1차 변수 의존, ④ 군별 이상반응·2차 변수 세부 수치가 본 분석에서 확보되지 않은 점이다. 알파본D(알파칼시돌)/프레논OD(프레가발린) 관점에서, 본 RCT는 1일 1회 서방형 프레가발린(프레논OD 제형 컨셉)이 검증된 오리지널 IR 프레가발린과 동등한 진통 효과를 1일 1회 복약 편의로 달성함을 입증한 직접 근거로, 복약 순응이 중요한 당뇨병성 신경병증 환자에서 &#x27;효과는 동등, 복용은 1회&#x27;라는 프레논OD의 차별적 디테일링 메시지를 뒷받침한다.</div>
                     </div>
@@ -148,6 +171,26 @@
                             <li>위약 대비 통증감소 LSM: PR -3.43 / IR -3.49 / 위약 -3.04 (PR vs 위약 p=0.0158, IR vs 위약 p=0.0047)</li>
                             <li>총 453명 무작위배정, 3군 1:1:1(PR/IR/위약), 13주 이중맹검·이중위약 비열등성 RCT</li>
                         </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 당뇨병성 신경병증: 서방형(1일1회) vs 속방형 — 통증감소 동등(비열등)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart1"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart1"), {
+                            type: "bar",
+                            data: { labels: ["통증감소(LSM)"], datasets: [
+                              { label: "서방형 1일1회", data: [3.43], backgroundColor: "#1A5276" },
+                              { label: "속방형 1일2회", data: [3.49], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 1일 1회 서방형 프레가발린이 1일 2회 오리지널 IR 대비 DPN 통증감소 비열등(LSM차 0.06, 95%CI -0.28~0.41) — 프레논OD의 &#x27;효과 동등·복용 1회&#x27; 순응도 근거</div><ul><li>디테일링 활용: 복약 순응이 어려운 당뇨병성 말초신경병증 환자에게 &#x27;검증된 오리지널과 동등한 진통 효과를 1일 1회로&#x27;라는 메시지로 프레논OD(서방형 프레가발린) 처방 전환 명분 제시</li><li>디테일링 활용: 위약 대비 유의한 통증 감소(PR p=0.0158)와 IR와 동등한 안전성을 근거로, 분복 부담·낮 시간 졸림 우려로 순응이 떨어지는 환자에서 1일 1회 제형의 임상적 가치 강조</li></ul>
                     </div>
                 </div>
             </div>
@@ -166,19 +209,19 @@
                     <div><a href="https://pubmed.ncbi.nlm.nih.gov/40088663/" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">후향적 비교 코호트</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">당뇨병성 말초신경병증(DPN)은 당뇨병의 대표적 만성 합병증으로 족부 궤양·하지 절단·샤르코 관절병증의 주된 선행 요인이며, 신경 기능을 회복시키는 확립된 치료가 없어 통증 조절과 혈당 유지가 관리의 핵심이다. 미국 FDA·ADA는 프레가발린과 둘록세틴을 1차, 가바펜틴을 2차 치료로 권고하나, 실제 임상에서는 세 약물 중 무엇을 먼저 시작하고 효과·부작용을 얼마나 관찰해야 하는지에 대한 합의가 없다. DPN은 만성이고 다양한 동반질환의 영향을 받아 1~2주 내 단기 효과를 기대하기 어렵고, 부작용으로 인한 순응도 저하 우려가 커 세 약물을 직접 비교하는 포괄적 연구가 필요했다. 본 연구는 세 대표 약물의 효과·합병증이 최소 6주 치료 기간 동안 어떻게 다른지 비교해 환자 맞춤형 1차 약제 선택 지침을 제시하고자 수행되었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">후향적 코호트 연구(근거수준 Level III)로, 한국 당뇨발 센터에 2019년 6월~2021년 8월 의뢰된 제2형 당뇨+DPN 환자를 대상으로 HbA1c와 연령으로 1:1:1 매칭하여 총 180명(가바펜틴 60명, 프레가발린 60명, 둘록세틴 60명)을 분석했다. 선정기준은 40~65세 미만, 제2형 당뇨 유병 5년 초과, 신경병증성 통증 1년 초과이며, MNSI≥7·10g 모노필라멘트 3부위 이상 감각소실·EMG-NCV 등으로 DPN을 확진했다. 1주 약물 휴지기(washout) 후 가바펜틴은 100mg 1일2회로 시작해 2주차부터 300mg 1일2회, 프레가발린은 75mg 1일1회 2주 후 75mg 1일2회, 둘록세틴은 30mg 1일1회 후 2주차부터 30mg 1일2회로 증량했다. 1차 평가변수는 painDETECT 점수(0~38점, 높을수록 중증)로 투약 전·2주·6주에 측정했고, 50% 이상 호전(&gt;50%)·70% 이상 호전 반응자 비율과 이상반응, 반응자의 HbA1c를 함께 분석했다. 추적기간은 6주.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">기저 painDETECT 점수는 군간 차이가 없었다(가바펜틴 21.1±4.0 vs 프레가발린 22.3±4.0 vs 둘록세틴 22.5±3.6, p=0.09).<br/>
 2주차에도 유의차 없었으나(가바 16.5±7.6 vs 프레가 15.2±8.6 vs 둘록 14.6±6.9, p=0.41), 6주차에는 유의한 차이가 발생했다(가바펜틴 15.7±7.1 vs 프레가발린 11.4±6.1 vs 둘록세틴 10.3±7.0, p=0.001).<br/>
@@ -187,11 +230,11 @@
 50% 이상 호전 반응자의 평균 HbA1c는 둘록세틴 7.718%(95%CI 6.74~8.70)로 가바펜틴 9.42%(95%CI 8.17~10.68)·프레가발린 10.43%(95%CI 8.65~12.21)보다 유의하게 낮았고(둘록 vs 가바 p=0.001, 둘록 vs 프레가 p=0.001), 가바-프레가 간 차이는 없었다(p=0.45).<br/>
 즉 둘록세틴은 혈당 조절이 양호한 환자(낮은 HbA1c)에서, 프레가발린·가바펜틴은 HbA1c가 높은 환자에서 만족도가 유지되었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">이상반응은 둘록세틴군에서 가장 빈번해 23.3%(14/60)였고, 프레가발린 6.7%(4/60), 가바펜틴 1.7%(1/60)로 유의한 차이를 보였다(p=0.001). 둘록세틴 이상반응 14명의 세부 내역은 어지럼증 9명(64.3%), 오심·구토 3명(21.4%), 두통 2명(14.3%)이었다. 프레가발린군 4명은 어지럼증 3명(75.0%)·오심구토 1명(25.0%)으로 약물 중단 사유가 되었고, 가바펜틴군은 단 1명이 어지럼증을 보고했다. 저자는 둘록세틴이 SNRI 항우울제로 효과적이나 어지럼증·위장장애·두통 빈도가 높고 특히 젊은 층에서 자살사고 관련 블랙박스 경고가 있어 주의·교육이 필요하다고 지적했다. 가바펜틴·프레가발린의 신경학적 합병증(어지럼·졸림)도 운전·중장비 작업자에서 특히 주의가 필요하다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자 결론은 둘록세틴과 프레가발린이 6주 시점에 가바펜틴보다 통증 감소 효과를 우수하게 유지하나 둘록세틴은 이상반응이 유의하게 많으므로, HbA1c 8.7 초과의 조절 불량 환자에서는 합병증이 적고 순응도가 높은 프레가발린(또는 가바펜틴)이, 혈당 조절이 양호한 환자에서는 둘록세틴이 적합하다는 것이다(HbA1c 기반 의사결정 트리 제시). 한계로는 후향적·소규모·단일기관·6주 단기 추적·open-label 평가 편향 가능성, painDETECT 단일 척도 사용, 가바펜틴·프레가발린의 상대적 저용량 투여 가능성을 들었다. 알파본D(알파칼시돌)/프레논OD(프레가발린) 관점에서, 프레논OD는 1차 약제로서 둘록세틴에 비견되는 통증 감소 효과를 보이면서 이상반응은 6.7%로 둘록세틴(23.3%)의 1/3 이하로 낮고 특히 혈당 조절이 불량한 환자(HbA1c&gt;8.7)에서 순응도·안전성 우위를 갖춰, DPN 1차 처방의 균형 잡힌 선택지임을 뒷받침한다.</div>
                     </div>
@@ -202,6 +245,26 @@
                             <li>이상반응 발생률: 둘록세틴 23.3%(14/60) vs 프레가발린 6.7%(4/60) vs 가바펜틴 1.7%(1/60), p=0.001</li>
                             <li>&gt;50% 호전 반응자 HbA1c: 프레가발린 10.43%(95%CI 8.65~12.21) vs 둘록세틴 7.72%(95%CI 6.74~8.70), p=0.001</li>
                         </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: DPN: 프레가발린 vs 둘록세틴 — 효과 유사·이상반응 1/3</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart2"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart2"), {
+                            type: "bar",
+                            data: { labels: ["통증(painDETECT)", "이상반응(%)"], datasets: [
+                              { label: "프레가발린", data: [11.4, 6.7], backgroundColor: "#1A5276" },
+                              { label: "둘록세틴", data: [10.3, 23.3], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: DPN 1차약 직접비교(N=180, 6주)에서 프레가발린은 둘록세틴급 통증 감소(painDETECT 11.4 vs 10.3, p=0.62 차이 없음)를 내면서 이상반응은 6.7%로 둘록세틴 23.3%의 1/3 이하 — 프레논OD의 효과·안전성 균형을 입증</div><ul><li>혈당 조절 불량 환자(HbA1c&gt;8.7) 디테일링: 프레가발린은 고HbA1c 반응자에서도 효과가 유지(반응자 평균 HbA1c 10.43%)되고 합병증이 적어 순응도가 높아, 조절 안 되는 당뇨 환자의 1차 신경병증성 통증 약제로 프레논OD를 권고할 근거</li><li>안전성 비교 강조: 둘록세틴군 어지럼증 64.3%·오심구토 21.4%·두통 14.3%로 23.3% 중단 위험 — 운전·중장비 작업 환자나 자살사고 블랙박스 우려 대상에서 프레논OD(어지럼·위장장애 위주, 6.7%)의 내약성 우위를 부각</li></ul>
                     </div>
                 </div>
             </div>
@@ -220,19 +283,19 @@
                     <div><a href="https://pubmed.ncbi.nlm.nih.gov/41139799/" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">메타분석</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">통증성 당뇨병성 신경병증(PDN)은 1형·2형 당뇨 모두에서 발생하는 가장 흔한 말초신경병증 합병증으로, 작열감·찌르는 듯한 통증·전기충격 같은 감각이상과 야간 악화를 동반해 수면·기분·신체활동을 훼손한다. 당뇨병성 신경병증 환자의 40~50%가 통증을 호소하며, PDN은 족부궤양·절단 위험을 높이고 잦은 입원·외래 방문으로 의료비와 생산성 손실을 키운다. 현재 가이드라인이 권고하는 삼환계 항우울제·항경련제·오피오이드 등 중추작용 진통제는 통증 완화 효과가 부분적이며 부작용 부담이 커 장기 사용을 제한한다. 비타민D 결핍은 당뇨 환자의 약 60%에 존재하고 PDN의 독립적 위험인자로 보고되어, 신경영양·항염·통각 경로를 통한 저독성·생물학적으로 타당한 보충 치료로 주목받지만 RCT 근거가 부족해 본 체계적 문헌고찰·메타분석이 수행됐다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">설계는 Cochrane Handbook·PRISMA를 따른 체계적 문헌고찰 및 고정효과 메타분석으로, 2025년 9월까지 Medline·EMBASE·Web of Science·Cochrane·CINAHL·EBSCO·Google Scholar를 검색했다. 총 73편(중복 제거 후 63편) 스크리닝에서 RCT 5편이 적격했고, 통증 결과를 충분히 보고한 4편(총 N=320)이 메타분석에 포함됐다(1편은 비타민D 단독 통증 결과 미보고로 제외). 대상은 국제기준으로 진단된 성인 2형 당뇨의 PDN 환자이며 4편 모두 기저 비타민D 결핍자(위약군 11.68~24.6 ng/mL)였다. 중재는 전 연구 경구 비타민D로 주 1회 50,000 IU(Shehab 2015)·1일 5000 IU(Pinzon 2021)·1일 4000 IU/주 28,000 IU(Davoudi 2021)·1일 2000 IU(Pinzon 2025)였고, 비교군은 위약 또는 표준치료(프레가발린·가바펜틴·아미트립틸린)였다. 군별 N은 Shehab 위약55/비타민D57, Pinzon2021 34/34, Davoudi 45/45, Pinzon2025 30/30. 1차 평가변수는 검증된 도구(VAS 0–10, NPS 0–100, NSS 0–9)로 측정한 통증강도이며, 추적기간은 8주(3편)~12주(1편)였다. 효과크기는 표준화평균차(SMD)로 통합하고 이질성은 I²(Higgins)로 평가했다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">4편 모두 비타민D군에서 통증 감소를 보였으며, 고정효과 통합 SMD = −0.85(95% CI −1.07~−0.62)로 위약 대비 강한 단기 통증 감소를 입증했다(중등도~상당 이질성 I²=61.4%).<br/>
 무작위효과 모델에서도 SMD −0.82(95% CI −1.42~−0.21)로 일관됐다.<br/>
@@ -241,11 +304,11 @@
 <strong>개별 통증 변화:</strong> Shehab 2015 NSS 비타민D −1.49(SD 1.37) vs 위약 −0.20(SD 0.59), p&lt;0.001; Pinzon 2021 VAS 비타민D −3.34(SD 2.03) vs 위약 −2.37(SD 2.2); Davoudi 2021 NPS 비타민D 49.4→31.03 vs 위약 47.02→45.6; Pinzon 2025 VAS 비타민D 5.62→2.25 vs 위약 5.38→3.11. 비타민D 혈중농도도 유의 상승(Shehab 변화 +13.12 ng/mL vs 위약 +0.44; Pinzon2021 +24.14 vs +3.10 ng/mL).<br/>
 표본수 차이가 작아 Egger 검정은 미시행, 깔때기 그림은 해석이 제한적이었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">본 메타분석은 통증 효능을 1차 목적으로 설계돼 이상반응명·군별 발생률·중대 이상반응·중단율을 별도 통합 분석하지 않았다(연구 본문에 안전성 통합 결과 없음 — 정직히 &#x27;검증 안 함&#x27;). 다만 저자들은 비타민D 보충을 반복적으로 &#x27;저독성(low-toxicity)·저위험(low-risk) 중재&#x27;로 규정했고, 결핍 교정은 이미 임상적으로 권고되는 표준 처치라 안전성 우려가 낮다고 기술했다. 탈락(attrition) 측면에서 Shehab 2015는 치료군 2명·위약군 3명 중도탈락(95% 분석, 저위험), Davoudi 2021은 군당 5명 탈락을 ITT 미적용으로 처리(중등도 위험)했고, Pinzon 2025는 탈락 0명으로 보고됐다. 비타민D는 비용이 낮아 고용량 진통제의 의인성 부작용과 다약제 처방을 줄일 잠재적 안전·경제적 이점이 거론됐다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자 결론은 비타민D 보충이 기저 결핍 PDN 환자에서 단기 신경병증성 통증을 유의하게(SMD −0.85) 감소시키며 저위험·저비용 보조 치료로서 잠재력이 있으나, 소규모 표본(메타분석 N=320, 일부 분석 N=260)·할당은폐·맹검·선택적보고 등 방법론적 한계와 12주 초과 추적 부재로 일반화에 제한이 있다는 것이다. 효과가 결핍 교정에 기인할 가능성이 커 비결핍 환자로의 적용은 추가 연구가 필요하고, 표준화된 용량·통증척도를 갖춘 대규모 충분검정력 RCT가 시급하다. 알파본D(알파칼시돌)/프레논OD(프레가발린) 관점에서, 본 메타분석은 프레가발린 등 표준 신경병증 진통제에 비타민D 보충을 더한 병용군(Pinzon 연구들)에서 추가 통증 감소가 관찰됐음을 보여주어, 결핍이 흔한 당뇨병성 신경병증 환자에서 알파칼시돌 계열 비타민D 보충과 프레가발린의 병용이 상보적 통증 관리 전략으로 검토될 임상적 근거를 제공한다.</div>
                     </div>
@@ -256,6 +319,26 @@
                             <li>NPS 환산 약 11.6점 감소 (95% CI 15.1~8.2), 무작위효과 SMD −0.82 (95% CI −1.42~−0.21)</li>
                             <li>Shehab 2015 NSS 변화 비타민D −1.49 vs 위약 −0.20, p&lt;0.001</li>
                         </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 당뇨병성 신경병증: 비타민D 통증 감소 효과크기(SMD, 메타분석)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart3"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart3"), {
+                            type: "bar",
+                            data: { labels: ["통증감소 효과크기(|SMD|)"], datasets: [
+                              { label: "비타민D", data: [0.85], backgroundColor: "#1A5276" },
+                              { label: " ", data: [0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 비타민D 보충이 결핍 동반 통증성 당뇨병성 신경병증의 단기 통증을 위약 대비 유의 감소(통합 SMD −0.85, I²=61.4%, RCT 4편 N=320)시켜, 프레가발린(프레논OD)+비타민D(알파본D) 병용의 상보적 통증관리 근거를 제시</div><ul><li>결핍이 흔한(당뇨 환자 약 60%) 당뇨병성 신경병증 환자에서 프레가발린 단독으로 통증이 충분히 잡히지 않을 때 비타민D 보충 병용을 권하는 디테일 포인트로 활용 — 포함 4편 중 Pinzon 연구들은 실제로 프레가발린·가바펜틴·아미트립틸린 표준치료에 비타민D를 더한 병용 설계였음</li><li>저독성·저비용 보조 치료라는 점, 그리고 비타민D 혈중농도 상승(예: +24.14 ng/mL)과 통증 감소가 동반된 점을 근거로 &#x27;결핍 교정&#x27; 명분의 처방 메시지를 구성하되, 12주 초과 장기 데이터·대규모 RCT 부재라는 한계도 함께 안내해 과대주장 리스크를 관리</li></ul>
                     </div>
                 </div>
             </div>
@@ -274,19 +357,19 @@
                     <div><a href="https://doi.org/10.1136/bmj-2025-088050" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">메타분석</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">골다공증성 골절은 노인의 주요 사망·장애·의료비 부담 요인으로, 영국에서만 연간 7만 건 이상의 고관절 골절이 발생하며 케어 비용이 약 20억 파운드에 이른다. 칼슘과 비타민D 보충은 수십 년간 골절 예방의 표준 권고로 자리잡아 전 세계 수백만 노인이 복용하고 있으나, 개별 대규모 RCT들은 일관되지 않은 결과를 보여왔고 특히 지역사회 거주 건강 노인에서의 효익은 논쟁적이었다. 기존 메타분석들은 통계적 유의성에만 초점을 맞추고 &#x27;임상적으로 의미 있는&#x27; 효과 크기 기준을 사전에 정의하지 않아, 미미한 효과를 과대 해석할 위험이 있었다. 본 연구는 칼슘 단독·비타민D 단독·병용 세 전략을 사전 정의된 임상적 의미 역치(MID)에 비추어 GRADE 근거확실성과 함께 평가하기 위해 수행되었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">체계적 문헌고찰 및 메타분석. 총 69개 무작위대조시험(RCT), 153,902명을 포함했다. 군별로는 칼슘 단독 11개 시험·9,067명(근거확실성 &#x27;중등도&#x27;), 비타민D 단독 36개 시험·92,045명(확실성 &#x27;높음&#x27;), 칼슘+비타민D 병용 15개 시험·51,126명(확실성 &#x27;높음&#x27;)으로 구성되었다. 대상은 주로 지역사회 거주 노인이며 골다공증 진단자·확진된 비타민D 결핍자·골다공증 치료제 복용자는 평가 범위에서 제외되는 한계가 있었다. 중재는 칼슘·비타민D·병용 보충(위약 또는 무처치 대조), 평균 추적기간은 비타민D 단독 약 2년, 칼슘 단독 2.8년, 병용 2.3년이었다. 평가변수는 모든 골절·고관절 골절·비척추 골절·척추 골절·낙상이었으며, 핵심 분석틀은 각 결과별로 사전 정의한 최소중요차이(MID): 고관절 골절 절대위험 0.7% 감소, 모든·비척추·척추 골절 2% 감소, 낙상 3% 감소(또는 100인년당 낙상 5건 감소)를 충족하는지였다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">칼슘 단독과 비타민D 단독은 어떤 골절 유형이나 낙상에서도 위약 대비 유의한 효과가 없었다(no significant effect on fracture or falls risk).<br/>
 병용(칼슘+비타민D)만이 통계적 유의성에 도달했다 — 모든 골절 RR 0.91(95% CI 0.84–0.99), 고관절 골절 RR 0.84(95% CI 0.74–0.96), 비척추 골절 RR 0.87(95% CI 0.78–0.96), 낙상 RR 0.92(95% CI 0.84–1.0, 경계적).<br/>
@@ -295,11 +378,11 @@
 전체적으로 세 전략 모두 중등도~높은 근거확실성 하에서 골절·낙상 예방에 little to no 효과로 결론지어졌다.<br/>
 기저 낙상률은 100인년당 약 40~73건이었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">본 메타분석은 효능(골절·낙상 예방) 평가가 주목적으로, 제공된 자료에서 신장결석·고칼슘혈증·위장관 이상반응 등 구체적 이상반응의 군별 발생률·중대 이상반응·중단율 수치는 별도로 추출·보고되지 않았다(본문 접근 제한으로 안전성 세부 수치 검증 불가). 다만 칼슘 보충과 연관된 것으로 알려진 신결석·소화기 불편·심혈관 우려는 기존 문헌에서 반복 제기된 사안으로, 본 연구가 보여준 &#x27;임상적 효익 부재&#x27;와 결합하면 무차별적 보충의 위험-효익 균형이 불리해질 수 있다는 점이 임상적 함의로 논의되었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자들은 지역사회 거주·임상적으로 골절 고위험이 아닌 노인 일반에서 칼슘 단독·비타민D 단독·병용 보충은 골절·낙상 예방에 임상적으로 의미 있는 효익을 제공하지 못하므로 &#x27;루틴 보충을 지지하지 않으며&#x27; 임상의가 현행 권고를 재평가해야 한다고 결론지었다. 한계로는 골다공증 확진자·비타민D 결핍 확진자·골다공증 약물 복용자를 포함하지 않아 이들 고위험군에는 일반화할 수 없고, 일부 결과(특히 척추 골절)는 포함 시험·참가자 수가 적었으며, 기저 비타민D 수치를 보고한 시험이 드물어 결핍 하위군 분석이 제한적이었다는 점이 지적된다. 알파본D(알파칼시돌)/프레논OD(프레가발린) 관점 — 일반 영양보충 칼슘/천연 비타민D와 달리 알파칼시돌은 신·간 수산화를 거치지 않는 활성형 비타민D 유사체로 칼슘 흡수·근력·낙상 기전이 다르므로 본 연구의 &#x27;단순 영양 보충 무효&#x27; 결론을 활성형 비타민D나 골다공증 확진·고위험군 치료에 그대로 적용해서는 안 된다는 점이 디테일링의 핵심 차별화 포인트가 된다.</div>
                     </div>
@@ -310,6 +393,26 @@
                             <li>병용 고관절 골절 RR 0.84 (95% CI 0.74–0.96)</li>
                             <li>69개 RCT·153,902명, 칼슘/비타민D 단독은 유의효과 없음</li>
                         </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 칼슘+비타민D 병용: 골절 위험비(RR&lt;1=감소)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart4"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart4"), {
+                            type: "bar",
+                            data: { labels: ["모든 골절", "고관절 골절"], datasets: [
+                              { label: "병용 RR", data: [0.91, 0.84], backgroundColor: "#1A5276" },
+                              { label: "기준(1.0)", data: [1.0, 1.0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 69개 RCT·15.4만명 메타분석에서 칼슘·비타민D 단순 보충은 골절·낙상 예방 효익이 임상적으로 무의미 — 알파본D(활성형 비타민D)는 이 &#x27;영양 보충 무효&#x27; 결론과 기전·적응증이 다름을 강조해야 함</div><ul><li>활용1: 본 연구의 무효 결론은 &#x27;지역사회 건강 노인 + 일반 칼슘/천연 비타민D&#x27;에 국한됨을 분명히 하고, 골다공증 확진·낙상 고위험·결핍 환자는 평가 대상에서 제외되었다는 한계를 디테일링 방어 논리로 사용한다.</li><li>활용2: 알파칼시돌은 신·간 수산화 불필요한 활성형으로 칼슘 흡수·근력 증진·낙상 감소 기전이 천연 비타민D와 구별됨을 설명해, 단순 영양 보충 무효 데이터와 활성형 비타민D 치료를 분리 포지셔닝한다.</li></ul>
                     </div>
                 </div>
             </div>
@@ -328,19 +431,19 @@
                     <div><a href="https://www.nature.com/articles/s41598-025-27617-2" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">비교 코호트</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">당뇨병성 말초신경병증 통증(DPNP)은 당뇨 환자의 약 50%가 일생 중 경험하는 만성 합병증으로, 수면·정서·삶의 질을 광범위하게 훼손한다. 만성 고혈당에 의한 폴리올 경로 활성화·AGE 축적·미세혈관 허혈·신경염증(TNF-α·IL-1β·IL-6)이 축삭 변성과 중추 감작을 일으켜 단일요법에 잘 반응하지 않는 경우가 많다. 현재 약물치료는 대증적이며 항경련제(프레가발린), 삼환계항우울제(노르트립틸린), SNRI(둘록세틴)가 주축이지만, 단일요법은 부분적 통증완화에 그치고 치료용량에서 부작용을 동반한다. 특히 프레가발린+노르트립틸린과 프레가발린+둘록세틴 병용을 직접 비교한 연구가 드물고, 대부분의 임상시험이 노르트립틸린 대신 아미트립틸린을 사용했으며 수면·기분 같은 2차 결과를 간과했다. 또한 약물대사·내약성이 다를 수 있는 인도·남아시아 인구를 다룬 근거가 부족해, 인도 인구에서 두 병용요법의 효능·내약성·2차 증상 영향을 직접 비교할 필요가 제기됐다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">인도 남부 군투르(Guntur) 3차 의료기관 신경과에서 시행된 후향-전향 혼합 코호트 연구(2022.11~2023.3, 5개월). DPNP 성인 60명을 PG-NT(프레가발린+노르트립틸린) 30명과 PG-DLX(프레가발린+둘록세틴) 30명으로 나눠 비교했다. 선정기준은 18세 이상, 1년 이상 당뇨병 진단, 당뇨 기원 신경병증 통증, 해당 병용약물을 2개월 이상 복용 중인 자(말기 장기질환·악성종양·간질·임신 등 제외). 신경병증 진단은 생체역치측정·모노필라멘트 없이 임상 병력·증상·진찰만으로 시행. 중재: PG-NT군은 프레가발린 50mg 1일3회(150mg/일, 최대 300mg/일)+노르트립틸린 10~25mg 야간 1회(최대 75mg/일), PG-DLX군은 동일 프레가발린+둘록세틴 60mg 1일1회 고정용량. 후향적으로 최소 2개월 치료 환자를 식별한 뒤 추가 3개월간 매월 전향 추적, 총 9주 관찰. 평가변수: 통증(VAS 0~10), 불면(ISI 0~28), 불안·우울(HADS-A·HADS-D 각 0~21). 효과크기는 Cohen&#x27;s d로 산출, GraphPad Prism 사용, 다중비교 보정 없음(2차 결과는 탐색적). 표본수 산출은 하지 않음(탐색적 설계).</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">VAS(통증): PG-NT군 4.23±1.38→2.76±0.91, 평균변화 -1.35(95%CI -1.65~-1.04, p&lt;0.001).<br/>
 PG-DLX군 4.83±1.84→2.57±1.30, 평균변화 -2.23(95%CI -2.69~-1.84, p&lt;0.001).<br/>
@@ -351,11 +454,11 @@ HADS-D(우울): PG-DLX 7.36±2.43→5.66±1.83, 변화 -1.70(95%CI -2.50~-0.90, 
 모든 1차·2차 지표에서 PG-DLX가 일관되게 더 큰 개선을 보였다(단, VAS 군간차 0.88cm는 통증 MID 1~2cm에 근접하나 robust하게 초과하진 않음).<br/>
 대상자 평균연령 54.68±11.44세, 남성 53.33%, 평균 당뇨 유병 9.03±5.25년, HbA1c≥8.0% 고위험군 53.3%.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">이상반응은 전반적으로 경증~중등도이며 어느 군에서도 용량감량·치료중단을 초래하지 않았고 모두 자연 소실. 총 14건(전체 23.33%). PG-DLX군 9건(30%): 두통 4명(13.33%), 비정상 꿈/수면장애 1명(3.33%), 체중증가 1명(3.33%), 흐린 시야 1명(3.33%), 말초부종 1명(3.33%), 운동 협응장애 1명(3.33%). PG-NT군 5건(16.67%): 체중증가 2명(6.67%·최다), 두통 1명(3.33%), 비정상 꿈/수면장애 1명(3.33%), 운동 협응장애 1명(3.33%). PG-DLX는 두통·말초부종이, PG-NT는 체중증가·협응문제가 상대적으로 많았다. 사후 CTCAE 매핑상 두통·체중증가·흐린시야·말초부종·협응장애는 Grade 1, 중등도 수면장애·간헐 중등도 두통은 Grade 2였고 Grade 3 이상·중대 이상반응·사망·영구 중단은 없었다. PG-DLX의 전체 이상반응 빈도가 높았으나(30% vs 16.67%) 중단 환자는 0명으로 9주간 양호한 내약성을 보였다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자 결론: 두 병용요법 모두 DPNP 통증을 유의하게 감소시켜 효과적이나, PG-DLX(프레가발린+둘록세틴)가 통증완화·수면질·기분증상(특히 우울)에서 더 우월한 이점을 보이며 경증 이상반응만 소폭 증가시켰다. 임상적으로 동반 기분·수면장애가 있는 환자엔 PG-DLX, 둘록세틴 금기(간장애·SNRI 불내성)인 경우엔 PG-NT가 합리적이다. 한계: 후향-전향 혼합·무작위배정 및 맹검 부재로 선택·관찰 편향 위험, 소규모(N=60)·단일기관으로 일반화 및 하위군 분석 제한, 9주 단기로 장기효능·지연부작용 평가 불가, 용량·순응도 미통제, 다중비교 보정 부재(2차결과는 탐색적), 신경병증 진단이 임상소견만 의존, PG-DLX군 기저 VAS가 다소 높아 변화폭에 영향 가능. 알파본D(알파칼시돌)/프레논OD(프레가발린) 관점의 임상 함의: 프레논OD(프레가발린)는 두 병용요법의 공통 기반축으로서 α2δ 말초 기전이 둘록세틴·노르트립틸린의 중추 단가아민 기전과 상보적으로 작용하며, 통증뿐 아니라 수면·기분까지 다차원 개선을 노리는 DPNP 병용전략에서 프레논OD를 중심 골격으로 제안할 근거를 제공한다.</div>
                     </div>
@@ -366,6 +469,10 @@ HADS-D(우울): PG-DLX 7.36±2.43→5.66±1.83, 변화 -1.70(95%CI -2.50~-0.90, 
                             <li>ISI 변화 PG-DLX -2.87(95%CI -3.76~-1.98) vs PG-NT -1.14(95%CI -1.61~-0.66)</li>
                             <li>HADS-D PG-DLX -1.70 p&lt;0.001 유의 vs PG-NT p=0.076 비유의; 이상반응 30% vs 16.67%, 중단 0명</li>
                         </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: DPNP 60명 비교코호트 — 프레가발린 기반 두 병용요법 모두 유효하나 PG-둘록세틴이 통증(VAS -2.23 vs -1.35)·수면·우울에서 우월, 프레논OD가 두 병용의 공통 기반축임을 입증</div><ul><li>프레논OD(프레가발린) 디테일링: &#x27;단일요법에 반응 부족한 DPNP에서 프레가발린은 α2δ 말초기전으로 중추작용 약물(둘록세틴/노르트립틸린)과 상보적 병용의 핵심 골격이며, 병용 시 통증·수면·기분까지 다차원 개선&#x27; 메시지로 활용</li><li>안전성 소구: 9주간 두 병용 모두 중대 이상반응·치료중단 0건(이상반응 경증 Grade 1~2), 프레가발린 기반 병용의 양호한 내약성을 강조 — 단 N=60·단일기관·무작위배정 부재의 근거수준 한계는 함께 고지</li></ul>
                     </div>
                 </div>
             </div>
@@ -384,19 +491,19 @@ HADS-D(우울): PG-DLX 7.36±2.43→5.66±1.83, 변화 -1.70(95%CI -2.50~-0.90, 
                     <div><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12451326/" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">포괄적 메타분석</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">요통(LBP)은 전 세계에서 가장 흔한 통증 질환이자 장애의 주요 원인으로, 2020년 기준 약 6억 1,900만 명(95% 불확실구간 5억 5,400만~6억 9,400만)이 앓고 있으며 전체 인구의 약 50%가 경험한다. 만성 요통은 침해수용성(nociceptive)과 신경병증성(neuropathic) 기전이 혼재된 &#x27;혼합성 통증(mixed pain)&#x27;으로 점차 이해되고 있으나, 신경병증성 요소가 과소 인식·과소 치료되는 경향이 있다. 환자의 약 1/4이 우울·불안 등 정신과적 동반질환을 갖고, 간접비용이 총비용의 최대 68%에 달할 만큼 사회경제적 부담이 크다. 기존 1차 치료인 파라세타몰·NSAIDs는 위장관 독성 등 위험이 있고 오피오이드는 중독·의존·오피오이드 위기 문제로 장기 사용이 제한되어, 신경병증성 요통에 대한 대안 약물 수요가 컸다. 프레가발린은 전압의존성 칼슘채널 α2-δ 아단위에 선택적으로 결합해 칼슘 유입과 흥분성 신경전달물질 방출을 억제함으로써 통증을 줄이는 기전을 갖지만, 기존 메타분석들은 프레가발린만을 분리 분석하지 못했거나(여러 약물 혼합), RCT 3편만 포함하고 용량·대조군을 보정하지 않는 한계가 있어 본 연구가 기획되었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">PRISMA 지침을 따르고 PROSPERO(CRD42025642429)에 등록된 포괄적 체계적 문헌고찰·메타분석. 2024년 12월 PubMed·Scopus·Cochrane Library 3개 DB를 출판일·언어 제한 없이 검색(초기 959건: PubMed 318·Scopus 401·Cochrane 240)하여, 중복·비RCT 제거 및 선별 후 최종 18편·환자 5,000명을 포함. PICOS — 대상(P): 요통·신경근병증·척추관협착증 성인(수술 환자 제외), 중재(I): 프레가발린(단독 또는 병용), 대조(C): 위약 또는 타 진통제(가바펜틴·아미트립틸린·리마프로스트·타페나돌·부프레노르핀·트라마돌/아세트아미노펜·에토리콕시브·셀레콕시브 등), 성과(O): 효능·안전성. 프레가발린 용량은 연구별로 25~600 mg/day(시작 75 또는 150 mg, 최대 300~600 mg), 추적기간은 14일~52주로 다양. 1차·2차 평가변수: 통증(VAS 요통·하지통증, 2·4·6·8주 및 8주 초과 시점별), 불안·우울(HADS), 장애(ODI·Roland-Morris·Sheehan), 삶의 질(EQ-5D·SF-12), 수면장애, 이상반응, 총비용. 연속변수는 MD/SMD, 이분변수는 OR(95% CI)로 분석, 이질성 I²≥50%면 무작위효과모델 적용. 비뚤림은 RoB 2(RCT)·MINORS(비RCT), 근거수준은 GRADE로 평가.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">통증(VAS, 시점별): 2주에는 활성대조군 대비 유의차 없음(SMD=−0.03, 95% CI −0.34~0.28, 환자 1,842명, 4편, I²=80%, p=0.85).<br/>
 그러나 4주(SMD=−0.64, 95% CI −1.09~−0.20, 2,619명, 7편, I²=95%, p=0.005), 6주(SMD=−0.72, 95% CI −1.15~−0.29, 2,284명, 6편, I²=94%, p=0.001), 8주(SMD=−0.50, 95% CI −0.71~−0.29, 2,284명, 6편, I²=80%, p=0.0005)에서 프레가발린(단독·병용)이 유의하게 통증을 더 감소시킴.<br/>
@@ -411,11 +518,11 @@ HADS-D(우울): PG-DLX 7.36±2.43→5.66±1.83, 변화 -1.70(95%CI -2.50~-0.90, 
 민감도분석에서 4주 통증은 최대가중치 연구 제외 시 유의성 소실(SMD=−0.66, 95% CI −1.36~0.04, p=0.07)되어 강건성이 다소 약했고, 나머지 결과는 유지됨.<br/>
 <strong>GRADE 근거수준:</strong> 통증·불안=낮음(Low), 우울·삶의질·수면·장애=중등도(Moderate).</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">안전성은 5편이 평가했으며 프레가발린(단독 또는 부프레노르핀·리마프로스트·가바펜틴 등과 병용)과 활성대조군 간 분석된 모든 이상반응에서 유의한 차이가 없었다. 어지럼증(dizziness): PGB·병용 통합 OR=1.72(95% CI 0.66~4.51, 688명, I²=53%, p=0.27), 프레가발린 단독 OR=2.23(95% CI 0.79~6.29, 583명, p=0.13). 오심(nausea): 통합 OR=1.69(95% CI 0.51~5.61, 264명, I²=0%, p=0.39), 단독 OR=2.71(95% CI 0.44~16.50, p=0.28). 졸림(drowsy): 통합 OR=0.82(95% CI 0.33~2.05, 481명, I²=22%, p=0.67). 장 장애(bowel disturbance): 통합 OR=2.27(95% CI 0.64~8.09, 264명, I²=0%, p=0.20). 부종(edema): 통합 OR=1.34(95% CI 0.30~6.04, 399명, I²=0%, p=0.70). 즉 어지럼·오심·장장애는 수치상 프레가발린에서 다소 높은 경향(OR&gt;1)이나 통계적 유의성에는 도달하지 못함. 저자는 프레가발린의 안전성 프로파일이 기존 문헌 및 타 치료 대안과 비슷한 수준이라고 결론. 다만 이상반응 보고가 연구마다 시점·항목이 불일치하고 변수별 포함 연구 수가 적어 안전성 결론의 신뢰도는 제한적이라고 명시했으며, 프레가발린+오피오이드 병용은 진정·낙상·인지장애·호흡억제 위험 증가가 별도 보고됨.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">프레가발린은 단독요법 또는 병용요법으로 요통(특히 신경병증성 요통) 관리에서 4~8주 시점 유의한 통증 감소와 함께 불안·우울·수면장애·삶의 질 개선을 보였고, 안전성은 타 대안과 유사한 우호적 프로파일을 나타냈다(장애 개선과 이상반응은 유의차 없음). 한계로 ① 포함 연구들의 통증 병인(신경병증 vs 비신경병증)·증상기간 보고가 부실하고 혼합 집단이 많아 하위군 분석이 제한적이며 일반화에 주의가 필요한 점, ② 높은 이질성(I² 다수 ≥74%)과 출판편향, 다양한 대조군·프레가발린 단독 대조군 부족, ③ 용량별 효과 미평가, 짧은 추적기간(≤12주가 다수)으로 장애 결과 변화 포착이 제한된 점을 들며, 표준화된 추가 연구로 LBP 아형별 역할과 최적 용량 정립이 필요하다고 했다. 알파본D(알파칼시돌)/프레논OD(프레가발린) 관점에서, 프레논OD는 신경병증 요소가 동반된 요통 환자에서 4주 이후 통증 완화와 더불어 동반 불안·우울·수면 개선이라는 다차원적 가치를 제공해, 골대사·신경 영역에서 활성형 비타민D(알파본D)와 병행한 척추관협착증·요통 환자 통증·기능 관리 전략의 근거로 활용 가능하다.</div>
                     </div>
@@ -426,6 +533,26 @@ HADS-D(우울): PG-DLX 7.36±2.43→5.66±1.83, 변화 -1.70(95%CI -2.50~-0.90, 
                             <li>불안 MD −1.38·우울 MD −1.40(둘 다 p&lt;0.00001), 수면 SMD −0.61(p&lt;0.00001)</li>
                             <li>총 18편·5,000명, 어지럼증 OR 1.72(95% CI 0.66~4.51, p=0.27)로 안전성 유의차 없음</li>
                         </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 요통: 프레가발린 통증 감소 효과크기(SMD, 시점별)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart6"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart6"), {
+                            type: "bar",
+                            data: { labels: ["4주", "6주", "8주"], datasets: [
+                              { label: "통증감소(|SMD|)", data: [0.64, 0.72, 0.5], backgroundColor: "#1A5276" },
+                              { label: " ", data: [0, 0, 0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 프레가발린은 18편·5,000명 메타분석에서 요통 통증을 4~8주에 유의하게 줄이고(4주 SMD −0.64, 8주 −0.50) 불안·우울·수면·삶의 질까지 개선 — 프레논OD를 &#x27;신경병증 요소 동반 요통의 다차원 통증관리&#x27; 근거로 제시</div><ul><li>통증 단일 효과를 넘어 불안(MD −1.38)·우울(MD −1.40)·수면(SMD −0.61) 동반 개선과 총비용 절감(SMD −0.16, p=0.0003)을 함께 강조해, 정신과적 동반증상·삶의 질을 중시하는 만성 요통 처방 명분으로 활용</li><li>안전성은 어지럼·오심·졸림·부종 모두 활성대조군과 유의차 없음(OR 신뢰구간 모두 1 포함)을 근거로 내약성 메시지로 활용하되, 4주 이전 효과는 미미하고 12주 초과 시 유의성 소실·높은 이질성이라는 한계를 균형있게 안내</li></ul>
                     </div>
                 </div>
             </div>
@@ -444,19 +571,19 @@ HADS-D(우울): PG-DLX 7.36±2.43→5.66±1.83, 변화 -1.70(95%CI -2.50~-0.90, 
                     <div><a href="https://pubmed.ncbi.nlm.nih.gov/40690010/" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">파일럿 RCT</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">만성 신경병성 통증은 말초·중추 신경계 손상에서 비롯되는 복잡한 병태생리를 가지며, 작열감·전기충격 양상의 난치성 통증으로 환자의 삶의 질을 크게 훼손하고 막대한 의료비·자원을 소모한다. 1차 약제로 프레가발린·가바펜티노이드가 광범위하게 사용되지만 통증 강도를 충분히 조절하지 못하는 환자가 상당수여서 대체 치료 전략이 지속적으로 요구된다. 라코사미드는 전압의존성 나트륨 채널의 &#x27;느린 불활성화&#x27;를 선택적으로 강화하는 항경련제로, 프레가발린(α2δ 칼슘 채널 서브유닛 결합)과 작용 기전이 달라 신경병성 통증에서 효능이 보고되어 왔으나 두 약제를 직접 비교한 연구, 특히 인도인 집단을 대상으로 한 비교 데이터가 부족했다. 이에 본 연구는 두 약제의 진통 효능·삶의 질·안전성을 직접 비교하기 위해 설계되었다. (출처: PubMed, DOI: 10.1007/s00210-025-04474-4)</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">인도 SRM 의과대학병원 단일기관에서 시행된 전향적·공개라벨·무작위배정·평행군 파일럿 RCT다. 대상은 18세 초과 성인 중 3개월 이상 지속된 &#x27;확정적(definite)&#x27; 또는 &#x27;개연성 있는(probable)&#x27; 신경병성 통증 환자로, 선별된 72명 중 36명이 무작위 배정되었다. 라코사미드군은 50mg 1일 2회(BD)로 1주간 투여 후 100mg 1일 2회로 증량해 3개월간, 프레가발린군은 75mg 1일 1회(OD)로 3개월간 경구 복용했다. 7명이 중도 탈락하여 최종 분석은 프레가발린군 15명, 라코사미드군 14명(총 29명)에서 이루어졌다. 1차 평가변수는 수치평가척도(NRS)로 측정한 진통 효능이며, 2차 평가변수는 SF-36 설문을 통한 삶의 질 전 영역 변화, 안전성은 Naranjo 알고리즘으로 인과성을 평가한 약물이상반응(ADR)이었다. 통계분석은 SPSS v16.0, p&lt;0.05를 유의수준으로 했다. 평균 연령 52세, 평균 BMI 24kg/m²였다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">1차 평가변수인 NRS 통증 점수에서 라코사미드군은 베이스라인 7.7에서 2.50으로(약 5.2점 감소), 프레가발린군은 7.6에서 4.27로(약 3.3점 감소) 떨어져, 라코사미드가 통계적으로 유의하게 더 큰 통증 감소를 보였다(p&lt;0.001).<br/>
 즉 라코사미드군이 종료 시점 통증 점수가 더 낮아(2.50 vs 4.27) 진통 효능 면에서 우월했다.<br/>
@@ -465,11 +592,11 @@ HADS-D(우울): PG-DLX 7.36±2.43→5.66±1.83, 변화 -1.70(95%CI -2.50~-0.90, 
 (영역별 세부 점수·95% 신뢰구간은 본문 유료접근 제한으로 초록 범위 내 수치만 확인됨.<br/>
 <strong>출처:</strong> PubMed, DOI: 10.1007/s00210-025-04474-4).</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">전체 추적 기간 동안 중대한 약물이상반응(serious ADR)은 양 군 모두에서 관찰되지 않았으며, 저자들은 라코사미드가 안전하다고 평가했다. 무작위 배정된 36명 중 7명이 중도 탈락하여 최종 29명이 분석되었다(탈락률 약 19.4%). 다만 초록 범위에서는 어지럼·졸림 등 가바펜티노이드 및 나트륨 채널 차단제 계열에서 흔한 개별 이상반응의 명칭과 군별 발생률, 탈락 사유의 세부 내역이 명시적으로 제시되지 않아(본문 유료접근 제한), 구체적 이상반응 프로파일은 추가 확인이 필요하다. Naranjo 알고리즘으로 인과성을 평가한 점은 이상반응의 약물 관련성을 체계적으로 판정했음을 시사한다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자들은 라코사미드(50→100mg BD)가 프레가발린(75mg OD)보다 만성 신경병성 통증의 통증 강도 감소에 더 효과적이며, 삶의 질 개선은 프레가발린과 동등한 수준이라고 결론지었다. 비용이 더 높음에도 안전성이 양호해 18세 이상 성인에게 권장할 만하다고 제시했다. 다만 공개라벨 설계, 소규모 표본(최종 29명), 위약 대조군 부재, 신경병성 통증 표현형(phenotype) 분석 결여라는 한계가 있어 더 큰 규모의 이중맹검 시험으로 확증이 필요하다. 알파본D(알파칼시돌)/프레논OD(프레가발린) 관점에서, 본 연구는 프레가발린이 통증·삶의 질 모두에서 임상적으로 유의한 개선을 일관되게 제공하는 1일 1회 75mg 저용량 요법임을 재확인하면서도, 1일 2회 라코사미드 대비 통증 감소 폭은 작았던 만큼, 반응이 불충분한 환자에서 용량 적정화 또는 기전이 다른 약제 병용·전환을 고려할 근거로 활용할 수 있다.</div>
                     </div>
@@ -480,6 +607,10 @@ HADS-D(우울): PG-DLX 7.36±2.43→5.66±1.83, 변화 -1.70(95%CI -2.50~-0.90, 
                             <li>총 36명 무작위배정(72명 선별), 최종 29명(프레가발린 15명·라코사미드 14명), 탈락 7명</li>
                             <li>SF-36 전 영역 양군 모두 유의 개선(각 p&lt;0.001), 전반적 삶의 질 군간 차이 없음</li>
                         </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 만성 신경병성 통증에서 프레가발린 75mg 1일1회는 통증(NRS 7.6→4.27)·삶의 질 전 영역을 유의하게 개선(p&lt;0.001)했고, 더 강력한 라코사미드 대비 삶의 질 개선은 동등 — 저용량 1일1회 편의성과 검증된 효능을 가진 1차 옵션임을 시사.</div><ul><li>프레논OD 디테일링: &#x27;프레가발린 75mg 1일1회만으로도 베이스라인 NRS 7.6→4.27, SF-36 전 영역 유의 개선(p&lt;0.001)&#x27;을 근거로 복약 편의성(1일1회)과 삶의 질 동등성을 강조 — 다회 투여 약제 대비 순응도 이점 소구.</li><li>치료 반응 불충분 환자 관리: 라코사미드(1일2회)가 통증 감소 폭은 컸으나 비용·투여 빈도 부담이 있고 삶의 질은 프레가발린과 동등했던 점을 활용해, 우선 프레가발린으로 시작 후 반응 평가·용량 적정화 흐름을 제안하고 알파본D 등 병용 관리 맥락으로 연결.</li></ul>
                     </div>
                 </div>
             </div>
