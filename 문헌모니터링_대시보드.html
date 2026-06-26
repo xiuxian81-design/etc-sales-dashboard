@@ -497,6 +497,20 @@ function getReportUrl(sessionKey, month) {
   return (REPORT_URLS[month] && REPORT_URLS[month][sessionKey]) || null;
 }
 
+/* activeMonth 값('YYYY년 M월' 또는 시트가 강제변환한 ISO 날짜)을 REPORT_URLS 키('YYYY년 M월')로 변환.
+   시트의 리포트월은 'YYYY-MM'이 구글시트에서 날짜(해당월 1일 KST = 전월 말일 15:00Z)로 강제변환되어 저장됨. */
+function monthLabel(v) {
+  if (!v) return '';
+  var m = String(v).match(/(\d+)년\s*(\d+)월/);
+  if (m) return m[1] + '년 ' + parseInt(m[2], 10) + '월';
+  var d = new Date(v);
+  if (!isNaN(d.getTime())) {
+    var kst = new Date(d.getTime() + 9 * 3600 * 1000); // KST 보정 → 해당 리포트월 1일
+    return kst.getUTCFullYear() + '년 ' + (kst.getUTCMonth() + 1) + '월';
+  }
+  return String(v);
+}
+
 /* ═══════════════════════════════════════════
    논문 요약 파싱 (5-파트 구조화 + 핵심 수치 추출)
 ═══════════════════════════════════════════ */
@@ -755,16 +769,46 @@ function renderSession() {
       </div>
     </div>`;
 
+  const reportUrl = getReportUrl(activeTab, monthLabel(activeMonth));
+
   if (!papers.length) {
     html += `<div class="empty">📭 해당 기간에 수록된 논문이 없습니다.</div>`;
   } else {
-    // NEW 논문 먼저, 나머지는 중요도 순
+    // 질환별 상세 페이지 진입 (깨끗한 풀상세 리포트 + BD 신청)
+    if (reportUrl) {
+      html += `<a href="${reportUrl}" target="_blank" rel="noopener"
+        style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 10px;padding:16px 22px;background:linear-gradient(135deg,#1A5276,#003366);color:#fff;border-radius:12px;text-decoration:none;box-shadow:0 3px 10px rgba(0,0,0,.18)">
+        <span style="font-weight:800;font-size:15px">📄 ${session.label} 상세 페이지 전체 보기 — ${papers.length}편</span>
+        <span style="font-size:12px;opacity:.92">배경·대상/방법·핵심결과·안전성·결론 + 📌 BD 신청 →</span>
+      </a>`;
+    }
+    // NEW 먼저, 나머지는 중요도 순 — 제목 인덱스(클릭 시 리포트의 해당 논문으로)
     const sorted = [...papers].sort((a, b) => {
       if (a.isNew !== b.isNew) return a.isNew ? -1 : 1;
       const s = { '★★★': 3, '★★☆': 2, '★☆☆': 1 };
       return (s[b.stars] || 0) - (s[a.stars] || 0);
     });
-    sorted.forEach((p, i) => { html += renderCard(p, i); });
+    html += '<div style="display:flex;flex-direction:column;gap:9px;margin-top:6px">';
+    sorted.forEach((p, i) => {
+      const anchor = reportUrl ? `${reportUrl}#${encodeURIComponent((p.title || '').slice(0, 45))}` : null;
+      const tag = anchor ? 'a' : 'div';
+      const href = anchor ? `href="${anchor}" target="_blank" rel="noopener"` : '';
+      const kp = ((p.keyPoint || '').split('\n')[0] || '').trim();
+      html += `<${tag} ${href}
+        style="display:block;padding:13px 16px;background:#fff;border:1px solid #e6e6ea;border-left:4px solid #1A5276;border-radius:9px;text-decoration:none;color:#1a1a2e;transition:box-shadow .15s">
+        <div style="font-size:11px;color:#7a7a86;margin-bottom:4px">
+          ${escHtml(p.stars || '')} · ${escHtml(p.evidence || '')} · ${escHtml(p.journal || '')} · ${escHtml((p.pubDate || '').slice(0,10))}
+          ${p.isNew ? '· <span style="color:#E87722;font-weight:800">NEW</span>' : ''}
+          ${p.bdReq ? '· <span style="color:#1A5276;font-weight:700">BD신청됨</span>' : ''}
+        </div>
+        <div style="font-weight:700;font-size:14px;line-height:1.45">#${i + 1}. ${escHtml(p.title || '')}</div>
+        ${kp ? `<div style="font-size:12.5px;color:#1A5276;margin-top:5px;line-height:1.45">${escHtml(kp)}</div>` : ''}
+      </${tag}>`;
+    });
+    html += '</div>';
+    if (!reportUrl) {
+      html += `<div style="margin-top:10px;font-size:12px;color:#999">※ 이 달의 질환별 상세 페이지 링크가 아직 없습니다. 월을 선택하면 상세 페이지로 연결됩니다.</div>`;
+    }
   }
 
   main.innerHTML = html;
