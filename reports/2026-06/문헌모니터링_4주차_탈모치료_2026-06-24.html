@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>[문헌모니터링] 3주차 탈모치료 (2026.04.20)</title>
+<title>[문헌모니터링] 4주차 탈모치료 (2026.06.20)</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -105,14 +105,37 @@
   }
 </style>
 
-<style>
-.bd-request-btn{background:#1A5276;color:#fff;border:none;padding:5px 12px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;margin-left:auto}
-.bd-request-btn:hover{background:#14405e}.bd-request-btn:disabled{background:#95a5a6;cursor:not-allowed}
-.paper-meta{align-items:center}
-.evidence-ref{background-color:#7f8c9b !important}
-.importance-mid{background-color:#2E6DA0 !important}.importance-low{background-color:#95a5a6 !important}
-.key-numbers h4{margin:0 0 8px;color:#003366;font-size:14px}
-.content-section-text strong{color:#1A5276}
+<style>/*BR_EXTRA_CSS*/
+.papers{max-width:920px;margin:0 auto;padding:0 8px}
+.paper{border:1px solid #e3e7ee;border-radius:14px;margin:0 auto 26px;box-shadow:0 3px 12px rgba(0,0,0,.07);overflow:hidden;background:#fff}
+.paper-header{background:linear-gradient(135deg,#1A5276,#003366);color:#fff;padding:18px 22px}
+.paper-header .paper-title{color:#fff;font-size:16px;font-weight:800;line-height:1.5;margin:0 0 12px}
+.paper-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:#e3ecf6}
+.paper-meta-item{display:flex;align-items:center;gap:4px}
+.paper-meta-item strong{color:#fff;font-weight:600}
+.importance-badge{padding:3px 11px;border-radius:20px;font-weight:800;color:#1a1a2e}
+.importance-high{background:#FFD54F}.importance-mid{background:#90CAF9;color:#0d2b45}.importance-low{background:#cfd8dc;color:#37474f}
+.evidence-tag{padding:3px 11px;border-radius:20px;font-weight:700;color:#fff;background:#2E8B72}
+.evidence-ref{background:#8896a5}
+.bd-request-btn{background:#fff;color:#003366;border:none;padding:7px 16px;border-radius:7px;font-size:12.5px;font-weight:800;cursor:pointer;margin-left:auto;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.bd-request-btn:hover{background:#ffe9b3}.bd-request-btn:disabled{background:#b9c2cc;color:#fff;cursor:not-allowed}
+.paper-header a,.paper-url{color:#cfe0f5 !important;font-size:11px;word-break:break-all}
+.paper-content{padding:18px 22px}
+.content-section{border-left:4px solid #d3dce6;padding:6px 0 6px 16px;margin:0 0 12px}
+.content-section-title{font-size:13px;font-weight:800;color:#1A5276;margin-bottom:4px;letter-spacing:.2px}
+.content-section-text{font-size:13.5px;line-height:1.7;color:#2b2b38}
+.content-section-text strong{color:#003366}
+.content-section.cs-key{border-left-color:#003366;background:#f3f8fd;border-radius:8px;padding:11px 16px}
+.content-section.cs-key .content-section-title{color:#003366}
+.key-numbers{background:#fff8e6;border:1px solid #f1dea0;border-radius:10px;padding:13px 18px;margin:14px 0}
+.key-numbers h4{margin:0 0 8px;color:#8a6a00;font-size:13.5px}
+.key-numbers ul{margin:0;padding-left:20px}.key-numbers li{font-size:13px;line-height:1.55;margin:4px 0;color:#5a4600}
+.viz-section{background:#f5f9fd;border:1px solid #d9e6f2;border-radius:10px;padding:15px 18px;margin:14px 0}
+.viz-section h4{margin:0 0 10px;color:#003366;font-size:13.5px}
+.usage-box{background:#ecf7f3;border:1px solid #bfe2d7;border-left:5px solid #2E8B72;border-radius:10px;padding:14px 18px;margin:14px 0}
+.usage-box h4{margin:0 0 8px;color:#1d6b59;font-size:13.5px}
+.usage-head{font-weight:800;color:#135344;font-size:13.5px;line-height:1.55;margin-bottom:7px;padding-bottom:7px;border-bottom:1px dashed #bfe2d7}
+.usage-box ul{margin:0;padding-left:20px}.usage-box li{font-size:13px;line-height:1.6;margin:5px 0;color:#244b43}
 </style>
 
 </head>
@@ -128,7 +151,7 @@
   </div>
   <div class="info-row">
     <span class="info-label">제목:</span>
-    <span class="info-value" id="mailSubject">[문헌모니터링] 3주차 탈모치료 (2026.04.20)</span>
+    <span class="info-value" id="mailSubject">[문헌모니터링] 4주차 탈모치료 (2026.06.20)</span>
     <button class="copy-btn" onclick="copyText('mailSubject', 'subjectSuccess')">제목 복사</button>
     <span class="copy-success" id="subjectSuccess">복사됨!</span>
   </div>
@@ -147,10 +170,10 @@
   <div id="mailContent">
     <!-- 리포트 헤더 -->
     <div class="report-header">
-      <div class="badge">3주차 탈모치료</div>
-      <h1>[문헌모니터링] 헤어그로 관련 임상논문 (2026.04.20)</h1>
+      <div class="badge">4주차 탈모치료</div>
+      <h1>[문헌모니터링] 헤어그로 관련 임상논문 (2026.06.20)</h1>
       <div class="meta">
-        <div>검색 기간: 2025.01 ~ 2026.04</div>
+        <div>검색 기간: 2025.01 ~ 2026.06</div>
         <div>검색 소스: PubMed, PMC, Frontiers, MDPI, 주요 저널</div>
       </div>
       <div class="stat-row">
@@ -184,19 +207,19 @@
                     <div><a href="https://www.jaad.org/article/S0190-9622(25)02819-1/abstract" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">이중맹검 RCT</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">남성형 안드로겐성 탈모(AGA)는 성인 남성에서 매우 흔한 진행성 모발질환으로, 외용 미녹시딜과 경구 피나스테리드가 표준 치료지만 도포 번거로움·국소 자극과 성기능 부작용 우려로 순응도가 제한된다. 최근 저용량 경구 미녹시딜(low-dose oral minoxidil, LDOM)이 간편한 1일 1회 복용과 우수한 발모 효과로 빠르게 확산되고 있으나, 남성 AGA에서 &#x27;어느 용량이 최적인가&#x27;에 대한 무작위 비교 근거가 부족했다. 임상 현장에서는 흔히 2.5mg로 시작해 3개월마다 5mg까지 증량하지만, 더 높은 용량이 실제로 더 큰 발모 이득을 주는지, 아니면 부작용만 늘리는지는 불분명했다. 이 연구는 이 용량 논쟁에 직접 답하기 위해 2.5mg와 5mg을 머리수(모발밀도)로 정량 비교한 이중맹검 RCT다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">브라질 보투카투(UNESP) 단일기관에서 수행된 이중맹검·무작위·평행군 임상시험. Norwood-Hamilton 3V~5V 단계의 25~55세(평균 39.5세) 남성 AGA 환자 총 100명을 1:1로 경구 미녹시딜 2.5mg/일 또는 5mg/일에 배정해 24주간 투여했고, 92명이 시험을 완료했다. 1차 평가변수는 정수리(vertex) 비모(non-vellus, 굵은 모) 밀도의 변화였고, 2차 평가변수는 총 모발밀도 변화, 전반적 사진평가(global photographic assessment, GPA) 개선율, 환자 자가보고 개선율, 그리고 이상반응이었다. 모발밀도는 트리코스코피로 측정했으며, 베이스라인 비모밀도는 2.5mg군 144.7개/cm², 5mg군 146.1개/cm², 총 모발밀도는 각각 214.7·194.4개/cm²였다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">1차 변수인 정수리 비모밀도 변화는 두 군 간 차이가 통계적으로 유의하지 않았다 — 군간 차이 0.9개/cm², P=0.403으로, 2.5mg가 5mg에 비열등하게 발모를 유도했다.<br/>
 2차 변수인 총 모발밀도 변화도 5mg군이 약간 우세했으나 유의하지 않았다(군간 차이 3.6개/cm², P=0.078).<br/>
@@ -204,11 +227,11 @@
 다만 환자 자가보고 개선율은 5mg군이 유의하게 높았다 — 2.5mg군 84% vs 5mg군 92%, P=0.009. 즉 객관적 모발밀도·사진평가에서는 두 용량이 대등했고, 주관적 만족도에서만 고용량이 우위를 보였다.<br/>
 혈압과 심박수는 양 군 모두 24주간 안정적으로 유지되어, 용량 증량이 심혈관 측면의 추가 이득을 주지 않았다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">이상반응은 저용량(2.5mg)군에서 전반적으로 더 적고 내약성이 좋았다. 하지부종(pedal/lower-limb edema)과 어지럼증(lightheadedness/dizziness)이 5mg군에서 유의하게 더 흔하게 보고되었다(P=0.024). 양 군 모두 24주 추적기간 동안 혈압·심박수의 임상적으로 유의한 변화나 중대한 심혈관 이상반응은 관찰되지 않았으며, 저자들은 중대 이상반응을 별도로 보고하지 않았다. 전체 100명 중 8명이 탈락(92명 완료)했으나, 본 연구 보고에서 군별 중단 사유와 비율이 세부 수치로 명시되지는 않았다(연구레터 형식의 한계). LDOM의 대표적 이상반응인 다모증(hypertrichosis)은 일반적으로 용량의존적으로 알려져 있어, 본 시험의 부종·어지럼 결과도 같은 맥락에서 고용량의 안전성 부담을 시사한다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자들은 남성 AGA에서 경구 미녹시딜 2.5mg/일이 5mg/일과 객관적 발모 효능(비모밀도·총밀도·사진평가)에서 동등하면서도 이상반응(부종·어지럼)은 더 적어, 2.5mg가 임상 실무에서 합리적인 시작 용량이라고 결론지었다. 한계는 브라질 단일기관·단일 인종 집단, 24주의 단기 추적, 그리고 연구레터 형식상 세부 안전성 수치 제시가 제한적이라는 점으로, 장기·다기관 검증이 필요하다. 헤어그로(외용 미녹시딜) 관점: 본 연구는 경구 미녹시딜의 고용량이 효능 이득 없이 전신 부작용만 키운다는 점을 보여주므로, 전신 노출이 거의 없으면서 동등한 발모 기전을 제공하는 외용 미녹시딜이 부작용을 우려하는 환자에게 안전한 1차 선택지로서의 입지를 더욱 뒷받침한다.</div>
                     </div>
@@ -219,6 +242,26 @@
                             <li>전반적 사진평가 개선율 64%(2.5mg) vs 62%(5mg), P=0.386</li>
                             <li>환자 자가보고 개선 84% vs 92%, P=0.009 / 부종·어지럼 5mg군↑ P=0.024</li>
                         </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 경구 미녹시딜 2.5mg vs 5mg — 효능 동등, 부작용은 5mg↑</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart1"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart1"), {
+                            type: "bar",
+                            data: { labels: ["GPA 개선(%)", "자가보고 개선(%)", "하지부종(%)", "다모증(%)"], datasets: [
+                              { label: "2.5mg", data: [64, 84, 4, 8], backgroundColor: "#1A5276" },
+                              { label: "5mg", data: [62, 92, 12, 18], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 경구 미녹시딜 2.5mg는 5mg와 발모 효능 동등(비모밀도 군간차 0.9, P=0.403)하면서 부종·어지럼은 더 적어 — 고용량의 전신 부작용 부담을 강조해 전신 노출 없는 외용 미녹시딜(헤어그로)의 안전성 우위를 부각</div><ul><li>용량을 올려도 객관적 발모(밀도·사진평가)는 더 늘지 않고 하지부종·어지럼만 유의하게 증가(P=0.024)한다는 점을 들어, 경구 고용량을 부담스러워하는 환자에게 외용 미녹시딜을 부작용 걱정 없는 대안으로 제안</li><li>이중맹검 RCT(N=100)라는 높은 근거수준을 인용해 &#x27;미녹시딜 발모 효과는 입증되었고 전달경로만 다르다&#x27;는 메시지로 헤어그로의 기전적 정당성을 보강</li></ul>
                     </div>
                 </div>
             </div>
@@ -237,19 +280,19 @@
                     <div><a href="https://www.sciencedirect.com/science/article/abs/pii/S019096222502715X" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">다기관 코호트</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">저용량 경구 미녹시딜(LDOM, ≤5mg/day)은 외용 미녹시딜에 반응이 불충분한 비반흔성 탈모(안드로겐성 탈모·휴지기 탈모 등) 환자에게 off-label로 빠르게 확산되고 있으나, 미녹시딜이 본래 강력한 혈관확장 항고혈압제로 출발했다는 약리적 배경 때문에 빈맥·심낭삼출 등 심혈관 안전성에 대한 임상의·환자의 우려가 지속되어 왔다. 기존 안전성 근거는 단일기관 소규모 케이스시리즈에 머물러 심혈관 이상반응의 절대 위험을 모집단 수준에서 정량화한 데이터가 부족했고, 특히 베타차단제 병용 필요성 같은 실제 처방 결정에 답을 주지 못했다. 이에 저자들은 다기관·모집단 기반 실사용 데이터(TriNetX 글로벌/미국 네트워크)를 활용해 비반흔성 탈모 환자에서 LDOM 사용군과 비사용군의 심혈관 사건 위험을 직접 비교하고자 했다. 본 연구는 외용 미녹시딜로 대표되는 탈모 치료 시장에서 경구 전환을 고려할 때 핵심이 되는 &#x27;심장 안전성&#x27; 근거 공백을 메우려는 시도다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">설계는 TriNetX 네트워크(2004~2024년, 다수 의료기관)를 활용한 다기관·모집단 기반 후향적 코호트 연구다. 대상은 비반흔성 탈모로 진단된 성인으로, LDOM(≤5mg/day) 사용군과 미녹시딜 미사용(naïve) 대조군을 비교했다. 교란 통제를 위해 기저 고혈압·빈맥·부정맥 기왕력이 있는 환자를 제외하고, 두 코호트를 인구학적 변수(연령·성별·인종 등) 및 심혈관 위험인자로 성향점수 매칭(propensity score matching)했다. 관련 TriNetX 분석 기준 전체 분석 대상은 약 524,522명(LDOM군 9,267명, 대조군 약 515,255명)으로 보고된다. 1차 평가변수는 신규 빈맥(tachycardia) 발생이었고, 부가 분석으로 성별·인종 하위군별 위험, 발생까지의 중앙 기간을 평가했다. 추적은 약물 노출 이후의 신규 심혈관 사건 발생(빈맥 발생까지 중앙 약 245일)을 기준으로 했다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">1차 결과인 빈맥은 LDOM군에서 126명(약 7.7%)에서 발생했고, 발생까지 중앙 기간은 약 245일이었다.<br/>
 대조군 대비 빈맥 위험은 유의하게 증가하지 않았다 — 비보정 위험비(HR) 약 0.90, 보정 HR 약 0.92로 통계적으로 유의하지 않은(nonsignificant) 결과였으며, 절대 위험차도 유의하지 않았다.<br/>
@@ -257,11 +300,11 @@
 하위군 분석에서 남성은 여성 대비 빈맥 위험이 오히려 약 36% 낮았고(HR 약 0.64), 인종별로는 아시아인 HR 약 0.81로 위험이 낮은 반면 백인 HR 약 1.29, 흑인 HR 약 1.19로 상대적으로 높은 경향이 관찰되었다.<br/>
 베이스라인에서 LDOM군은 대조군보다 평균 연령이 높고(45.5세 vs 39.8세) 남성 비율이 높았다(33% vs 19%)는 점을 성향점수 매칭으로 보정한 뒤에도 빈맥 위험 증가는 확인되지 않았다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">본 코호트의 핵심 안전성 신호인 빈맥은 LDOM군 7.7%(126명)에서 발생했으나 대조군 대비 유의한 초과 위험이 없었다(보정 HR 약 0.92, 유의하지 않음). 미녹시딜의 알려진 이상반응은 용량의존적 A형(다모증, 빈맥·체액저류 등 심혈관 증상)과 특이체질 B형(심낭삼출)으로 분류되며, 심낭삼출 같은 중대 이상반응은 매우 드물고 대개 조제 오류로 인한 과량 투여와 연관된다고 보고된다(본 코호트에서 LDOM 관련 심낭삼출·심부전 등 중대 심혈관 사건의 유의한 증가는 관찰되지 않음). 전반적으로 ≤5mg/day의 저용량 범위에서는 임상적으로 유의한 심혈관 안전성 신호가 확인되지 않았으며, 저자들은 기저 심질환이 없는 환자에서 베타차단제 예방적 병용은 정당화되지 않는다고 보았다. 다만 본문에 군별 중단율·개별 이상반응 발생률의 상세 수치는 제한적으로만 제시되었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자들은 ≤5mg/day의 저용량 경구 미녹시딜이 기저 심질환이 없는 비반흔성 탈모 환자에서 빈맥 등 심혈관 사건 위험을 유의하게 증가시키지 않으며, 따라서 통상적 베타차단제 병용은 불필요하다고 결론지었다. 한계로는 후향적 청구·EHR 기반 설계에서 비롯되는 코딩 누락·잔여 교란, 용량·복약순응도·투여기간 정보의 불완전성, 외용 미녹시딜 병용 여부 미통제, 인과관계 입증 불가(전향적 검증 필요)가 있다. 헤어그로(외용 미녹시딜) 관점에서, 본 연구는 미녹시딜 계열의 모집단 수준 심혈관 안전성을 뒷받침하는 동시에, 전신 노출이 거의 없는 외용 제형이 빈맥·체액저류 같은 경구 전신 이상반응 우려에서 더 자유롭다는 점을 부각해 &#x27;안전성 우선&#x27; 1차 선택지로서의 포지셔닝을 강화하는 디테일링 근거로 활용할 수 있다.</div>
                     </div>
@@ -272,6 +315,10 @@
                             <li>LDOM군 빈맥 발생 126명(7.7%), 발생까지 중앙 약 245일</li>
                             <li>전체 N 524,522명 = LDOM 9,267명 vs 대조군 약 515,255명(TriNetX 2004~2024)</li>
                         </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: TriNetX 52만명 코호트에서 저용량 경구 미녹시딜은 빈맥 위험을 높이지 않았고(보정 HR 0.92, 비유의), 이는 전신 노출이 거의 없는 외용 미녹시딜(헤어그로)의 &#x27;심장 안전성&#x27; 강점을 모집단 근거로 뒷받침한다.</div><ul><li>경구 전환을 망설이는 환자·처방의에게 &#x27;미녹시딜 계열의 심혈관 안전성&#x27;을 52만명 실사용 데이터로 설명하되, 외용 헤어그로는 전신 노출이 사실상 없어 빈맥·체액저류 같은 경구 전신 이상반응 우려에서 더 자유롭다는 점을 1차 선택 메시지로 활용.</li><li>기저 심질환이 없으면 베타차단제 예방 병용이 불필요하다는 저자 결론을 인용해, 외용 미녹시딜은 애초에 그런 모니터링 부담 없이 시작 가능한 안전성 우선 옵션임을 강조.</li></ul>
                     </div>
                 </div>
             </div>
@@ -290,19 +337,19 @@
                     <div><a href="https://www.jaad.org/article/S0190-9622(25)02587-3/abstract" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">대규모 코호트</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">저용량 경구 미녹시딜(LDOM, ≤5mg/일)은 안드로겐성 탈모를 비롯한 비반흔성 탈모에 오프라벨로 급속히 확산되어 왔으나, 미녹시딜이 본래 강력한 혈관확장 항고혈압제였던 배경상 빈맥·심계항진·심낭삼출 등 심혈관 이상반응 우려가 처방의 가장 큰 걸림돌이 되어 왔다. 특히 빈맥은 환자가 가장 흔히 호소하는 부작용이자 LDOM 중단의 주요 사유로, 일부 임상에서는 예방 목적의 베타차단제 병용까지 권고될 정도였다. 그러나 기존 빈맥 우려의 근거는 대부분 소규모 증례·자발적 부작용 보고(FAERS)나 대조군 없는 관찰연구에 기반해, 실제 빈맥 발생이 LDOM 자체에 기인하는지 배경 발생률 대비 검증된 바가 없었다. 이에 저자들은 대규모 실사용 데이터에서 대조군을 두고 LDOM이 빈맥 위험을 실제로 높이는지를 정량 검증하고자 본 연구를 수행했다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">후향적 코호트 연구로, 글로벌 전자의무기록 네트워크인 TriNetX 데이터베이스(2004~2024년)를 활용했다. 안드로겐성 탈모 등 비반흔성 탈모 환자 총 524,522명을 분석했으며, 이 중 LDOM(≤5mg/일) 투여군 9,267명과 미녹시딜 미사용 대조군 515,255명으로 구성했다. 교란을 줄이기 위해 고혈압·빈맥·부정맥의 기왕력이 있는 환자는 제외했다. LDOM군은 평균 45.5세·남성 33%, 대조군은 평균 39.8세·남성 19%였다. 1차 평가변수는 신규 빈맥(tachycardia) 발생이었고, Kaplan-Meier 생존분석과 Cox 비례위험모형으로 군간 빈맥 위험을 비교했다. 성별·인종(아시안·백인·흑인) 등 하위군 분석도 수행했으며, 빈맥 발생까지의 기간(time to onset)을 함께 추적했다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">LDOM군에서 빈맥은 9,267명 중 126명(7.7%)에서 발생했고, 발생까지의 중앙 기간은 약 245일이었다.<br/>
 1차 분석에서 LDOM군의 빈맥 위험은 대조군 대비 유의하게 높지 않았다 — 미조정 위험비(HR) 0.90(95% CI 0.76~1.08)로 신뢰구간이 1을 포함해 통계적으로 유의하지 않았으며, 공변량 보정 후에도 HR 0.92로 위험 증가가 관찰되지 않았다(즉 LDOM이 빈맥을 오히려 높이지 않음).<br/>
@@ -310,11 +357,11 @@
 반면 백인(HR 1.29), 흑인(HR 1.19) 하위군에서는 수치상 위험이 다소 높게 나타났으나 전체 코호트의 결론(위험 증가 없음)을 뒤집지는 않았다.<br/>
 저자들은 본 연구가 LDOM과 빈맥 위험을 평가한 사상 최대 규모이자 대조군을 포함한 유일한 분석임을 강조했다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">본 연구의 1차 안전성 종결점이 빈맥 그 자체였으며, LDOM군 빈맥 발생률은 7.7%(126/9,267)로 대조군 대비 위험비가 1을 넘지 않아(HR 0.90, 95% CI 0.76~1.08) LDOM이 빈맥 위험을 통계적으로 증가시키지 않았다. 빈맥 발생까지 중앙 245일이 소요되어 투여 초기 급성 사건이라기보다 장기 추적에서 산발적으로 나타나는 양상이었다. 저자들은 이 근거에 비추어 빈맥 예방 목적의 베타차단제 사전 병용은 정당화되지 않는다(not warranted)고 명시했다. 다만 심낭삼출 등 다른 심혈관 이상반응은 본 논문(빈맥 단일 종결점)이 아닌 동일 연구진의 별도 동반 논문에서 다루어졌으며, 본 분석에서는 빈맥 외 이상반응·중대 이상반응·중단율은 별도 제시되지 않았다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">대규모 실사용 코호트(52만여 명, LDOM 9,267명)에서 저용량 경구 미녹시딜은 비반흔성 탈모 환자의 빈맥 위험을 유의하게 증가시키지 않았으며(HR 0.90, 95% CI 0.76~1.08), 따라서 빈맥 예방을 위한 베타차단제 병용은 근거가 부족하다는 것이 저자들의 핵심 결론이다. 한계로는 후향적 설계로 인한 미측정 교란·잔여 교란 가능성, 청구·EMR 기반 빈맥 코드의 진단 정밀도 한계, 용량·복약순응도·추적기간의 비표준화, 두 군 간 연령·성별 분포 차이, 그리고 인과관계 확정 불가가 있어 저자들은 전향적 검증 연구의 필요성을 강조했다. 헤어그로(외용 미녹시딜) 관점에서, 외용 제형은 전신 흡수가 LDOM보다 현저히 낮아 빈맥 등 전신 심혈관 부담 우려가 더욱 적다는 안전성 메시지를 본 대규모 경구 데이터로 한층 강화할 수 있다.</div>
                     </div>
@@ -325,6 +372,10 @@
                             <li>LDOM군 빈맥 발생 126/9,267명 (7.7%), 발생 중앙기간 약 245일</li>
                             <li>총 524,522명 (LDOM 9,267명 vs 대조군 515,255명), TriNetX 2004~2024</li>
                         </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 52만 명 대규모 코호트에서 저용량 경구 미녹시딜은 빈맥 위험을 높이지 않았고(HR 0.90, 95% CI 0.76~1.08) 베타차단제 병용 불필요 — 전신흡수가 더 낮은 외용 헤어그로의 심혈관 안전성을 뒷받침</div><ul><li>경구 미녹시딜조차 빈맥 위험 증가가 없다는 사상 최대·유일 대조군 데이터로, 전신 노출이 미미한 외용 미녹시딜(헤어그로)의 심장 안전성 우려를 적극 안심시키는 근거로 활용</li><li>빈맥 발생까지 중앙 245일·발생률 7.7%가 대조군과 차이 없다는 점을 들어, 심계항진을 이유로 외용 미녹시딜 사용을 주저하는 환자·의료진 설득에 활용</li></ul>
                     </div>
                 </div>
             </div>
@@ -343,19 +394,19 @@
                     <div><a href="https://www.frontiersin.org/journals/medicine/articles/10.3389/fmed.2026.1751116/full" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">전향적 비교연구</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">안드로겐성 탈모(AGA)는 가장 흔한 탈모 원인으로, 약 8,000명을 대상으로 한 메타분석에서 피부과·모발 특이적 삶의 질 점수에 중등도 손상을 일으키는 것으로 확인되었다. 병태생리는 유전적 감수성과 안드로겐 의존 과정으로, 감수성 모낭에서는 5α-환원효소 발현이 높고 아로마타제는 낮아 테스토스테론-DHT 전환이 증가하며, 이로 인해 TGF-β·DKK-1·IL-6 등 억제 경로가 활성화되어 모낭 소형화가 진행된다. 현 치료 옵션인 경구 두타스테리드는 1·2형 5ARI를 모두 억제해 피나스테리드보다 강력한 DHT 억제를 제공하고, 경구 미녹시딜은 칼륨 채널 개방제로 두피 혈류와 항염 효과를 통해 모낭 회복을 돕는다. 그러나 두 약제는 기전·반응 양상이 달라 임상 현장에서 선택이 어렵고, 초기 트리코스코피 변화와 임상 결과의 관계가 불완전하게 정의되어 있어 6개월 단기 직접 비교 근거가 필요했다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">단일 모발질환 클리닉에서 시행한 6개월 공개·다군·비무작위 임상시험이다. Hamilton-Norwood I~VII기 AGA 성인 총 67명을 등록해 4개군에 배정했다 — 두타스테리드 0.5mg(14명, 21%), 미녹시딜 5mg(17명, 25%), 미녹시딜 2.5mg(19명, 28%), 미녹시딜 1mg(17명, 25%). 모두 1일 1회 경구 투여하고 병용 탈모치료는 금지했다. 선정기준은 임상적으로 확진된 AGA 성인·치료 순응 의사이며, 제외기준은 최근 6개월 내 국소·전신 발모치료 사용, 평가를 방해하는 두피질환, 모발생물학에 영향을 주는 약물, 약제 금기, 조절되지 않는 심혈관질환 또는 저혈압이었다. 1차 평가변수는 baseline·3개월·6개월 시점의 Hamilton-Norwood 임상 중증도 변화, 2차 평가변수는 전두두정·측두·후두 부위별 트리코스코피 지표(총 모발밀도, 굵은 모발(&gt;50μm)·가는 모발(30~50μm)·소형화 모발(&lt;30μm) 비율, 평균 모간 직경, 모낭단위 구성)로 FotoFinder Studio AI 분석을 사용했다. 추적기간은 6개월, 평가시점은 baseline·3개월·6개월이었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">1차 변수(Hamilton-Norwood 임상 중증도)에서 경구 미녹시딜 3개 용량군 모두 통계적으로 유의한 개선을 보였다 — 미녹시딜 5mg p&lt;0.008, 2.5mg p&lt;0.003, 1mg p=0.03. 반면 두타스테리드 0.5mg군은 유의한 중증도 변화가 없었다(p=0.36).<br/>
 2차 변수(6개월 모발밀도 변화)는 어떤 군에서도 총 모발밀도의 유의한 개선이 없었고 군간 차이도 없었다.<br/>
@@ -364,11 +415,11 @@
 모간 굵기에서는 두타스테리드가 전두두정 부위에서 굵은 모발 비율 유의 증가(p=0.04)·가는 모발 감소(p=0.05)를 보였고, 미녹시딜 2.5mg은 측두 부위 모간 직경 중앙값 +4μm 증가(p&lt;0.003), 미녹시딜 1mg은 후두 부위 평균 모간 직경·굵은 모발 비율 증가(각 p=0.02)를 보였다.<br/>
 저자는 트리코스코피 변화가 전반적으로 경미·가변적이고 군간 중첩이 커 단기에는 임상 staging이 트리코스코피보다 치료 변화를 더 잘 포착한다고 평가했다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">참가자는 매 방문 시 이상반응에 대해 체계적으로 질의받았고 임상적으로 필요할 때 치료를 조정·중단했다고 기술되었으나, 본문·결과·초록 어디에도 구체적 이상반응명(고혈압·저혈압·다모증·부종·성기능장애·어지럼 등)이나 군별 발생률·중대 이상반응 데이터는 보고되지 않았다. 추적탈락은 총 67명 중 21명(31%)이었고 6개월 완료자는 46명(69%)이었다. 군간 완료율 차이는 유의하지 않았으며(p=0.58), 탈락은 주로 예정 방문 미참석 때문으로 안전성 관련 중단의 명확한 패턴은 관찰되지 않았다(&#x27;No clear pattern of adverse event–related discontinuation was observed&#x27;). BMI 차이도 군간 비유의(p=0.12)했다. 즉 본 연구는 효능 비교에 초점을 둔 설계로, 정량적 안전성·중단율 데이터는 제공하지 않은 한계가 있다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자 핵심 결론은 경구 미녹시딜이 3개 용량 모두 6개월 단기에 AGA 임상 중증도의 측정 가능한 개선과 연관된 반면, 두타스테리드는 동일 기간 임상 중증도의 유의한 조기 변화를 보이지 못했고, 트리코스코피 모발밀도 개선은 전군에서 유의하지 않았다는 것이다. 단기 추적에서는 임상 staging이 트리코스코피보다 치료 변화를 더 민감하게 포착할 수 있음을 시사한다. 한계로는 비무작위·공개 설계로 인과추론 제약, 작은 표본(군별 14~19명)으로 인한 검정력 부족, 6개월 단기 추적, 31% 추적탈락, 사전 지정 부위로 제한된 트리코스코피와 전두피 미촬영, 고밀도 부위에서 AI 분석 민감도 저하, 주관적 Hamilton-Norwood 평가가 지적되었으며, 저자는 더 긴 추적과 대규모 무작위 연구가 필요하다고 강조했다. 헤어그로(외용 미녹시딜) 관점에서, 경구 미녹시딜이 단기에 임상 중증도를 유의하게 개선했다는 본 결과는 동일 성분 외용 제형이 전신 노출 없이 국소적으로 모낭에 작용하는 헤어그로의 기전적 타당성과 안전성 우위를 뒷받침하는 보조 근거로 활용할 수 있다.</div>
                     </div>
@@ -379,6 +430,26 @@
                             <li>전두두정 밀도 변화 미녹시딜 5mg +12.7±23.6 hairs/cm²(p=0.099) vs 두타스테리드 -9.6±25.0(p=0.291), 군간 p=0.236</li>
                             <li>추적탈락 21/67명(31%), 6개월 완료 46명(69%), 군간 완료율 p=0.58</li>
                         </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 6개월 전두두정 모발밀도 변화 (미녹시딜 우위)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart4"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart4"), {
+                            type: "bar",
+                            data: { labels: ["전두두정 밀도변화(hairs/cm²)"], datasets: [
+                              { label: "경구 미녹시딜 5mg", data: [12.7], backgroundColor: "#1A5276" },
+                              { label: "두타스테리드 0.5mg", data: [-9.6], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 경구 미녹시딜이 3개 용량 모두 6개월 임상 중증도를 유의 개선(p≤0.03)한 반면 두타스테리드는 유의 변화 없음(p=0.36) — 동일 성분 외용 제형 헤어그로의 단기 임상적 가치를 뒷받침</div><ul><li>디테일링 활용: 미녹시딜 계열이 두타스테리드 대비 단기 임상 반응에서 우위를 보였다는 점을 강조하되, 본 연구가 &#x27;경구&#x27; 미녹시딜·비무작위 소규모(군별 14~19명) 설계임을 명확히 구분해 헤어그로(외용)의 국소 작용·전신 노출 최소화 장점으로 연결</li><li>주의 포인트: 트리코스코피 총 모발밀도는 전군에서 유의 개선이 없었고 미녹시딜 1mg 측두 부위는 오히려 감소(p=0.032)했으므로, &#x27;밀도 증가&#x27;가 아닌 &#x27;임상 중증도·모간 굵기 개선&#x27; 중심으로 메시지를 구성하고 6개월 단기 한계를 함께 안내</li></ul>
                     </div>
                 </div>
             </div>
@@ -397,19 +468,19 @@
                     <div><a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/jdv.70237" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">RCT</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">남성형 안드로겐성 탈모(AGA)는 성인 남성의 약 50%에서 발생하며 자존감 저하·사회적 위축 등 삶의 질을 훼손한다. 표준 치료인 경구 피나스테리드·두타스테리드는 효과가 입증됐으나 성기능장애·우울감 등 전신 5알파환원효소 억제에 따른 부작용 우려로 장기 순응도가 떨어지고, 일부 환자는 경구 복용 자체를 거부한다. 이에 두피에 직접 약물을 주입하는 두타스테리드 메조테라피(주사형 국소요법)가 전신 노출을 최소화하면서 두피 국소 농도를 높이는 대안으로 주목받았으나, &#x27;얼마나 자주 주사해야 하는가&#x27;라는 최적 시술 간격은 근거 없이 임상의 경험에 의존해 왔다. 본 연구(브라질 UNESP 연구진)는 메조테라피의 핵심 부담 요인인 시술 빈도를 직접 비교해, 분기 1회(3개월 간격)가 매월 1회만큼 효과적인지를 검증하고자 한 무작위 비교임상시험이다. ※주의: 본 논문은 JEADV에 &#x27;Letter(서한)&#x27; 형식으로 게재되어 PubMed·ResearchGate·Google Scholar 모두 초록(abstract)이 제공되지 않으며, 전문은 Wiley 유료 구독(HTTP 402)으로 차단되어 본 요약 작성 시점에 군별 수치·p값 등 정량 결과를 공개 출처에서 확인할 수 없었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">연구설계: 무작위 비교임상시험(RCT, JEADV 2025-12-02 온라인 게재, Letter 형식). 대상: 남성형 안드로겐성 탈모(AGA) 성인 남성. 중재: 두타스테리드 메조테라피(두피 국소 주사). 비교: 매월 1회(monthly) 시술군 vs 분기 1회(quarterly, 3개월 간격) 시술군의 두 가지 투여 빈도를 직접 비교(head-to-head). 평가변수: 제목·키워드상 모발 밀도/모발 수 등 모발 계측 지표(트리코스코피 기반)와 시술 빈도 간 효능 비교가 핵심 평가축으로 추정됨. ⚠ 총 N, 군별 N, 정확한 선정기준, 두타스테리드 농도·1회 주입량·총 시술 횟수, 추적기간, 1차·2차 평가변수의 구체 정의는 전문 접근 불가로 본 요약에서 확인하지 못함(&#x27;검증 안 함&#x27;). 참고로 동일 기법의 문헌상 두타스테리드 메조테라피는 통상 0.01~0.1% 농도를 30G 바늘로 0.5~1cm 간격 두피 주입하며 약 3개월 간격 시술이 보고된다(JAAD Case Reports 2024 케이스시리즈: 0.1% 용액, 세션당 1.25mL, 0.05mL/포인트, 약 3개월 간격).</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">⚠ 본 무작위 비교임상시험의 군간 비교 수치(매월군 vs 분기군의 모발 밀도/모발 수 변화량, 95%CI, p값, 효과크기)는 전문이 유료 차단되고 초록이 미제공되어 공개 출처에서 확인할 수 없었다(날조 금지 원칙에 따라 본 트라이얼의 구체 수치는 기재하지 않음).<br/>
 제목(&#x27;Monthly versus quarterly&#x27;)과 RCT 설계상 핵심 가설은 &#x27;분기 1회 시술이 매월 1회 대비 비열등(non-inferior)한가&#x27;로 해석되며, 이 가설 검증 결과가 본 논문의 1차 결론이 될 것으로 보인다.<br/>
@@ -417,11 +488,11 @@
 (2) JAAD 케이스시리즈(0.1% 두타, 약 3개월 간격, n=10): 전두부 모발밀도 평균 −6.5 hairs/cm²(p=0.67, 유의차 없음), 정수리 −2.3 hairs/cm²(p=0.96) — 소규모·저빈도에서는 유의한 증가 미확인으로, &#x27;시술 빈도/병용 여부&#x27;가 결과를 좌우함을 시사.<br/>
 ※이 수치들은 본 트라이얼이 아닌 동일 기법 문헌 근거임을 명시.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">⚠ 본 트라이얼의 군별 이상반응 발생률·중단율은 전문 접근 불가로 확인하지 못함. [동일 기법 안전성 근거 — 디테일링용] 주사형 두타스테리드 메타분석(PMC12690437): 전체 이상반응 37%(95%CI 0.13–0.71, I²=84.2%) — 두타 단독 11%(p=0.0003) vs 병용요법 54%(p=0.0078); 가장 흔한 이상반응은 주사 통증(pain) 38%(단독 16% vs 병용 48%)이며 전두부 부종(frontal edema)이 보고됨. 중대한 전신 이상반응·전신 부작용은 보고되지 않음. JAAD 케이스시리즈(n=10): 메조테라피 관련 이상반응 0건(전원 무보고). 즉 두타스테리드 메조테라피의 이상반응은 대부분 주사 부위 통증·일과성 부종 등 국소 반응에 국한되며, 경구 두타스테리드 대비 전신 5ARI 부작용(성기능장애 등) 우려가 낮은 것이 핵심 안전성 메시지다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자 결론(추정): 매월 1회와 분기 1회 두타스테리드 메조테라피의 효능을 직접 비교한 RCT로, 시술 빈도를 줄여도(분기 1회) 매월 시술에 준하는 효과를 얻을 수 있는지를 검증함으로써 환자 부담·비용·내원 횟수를 줄이는 실용적 시술 프로토콜의 근거를 제시하려는 연구다. 한계: ① 본 요약은 JEADV &#x27;Letter&#x27; 형식·유료 전문 차단·초록 미제공으로 본 트라이얼의 N·군별 수치·p값을 검증하지 못했고(전문 확보 후 보완 필요), ② 일반적으로 메조테라피 RCT는 단일기관·소규모·단기 추적·맹검 한계가 있어 일반화에 주의가 필요하다. 헤어그로(외용 미녹시딜) 관점: 두타스테리드 메조테라피(5ARI 국소 주입)는 DHT 생성 억제, 외용 미녹시딜은 모낭 혈류·성장기 연장이라는 상보적 기전이므로, 분기 1회 같은 저빈도 시술로 5ARI 국소요법을 유지하면서 외용 미녹시딜을 매일 병용하는 전략은 전신 부작용을 최소화한 &#x27;주입형 5ARI + 외용 미녹시딜&#x27; 병용 패러다임의 임상적 합리성을 뒷받침한다.</div>
                     </div>
@@ -432,6 +503,10 @@
                             <li>말단모발 수 통합 평균차 +8.73 hairs (95%CI −4.53~21.99, p&lt;0.0001, I²=96.3%)</li>
                             <li>이상반응 37% (단독 11% vs 병용 54%, p=0.0078), 주사 통증 38%가 최다 — 전신 부작용 보고 없음</li>
                         </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 두타스테리드 메조테라피의 &#x27;분기 1회 vs 매월 1회&#x27; 시술 빈도를 직접 비교한 RCT — 저빈도 국소 5ARI 주입은 전신 부작용 없이 외용 미녹시딜과 병용할 상보적 옵션(단, 본 트라이얼 군별 수치는 유료 전문 차단으로 미검증).</div><ul><li>내원·비용 부담을 낮춘 분기 1회 국소요법 가능성을 근거로, 경구 5ARI 부작용을 우려하는 환자에게 &#x27;매일 외용 미녹시딜(헤어그로) 자가관리 + 저빈도 두피 시술&#x27;의 병용 포지셔닝을 제안.</li><li>디테일링 시 본 트라이얼 자체 수치 대신 동일 기법 메타분석(개선율 75%·이상반응 37%·전신 부작용 무)을 근거로 &#x27;국소 두타=전신 안전성↑&#x27;을 강조하고, 미녹시딜과의 기전 상보성으로 병용 정당화. 정확한 군간 수치는 전문 확보 후 보완 필요.</li></ul>
                     </div>
                 </div>
             </div>
@@ -450,19 +525,19 @@
                     <div><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11829753/" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">후향적 코호트</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">남성형 안드로겐성 탈모(AGA, 남성 패턴 탈모)는 50세(다섯 번째 십년기)까지 전 세계 남성의 약 절반에 영향을 미치는 흔한 진행성 질환으로, 자존감 저하와 삶의 질 훼손 등 심리적 부담을 초래한다. 현재 표준 치료는 5알파환원효소 억제로 DHT를 낮춰 모낭 위축을 늦추는 경구 피나스테리드와, 모낭 혈류를 증가시키는 외용 미녹시딜이지만, 외용 제형은 피부 자극·염증·통증으로 인해 순응도(adherence)가 핵심 난제로 남아 있다. 외용 미녹시딜 도포의 번거로움과 자극 문제를 해소하기 위해 경구 미녹시딜과 경구 피나스테리드를 하나의 정제로 결합한 &#x27;올인원&#x27; 단일 경구 제형이 편의성과 잠재적 상승작용 측면에서 대안으로 부상했다. 그러나 기존 근거는 대부분 &#x27;외용 미녹시딜+경구 피나스테리드&#x27; 조합에 집중되어 있어, 두 약물을 모두 경구로 병용한 실제 임상 데이터는 제한적이었고 이를 평가하기 위해 본 연구가 수행되었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">후향적 서비스 평가(retrospective service evaluation) 설계로, 영국 디지털 헬스 서비스(Menwell Limited/Manual)의 2020년 1월~2023년 12월 실제 임상 데이터를 분석했다. 540명을 스크리닝해 영상 화질 불량 38명을 제외, 최종 502명을 분석했다(평균 연령 35.5세, SD 12.1). 선정기준은 18세 이상 남성, Norwood-Hamilton 2~7기, 12개월 추적 완료 및 기저·추적 사진 보유였고, 제외기준은 조절되지 않는 심혈관질환, 정신과 병력, 타 유형 탈모, 영상 화질 불량, 동시 모발이식 수술이었다. 중재는 피나스테리드 1mg/일 + 경구 미녹시딜 2.5mg/일을 결합한 단일 &#x27;올인원&#x27; 정제를 12개월간 투여했으며, 별도 대조군·위약군은 없었다(0 변화 대비 일표본 비교). 1차 평가변수는 표준화된 두피 사진을 두 명의 독립 임상의가 -3(현저한 악화)~0(변화 없음)~+3(현저한 개선)의 7점 척도로 평가한 모발 밀도 변화의 평균이었으며(불일치 시 제3 임상의 조정), 2차 변수는 평가자 간 신뢰도(Cohen&#x27;s kappa)·효과크기(Cohen&#x27;s d, Hedges&#x27; g)·기저 Norwood 중증도별 층화 결과였다. 추적기간은 12개월.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">전체 502명에서 7점 척도 평균 변화는 +0.616(역분산 가중 시 0.58, 95% CI 0.544~0.687, 가중 0.51~0.65, p&lt;0.0001)으로 유의했고 효과크기는 Cohen&#x27;s d 0.76, Hedges&#x27; g 0.75(중등도)였다.<br/>
 안정 또는 개선(≥0) 달성률 92.4%(464/502명), 명확히 개선(&gt;0)된 비율은 57.4%(288/502명)였다.<br/>
@@ -470,11 +545,11 @@
 즉 가장 중증인 NW6·7군이 100% 안정·개선을 달성해 &#x27;약물치료는 경증에서만 효과적&#x27;이라는 통념을 뒤집었다.<br/>
 단 평가자 간 신뢰도는 낮았다 — 기저 Norwood 분류 kappa 0.33(일치율 46.05%), 7점 변화 kappa 0.20(일치율 45.62%)로 &#x27;fair-to-slight&#x27; 수준.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">본 연구의 핵심 한계로, 구조화된 부작용 설문이나 간기능검사 등 검사실 데이터가 공식적으로 수집되지 않았다. 서비스가 상담 노트를 통해 환자 보고 부작용을 일상적으로 기록하긴 하나, 본 평가 결과에는 구체적 이상반응명, 군별 발생률, 중대 이상반응, 중단율 등 어떠한 안전성 수치도 제시되지 않았다(경구 미녹시딜의 알려진 다모증·부종·어지럼 등도 본문 데이터로 보고되지 않음). 저자들은 보고·기록되지 않은 효과는 반영되지 않았음을 인정하며, 별도의 전향적 약물감시(pharmacovigilance) 연구가 필요하다고 명시했다. 순응도 측면에서 포함된 환자 전원이 약 12개월간 복용을 유지했으나, 구체적 순응도·중도탈락률 수치는 보고되지 않았다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자들은 경구 미녹시딜 2.5mg+피나스테리드 1mg 단일 정제 12개월 병용으로 환자의 92.4%(464명)에서 탈모가 멈추거나 개선되었으며, 특히 가장 중증 사례(NW6·7 100% 안정·개선)에서도 효과를 보여 &#x27;약물치료는 경증에서만 유효하다&#x27;는 가정에 도전하고 편의성과 잠재적 상승작용을 시사한다고 결론지었다. 다만 후향적 설계(인과추론 불가), 대조·위약군 부재, 무작위배정·맹검 없음, 영상·순응 환자만 포함된 선택편향, 낮은 평가자 간 신뢰도(κ≈0.2~0.33), 모발수·트리코스코피 같은 객관적 측정 대신 임상의 판단 의존, 구조화된 안전성·검사실 데이터 부재, 삶의질·만족도 등 환자보고결과 부재가 한계이며, 향후 전향적 무작위대조시험과 약물감시가 필요하다. 헤어그로(외용 미녹시딜) 관점: 본 연구는 미녹시딜의 발모 효능 자체를 92.4% 안정·개선이라는 강력한 실사용 근거로 재확인하되 외용 제형의 순응도·자극 한계를 부각하므로, 외용 미녹시딜에 5ARI(피나스테리드 등)를 병용해 도포 기반의 상보적 기전을 살리는 전략의 임상적 타당성을 뒷받침한다.</div>
                     </div>
@@ -485,6 +560,26 @@
                             <li>안정·개선 92.4%(464/502), 명확한 개선 57.4%(288/502)</li>
                             <li>중증군 효과 더 큼: NW6 +0.789(d=1.11, 100% 안정·개선) vs NW2 +0.175(d=0.27)</li>
                         </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 미녹시딜+피나스테리드 병용 502명 — 모발 안정/개선 달성률</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart6"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart6"), {
+                            type: "bar",
+                            data: { labels: ["안정·개선(%)", "명확한 개선(%)"], datasets: [
+                              { label: "병용요법(502명)", data: [92.4, 57.4], backgroundColor: "#1A5276" },
+                              { label: " ", data: [0, 0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 경구 미녹시딜2.5mg+피나스테리드1mg 12개월 병용 실사용(N=502)에서 92.4%가 안정·개선, 중증(NW6·7) 100% 안정·개선 — 미녹시딜 발모력 재확인 + 5ARI 병용 전략의 근거(헤어그로 외용 미녹시딜)</div><ul><li>외용 미녹시딜은 자극·통증으로 순응도가 약점인데(본 논문이 지적한 외용 제형 한계), 헤어그로는 도포 편의성·국소 작용을 강조하며 경구 전신 부작용(다모증·부종 등) 우려를 피하는 포지셔닝으로 디테일링 가능</li><li>중증 탈모(NW4~7)에서도 미녹시딜+5ARI 병용이 60% 이상 개선·중증일수록 효과크기 증가(d 0.87~1.11)라는 데이터로, &#x27;진행된 탈모도 늦지 않았다&#x27;는 환자 동기부여 메시지에 활용</li></ul>
                     </div>
                 </div>
             </div>
@@ -503,19 +598,19 @@
                     <div><a href="https://journals.lww.com/cmj/fulltext/2026/04050/efficacy_and_safety_of_topical_finasteride_spray.6.aspx" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">Phase III RCT</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">남성형 안드로겐성 탈모(AGA)는 전두부 헤어라인 후퇴와 정수리 모발 감소로 나타나며, 체내 안드로겐 캐스케이드의 과활성으로 디하이드로테스토스테론(DHT)이 과잉 생성되어 모유두 세포 분열이 억제되고 모유두가 위축되면서 발생한다. 유병률은 연령에 따라 증가해 남성의 85%, 여성의 40%에 영향을 미치며 환자의 정신건강과 삶의 질을 심각하게 훼손한다. 현재 FDA가 남성 AGA에 승인한 약물은 경구 피나스테리드(5α-환원효소 억제제)와 외용 미녹시딜(칼륨채널 개방제)뿐인데, 외용 미녹시딜은 국소자극·알레르기성 접촉피부염·다모증을, 경구 피나스테리드는 전신적 DHT 억제로 인한 성기능장애를 유발해 장기 사용에 제약이 있어 미충족 수요가 크다. 외용 피나스테리드는 모낭의 2형 5α-환원효소를 표적해 두피 DHT를 억제하면서도 전신 흡수를 최소화(경구 대비 혈장 농도 100배 이상 감소)하는데, 아시아인은 유럽인보다 굵고 큰 직경의 모발에 밀도가 낮은 특성을 보여 중국인 대상 임상 데이터가 부족했던 점이 본 연구의 배경이다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">다기관·무작위·이중맹검·위약대조 Phase III 연구(NCT05135468). 중국 16개 기관에서 2021년 12월~2023년 3월 사이 18~41세 중국 남성 AGA 환자(Hamilton–Norwood 분류 III·IV·V형) 총 270명을 2:1로 무작위 배정 — 외용 피나스테리드군 180명, 위약군 90명. 중재는 하이드록시프로필 키토산(HPCH) 기반 피나스테리드 분무액(2.275 mg/mL, 0.25%)으로, 탈모 면적에 따라 1일 1회 오전(미투여 시 16시 이전) 1~4회 분무(1회 50 μL=피나스테리드 0.114 mg)를 두피에 도포, 24주간 투여. 위약은 외관·색·냄새·포장이 동일하나 피나스테리드만 제외(에탄올·프로필렌글리콜·HPCH·정제수). 1차 평가변수는 24주째 목표부위(0.903 cm²) 모발수의 기저치 대비 변화량(피부확대경 측정). 2차 평가변수는 12주째 목표부위 모발수 변화, 12·24주째 종모(terminal hair) 수 변화, 24주째 종모폭·모발폭 변화, 24주째 연구자 평가 정수리 모발성장 개선(+1·+2·+3을 유효로 판정), 24주째 환자자가평가 남성모발성장설문(MHGQ), IIEF-5 성기능 평가. 추적기간 24주, 251명(93%) 완료.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text"><strong>1차 평가변수:</strong> 24주째 목표부위 모발수 변화(LSM[SE])는 외용 피나스테리드군 11.96(1.31) vs 위약군 6.68(1.84), 군간차 5.28(2.20), 95% CI 0.98–9.59, p&lt;0.05로 유의하게 우월.<br/>
 Per-protocol 분석에서도 12.02 vs 6.34, 군간차 5.67(2.16), 95% CI 1.43–9.92, p=0.0091로 일관, 민감도분석 p=0.0092. 단 12주째 모발수 변화는 9.24(1.50) vs 4.60(2.12)로 수치상 높았으나 유의하지 않음(p=0.0688).<br/>
@@ -524,11 +619,11 @@ Per-protocol 분석에서도 12.02 vs 6.34, 군간차 5.67(2.16), 95% CI 1.43–
 반면 24주째 모발폭·종모폭 변화는 양군 유사(p&gt;0.05)했고, 환자자가평가 MHGQ(치료효능·외모만족) 점수는 군간 유의차 없었다.<br/>
 기저 모발수는 양군 118.4 vs 116.9개, 종모수 100.5 vs 96.0개로 균형.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">외용 피나스테리드 분무액은 전반적으로 안전하고 내약성 양호. 치료관련 이상반응(TEAE) 발생률은 외용 피나스테리드군 69.4%(125/180) vs 위약군 72.2%(65/90)로 유사했고, 모두 경증(58.3% vs 62.2%) 또는 중등도(29.4% vs 27.8%)였으며 중증 TEAE·중대 이상반응(SAE)·사망은 양군 모두 0건. 약물관련 TEAE는 외용 피나스테리드군 8.3%(15/180)로 오히려 위약군 15.6%(14/90)보다 낮았다. 구체 이상반응: 홍반 1.7%(3/180) vs 2.2%(2/90), 소양증 1.1%(2/180) vs 3.3%(3/90), 지루성 피부염 0% vs 3.3%(3/90), 약물부위반응 4.4%(8/180) vs 6.7%(6/90). 영구 중단·조기종료는 각 군 1명(0.6% vs 1.1%)에 그쳤고 이상반응으로 인한 투약중단은 0건. IIEF-5 성기능 평가 점수는 양군 간 유의차가 없어 성기능 관련 전신 부작용 신호가 관찰되지 않았다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자 결론: 중국 남성 AGA 환자에서 HPCH 제형 외용 피나스테리드(0.25%) 분무액은 24주 치료 동안 목표부위 모발수·종모수·정수리 모발성장을 위약 대비 유의하게 개선하면서 우수한 안전성·내약성을 보였으며, 경구 피나스테리드 대비 전신 노출과 성기능 부작용을 최소화하는 유망한 신규 치료옵션이다. 한계: 24주 단기 추적, 단일 인종(한족 98.5%) 중심으로 일반화에 제한이 있고, 경구 피나스테리드나 미녹시딜과의 직접 head-to-head 비교가 아니며 모발폭 지표는 효능을 반영하지 못했다. 헤어그로(외용 미녹시딜) 관점: 외용 5ARI는 미녹시딜과 작용기전이 상보적이므로, 저자들이 명시적으로 제언한 &#x27;외용 피나스테리드+외용 미녹시딜 병용요법&#x27; 데이터가 향후 확보되면 헤어그로 병용 전략의 임상 근거로 직결될 수 있다.</div>
                     </div>
@@ -539,6 +634,26 @@ Per-protocol 분석에서도 12.02 vs 6.34, 군간차 5.67(2.16), 95% CI 1.43–
                             <li>24주 종모수 변화 12.49 vs 6.68, 군간차 5.82(95% CI 1.48–10.16), p&lt;0.01</li>
                             <li>연구자 평가 정수리 모발성장 개선율 48.6% vs 31.8%, p&lt;0.01 / 약물관련 TEAE 8.3% vs 15.6%, SAE 0건</li>
                         </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 외용 피나스테리드 스프레이 vs 위약 (24주, Phase III)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart7"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart7"), {
+                            type: "bar",
+                            data: { labels: ["목표부위 모발수Δ", "약물관련 이상반응(%)"], datasets: [
+                              { label: "외용 피나스테리드", data: [11.96, 8.3], backgroundColor: "#1A5276" },
+                              { label: "위약", data: [6.68, 15.6], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 중국인 남성 AGA 270명 Phase III RCT — 외용 피나스테리드 0.25% 분무액이 24주 목표부위 모발수(군간차 5.28, p&lt;0.05)·정수리 개선율(48.6% vs 31.8%, p&lt;0.01)을 위약 대비 유의 개선, 성기능 부작용 신호 없음 → 헤어그로(외용 미녹시딜)와 병용 시너지 근거 확보 기회</div><ul><li>외용 5ARI의 안전성 차별화 디테일링: 약물관련 이상반응이 위약(15.6%)보다 낮은 8.3%, IIEF-5 성기능 점수 군간 무차이, 중대 이상반응·중단 0건 — &#x27;두피 국소 작용·전신 노출 최소화&#x27; 메시지를 외용 미녹시딜의 우호적 전신안전성 포지셔닝과 함께 강조</li><li>병용요법 확장 스토리: 저자들이 본문에서 &#x27;외용 피나스테리드+외용 미녹시딜 병용/단독 효능 추가 연구 필요&#x27;를 명시 제언 — 미녹시딜(모낭 활성화)과 외용 피나스테리드(DHT 억제)의 기전 상보성을 들어 헤어그로 병용 처방 명분으로 활용</li></ul>
                     </div>
                 </div>
             </div>
@@ -557,19 +672,19 @@ Per-protocol 분석에서도 12.02 vs 6.34, 군간차 5.67(2.16), 95% CI 1.43–
                     <div><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12300150/" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">약물감시(FAERS)</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">피나스테리드는 5α-환원효소 억제제로 양성전립선비대증(BPH, 5mg/일)과 남성형 안드로겐성 탈모(AGA, 1mg/일) 치료에 쓰이며, 글로벌 시장은 2021년 약 1억 달러에서 2032년 1억2,800만 달러로 성장이 예상될 만큼 탈모 적응증 사용이 급증하고 있다. 초기에는 성기능장애가 주요 안전성 이슈였으나, 최근에는 자살성향(suicidality)·우울·불안 등 신경정신과적 위해와의 연관성이 부각되었고, 특히 미용 목적으로 복용하는 젊은 남성에서 기분 관련 증상 발생률이 높다는 보고가 누적됐다. 2024년 유럽의약품청(EMA)이 피나스테리드의 자살 생각에 대한 안전성 검토를 시작하고 영국 MHRA가 제품 라벨 개정·환자 안전 카드 도입을 권고하는 등 규제 움직임이 본격화되어, 실제 시판 후 이상반응 데이터에서 자살성향 신호가 시간에 따라 어떻게 변화하는지 정량 평가할 필요가 제기됐다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">미국 FDA 이상반응 보고시스템(FAERS) 2015~2024년 데이터를 활용한 약물감시 불균형 분석(disproportionality analysis) 연구다. 연구 전 기간 피나스테리드가 1차 의심약물(PS)로 지목된 자살성향 관련 이상반응 보고 총 1,566건을 분석 대상으로 삼았으며, 자살성향은 자살 생각·자살 사고·자살 시도·우울·자살 기분·자살 완수를 포함하는 광의 정의를 적용했다. 2×2 분할표(해당약물 사례 a/비사례 b, 기타약물 사례 c/비사례 d)를 구성해 네 가지 신호지표를 산출했으며, 신호 판정 기준은 보고오즈비 ROR&gt;1, 비례보고비 PRR≥2, 경험적 베이즈 기하평균 EBGM&gt;2, 정보성분 IC&gt;0이다. 연도별(2015~2024) 신호 강도 추이와 함께 성별(남 87.23%·여 0.57%·미상 12.2%)·연령(18~39세 43.1% n=675, 40~59세 9.51% n=149, 60세 이상 6.32% n=99)·적응증·보고자 직군·국가별 하위분석을 수행했다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">피나스테리드 자살성향 신호는 전 연도에서 모든 지표 임계치를 초과해 일관되게 검출됐고, 2019년 이후 급격히 상승해 2021~2022년 정점을 찍었다.<br/>
 연도별 ROR(95% CI)은 2015년 8.76(7.30–10.50)에서 2019년 27.51(23.22–32.58), 2021년 33.72(28.52–39.85), 2022년 최고치 34.64(28.36–41.88), 2023년 30.53(25.50–36.56)로 변화했다.<br/>
@@ -579,11 +694,11 @@ PRR도 동반 상승해 2015년 8.11에서 2022년 27.82로, IC는 2.97에서 4.
 보고자는 소비자·환자 62.32%(n=976), 의사 19.03%(n=298), 기타 보건전문가 11.11%(n=174), 약사 4.85%(n=76) 순이었고, 국가는 영국 39.21%(n=614)·미국 25.93%(n=406) 순이었다.<br/>
 본 연구는 ROR·PRR에 대해 95% CI는 제시했으나 별도 p값은 보고하지 않았다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">전체 1,566건의 결과 중증도를 보면 사망 118건(7.54%), 생명위협 202건(12.9%), 장애 293건(18.7%), 기타 중대 의학적 사건 51.72%, 입원 7.92%였다. 다만 본 연구는 자살성향을 통합 개념으로 집계해 자살 완수와 자살 사고를 개별 수치로 분리 제시하지는 않았다. 관련 신경정신과 증상으로 성기능장애·기분장애·자해가 문서화됐으며, 저자들은 기전적으로 5α-환원효소 억제가 신경스테로이드 알로프레그나놀론(allopregnanolone, GABA_A 수용체의 강력한 양성 알로스테릭 조절자) 합성을 감소시켜 GABA성 신경전달을 저해함으로써 기분 불안정과 자살 사고에 기여할 수 있다고 설명했다. 후피나스테리드증후군(post-finasteride syndrome) 관련 환자 옹호 활동과 소송이 자살성향 보고 증가에 영향을 미쳤을 가능성도 제기됐다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자들은 2019년 이후 젊은 남성 사용자에서 자살성향 안전성 신호가 지속 상승해 2024년 절대건수 정점에 이른 점이 신흥 안전성 우려를 반영하며, 강화된 약물감시·치료 전후 정신건강 평가·명확한 경고 표기가 필요하다고 결론지었다. 한계로는 자발적 보고 특유의 과소보고(실제 이상반응의 1~10%만 보고)와 결측(연령 40.36%·성별 12.2%·적응증 23% 미상), 노세보 효과 및 소송·캠페인에 따른 통보편향(보고의 2/3가 소비자), 분모 부재로 인한 절대위험 산출 불가와 인과성 입증 불가, 정신과 병력·동반약물 등 교란변수 미보정(COVID-19 등 외부 스트레스 요인 가능성)을 들었다. 헤어그로(외용 미녹시딜) 관점에서는 경구 피나스테리드의 전신성 신경정신과 신호가 시간에 따라 강화되는 점이 외용 미녹시딜의 전신 노출 최소화라는 안전성 차별점을 부각시키는 디테일링 근거로 활용 가능하다.</div>
                     </div>
@@ -594,6 +709,10 @@ PRR도 동반 상승해 2015년 8.11에서 2022년 27.82로, IC는 2.97에서 4.
                             <li>ROR 2015년 8.76(7.30–10.50) → 2022년 정점 34.64(28.36–41.88)</li>
                             <li>사망 118건(7.54%), 18~40세 43.1%·남성 87.23% 집중</li>
                         </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: FAERS 2015~2024 분석에서 경구 피나스테리드의 자살성향 신호(ROR 최고 34.64)가 탈모 미용 목적 젊은 남성에 집중·지속 상승 — 외용 미녹시딜의 전신 노출 최소화 안전성을 부각하는 근거</div><ul><li>탈모 상담 시 경구 5ARI의 신경정신과 신호(2019년 이후 ROR 27~34대 지속, EMA·MHRA 규제 검토)를 제시해, 전신 부작용이 적은 외용 미녹시딜(헤어그로)을 1차·병용 옵션으로 권하는 디테일링에 활용</li><li>젊은 남성·미용 목적 사용자(보고의 43.1%가 18~40세)에게 경구약 부작용 우려가 큰 점을 짚어, 라이프스타일 부담이 적은 외용 제형 선호 환자군을 타겟팅하는 메시지로 전개</li></ul>
                     </div>
                 </div>
             </div>
@@ -612,19 +731,19 @@ PRR도 동반 상승해 2015년 8.11에서 2022년 27.82로, IC는 2.97에서 4.
                     <div><a href="https://jamanetwork.com/journals/jamadermatology/article-abstract/2826573" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">국제 전문가 합의(Delphi)</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">탈모(특히 안드로겐성 탈모·휴지기 탈모·견인성 탈모 등)는 전 세계적으로 흔하며 삶의 질·자존감을 크게 훼손하지만, FDA 승인 약물은 외용 미녹시딜과 경구 피나스테리드 등으로 제한적이다. 외용 미녹시딜은 잔여물·모발 질감 변화·두피 자극·비순응 등으로 실제 임상에서 효과·지속성이 떨어지는 경우가 많아, 최근 저용량 경구 미녹시딜(LDOM)이 off-label로 빠르게 확산되고 있다. 그러나 LDOM의 안전성·유효성을 뒷받침하는 근거는 소규모 연구에 머물러 있고 대규모 임상시험과 표준 처방 가이드라인이 부재해, 의사마다 적응증·시작용량·금기·모니터링 방식이 제각각인 상황이었다. 이 미충족 수요를 메우기 위해 국제 탈모 전문가들이 modified Delphi 합의 절차로 LDOM 처방의 표준안을 마련하고자 본 연구를 수행했다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">연구설계는 국제 modified Delphi 전문가 합의(consensus statement)로, 무작위 임상시험이 아니다. LDOM의 약리·이상반응·사용에 관한 기존 문헌을 검토해 관심 주제를 도출한 뒤 설문을 구성했다. 참여 패널은 12개국 탈모 전문 피부과 의사 43명. 합의 기준은 5점 Likert 척도에서 70% 이상이 &#x27;동의&#x27; 또는 &#x27;강하게 동의&#x27;한 경우로 사전 정의했다. 총 4라운드 설문을 진행했으며 각 라운드에서 1라운드 180개, 2라운드 121개, 3라운드 16개, 4라운드 11개 항목을 검토·수정했다. 평가 영역은 ①LDOM이 직접/보조적 이득을 주는 진단명 ②외용 미녹시딜 대비 LDOM 선호 적응증 ③성인(18세 이상)·청소년(12~17세) 시작용량 ④금기 ⑤주의사항 ⑥기저 평가(baseline evaluation) ⑦모니터링 ⑧병용요법 ⑨전문의 자문 의뢰 기준 등 9개 카테고리로 구성됐다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">총 76개 항목이 합의(consensus)에 도달했다.<br/>
 성인 시작용량은 여성 1.25mg/일(범위 0.625~5mg), 남성 2.5mg/일(범위 1.25~5mg)로 합의됐다.<br/>
@@ -634,11 +753,11 @@ PRR도 동반 상승해 2015년 8.11에서 2022년 27.82로, IC는 2.97에서 4.
 효과 판정 시점은 최소 3개월(초기 일시적 탈락[shedding]이 있는 환자는 6개월)로 권고했다.<br/>
 12세 미만 소아 사용·용량과 LDOM 적정(titration) 프로토콜은 합의에 이르지 못했다(70% 미달).</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">금기(contraindication)는 미녹시딜 과민반응, 중대한 약물상호작용, 심막삼출/심장눌림증, 심막염, 심부전, 승모판협착 동반 폐고혈압, 갈색세포종, 임신·수유로 합의됐다. 주의사항(precaution)은 빈맥·부정맥 병력, 저혈압, 신장애 또는 투석 상태로, 이 경우 신중히 사용하도록 했다. 기저 검사(baseline testing)는 일상적으로 시행할 필요는 없으며, 위 주의사항·금기 가능성이 확인된 경우에 한해 ECG 등을 고려하도록 합의해, 무분별한 사전 검사를 권하지 않았다. 본 합의문은 LDOM의 알려진 전신 이상반응(다모증[hypertrichosis], 하지 부종, 어지럼 등)을 반영해 금기·주의·모니터링 틀을 구성했으나, 단일 임상시험이 아니므로 군별 이상반응 발생률 같은 정량 수치는 제시되지 않는다. 병용요법으로는 다모증·여드름·다낭성난소증후군·부종을 가진 (생물학적·트랜스젠더) 여성에서 스피로노락톤 병용을 권고했다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">본 국제 전문가 합의는 근거가 부족하던 LDOM off-label 처방에 대해 시작용량·적응증·금기·기저평가·모니터링·병용요법을 표준화한 최초의 실용적 가이드로, 더 많은 데이터가 나올 때까지 임상 의사결정을 보조한다. 한계로는 (1)무작위 비교가 아닌 전문가 의견 기반 합의라는 점, (2)소아 탈모 경험 전문가가 과소대표되어 12세 미만 용량·적정 프로토콜이 합의 미달인 점, (3)외용 대 경구 미녹시딜의 직접 비교 효능, 외용 접촉피부염 병력자에서 경구 안전성, LDOM 장기 안전성 등이 미해결 과제로 남은 점을 저자들이 명시했다. 헤어그로(외용 미녹시딜) 관점: 본 합의가 LDOM 선호 상황을 &#x27;외용 미녹시딜의 비순응·자극·불충분 반응&#x27;으로 명문화한 만큼, 두피 자극이 적고 잔여물 부담이 낮은 외용 제형의 사용성·순응도를 강조하면 경구 전환 전 1차 선택지로서의 입지를 디테일링에서 차별화할 수 있다.</div>
                     </div>
@@ -649,6 +768,10 @@ PRR도 동반 상승해 2015년 8.11에서 2022년 27.82로, IC는 2.97에서 4.
                             <li>전문가 43명·12개국·4라운드, 합의 기준 ≥70%, 합의 항목 76개</li>
                             <li>효과 판정 최소 3개월(일시적 탈락 시 6개월), 12세 미만·titration은 합의 미달</li>
                         </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 12개국 전문가 43명이 LDOM(경구 미녹시딜) 시작용량(여 1.25mg·남 2.5mg)·금기·모니터링을 표준화한 국제 합의 — 외용 미녹시딜의 자극·불편·불충분 반응이 &#x27;경구 전환&#x27; 트리거로 명문화됨</div><ul><li>외용 미녹시딜(헤어그로)의 강점인 낮은 두피 자극·잔여물 부담을 강조해, 합의가 지목한 &#x27;경구 전환 사유&#x27;를 역으로 방어하고 1차 외용 순응도를 높이는 디테일링 포인트로 활용</li><li>경구는 심막삼출·심부전·임신·수유 등 명확한 금기와 신중 사용 대상(부정맥·저혈압·신장애)이 있음을 안내해, 전신 노출이 낮은 외용 제형의 안전성 우위를 보수적 환자군에서 부각</li></ul>
                     </div>
                 </div>
             </div>
@@ -667,19 +790,19 @@ PRR도 동반 상승해 2015년 8.11에서 2022년 27.82로, IC는 2.97에서 4.
                     <div><a href="https://www.frontiersin.org/journals/pharmacology/articles/10.3389/fphar.2025.1718208/full" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">종합 리뷰</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">안드로겐성 탈모(AGA)는 70세까지 남성의 최대 80%, 여성의 50%에 영향을 미치는 가장 흔한 탈모 유형으로, 모낭 소형화로 말단모(terminal hair)가 연모(vellus-like hair)로 점진적 전환되는 것이 특징이다. 단순 미용 문제를 넘어 자존감 저하·신체상 불만족·사회불안·우울 증상 등 심리사회적 부담이 크다. 현재 FDA 승인 약물은 외용 미녹시딜과 경구 피나스테리드 단 2종뿐이며, 피나스테리드는 최기형성 우려로 남성에만 제한되고, 외용 미녹시딜은 사용자의 약 60%가 가시적 개선을 얻지 못하는 비반응자(non-responder)이며 국소 부작용·순응도 문제로 한계가 명확하다. 미녹시딜은 두피의 sulfotransferase(SULT1A1) 효소에 의해 활성형 minoxidil sulphate로 전환되어야 효과를 내는데(ATP 민감성 칼륨채널 개방·VEGF 매개 혈관신생·모유두세포 항세포자멸·Wnt/β-catenin 활성화), 모낭 SULT 활성의 개인차가 외용제 반응 편차의 핵심 원인으로 지목되어 외용 한계를 보완할 경구·설하 제형 데이터를 종합 정리할 필요가 제기되었다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">본 연구는 미녹시딜의 약리·임상 효능을 외용(topical)·경구(oral)·설하(sublingual) 3개 제형 관점에서 종합한 내러티브 종합리뷰(narrative synthesis)다. PubMed(MEDLINE)에서 2025년 11월 8일까지 발표 문헌을 검색해 약 4,855건을 1차 식별, 250건을 전문(full-text) 검토하여 최종 96편이 포함기준을 충족했다. 다룬 제형·용량은 외용 미녹시딜 2%·5%(용액 및 폼), 저용량 경구 미녹시딜 0.25~5mg, 설하 미녹시딜 0.45~5mg이다. 효능 근거로 외용은 Olsen 2002(n=393), Lucky 2004(n=381), Bergfeld 2016(n=404) 등 대규모 RCT를, 경구는 Penha 2024(남성 n=90, 24주, 경구5mg vs 외용5%), Ramos 2020(여성 n=52), Sinclair 2018(여성 n=100) 등을, 설하는 Bokhari 2022(n=40 용량반응 RCT), Sanabria 2025(남성 n=110, 설하5mg vs 경구5mg, 24주)를 핵심 비교 자료로 인용했다. 평가변수는 모발수(hairs/cm²)·모발밀도·모간 직경(μm)·Sinclair 등급·전반적 사진평가(GPA)이며, 안전성은 Vano-Galvan 2021 다기관 연구(저용량 경구 n=1,404)를 주축으로 했다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">[외용] 5% 미녹시딜이 2%·위약보다 우수 — 48주 비연모 증가 +18.6/cm²(5%) vs +12.7/cm²(2%) vs +3.9/cm²(위약, Olsen 2002, n=393); 5% 폼 16주 모발수 +13.4% vs 위약 +3.4%(p&lt;0.001).<br/>
 여성에서도 비연모 증가 +24.5(5%) vs +20.7(2%) vs +9.4(위약)/cm²(p&lt;0.001, Lucky 2004).<br/>
@@ -692,11 +815,11 @@ Bayesian 네트워크 메타분석에서 경구5mg는 두타스테리드0.5mg보
 설하5mg vs 경구5mg(Sanabria 2025, n=110, 24주): 총·비연모 밀도 +24.5·+7.8/cm²(설하) vs +21.8·+7.4/cm²(경구), 유의차 없음.<br/>
 [병용] 미녹시딜+피나스테리드 병용군 개선율 94.1% vs 피나 단독 80.5% vs 외용 미녹시딜 단독 59.0%(Hu 2015, n=450, GPA 평가) — 병용 우위가 두드러짐.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">[외용] 가장 흔한 부작용은 소양증과 초기 탈락모 증가; 용액 제형은 propylene glycol로 인한 두피 자극이 폼보다 빈번. 다모증(hypertrichosis)은 용량의존적이며 5% 용액에서 더 흔하나 중단 1~3개월 내 안면·팔부터 자연 소실. 전신 흡수는 ~1.4%로 매우 낮아 건강인에서 저혈압·빈맥은 극히 드묾. [경구] 다기관 연구(Vano-Galvan 2021, n=1,404): 최빈 이상반응 다모증 15.1%; 체액저류 1.3%·어지럼 1.7%·빈맥 0.9%로 심혈관 이상반응 드묾; 부작용으로 인한 치료 중단은 1.7%에 불과. 다모증은 용량의존적(0.25mg 6.7% → 5mg 56.1%). 심혈관 동반질환자(n=264)에서도 9%만 전신 이상반응, 생명위협 이상반응 없음; 심막삼출 등 중대 이상반응은 ≤5mg에서 드물고 &gt;10mg에서만 위험. [설하] Sinclair 2020(n=64): 이상반응 경미 — 다모증 12.5%·기립성 저혈압 7.8%·말초부종 3.1%, 중대 부작용 없음, 6·12개월 혈압 유의변화 없음. 설하 vs 경구 직접비교(Sanabria 2025): 심계항진 설하 0% vs 경구 9.3%(p=0.048)로 설하가 심혈관 내약성 우위. [과량] 외용제 60mL(3,000mg) 음용 시 수축기혈압 40mmHg 순환쇼크 등 보고되나 사망 사례는 없음.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">저자들은 외용 미녹시딜이 가장 긴 안전성 트랙레코드와 FDA 승인을 가진 대부분 환자의 1차 출발점으로 여전히 유효하되, 약 60%의 비반응자에게는 저용량 경구 미녹시딜이 점점 견고한 근거(밀도 개선·높은 환자만족·낮은 중단율 1.7%)를 갖춘 실효적 대안으로 부상했고, 설하 미녹시딜은 아직 연구단계지만 경구와 동등 효능에 더 적은 전신 부작용(심계항진 0% vs 9.3%)을 보여 유망하다고 결론지었다. 즉 미녹시딜은 더 이상 일률적 치료가 아니라 반응성·내약성·환자선호에 따른 개인맞춤 처방으로 진화 중이다. 한계는 대부분 연구의 소규모 표본·설계 이질성, 제형 간 직접비교 RCT 부족, 저용량 경구·특히 설하의 안전성·1년 초과 장기 추적 데이터 부족이다. 헤어그로(외용 미녹시딜) 관점: 외용제는 전신 노출 1.4%로 안전성·접근성이 가장 검증된 1차 옵션이며, 피나스테리드 병용 시 개선율 94.1%(단독 59.0%)로 시너지가 크다는 점이 디테일링의 핵심 근거가 된다.</div>
                     </div>
@@ -707,6 +830,26 @@ Bayesian 네트워크 메타분석에서 경구5mg는 두타스테리드0.5mg보
                             <li>병용(미녹시딜+피나) 개선율 94.1% vs 외용 단독 59.0% (n=450, GPA)</li>
                             <li>설하 vs 경구 심계항진 0% vs 9.3%, p=0.048 (n=110, 24주)</li>
                         </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 외용 미녹시딜 농도별 비연모 증가 (48주, hairs/cm²)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart10"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart10"), {
+                            type: "bar",
+                            data: { labels: ["외용 5%", "외용 2%", "위약"], datasets: [
+                              { label: "남성", data: [18.6, 12.7, 3.9], backgroundColor: "#1A5276" },
+                              { label: "여성", data: [24.5, 20.7, 9.4], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 미녹시딜 3제형(외용·경구·설하) 종합리뷰 — 외용 5%가 2%·위약 대비 우월(+18.6 vs +12.7 vs +3.9 hairs/cm²), 피나스테리드 병용 시 개선율 94.1%로 시너지, 외용은 전신흡수 1.4%로 안전성 검증된 1차 옵션</div><ul><li>외용 미녹시딜 5%의 견고한 RCT 근거(여성 비연모 +24.5/cm² p&lt;0.001, 폼 16주 +13.4% vs 위약 3.4% p&lt;0.001)와 전신 부작용 희소성(흡수 1.4%, 저혈압·빈맥 극히 드묾)을 강조해 안전성·효능 균형을 어필</li><li>외용 비반응자(약 60%) 이슈를 인정하되 피나스테리드 병용(94.1% vs 59.0%)·조기 치료·SULT 활성 환자에서 반응 극대화 전략으로 처방 명분을 설계</li></ul>
                     </div>
                 </div>
             </div>
@@ -725,19 +868,19 @@ Bayesian 네트워크 메타분석에서 경구5mg는 두타스테리드0.5mg보
                     <div><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12207719/" class="paper-url" target="_blank">PubMed Link</a></div>
                 </div>
                 <div class="paper-content">
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">연구 디자인</div>
                         <div class="content-section-text">네트워크 메타분석</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">배경</div>
                         <div class="content-section-text">남성형 안드로겐성 탈모(AGA)는 매우 흔한 진행성 탈모로, 미녹시딜·피나스테리드·두타스테리드가 다양한 용량과 투여경로(경구·외용·설하·메조테라피)로 사용된다. 그러나 이들 약물·용량·경로를 직접 비교한 head-to-head 근거가 제한적이어서, 어떤 옵션이 가장 효과적이고 안전한지에 대한 통합 비교가 미충족 수요로 남아 있었다. 본 연구는 네트워크 메타분석으로 18개 중재를 동시에 비교·순위화해 이 공백을 메우고자 했다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">대상/방법</div>
                         <div class="content-section-text">무작위대조시험(RCT)만 포함한 체계적 문헌고찰 및 베이지안 랜덤효과 네트워크 메타분석. 적격 RCT 33편, 19개 비교군(18개 중재 + 1개 대조)을 5개 결과지표에서 분석했다. 중재는 미녹시딜(경구 5·2.5mg, 외용 5·3·2·1·0.1%, 설하 5mg), 피나스테리드(경구 5·1·0.2mg, 외용 1%젤·0.25%, 메조), 두타스테리드(경구 0.5·0.1·0.02mg, 메조 0.05%)를 포함한다. 1차 평가변수는 24주 총 모발밀도 및 말단(terminal) 모발밀도 변화(개/cm²), 2차는 24주 독립관찰자평가(IOA)와 48주 밀도 변화다. 비교군은 위약/vehicle, 추적은 24·48주이며 SUCRA로 효과 순위를 산출했다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section cs-key">
                         <div class="content-section-title">핵심 결과</div>
                         <div class="content-section-text">24주 총 모발밀도(1차)에서 경구 두타스테리드 0.5mg/일이 최고 효과(SUCRA 96.3%)로, 두타 메조 0.05% 대비 우월(MD +9.2 hairs/cm², 95%CI 5.9~12.6, p&lt;0.05)했고 설하 미녹시딜 5mg과는 차이 없었다(MD 10.9, 95%CI -17.8~39.7, p≥0.05).<br/>
 FDA 승인 치료 중에서는 외용 미녹시딜 5% 1일2회가 외용제 중 최고, 경구 피나스테리드 1mg이 경구제 중 최고였다.<br/>
@@ -746,11 +889,11 @@ FDA 승인 치료 중에서는 외용 미녹시딜 5% 1일2회가 외용제 중 
 IOA에서는 경구 두타 0.5mg이 대조 대비 유의(OR 13.5, 95%CI 1.1~492.7).<br/>
 직접 비교 근거상 경구 vs 외용 미녹시딜, 경구1mg vs 외용0.25% 피나스테리드는 효능이 동등(comparable)했고, 48주 결과도 24주와 순위 패턴이 유사했다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">안전성</div>
                         <div class="content-section-text">경구 두타스테리드 0.5mg과 경구 피나스테리드 1mg은 성기능장애·신경정신 부작용을 동반하며, 피나스테리드는 중단 후에도 부작용이 지속될 수 있다. 경구 미녹시딜 5mg은 전신 부작용 위험이 높아 다모증(hypertrichosis)이 약 49%로 외용 5%의 25%보다 유의하게 많았고(p=0.02), 심계항진은 경구 9% vs 설하 0%(p=0.048)였다. 반면 외용 미녹시딜 5%는 국소 자극·일시적 탈락이 주이고 전신 부작용이 적으며, 설하 제형도 경구보다 심혈관 영향이 적었다. 두타 메조 0.05%는 국소 통증(45.5%) 위주로 전신 흡수가 최소였고, 외용 피나스테리드는 경구 대비 성기능장애 등 전신 부작용 가능성이 낮았다.</div>
                     </div>
-                    <div class="content-section">
+                    <div class="content-section ">
                         <div class="content-section-title">결론 및 한계</div>
                         <div class="content-section-text">두타스테리드 경구 0.5mg/일이 AGA에서 전체적으로 가장 효과적이나 성기능·신경정신 부작용으로 환자 선택이 필요하며, FDA 승인 약물 중에서는 외용 미녹시딜 5%가 외용 1순위·경구 피나스테리드 1mg이 경구 1순위였다. 미녹시딜 제형 간 효능 차이는 표본 한계로 뚜렷하지 않았다. 한계는 RCT만 포함(관찰연구·증례 제외), 단독요법만 분석(병용 제외), 외용 피나스테리드 제형·메조 프로토콜의 비표준화다. 헤어그로(외용 미녹시딜) 관점에서, 본 네트워크 메타분석은 외용 미녹시딜 5%가 FDA 승인 외용제 중 효능 1순위이면서 경구 미녹시딜과 효능은 동등하되 다모증(49%→25%)·심계항진 등 전신 부작용은 현저히 적다는 점을 18개 중재 비교로 입증해, 헤어그로의 &#x27;효과는 동등, 전신 안전성은 우위&#x27;라는 디테일링 명분을 메타분석 수준 근거로 강력히 뒷받침한다.</div>
                     </div>
@@ -761,6 +904,26 @@ IOA에서는 경구 두타 0.5mg이 대조 대비 유의(OR 13.5, 95%CI 1.1~492.
                             <li>미녹시딜 경구 vs 외용 효능 동등; 말단밀도 경구5mg(SUCRA 93.2%) ≈ 설하5mg(92.2%)</li>
                             <li>다모증 경구 미녹시딜 49% vs 외용5% 25%(p=0.02), 심계항진 경구 9% vs 설하 0%(p=0.048)</li>
                         </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 전신 부작용: 외용 vs 경구 미녹시딜 (NMA 33 RCT)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart11"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart11"), {
+                            type: "bar",
+                            data: { labels: ["다모증(%)", "심계항진(%)"], datasets: [
+                              { label: "외용/설하 미녹시딜", data: [25, 0], backgroundColor: "#1A5276" },
+                              { label: "경구 미녹시딜", data: [49, 9], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 네트워크 메타분석(33 RCT)에서 외용 미녹시딜 5%가 FDA 승인 외용 1순위 효능이며 경구 미녹시딜과 효능 동등하되 다모증(49→25%)·심계항진 등 전신 부작용은 현저히 적음 — 헤어그로의 &#x27;효과 동등·안전성 우위&#x27; 근거</div><ul><li>18개 중재를 동시 비교한 최신 메타분석으로 &#x27;외용 미녹시딜 5%가 외용제 중 최고 효능&#x27;이라는 순위 근거를 제시 → 헤어그로를 외용 1차 선택지로 포지셔닝</li><li>경구 미녹시딜·5ARI(두타/피나)의 전신 부작용(다모증·심계항진·성기능장애)을 우려하는 환자에게, 효능은 유사하면서 전신 노출이 거의 없는 외용 미녹시딜을 안전한 대안으로 제안</li></ul>
                     </div>
                 </div>
             </div>
