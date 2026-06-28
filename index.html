@@ -2264,7 +2264,8 @@ function renderFcHQ(hq, meta){
       +'<div style="flex:1;min-width:170px;background:var(--blue-lt);border:1px solid #c7d7f0;border-radius:10px;padding:14px 16px">'
         +'<div style="font-size:11px;color:var(--blue-dk)">이번달 매출예측</div>'
         +'<div style="font-size:26px;font-weight:800;color:var(--blue-dk)">'+fcEok(hq.current)+'<span style="font-size:14px">억원</span></div>'
-        +'<div style="font-size:11px;color:var(--gray4);margin-top:3px">목표 '+fcEok(hq.target)+'억 · 근거 '+fcEok(hq.evidence)+'억 · gap '+fcEok(hq.gap)+'억</div></div>'
+        +'<div style="font-size:11px;color:var(--gray4);margin-top:3px">목표 '+fcEok(hq.target)+'억 · 근거 '+fcEok(hq.evidence)+'억 · gap '+fcEok(hq.gap)+'억</div>'
+        +'<div style="font-size:10px;color:var(--gray3);margin-top:2px">근거1(PRN) '+fcEok(hq.evidence1)+'억 · 근거2(볼륨업) '+fcEok(hq.evidence2)+'억 · 근거확보율 '+(Number(hq.target)>0?Math.round((Number(hq.evidence)||0)/Number(hq.target)*100):0)+'%</div></div>'
       +deltaCard('전월 대비', delta.prevMonth)
       +deltaCard('직전 3개월 평균 대비', delta.avg3Month)
       +deltaCard('전년 동월 대비', delta.prevYear)
@@ -2284,6 +2285,7 @@ function renderFcYearly(y, meta){
   var head='<tr><th style="text-align:left">연도</th>';
   for(var mo=1;mo<=12;mo++)head+='<th>'+mo+'월</th>';
   head+='<th style="background:#eef2f9">연누계</th><th style="background:#eef2f9">월평균</th></tr>';
+  var curYear=fcYearOf(meta&&meta.nowMonth?meta.nowMonth:'');
   var body='';
   years.forEach(function(yr){
     var row='<tr><td style="text-align:left;font-weight:700">'+yr+'</td>';
@@ -2295,17 +2297,29 @@ function renderFcYearly(y, meta){
         row+='<td style="'+bg+'">'+fcEok(cell.v)+'</td>'; sum+=Number(cell.v)||0; cnt++;
       } else { row+='<td style="color:var(--gray3)">-</td>'; }
     }
-    row+='<td style="background:#eef2f9;font-weight:700">'+fcEok(sum)+'</td>';
-    row+='<td style="background:#eef2f9">'+(cnt?fcEok(sum/cnt):'-')+'</td></tr>';
+    // 현재년(2026)행: 연누계=annualized2026(월평균×12 연환산), 월평균=monthlyAvg2026(입력된 달만 평균). 과거년은 실제 누계/월평균.
+    var isCurYr=(curYear&&yr===curYear&&(y.annualized2026!=null||y.monthlyAvg2026!=null));
+    if(isCurYr){
+      var annV=(y.annualized2026!=null?y.annualized2026:sum);
+      var avgV=(y.monthlyAvg2026!=null?y.monthlyAvg2026:(cnt?sum/cnt:null));
+      row+='<td style="background:#eef2f9;font-weight:700;color:var(--blue)">'+fcEok(annV)+'<span style="font-size:9px;color:var(--gray3)">*</span></td>';
+      row+='<td style="background:#eef2f9;color:var(--blue)">'+(avgV!=null?fcEok(avgV):'-')+'</td></tr>';
+    } else {
+      row+='<td style="background:#eef2f9;font-weight:700">'+fcEok(sum)+'</td>';
+      row+='<td style="background:#eef2f9">'+(cnt?fcEok(sum/cnt):'-')+'</td></tr>';
+    }
     body+=row;
   });
   var annualNote='';
   if(y.annualized2026!=null){
-    annualNote='<div style="margin-top:8px;font-size:12px;color:var(--gray4)">📌 2026 누계(연환산) = 월평균×12 = <b style="color:var(--blue)">'+fcEok(y.annualized2026)+'억원</b>'
-      +(y.ytd2026Months?' <span style="color:var(--gray3)">(1~'+y.ytd2026Months+'월 합 '+fcEok(y.ytd2026Sum)+'억 ÷ '+y.ytd2026Months+' × 12)</span>':'')+'</div>';
+    annualNote='<div style="margin-top:8px;font-size:12px;color:var(--gray4)">📌 '+(curYear||'2026')+' 연누계 = <b style="color:var(--blue)">입력된 달 기준 월평균 × 12</b> = '
+      +(y.monthlyAvg2026!=null?'월평균 '+fcEok(y.monthlyAvg2026)+'억 × 12 = ':'')
+      +'<b style="color:var(--blue)">'+fcEok(y.annualized2026)+'억원</b>'
+      +(y.ytd2026Months?' <span style="color:var(--gray3)">(입력 '+y.ytd2026Months+'개월 합 '+fcEok(y.ytd2026Sum)+'억 ÷ '+y.ytd2026Months+'개월 × 12)</span>':'')
+      +' <span style="color:var(--gray3)">(*표시 연: 연환산·입력월 평균. 과거 연은 실제 누계·월평균)</span></div>';
   }
   el.innerHTML='<div class="section-card"><h3>📅 연도별 월별매출표 <span style="font-size:11px;color:var(--gray3);font-weight:400">단위: 억원 · '
-    +'<span style="color:#9a3412">현재월=마감예측합</span> · <span style="color:#1d4ed8">미래월=예측</span></span></h3>'
+    +'<span style="color:#9a3412">현재월=마감예측합</span> · <span style="color:#1d4ed8">미래월=예측</span> · '+(curYear||'2026')+' 연누계=월평균×12</span></h3>'
     +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div>'+annualNote+'</div>';
 }
 
@@ -2319,8 +2333,8 @@ function renderFcDirectors(dirs, meta){
   if(!dirs.length){el.innerHTML='<div class="section-card"><h3>👥 지부장 4인 월별·목표/근거/gap</h3><div class="no-data">지부장 데이터가 없습니다</div></div>';return;}
   var head='<tr><th style="text-align:left">지부장</th>';
   monCols.forEach(function(m){head+='<th>'+parseInt(m.slice(5,7),10)+'월</th>';});
-  head+='<th style="background:#eef2f9">현재월 목표</th><th style="background:#eef2f9">근거</th><th style="background:#eef2f9">gap</th><th>잠금</th></tr>';
-  var body='', sumMon={}, sumT=0,sumE=0,sumG=0;
+  head+='<th style="background:#eef2f9">현재월 목표</th><th style="background:#eef2f9">근거1<br><span style="font-size:9px;color:var(--gray3)">PRN</span></th><th style="background:#eef2f9">근거2<br><span style="font-size:9px;color:var(--gray3)">볼륨업</span></th><th style="background:#eef2f9">gap</th><th>잠금</th></tr>';
+  var body='', sumMon={}, sumT=0,sumE1=0,sumE2=0,sumG=0;
   dirs.forEach(function(dir){
     var mthly=dir.monthly||{};
     var row='<tr><td style="text-align:left;font-weight:700">'+fcEsc(dir.name)+'</td>';
@@ -2330,18 +2344,21 @@ function renderFcDirectors(dirs, meta){
       row+='<td'+(isCur?' style="background:#fff7ed;color:#9a3412;font-weight:700"':'')+'>'+(v!=null&&v!==''?fcEok(v):'-')+'</td>';
       sumMon[m]=(sumMon[m]||0)+(Number(v)||0);
     });
+    // 근거1=PRN(현재월), 근거2=볼륨업(현재월). gap=목표−(근거1+근거2)=dir.gap.
+    var e1=(dir.evidence1!=null?dir.evidence1:0), e2=(dir.evidence2!=null?dir.evidence2:0);
     var gapColor=(Number(dir.gap)||0)>0?'#dc2626':'#16a34a';
     row+='<td style="background:#eef2f9;font-weight:700">'+fcEok(dir.target)+'</td>';
-    row+='<td style="background:#eef2f9">'+fcEok(dir.evidence)+'</td>';
+    row+='<td style="background:#eef2f9">'+fcEok(e1)+'</td>';
+    row+='<td style="background:#eef2f9">'+fcEok(e2)+'</td>';
     row+='<td style="background:#eef2f9;color:'+gapColor+';font-weight:700">'+fcEok(dir.gap)+'</td>';
     row+='<td>'+(dir.locked?'🔒':'<span style="color:var(--gray3)">-</span>')+'</td></tr>';
-    body+=row; sumT+=Number(dir.target)||0; sumE+=Number(dir.evidence)||0; sumG+=Number(dir.gap)||0;
+    body+=row; sumT+=Number(dir.target)||0; sumE1+=Number(e1)||0; sumE2+=Number(e2)||0; sumG+=Number(dir.gap)||0;
   });
   // 본부 합계 행 (지부장 합 = 연도별표 현재월 정합)
   var sumRow='<tr style="background:#1a4fa0;color:#fff;font-weight:700"><td style="text-align:left">본부 합계</td>';
   monCols.forEach(function(m){sumRow+='<td>'+fcEok(sumMon[m]||0)+'</td>';});
-  sumRow+='<td>'+fcEok(sumT)+'</td><td>'+fcEok(sumE)+'</td><td>'+fcEok(sumG)+'</td><td>-</td></tr>';
-  el.innerHTML='<div class="section-card"><h3>👥 지부장 4인 월별 · 목표/근거/gap <span style="font-size:11px;color:var(--gray3);font-weight:400">단위: 억원 · 합=본부 월매출 · gap=목표−근거</span></h3>'
+  sumRow+='<td>'+fcEok(sumT)+'</td><td>'+fcEok(sumE1)+'</td><td>'+fcEok(sumE2)+'</td><td>'+fcEok(sumG)+'</td><td>-</td></tr>';
+  el.innerHTML='<div class="section-card"><h3>👥 지부장 4인 월별 · 목표/근거1·2/gap <span style="font-size:11px;color:var(--gray3);font-weight:400">단위: 억원 · 합=본부 월매출 · 근거1=PRN·근거2=볼륨업(현재월) · gap=목표−(근거1+근거2)</span></h3>'
     +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead>'+head+'</thead><tbody>'+body+sumRow+'</tbody></table></div></div>';
 }
 
@@ -2370,24 +2387,39 @@ function renderFcNewDrug(nd, meta){
     +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead>'+head+'</thead><tbody>'+body+totRow+'</tbody></table></div></div>';
 }
 
-/* 5) 대웅바이오 현황 (표시 전용) */
+/* 5) 대웅바이오 현황 — DC접수월(랜딩예정월) 기준 월별 집계표 [v31 #4] */
 function renderFcDWB(dwb){
   var el=document.getElementById('fc-dwb');
-  var rows=dwb.rows||[];
   var src=dwb.source?(' <span style="font-size:11px;color:var(--gray3);font-weight:400">출처: '+fcEsc(dwb.source)+'</span>'):'';
-  if(!rows.length){el.innerHTML='<div class="section-card"><h3>🟠 대웅바이오 현황'+src+'</h3><div class="no-data">대웅바이오(DWB 도전처) 데이터가 없습니다</div></div>';return;}
-  // daewoongBio.rows 실제 필드 = 병원명·사업자번호·담당·MBO·랜딩예정월·상태 (buildDaewoongBio_, getPrenonMaster 채널='대웅바이오'). '가능여부' 필드 없음 → 죽은 열 제거, 랜딩예정월로 대체.
-  var head='<tr><th style="text-align:left">병원명</th><th>사업자번호</th><th>담당</th><th>랜딩예정월</th><th>MBO(만원)</th><th>상태</th></tr>';
-  var body=rows.map(function(r){
-    return '<tr><td style="text-align:left;font-weight:600">'+fcEsc(r.병원명||'-')+'</td>'
-      +'<td>'+fcEsc(r.사업자번호||'-')+'</td>'
-      +'<td>'+fcEsc(r.담당||'-')+'</td>'
-      +'<td>'+fcEsc(r.랜딩예정월||'-')+'</td>'
-      +'<td style="font-weight:700">'+fcMan(r.MBO)+'</td>'
-      +'<td>'+fcEsc(r.상태||'-')+'</td></tr>';
+  var byMonth=dwb.byMonth||{};
+  var months=dwb.months||Object.keys(byMonth);
+  if(!months.length){el.innerHTML='<div class="section-card"><h3>🟠 대웅바이오 현황'+src+'</h3><div class="no-data">대웅바이오(DWB 도전처) 데이터가 없습니다</div></div>';return;}
+  // 월별 표: 월 / DC접수 처수 / MBO / 랜딩 처수. 랜딩일자[] 있으면 처수 셀 title(툴팁).
+  var head='<tr><th style="text-align:left">월(DC접수/랜딩예정)</th><th>DC접수 처수</th><th>MBO(만원)</th><th>랜딩 처수</th></tr>';
+  var sumCnt=0,sumMBO=0,sumLanded=0;
+  var body=months.map(function(m){
+    var r=byMonth[m]||{};
+    var cnt=Number(r.처수)||0, mbo=Number(r.MBO)||0, landed=Number(r.랜딩처수)||0;
+    sumCnt+=cnt; sumMBO+=mbo; sumLanded+=landed;
+    var dates=(r.랜딩일자&&r.랜딩일자.length)?r.랜딩일자.join(', '):'';
+    var landTip=dates?' title="랜딩일자: '+fcEsc(dates)+'"':'';
+    var landCell=landed>0
+      ? '<td style="font-weight:700;color:#16a34a"'+landTip+'>'+landed+(dates?' <span style="font-size:9px;color:var(--gray3)">📅</span>':'')+'</td>'
+      : '<td style="color:var(--gray3)">-</td>';
+    var monLabel=(m==='미정')?'<span style="color:var(--gray3)">미정</span>':fcEsc(m);
+    return '<tr><td style="text-align:left;font-weight:600">'+monLabel+'</td>'
+      +'<td style="font-weight:700">'+cnt+'</td>'
+      +'<td>'+fcMan(mbo)+'</td>'
+      +landCell+'</tr>';
   }).join('');
-  el.innerHTML='<div class="section-card"><h3>🟠 대웅바이오 현황'+src+' <span style="font-size:11px;color:var(--gray3);font-weight:400">표시 전용 · '+rows.length+'건 · MBO합 '+fcMan(dwb.totalMBO)+'만원</span></h3>'
-    +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div></div>';
+  // 합계 행
+  var totCnt=(dwb.totalCount!=null?dwb.totalCount:sumCnt);
+  var totLanded=(dwb.totalLanded!=null?dwb.totalLanded:sumLanded);
+  var totMBO=(dwb.totalMBO!=null?dwb.totalMBO:sumMBO);
+  var totRow='<tr style="background:#ea580c;color:#fff;font-weight:700"><td style="text-align:left">합계</td>'
+    +'<td>'+totCnt+'</td><td>'+fcMan(totMBO)+'</td><td>'+totLanded+'</td></tr>';
+  el.innerHTML='<div class="section-card"><h3>🟠 대웅바이오 현황'+src+' <span style="font-size:11px;color:var(--gray3);font-weight:400">월별 집계(DC접수/랜딩예정월 기준) · 도전 '+totCnt+'처 · 랜딩 '+totLanded+'처 · MBO합 '+fcMan(totMBO)+'만원</span></h3>'
+    +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead>'+head+'</thead><tbody>'+body+totRow+'</tbody></table></div></div>';
 }
 
 /* 6) 볼륨업 현황 */
