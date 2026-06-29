@@ -2234,7 +2234,7 @@ function renderForecast(){
   if(!forecastData)return;
   var d=forecastData, meta=d.meta||{};
   document.getElementById('fc-status').innerHTML=
-    '✅ 매출예측 로드 완료 — 기준월 <b>'+fcEsc(meta.nowMonth||'-')+'</b> · 단위 원(표시 환산: 억/만원) '
+    '✅ 매출예측 로드 완료 — 기준월 <b>'+fcEsc(meta.nowMonth||'-')+'</b>'+(meta.forecastLabel?' · <b>'+fcEsc(meta.forecastLabel)+'</b>':(meta.week?' · '+meta.week+'주차':''))+' · 단위 원(표시 환산: 억/만원) '
     +'<button onclick="refreshForecast()" style="margin-left:10px;padding:4px 12px;font-size:11px;font-weight:700;border:1.5px solid var(--blue);border-radius:7px;background:var(--blue);color:#fff;cursor:pointer">🔄 새로고침</button>'
     +(meta.generatedAt?'<span style="margin-left:10px;color:var(--gray3);font-size:11px">생성 '+fcEsc(meta.generatedAt)+'</span>':'');
   renderFcHQ(d.headquarters||{}, meta);
@@ -2328,38 +2328,49 @@ function renderFcYearly(y, meta){
 function renderFcDirectors(dirs, meta){
   var el=document.getElementById('fc-directors');
   var nm=meta.nowMonth||'';
-  // 현재월까지 월 컬럼 산출
-  var year=fcYearOf(nm), upto=parseInt(nm.slice(5,7),10)||12;
-  var monCols=[]; for(var mo=1;mo<=upto;mo++)monCols.push(year+'-'+('0'+mo).slice(-2));
-  if(!dirs.length){el.innerHTML='<div class="section-card"><h3>👥 지부장 4인 월별·목표/근거/gap</h3><div class="no-data">지부장 데이터가 없습니다</div></div>';return;}
+  // [v33] 과거월 컬럼(1월~현재월-1)만 월별 표기 — 현재월은 목표/예측 2컬럼으로 분리
+  var year=fcYearOf(nm), curN=parseInt(nm.slice(5,7),10)||12;
+  var pastUpto=curN-1; // 과거월 마지막(현재월 직전)
+  var monCols=[]; for(var mo=1;mo<=pastUpto;mo++)monCols.push(year+'-'+('0'+mo).slice(-2));
+  if(!dirs.length){el.innerHTML='<div class="section-card"><h3>👥 지부장 4인 월별·목표/예측/근거/gap</h3><div class="no-data">지부장 데이터가 없습니다</div></div>';return;}
+  // [v33 라벨①] N월 예측 (n주차) — meta.forecastLabel 우선, 없으면 nowMonth/week로 합성
+  var hqWeek=(meta.week!=null?meta.week:'');
+  var fcLabel=meta.forecastLabel || (curN+'월 예측'+(hqWeek?' ('+hqWeek+'주차)':''));
   var head='<tr><th style="text-align:left">지부장</th>';
   monCols.forEach(function(m){head+='<th>'+parseInt(m.slice(5,7),10)+'월</th>';});
-  head+='<th style="background:#eef2f9">현재월 목표</th><th style="background:#eef2f9">근거1<br><span style="font-size:9px;color:var(--gray3)">PRN</span></th><th style="background:#eef2f9">근거2<br><span style="font-size:9px;color:var(--gray3)">볼륨업</span></th><th style="background:#eef2f9">gap</th><th>잠금</th></tr>';
-  var body='', sumMon={}, sumT=0,sumE1=0,sumE2=0,sumG=0;
+  head+='<th style="background:#eef2f9">목표<br><span style="font-size:9px;color:var(--gray3)">첫주확정</span></th>'
+       +'<th style="background:#fff7ed;color:#9a3412">'+fcEsc(fcLabel)+'</th>'
+       +'<th style="background:#eef2f9">근거1<br><span style="font-size:9px;color:var(--gray3)">PRN</span></th>'
+       +'<th style="background:#eef2f9">근거2<br><span style="font-size:9px;color:var(--gray3)">볼륨업</span></th>'
+       +'<th style="background:#eef2f9">gap</th><th>잠금</th></tr>';
+  var body='', sumMon={}, sumT=0,sumF=0,sumE1=0,sumE2=0,sumG=0;
   dirs.forEach(function(dir){
     var mthly=dir.monthly||{};
     var row='<tr><td style="text-align:left;font-weight:700">'+fcEsc(dir.name)+'</td>';
     monCols.forEach(function(m){
       var v=mthly[m];
-      var isCur=(m===nm);
-      row+='<td'+(isCur?' style="background:#fff7ed;color:#9a3412;font-weight:700"':'')+'>'+(v!=null&&v!==''?fcEok(v):'-')+'</td>';
+      row+='<td>'+(v!=null&&v!==''?fcEok(v):'-')+'</td>';
       sumMon[m]=(sumMon[m]||0)+(Number(v)||0);
     });
+    // [v33] 목표=baseline(첫주확정), 예측=현재월 최신(forecast ?? monthly[nm])
+    var fv=(dir.forecast!=null?dir.forecast:(mthly[nm]!=null?mthly[nm]:0));
+    var dweek=(dir.week!=null?dir.week:'');
     // 근거1=PRN(현재월), 근거2=볼륨업(현재월). gap=목표−(근거1+근거2)=dir.gap.
     var e1=(dir.evidence1!=null?dir.evidence1:0), e2=(dir.evidence2!=null?dir.evidence2:0);
     var gapColor=(Number(dir.gap)||0)>0?'#dc2626':'#16a34a';
     row+='<td style="background:#eef2f9;font-weight:700">'+fcEok(dir.target)+'</td>';
+    row+='<td style="background:#fff7ed;color:#9a3412;font-weight:700">'+fcEok(fv)+(dweek!==''&&dweek!=null?'<span style="font-size:9px;color:var(--gray3);font-weight:400"> '+dweek+'주</span>':'')+'</td>';
     row+='<td style="background:#eef2f9">'+fcEok(e1)+'</td>';
     row+='<td style="background:#eef2f9">'+fcEok(e2)+'</td>';
     row+='<td style="background:#eef2f9;color:'+gapColor+';font-weight:700">'+fcEok(dir.gap)+'</td>';
-    row+='<td>'+(dir.locked?'🔒':'<span style="color:var(--gray3)">-</span>')+'</td></tr>';
-    body+=row; sumT+=Number(dir.target)||0; sumE1+=Number(e1)||0; sumE2+=Number(e2)||0; sumG+=Number(dir.gap)||0;
+    row+='<td>'+(dir.locked?'<span title="목표 확정 — 예측은 매주 갱신">🔒</span>':'<span style="color:var(--gray3)">-</span>')+'</td></tr>';
+    body+=row; sumT+=Number(dir.target)||0; sumF+=Number(fv)||0; sumE1+=Number(e1)||0; sumE2+=Number(e2)||0; sumG+=Number(dir.gap)||0;
   });
-  // 본부 합계 행 (지부장 합 = 연도별표 현재월 정합)
+  // 본부 합계 행 (예측합 = 연도별표 현재월 = headquarters.current 정합)
   var sumRow='<tr style="background:#1a4fa0;color:#fff;font-weight:700"><td style="text-align:left">본부 합계</td>';
   monCols.forEach(function(m){sumRow+='<td>'+fcEok(sumMon[m]||0)+'</td>';});
-  sumRow+='<td>'+fcEok(sumT)+'</td><td>'+fcEok(sumE1)+'</td><td>'+fcEok(sumE2)+'</td><td>'+fcEok(sumG)+'</td><td>-</td></tr>';
-  el.innerHTML='<div class="section-card"><h3>👥 지부장 4인 월별 · 목표/근거1·2/gap <span style="font-size:11px;color:var(--gray3);font-weight:400">단위: 억원 · 합=본부 월매출 · 근거1=PRN·근거2=볼륨업(현재월) · gap=목표−(근거1+근거2)</span></h3>'
+  sumRow+='<td>'+fcEok(sumT)+'</td><td>'+fcEok(sumF)+'</td><td>'+fcEok(sumE1)+'</td><td>'+fcEok(sumE2)+'</td><td>'+fcEok(sumG)+'</td><td>-</td></tr>';
+  el.innerHTML='<div class="section-card"><h3>👥 지부장 4인 월별 · 목표/예측/근거1·2/gap <span style="font-size:11px;color:var(--gray3);font-weight:400">단위: 억원 · 목표=첫주확정(불변)·예측=매주갱신(합=본부 월매출) · 근거1=PRN·근거2=볼륨업(현재월) · gap=목표−(근거1+근거2) · 🔒=목표확정</span></h3>'
     +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead>'+head+'</thead><tbody>'+body+sumRow+'</tbody></table></div></div>';
 }
 
