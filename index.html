@@ -1748,6 +1748,7 @@ function renderAging(d){
   const rows=[];
   d.forEach(x=>{
     if(x.신약과정==='처방') return;
+    if(x.DC접수월 && x.DC접수월>cym) return; // DC계획월(접수월)이 현재월보다 미래=아직 도래 전이라 지연 아님 → 정체 제외
     const g=daysDiff(x.작성일, now); // 미갱신 일수(오늘-작성일)
     const gv=(g===null?-1:g);
     const why=[];
