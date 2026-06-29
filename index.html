@@ -394,7 +394,7 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#ee
       <div id="mbostage-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px"></div>
     </div>
     <div class="section-card" id="aging-card">
-      <h3>⏳ 정체 블럭 <span style="font-size:11px;color:var(--gray3);font-weight:400">①코딩예정 등록·작성일 30일↑ 미갱신 ②코딩예정 미등록·60일↑ 미갱신 ③계획월 도래·서류준비前 · 처방 제외</span></h3>
+      <h3>⏳ 정체 블럭 <span style="font-size:11px;color:var(--gray3);font-weight:400">①DC접수·코딩월 도래·30일↑ 미갱신 ②코딩예측월 미등록·60일↑ 미갱신 ③계획월 도래·서류준비前 · 처방 제외</span></h3>
       <div id="aging-body"></div>
     </div>
     <div class="section-card" id="monthrep-card">
@@ -1752,7 +1752,7 @@ function renderAging(d){
     const g=daysDiff(x.작성일, now); // 미갱신 일수(오늘-작성일)
     const gv=(g===null?-1:g);
     const why=[];
-    if(x.코딩예측월 && g!==null && g>=30) why.push('코딩예정 미갱신');
+    if(x.코딩예측월 && x.코딩예측월<=cym && STAGES.indexOf(x.신약과정)>=3 && g!==null && g>=30) why.push('코딩예정 미갱신'); // 코딩월 도래(미래제외)+DC접수(DC신청↑)+작성일30일↑
     if(!x.코딩예측월 && g!==null && g>=60) why.push('진행 정체');
     if(x.DC접수월 && x.DC접수월<=cym && PRE_DOC.indexOf(x.신약과정)>=0) why.push('계획월 미착수');
     if(why.length) rows.push({x:x, gv:gv, gd:(g===null?'-':String(g)), why:why.join(', ')});
