@@ -394,7 +394,7 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#ee
       <div id="mbostage-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px"></div>
     </div>
     <div class="section-card" id="aging-card">
-      <h3>⏳ 정체 블럭 <span style="font-size:11px;color:var(--gray3);font-weight:400">①코딩예측월+30일 미갱신 ②코딩無·DC통과+60일 미갱신 ③계획월 도래·서류준비前 · 처방 제외</span></h3>
+      <h3>⏳ 정체 블럭 <span style="font-size:11px;color:var(--gray3);font-weight:400">①코딩예정 등록·작성일 30일↑ 미갱신 ②코딩예정 미등록·60일↑ 미갱신 ③계획월 도래·서류준비前 · 처방 제외</span></h3>
       <div id="aging-body"></div>
     </div>
     <div class="section-card" id="monthrep-card">
@@ -1751,8 +1751,8 @@ function renderAging(d){
     const g=daysDiff(x.작성일, now); // 미갱신 일수(오늘-작성일)
     const gv=(g===null?-1:g);
     const why=[];
-    if(x.코딩예측월 && g!==null && g>=30) why.push('코딩임박 미갱신');
-    if(!x.코딩예측월 && x.신약과정==='DC통과' && g!==null && g>=60) why.push('DC통과 정체');
+    if(x.코딩예측월 && g!==null && g>=30) why.push('코딩예정 미갱신');
+    if(!x.코딩예측월 && g!==null && g>=60) why.push('진행 정체');
     if(x.DC접수월 && x.DC접수월<=cym && PRE_DOC.indexOf(x.신약과정)>=0) why.push('계획월 미착수');
     if(why.length) rows.push({x:x, gv:gv, gd:(g===null?'-':String(g)), why:why.join(', ')});
   });
@@ -1761,10 +1761,10 @@ function renderAging(d){
   rows.sort((a,b)=>{ const ra=rpmRank(a.x.담당RPM), rb=rpmRank(b.x.담당RPM); if(ra!==rb)return ra-rb; const na=a.x.담당RPM||'', nb=b.x.담당RPM||''; if(na!==nb)return na<nb?-1:1; return b.gv-a.gv; });
   const el=document.getElementById('aging-body');
   if(!rows.length){ el.innerHTML='<div style="color:var(--gray3);font-size:12px;padding:6px">정체 블럭 없음</div>'; return; }
-  const c1=rows.filter(r=>r.why.indexOf('코딩임박')>=0).length;
-  const c2=rows.filter(r=>r.why.indexOf('DC통과')>=0).length;
+  const c1=rows.filter(r=>r.why.indexOf('코딩예정')>=0).length;
+  const c2=rows.filter(r=>r.why.indexOf('진행 정체')>=0).length;
   const c3=rows.filter(r=>r.why.indexOf('계획월')>=0).length;
-  let t='<div style="font-size:12px;color:var(--gray4);margin-bottom:6px">정체 '+rows.length+'건 <span style="color:var(--gray3)">(코딩임박 '+c1+' · DC통과정체 '+c2+' · 계획월미착수 '+c3+')</span></div><div class="tbl-wrap"><table class="btbl"><thead><tr><th>RPM</th><th>병원</th><th>제품</th><th>단계</th><th>DC접수월</th><th>코딩예측월</th><th>작성일</th><th>미갱신(일)</th><th>사유</th><th>MBO</th></tr></thead><tbody>';
+  let t='<div style="font-size:12px;color:var(--gray4);margin-bottom:6px">정체 '+rows.length+'건 <span style="color:var(--gray3)">(코딩예정 '+c1+' · 진행정체 '+c2+' · 계획월미착수 '+c3+')</span></div><div class="tbl-wrap"><table class="btbl"><thead><tr><th>RPM</th><th>병원</th><th>제품</th><th>단계</th><th>DC접수월</th><th>코딩예측월</th><th>작성일</th><th>미갱신(일)</th><th>사유</th><th>MBO</th></tr></thead><tbody>';
   let prevRpm=null;
   rows.forEach(r=>{ const x=r.x;
     const isNewRpm=x.담당RPM!==prevRpm; prevRpm=x.담당RPM;
