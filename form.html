@@ -994,8 +994,10 @@ function onClosingInput(v){
 function unlockClosing(){ closing._force=true; renderClosing(); toast('🔓 목표 정정 모드 — 값 변경 후 전송하세요(목표까지 덮어씀)'); }
 
 /* ════════════ ② 신약 진행상황 — 자동표시 3종 ════════════ */
-/* ⓐ DC접수월=이번달 + 'DC신청' 전 / ⓑ DC접수 지연(DC접수월 지남 + 'DC신청' 전) / ⓒ 코딩월 도래(코딩예측월≤이번달 + '코딩' 전) — DC접수된 건(DC신청 이상)은 ⓒ 해당 시에만 표시 */
+/* ⓐ DC접수월=이번달 + 'DC신청' 전 / ⓑ DC접수 지연(DC접수월 지남 + 'DC신청' 전) / ⓒ 코딩월 도래(코딩예측월≤이번달 + '코딩' 전) — DC접수된 건(DC신청 이상)은 ⓒ 해당 시에만, 이슈상태 DC실패(재도전·종결)는 전체 제외 */
 function autoGroupOf(d){
+  // DC실패(재도전·종결) 건은 챙김 대상 아님 → 자동표시 전체 제외
+  if((d.이슈상태||'').startsWith('DC실패')) return '';
   const nm=nowMonth();
   const stg=d.신약과정||'';
   const sIdx=(stg in STAGE_IDX)?STAGE_IDX[stg]:-1;
