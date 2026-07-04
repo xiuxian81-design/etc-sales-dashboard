@@ -209,6 +209,10 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#ee
 .ri-del{background:none;border:none;color:var(--gray3);font-size:20px;cursor:pointer;flex-shrink:0;line-height:1;padding:0 4px}
 .ri-del:hover{color:#dc2626}
 .ri-bd{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.ri.collapsed .ri-bd{display:none}
+.ri-hd{cursor:pointer}
+.ri-caret{flex-shrink:0;font-size:11px;color:var(--gray3);transition:transform .15s}
+.ri.collapsed .ri-caret{transform:rotate(-90deg)}
 .badge-new{background:#f3e8ff;color:#7c3aed;border:1px solid #c4b5fd;border-radius:4px;font-size:10px;padding:1px 6px;font-weight:700;margin-left:4px}
 .badge-unreg{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;border-radius:4px;font-size:10px;padding:1px 6px;font-weight:700;margin-left:4px}
 .badge-dc{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:4px;font-size:10px;padding:1px 6px;font-weight:700;margin-left:4px;animation:dcPulse 2s ease-in-out infinite}
@@ -332,7 +336,7 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#ee
 
     <!-- ② 신약 진행상황 -->
     <div class="card">
-      <div class="card-hd">② 신약 진행상황 <span class="cnt" id="list-cnt">0</span></div>
+      <div class="card-hd">② 신약 진행상황 <span class="cnt" id="list-cnt">0</span> <span class="sec-help">— 병원명을 탭하면 상세 입력</span></div>
       <div class="card-bd" style="padding-top:10px">
         <div id="auto-groups"></div>
         <div class="sw" style="margin-top:6px">
@@ -990,7 +994,7 @@ function onClosingInput(v){
 function unlockClosing(){ closing._force=true; renderClosing(); toast('🔓 목표 정정 모드 — 값 변경 후 전송하세요(목표까지 덮어씀)'); }
 
 /* ════════════ ② 신약 진행상황 — 자동표시 3종 ════════════ */
-/* ⓐ DC접수월=이번달 + 'DC신청' 전 / ⓑ DC접수 지연(DC접수월 지남 + 신약과정 'DC신청' 전) / ⓒ 코딩 지연(코딩예측월 도래 + 신약과정 '코딩' 전) */
+/* ⓐ DC접수월=이번달 + 'DC신청' 전 / ⓑ DC접수 지연(DC접수월 지남 + 'DC신청' 전) / ⓒ 코딩 지연(코딩예측월 도래 + DC접수 전) — DC접수된 건(DC신청 이상)은 자동표시 제외 */
 function autoGroupOf(d){
   const nm=nowMonth();
   const stg=d.신약과정||'';
@@ -1001,8 +1005,8 @@ function autoGroupOf(d){
   if(dc===nm && sIdx>=0 && sIdx<STAGE_IDX['DC신청']) return 'a';
   // ⓑ DC접수 지연: DC접수월이 지났는데 아직 'DC신청' 전(미시작·업체확인·서류준비 = idx<3)
   if(dc && dc<nm && sIdx>=0 && sIdx<STAGE_IDX['DC신청']) return 'b';
-  // ⓒ 코딩 지연: 코딩예측월 도래(<=이번달)인데 아직 '코딩' 전(DC신청·DC통과 = idx<5)
-  if(cd && cd<=nm && sIdx>=0 && sIdx<STAGE_IDX['코딩']) return 'c';
+  // ⓒ 코딩 지연: 코딩예측월 도래(<=이번달)인데 아직 DC접수 전(idx<3) — DC접수된 건(DC신청 이상)은 자동표시 제외
+  if(cd && cd<=nm && sIdx>=0 && sIdx<STAGE_IDX['DC신청']) return 'c';
   return '';
 }
 function buildAutoGroups(){
@@ -1059,7 +1063,7 @@ function doSearch(){
 function addItem(id){
   if(items.some(x=>x._id===id))return;
   const d=data.find(d=>d._id===id);if(!d)return;
-  items.push(Object.assign({}, d));renderList();doSearch();toast(`✅ ${d.실납처명} 추가됨`);
+  items.push(Object.assign({_open:true}, d));renderList();doSearch();toast(`✅ ${d.실납처명} 추가됨`);
 }
 
 /* ── 목록 렌더 (자동표시는 그룹 보더, 나머지는 일반) ── */
@@ -1097,13 +1101,14 @@ function buildRI(it,i){
   const grpCls=it._autoGrp?(' grp-'+it._autoGrp):'';
   const grpBadge=it._autoGrp?`<span class="auto-lbl ${it._autoGrp}" style="margin-left:4px;padding:1px 6px;font-size:10px">${{a:'ⓐ DC접수',b:'ⓑ DC지연',c:'ⓒ 코딩지연'}[it._autoGrp]}</span>`:'';
   const unreg=it._new && it._미등록?`<span class="badge-unreg">미등록</span>`:'';
-  return`<div class="ri${it._new?' isnew':''}${grpCls}${dcChanged?' dc-changed':''}" id="ri-${i}">
-    <div class="ri-hd">
+  return`<div class="ri${it._new?' isnew':''}${grpCls}${dcChanged?' dc-changed':''}${it._open?'':' collapsed'}" id="ri-${i}">
+    <div class="ri-hd" onclick="toggleRI(${i})">
       <div class="ri-hl">
         <div class="ri-hn">${esc(it.실납처명)}${it._new?'<span class="badge-new">NEW</span>':''}${unreg}${grpBadge}${dcBadge}${svrDcBadge}${sb}</div>
         <div class="ri-hm">💊 ${esc(it.기준품명)} · 🏢 ${esc(it.업체명||'-')} · 💰 ${mbo}${curDC?` · 📅 ${dcOldTxt}${curDC}`:''}</div>
       </div>
-      <button class="ri-del" onclick="removeItem(${i})">×</button>
+      <span class="ri-caret">▾</span>
+      <button class="ri-del" onclick="event.stopPropagation();removeItem(${i})">×</button>
     </div>
     <div class="ri-bd">
       <div class="row2">
@@ -1143,6 +1148,11 @@ function buildRI(it,i){
       </div>
     </div>
   </div>`;
+}
+function toggleRI(i){
+  items[i]._open=!items[i]._open;
+  const ri=document.getElementById('ri-'+i);
+  if(ri) ri.classList.toggle('collapsed', !items[i]._open);
 }
 function setF(i,f,v){
   items[i][f]=v;
@@ -1211,7 +1221,7 @@ function addNB(){
   const m=matchHospital(h,biz);  // 미등록 플래그 판정
   const is110=document.getElementById('nb-is110').checked;
   const issVal=document.getElementById('nb-iss').value;
-  items.push({_id:Date.now(),_new:true,_미등록:(m.미등록==='미등록'),담당RPM:rpm,신청월:today().slice(0,4)+'년',
+  items.push({_id:Date.now(),_new:true,_open:true,_미등록:(m.미등록==='미등록'),담당RPM:rpm,신청월:today().slice(0,4)+'년',
     RPM연락처:'',사업자번호:biz,실납처명:h,is110:is110,시군구:V('nb-sgg'),제품명:p,기준품명:p,
     업체사업자번호:'',업체명:V('nb-c'),업체연락처:V('nb-ct'),MBO:Number(V('nb-m'))||0,
     DC접수월:V('nb-ld'),코딩예측월:V('nb-cd'),상정과KOL:V('nb-kol'),신약과정:document.getElementById('nb-st').value,
