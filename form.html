@@ -994,7 +994,7 @@ function onClosingInput(v){
 function unlockClosing(){ closing._force=true; renderClosing(); toast('🔓 목표 정정 모드 — 값 변경 후 전송하세요(목표까지 덮어씀)'); }
 
 /* ════════════ ② 신약 진행상황 — 자동표시 3종 ════════════ */
-/* ⓐ DC접수월=이번달 + 'DC신청' 전 / ⓑ DC접수 지연(DC접수월 지남 + 'DC신청' 전) / ⓒ 코딩 지연(코딩예측월 도래 + DC접수 전) — DC접수된 건(DC신청 이상)은 자동표시 제외 */
+/* ⓐ DC접수월=이번달 + 'DC신청' 전 / ⓑ DC접수 지연(DC접수월 지남 + 'DC신청' 전) / ⓒ 코딩월 도래(코딩예측월≤이번달 + '코딩' 전) — DC접수된 건(DC신청 이상)은 ⓒ 해당 시에만 표시 */
 function autoGroupOf(d){
   const nm=nowMonth();
   const stg=d.신약과정||'';
@@ -1005,8 +1005,8 @@ function autoGroupOf(d){
   if(dc===nm && sIdx>=0 && sIdx<STAGE_IDX['DC신청']) return 'a';
   // ⓑ DC접수 지연: DC접수월이 지났는데 아직 'DC신청' 전(미시작·업체확인·서류준비 = idx<3)
   if(dc && dc<nm && sIdx>=0 && sIdx<STAGE_IDX['DC신청']) return 'b';
-  // ⓒ 코딩 지연: 코딩예측월 도래(<=이번달)인데 아직 DC접수 전(idx<3) — DC접수된 건(DC신청 이상)은 자동표시 제외
-  if(cd && cd<=nm && sIdx>=0 && sIdx<STAGE_IDX['DC신청']) return 'c';
+  // ⓒ 코딩월 도래: 코딩예측월이 이번달이거나 지났는데 아직 '코딩' 전 — DC접수된 건도 코딩월 도래 시엔 표시
+  if(cd && cd<=nm && sIdx>=0 && sIdx<STAGE_IDX['코딩']) return 'c';
   return '';
 }
 function buildAutoGroups(){
@@ -1022,7 +1022,7 @@ function buildAutoGroups(){
 }
 function renderAutoGroups(){
   const cont=document.getElementById('auto-groups');
-  const labels={a:['ⓐ 이번달 DC접수','a'],b:['ⓑ DC접수 지연','b'],c:['ⓒ 코딩 지연','c']};
+  const labels={a:['ⓐ 이번달 DC접수','a'],b:['ⓑ DC접수 지연','b'],c:['ⓒ 코딩월 도래','c']};
   let html='';
   ['a','b','c'].forEach(g=>{
     const cnt=items.filter(it=>it._autoGrp===g).length;
@@ -1099,7 +1099,7 @@ function buildRI(it,i){
   const vendorHistTip=vendorHist?` title="이전 업체: ${esc(it.업체_이전값)} · 변경일: ${it.업체_변경일}"`:'';
   const vendorHistIcon=vendorHist?`<span class="hist-icon"${vendorHistTip}>📋</span>`:'';
   const grpCls=it._autoGrp?(' grp-'+it._autoGrp):'';
-  const grpBadge=it._autoGrp?`<span class="auto-lbl ${it._autoGrp}" style="margin-left:4px;padding:1px 6px;font-size:10px">${{a:'ⓐ DC접수',b:'ⓑ DC지연',c:'ⓒ 코딩지연'}[it._autoGrp]}</span>`:'';
+  const grpBadge=it._autoGrp?`<span class="auto-lbl ${it._autoGrp}" style="margin-left:4px;padding:1px 6px;font-size:10px">${{a:'ⓐ DC접수',b:'ⓑ DC지연',c:'ⓒ 코딩월도래'}[it._autoGrp]}</span>`:'';
   const unreg=it._new && it._미등록?`<span class="badge-unreg">미등록</span>`:'';
   return`<div class="ri${it._new?' isnew':''}${grpCls}${dcChanged?' dc-changed':''}${it._open?'':' collapsed'}" id="ri-${i}">
     <div class="ri-hd" onclick="toggleRI(${i})">
