@@ -730,6 +730,27 @@ function buildTabs() {
 }
 
 /* ══════════════════════════════════════════
+   이번 달 필독 큐레이션 (PM별 맞춤)
+   — 시트 데이터만으로 클라이언트단 조립, 신규 파이프라인 없음
+══════════════════════════════════════════ */
+const STAR_SCORE = { '★★★': 3, '★★☆': 2, '★☆☆': 1 };
+
+/* NEW(100) > 중요도(×10) > 직접근거(+1) 순 가중치 */
+function paperRank(p) {
+  return (p.isNew ? 100 : 0) + (STAR_SCORE[p.stars] || 0) * 10 + (p.evidence === '직접근거' ? 1 : 0);
+}
+
+/* 활용포인트 첫 줄(=🎯 핵심 주제)에서 라벨 접두어만 제거 */
+function keyTopic(p) {
+  const first = ((p.keyPoint || '').split('\n')[0] || '').trim();
+  return first.replace(/^🎯\s*핵심\s*주제\s*:?\s*/, '').trim();
+}
+
+function pickMustRead(papers, max) {
+  return [...papers].sort((a, b) => paperRank(b) - paperRank(a)).slice(0, Math.min(max, papers.length));
+}
+
+/* ══════════════════════════════════════════
    메인 렌더링
 ══════════════════════════════════════════ */
 function getFiltered() {
@@ -774,6 +795,29 @@ function renderSession() {
   if (!papers.length) {
     html += `<div class="empty">📭 해당 기간에 수록된 논문이 없습니다.</div>`;
   } else {
+    // ── 📌 이번 달 필독 (PM별 맞춤 큐레이션) ──
+    const must = pickMustRead(papers, 3);
+    if (must.length) {
+      const items = must.map(p => {
+        const anchor = reportUrl
+          ? `${reportUrl}#${encodeURIComponent((p.title || '').slice(0, 45))}`
+          : (p.url || '#');
+        const topic = keyTopic(p);
+        return `<a href="${anchor}" target="_blank" rel="noopener"
+          style="display:block;padding:11px 14px;background:#fff;border:1px solid #ffd9b0;border-radius:8px;text-decoration:none;color:#1a1a2e;margin-top:8px">
+          <div style="font-size:11px;color:#b5581a;font-weight:800;margin-bottom:3px">
+            ${p.isNew ? '✦ NEW · ' : ''}${escHtml(p.stars || '')} · ${escHtml(p.evidence || '')}${p.journal ? ' · ' + escHtml(p.journal) : ''}
+          </div>
+          <div style="font-weight:700;font-size:13.5px;line-height:1.45">${escHtml(p.title || '')}</div>
+          ${topic ? `<div style="font-size:12.5px;color:#555;margin-top:5px;line-height:1.5">🎯 ${escHtml(topic)}</div>` : ''}
+        </a>`;
+      }).join('');
+      html += `<div style="background:linear-gradient(135deg,#fff6ec,#ffe7d3);border:1px solid #ffd9b0;border-radius:12px;padding:16px 18px;margin-bottom:16px">
+        <div style="font-size:14px;font-weight:800;color:#b5581a">📌 ${escHtml(session.pm)} PM · 이번 달 필독 ${must.length}편</div>
+        <div style="font-size:11.5px;color:#9a6b3f;margin-top:2px">업데이트된 임상 중 먼저 보실 논문을 골랐습니다</div>
+        ${items}
+      </div>`;
+    }
     // 질환별 상세 페이지 진입 (깨끗한 풀상세 리포트 + BD 신청)
     if (reportUrl) {
       html += `<a href="${reportUrl}" target="_blank" rel="noopener"
