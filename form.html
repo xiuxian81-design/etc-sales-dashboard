@@ -2,12 +2,28 @@
 <!-- form.html v30 — 2026-06-28 재설계: 작성자=지부장4명 / ①마감예측(월1회·잠금) / ②신약진행 자동표시3종+검색 / ③볼륨업 / 마스터 병원명 자동완성.
      기존 신약진행 보고·프레논 조회·JSONP 로딩·payload(items[]) 회귀 0. payload 키는 02_backend_notes 스펙과 일치.
      v38 (2026-07-24): ①신규블럭 모달에 '업체 사업자번호'(nb-cbiz) 입력칸 추가 + addNB에서 RPM연락처 자동채움 → C·J열 공란 해소.
-     ②외부호스팅 제출을 no-cors→cors 읽기로 전환해 서버 {success,message}(중복병합·재등록차단 안내) 표시, 읽기 실패 시 기존 '전송됨'으로 폴백(재전송 없음). GAS 서버 코드 변경 없음. -->
+     ②외부호스팅 제출을 no-cors→cors 읽기로 전환해 서버 {success,message}(중복병합·재등록차단 안내) 표시, 읽기 실패 시 기존 '전송됨'으로 폴백(재전송 없음). GAS 서버 코드 변경 없음.
+     v39 (2026-08-03) — MS팀 성과관리 CRM 일일보고 (계약: 01_architect_datamodel §11):
+     ① 목표 카드 4칸 개편(확정실적 자동·전월 실적예측·이번달 목표·이번달 예측[매월 8일부터 = meta.forecastOpen])
+     ② 이번달 주요계획(월간계획) 카드 신설 — 월 1회 작성 → mode=crm monthlyPlans 프리필, 평소 접힘+요약 1줄, 수정 시 월 단위 전체교체 전송
+     ⑤ 오늘 한일 / ⑥ 내일 할일 / ⑦ 고민·이슈 카드 신설 — 업체명 자동완성(mode=crm vendors) + 상태 세그먼트(순항/관찰/부진)
+     · payload 확장: 월간계획[]·한일[]·할일[]·이슈 + 마감예측{목표·전월예측액·전월년월}. 키 없으면 서버 skip(구폼 회귀 0)
+     · mode=crm JSONP 1회 호출로 폼 프리필(확정실적·전월예측·목표·예측·월간계획·업체 마스터) — 콜백 __crmFormCallback
+     · 이메일: buildNewDrugText()(기존 신약 블록 텍스트 불변 추출) + buildDailyClosingEmail()(일일결산 전문). 모달 토글 2종
+     · localStorage 임시저장 cso_daily_{지부장}_{yyyy-MM-dd} (oninput 저장·재방문 복원)
+     · 디자인: 마루부리 웹폰트(fonts/*.woff2) + 애플 스타일 토큰 리스킨 + 데스크톱(≥900px) 2열 그리드(좌 ①②③④ / 우 ⑤⑥⑦)
+     · 무변경: ③신약 진행상황(자동그룹·검색·신규블럭) / ④볼륨업 / 프레논 조회 / JSONP 로딩 / sendToSheets 전송 경로 -->
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>CSO 병원영역 매출예측 보고</title>
+<title>CSO 병원영역 일일보고</title>
+<style>
+/* ── 마루부리(MaruBuri) 웹폰트 — 저장소 동봉 fonts/ 상대경로 ── */
+@font-face{font-family:'MaruBuri';src:url('fonts/MaruBuri-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'MaruBuri';src:url('fonts/MaruBuri-SemiBold.woff2') format('woff2');font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:'MaruBuri';src:url('fonts/MaruBuri-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 /* ── GAS URL (고정) ── */
@@ -31,9 +47,18 @@ function nowMonth(){const n=new Date();return n.getFullYear()+'-'+String(n.getMo
 /* ── Google Sheets 전송 — 신약 items[] + 마감예측 + 볼륨업 (payload 키 = 02_backend_notes 스펙) ── */
 async function sendToSheets() {
   if (!rpm) { toast('작성자(지부장)를 선택해주세요'); return; }
-  // 신약·마감·볼륨업 중 하나라도 있으면 전송 가능
-  const hasClosing = (closing.예측액!=null && closing.예측액!=='');
-  if (!items.length && !hasClosing && !volumeUp.length) { toast('마감예측·신약진행·볼륨업 중 하나 이상 입력하세요'); return; }
+  // [v39] ① 목표 4칸 — 전월 실적예측 / 이번달 목표 / 이번달 예측(8일부터) 중 하나라도 값이 있으면 마감예측 전송
+  const hasGoal   = (closing.목표     != null && closing.목표     !== '');
+  const hasPrevFc = (isPrevNeeded() && closing.전월예측 != null && closing.전월예측 !== '');
+  const hasFcAmt  = (isForecastOpen() && closing.예측 != null && closing.예측 !== '');
+  const hasClosing = hasGoal || hasPrevFc || hasFcAmt;
+  // [v39] CRM 일일 섹션(②월간계획·⑤한일·⑥할일·⑦이슈) 단독 제출 허용 — 게이트 11
+  const planRows = collectPlanRows(), doneRows = collectDoneRows(), todoRows = collectTodoRows();
+  const issueTxt = (daily.이슈 || '').trim();
+  const hasDaily = !!(planRows.length || doneRows.length || todoRows.length || issueTxt);
+  if (!items.length && !hasClosing && !volumeUp.length && !hasDaily) { toast('목표·주요계획·신약진행·볼륨업·한일/할일/이슈 중 하나 이상 입력하세요'); return; }
+  // ⑤ 한일의 상태(순항/관찰/부진)는 필수 — 대시보드 업체 칩 색의 원천
+  if (doneRows.some(r => !r.상태)) { toast('오늘 한일의 상태(순항/관찰/부진)를 선택해주세요'); renderDone(); return; }
 
   const btn = document.getElementById('btn-sheets');
   btn.textContent = '📤 전송 중...';
@@ -74,14 +99,18 @@ async function sendToSheets() {
   // ① 마감예측 (객체, 키: 지부장+년월 upsert) — [v33] 마감예측액=예측(latest)만 전송.
   //   목표(baseline)는 백엔드가 '목표 컬럼 공란=첫 저장'으로 자동 1회 고정 → 프론트는 목표 미전송.
   //   force=true(목표 정정 모드)일 때만 백엔드가 목표까지 강제 정정. 잠금 키는 무해(백엔드 자동 처리).
+  // [v39] 4칸 → 마감예측 저장 위치는 §11-2 표 그대로: 목표=목표컬럼 / 이번달예측=마감예측액 / 전월예측=전월행 마감예측액
+  //   ⚠ 이번달 예측은 8일 전(forecastOpen=false)이면 키 자체를 보내지 않는다(서버 hasAmt 가드와 짝 — 기존 예측 0 덮어쓰기 방지)
   if (hasClosing) {
     payload.마감예측 = {
       지부장:     rpm,
       년월:       reportMonth,
-      마감예측액: Number(closing.예측액) || 0,   // = 예측(매주 갱신)
       비고:       closing.비고 || '',
       force:      !!closing._force                // 관리자 목표 정정 시만 true
     };
+    if (hasGoal)   payload.마감예측.목표       = Number(closing.목표) || 0;
+    if (hasFcAmt)  payload.마감예측.마감예측액 = Number(closing.예측) || 0;
+    if (hasPrevFc) { payload.마감예측.전월예측액 = Number(closing.전월예측) || 0; payload.마감예측.전월년월 = prevMonth(); }
   }
   // ③ 볼륨업 (배열, 키: 사업자번호+품목+목표월 upsert)
   if (volumeUp.length) {
@@ -97,6 +126,20 @@ async function sendToSheets() {
       진행:      v.진행 || ''
     }));
   }
+  // [v39] ② 월간계획 (배열 — 지부장+년월 월 단위 전체교체. 빈 배열은 백엔드 no-op이라 키 자체를 생략)
+  if (planRows.length) payload.월간계획 = planRows;
+  // [v39] ⑤⑥⑦ 업체활동 (한일/할일/이슈 — 서버 saveActivities_가 구분 값으로 1탭 통합 저장)
+  if (doneRows.length) payload.한일 = doneRows;
+  if (todoRows.length) payload.할일 = todoRows;
+  if (issueTxt)        payload.이슈 = issueTxt;
+
+  // 전송 성공 후 로컬 상태 확정 — 목표를 보냈으면 '목표 확정'(읽기전용+수정 버튼)으로 전환
+  const finalizeClosing = () => {
+    if (hasClosing && hasGoal) closing.목표확정 = true;
+    closing._force = false;
+    saveDaily();
+    renderClosing();
+  };
 
   try {
     if (typeof google !== 'undefined' && google.script && google.script.run) {
@@ -105,8 +148,8 @@ async function sendToSheets() {
           if (result && result.success) {
             toast(`✅ 전송 완료! ${result.message || ''}`);
             btn.textContent = '✅ 전송 완료';
-            // 마감예측 성공 시: 목표 미확정이었으면 이번 값이 목표로 고정(백엔드 첫 저장 감지와 동기), 잠금=목표확정
-            if (hasClosing) { if(closing.목표===''||closing.목표==null||closing._force){closing.목표=closing.예측액;} closing.잠금=true; closing._force=false; saveClosingLocal(); renderClosing(); }
+            // 마감예측 성공 시: 목표를 보냈으면 목표 확정(읽기전용) 전환 — 백엔드 목표확정일·잠금 기록과 동기
+            finalizeClosing();
           } else {
             toast(`⚠️ 서버 응답: ${result ? result.message : '알 수 없는 오류'}`);
             btn.textContent = '⚠️ 확인 필요';
@@ -125,7 +168,6 @@ async function sendToSheets() {
       // [v38] 외부 호스팅(github.io) 제출. 기존 no-cors는 서버 응답을 못 읽어 '중복병합·재등록차단' 안내가 지부장에게 미노출.
       //   GAS doPost는 {success,message}를 반환하고, 폼은 text/plain 전송이라 preflight 없는 단순요청 → cors 읽기 시도 가능.
       //   읽기 성공: 서버 실제 메시지 표시. 읽기 실패(CORS 미허용/네트워크): 요청은 이미 전송됐으므로 기존 '전송됨' 문구로 폴백(재전송 없음 → 중복 위험 0).
-      const finalizeClosing = () => { if (hasClosing) { if(closing.목표===''||closing.목표==null||closing._force){closing.목표=closing.예측액;} closing.잠금=true; closing._force=false; saveClosingLocal(); renderClosing(); } };
       let serverMsg = '', serverOk = null;
       try {
         const resp = await fetch(GAS_URL, {
@@ -157,19 +199,21 @@ async function sendToSheets() {
 }
 </script>
 <style>
-:root{--blue:#1a4fa0;--blue-lt:#e8effa;--blue-dk:#123575;--green:#16a34a;--green-lt:#dcfce7;--green-dk:#14532d;--yellow-lt:#fef9c3;--red-lt:#fee2e2;--gray1:#f1f5f9;--gray2:#e2e8f0;--gray3:#94a3b8;--gray4:#475569;--gray5:#1e293b;--purple:#7c3aed;--purple-lt:#f3e8ff;--shadow:0 1px 6px rgba(0,0,0,.10)}
+/* [v39] 애플 스타일 토큰 리스킨 — 변수값만 교체해 기존 규칙(카드·버튼·배지)이 자동으로 새 팔레트를 탄다 */
+:root{--blue:#0071e3;--blue-lt:#eff5fe;--blue-dk:#0058b0;--green:#248a3d;--green-lt:#dff3e4;--green-dk:#1a6b2e;--yellow-lt:#fdf1df;--red-lt:#fde8e8;--gray1:#f5f5f7;--gray2:#d2d2d7;--gray3:#86868b;--gray4:#6e6e73;--gray5:#1d1d1f;--purple:#7c3aed;--purple-lt:#f3e8ff;--shadow:0 1px 3px rgba(0,0,0,.04);
+  --ok:#248a3d;--ok-lt:#dff3e4;--watch:#c76b00;--watch-lt:#fdf1df;--bad:#d70015;--bad-lt:#fde8e8;--hair:#d2d2d7;--bg:#f5f5f7}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#eef2f9;color:var(--gray5);font-size:14px}
-.hd{background:var(--blue);color:#fff;padding:14px 16px 12px;position:sticky;top:0;z-index:50;box-shadow:0 2px 8px rgba(26,79,160,.3)}
+body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var(--gray5);font-size:14px;-webkit-font-smoothing:antialiased}
+.hd{background:var(--blue);color:#fff;padding:14px 16px 12px;position:sticky;top:0;z-index:50;box-shadow:0 1px 3px rgba(0,0,0,.10)}
 .hd-top{display:flex;justify-content:space-between;align-items:center}
-.hd h1{font-size:15px;font-weight:700}.hd-sub{font-size:11px;opacity:.7;margin-top:2px}
+.hd h1{font-size:16px;font-weight:700;letter-spacing:-.02em}.hd-sub{font-size:11px;opacity:.75;margin-top:2px}
 .step-bar{display:flex;margin-top:10px;background:rgba(255,255,255,.15);border-radius:6px;overflow:hidden}
 .step-item{flex:1;text-align:center;padding:5px 0;font-size:10px;font-weight:600;opacity:.45;transition:.2s}
 .step-item.done{opacity:.7}.step-item.active{background:rgba(255,255,255,.25);opacity:1}
 .rpm-badge{background:rgba(255,255,255,.2);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;display:none}
 .wrap{max-width:680px;margin:0 auto;padding:14px 12px 90px}
-.card{background:#fff;border-radius:12px;box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden}
-.card-hd{padding:11px 16px;background:var(--blue-lt);border-bottom:1px solid var(--gray2);font-weight:700;font-size:12px;color:var(--blue);display:flex;align-items:center;justify-content:space-between}
+.card{background:#fff;border-radius:16px;box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden}
+.card-hd{padding:12px 16px;background:#fff;border-bottom:1px solid var(--hair);font-weight:700;font-size:13px;color:var(--gray5);letter-spacing:-.01em;display:flex;align-items:center;justify-content:space-between;gap:6px}
 .card-bd{padding:14px 16px}
 /* 로딩 카드 */
 .load-box{text-align:center;padding:28px 16px}
@@ -306,12 +350,94 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#ee
 .cnt{background:var(--blue);color:#fff;border-radius:50px;font-size:10px;padding:1px 7px;font-weight:700;margin-left:6px}
 .cnt.grn{background:var(--green)}
 .sec-help{font-size:11px;font-weight:400;color:var(--gray3)}
+
+/* ══════════ [v39] MS팀 성과관리 CRM — 레이아웃 · 신규 카드 ══════════ */
+/* 데스크톱(≥900px) 2열 그리드 — 좌 ①②③④ / 우 ⑤⑥⑦(+프레논). 모바일은 1열(기존 골격 유지) */
+.form-grid{display:block}
+@media(min-width:900px){
+  .wrap{max-width:1180px;padding:16px 20px 96px}
+  .form-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  .fg-col{min-width:0}
+}
+/* 카드 접힘(③④ 기본 접힘 · ② 요약 접힘) */
+.card-hd.foldable{cursor:pointer;user-select:none}
+.card-caret{font-size:11px;color:var(--gray3);transition:transform .15s;flex-shrink:0}
+.card.fold .card-caret{transform:rotate(-90deg)}
+.card.fold .card-bd{display:none}
+.fold-sum{font-size:12px;color:var(--gray4);font-weight:400}
+/* 섹션 공통 */
+.sec-note{font-size:11px;color:var(--gray3);line-height:1.6;margin-bottom:10px}
+.row-add{width:100%;min-height:44px;padding:12px;border:1.5px dashed var(--gray2);border-radius:12px;background:#fff;color:var(--blue);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px}
+.row-add:hover{background:var(--blue-lt);border-color:var(--blue)}
+.rowbox{border:1px solid var(--hair);border-radius:12px;padding:11px 12px;background:#fff;position:relative;display:flex;flex-direction:column;gap:8px}
+.rowbox + .rowbox{margin-top:8px}
+.row-del{position:absolute;top:0;right:0;width:44px;height:44px;min-width:44px;min-height:44px;padding:0;background:none;border:none;color:var(--gray3);font-size:19px;line-height:1;cursor:pointer;border-radius:0 12px 0 12px;display:flex;align-items:center;justify-content:center}
+.row-del:hover{color:var(--bad);background:var(--bad-lt)}
+.row-empty{padding:16px 8px;text-align:center;color:var(--gray3);font-size:12px}
+.fi{width:100%;border:1px solid var(--gray2);border-radius:10px;padding:11px 12px;font-size:14px;font-family:inherit;color:var(--gray5);background:#fff;min-height:44px;-webkit-appearance:none;appearance:none}
+.fi:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,113,227,.12)}
+.fi[disabled]{background:var(--gray1);color:var(--gray3)}
+textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
+.fl{font-size:11px;font-weight:700;color:var(--gray4);letter-spacing:.2px;display:block;margin-bottom:4px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+/* 세그먼트 컨트롤 (유형 토글 · 상태 3버튼 · 이메일 모드) */
+.seg{display:flex;background:var(--gray1);border-radius:10px;padding:3px;gap:3px}
+.seg button{flex:1;min-height:44px;border:none;background:none;border-radius:8px;font-size:12.5px;font-weight:700;color:var(--gray4);cursor:pointer;font-family:inherit;padding:6px 4px;transition:.12s;white-space:nowrap}
+.seg button.on{background:#fff;color:var(--gray5);box-shadow:0 1px 3px rgba(0,0,0,.10)}
+.seg.st button.on[data-v="순항"]{background:var(--ok-lt);color:var(--ok)}
+.seg.st button.on[data-v="관찰"]{background:var(--watch-lt);color:var(--watch)}
+.seg.st button.on[data-v="부진"]{background:var(--bad-lt);color:var(--bad)}
+.seg.need{box-shadow:0 0 0 1.5px var(--bad) inset;border-radius:10px}
+/* ① 목표 4칸 */
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.gcell{border:1px solid var(--hair);border-radius:12px;padding:10px 11px;background:#fff;display:flex;flex-direction:column;gap:5px}
+.gcell.fixed{background:var(--gray1)}
+.gcell.accent{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue) inset}
+.gcell.off{border-style:dashed;background:var(--gray1);opacity:.75}
+.gcell .gl{font-size:11px;font-weight:700;color:var(--gray4);display:flex;align-items:center;justify-content:space-between;gap:4px}
+.gcell .gv{font-size:19px;font-weight:700;color:var(--gray5);letter-spacing:-.02em}
+.gcell .gs{font-size:11px;color:var(--gray3)}
+.gcell input{width:100%;border:1px solid var(--gray2);border-radius:9px;padding:9px 10px;font-size:16px;font-weight:700;font-family:inherit;color:var(--gray5);min-height:44px}
+.gcell input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,113,227,.12)}
+.gcell input[disabled]{background:transparent;border-style:dashed;color:var(--gray3)}
+.gbadge{font-size:10px;font-weight:700;padding:1px 7px;border-radius:6px;background:var(--gray1);color:var(--gray4)}
+.gbadge.on{background:var(--ok-lt);color:var(--ok)}
+.gbadge.wait{background:var(--watch-lt);color:var(--watch)}
+.btn-mini{min-height:32px;padding:5px 12px;background:#fff;color:var(--blue);border:1px solid var(--blue);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+/* 유형 배지 */
+.tbadge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px}
+.tbadge.신약{background:#eef5fe;color:#0058b0}
+.tbadge.볼륨업{background:var(--ok-lt);color:var(--ok)}
+.tbadge.로컬{background:var(--purple-lt);color:var(--purple)}
+/* 업체명 자동완성 */
+.vac{position:relative}
+.vac-list{position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid var(--gray2);border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.14);max-height:220px;overflow-y:auto;display:none;z-index:70;margin-top:3px}
+.vac-item{padding:11px 13px;border-bottom:1px solid var(--gray1);cursor:pointer;font-size:13.5px;min-height:44px;display:flex;align-items:center;gap:6px}
+.vac-item:last-child{border-bottom:none}
+.vac-item:hover,.vac-item.sel{background:var(--blue-lt)}
+.vac-item .rc{font-size:10px;font-weight:700;color:var(--blue);background:var(--blue-lt);border-radius:5px;padding:1px 6px}
+/* 상태 칩(요약) */
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:50px;background:var(--gray1);color:var(--gray4)}
+.chip.순항{background:var(--ok-lt);color:var(--ok)}
+.chip.관찰{background:var(--watch-lt);color:var(--watch)}
+.chip.부진{background:var(--bad-lt);color:var(--bad)}
+/* 하단 고정 바 · 버튼 애플 톤 */
+.bot{box-shadow:0 -1px 3px rgba(0,0,0,.05);border-top:1px solid var(--hair)}
+.btn-main,.btn-sheets,.btn-grn,.btn-copy{border-radius:11px;min-height:44px}
+.btn-sheets{background:var(--blue)}
+.btn-sheets:hover{background:var(--blue-dk)}
+.rpm-btn{min-height:44px;border-width:1.5px}
+/* 이메일 모드 토글 */
+.em-mode{display:flex;gap:3px;background:var(--gray1);border-radius:10px;padding:3px;margin-bottom:12px}
+.em-mode button{flex:1;min-height:44px;border:none;background:none;border-radius:8px;font-size:12.5px;font-weight:700;color:var(--gray4);cursor:pointer;font-family:inherit}
+.em-mode button.on{background:#fff;color:var(--gray5);box-shadow:0 1px 3px rgba(0,0,0,.10)}
+.email-box{font-family:'MaruBuri','Malgun Gothic',serif}
 </style>
 </head>
 <body>
 <div class="hd">
   <div class="hd-top">
-    <div><h1>CSO 병원영역 매출예측 보고</h1><div class="hd-sub">한올바이오파마 ETC마케팅기획본부 · MS팀</div></div>
+    <div><h1>CSO 병원영역 일일보고</h1><div class="hd-sub">한올바이오파마 ETC마케팅기획본부 · MS팀</div></div>
     <div class="rpm-badge" id="rpm-badge"></div>
   </div>
   <div class="step-bar">
@@ -339,18 +465,36 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#ee
     <div class="rpm-wrap" id="rpm-grid"></div>
   </div>
 
-  <!-- 보고 영역 -->
+  <!-- 보고 영역 — [v39] 데스크톱 2열: 좌 ①②③④ / 우 ⑤⑥⑦(+프레논) -->
   <div id="c-report" style="display:none">
+   <div class="form-grid">
+    <div class="fg-col">
 
-    <!-- ① 이번달 마감예측 -->
+    <!-- ① 목표 (마감예측 4칸) -->
     <div class="card">
-      <div class="card-hd"><span id="cl-card-title">① 이번달 예측</span> <span class="sec-help" id="cl-month-lbl"></span></div>
+      <div class="card-hd"><span id="cl-card-title">① 목표</span> <span class="sec-help" id="cl-month-lbl"></span></div>
       <div class="card-bd" id="cl-body"></div>
     </div>
 
-    <!-- ② 신약 진행상황 -->
-    <div class="card">
-      <div class="card-hd">② 신약 진행상황 <span class="cnt" id="list-cnt">0</span> <span class="sec-help">— 병원명을 탭하면 상세 입력</span></div>
+    <!-- ② 이번달 주요계획 (월간계획 · 월 1회) -->
+    <div class="card fold" id="c-plan">
+      <div class="card-hd foldable" onclick="toggleCard('c-plan')">
+        <span>② 이번달 주요계획 <span class="cnt" id="plan-cnt">0</span></span>
+        <span style="display:flex;align-items:center;gap:8px"><span class="fold-sum" id="plan-sum">계획 0건</span><span class="card-caret">▾</span></span>
+      </div>
+      <div class="card-bd" style="padding-top:10px">
+        <div class="sec-note">월 1회만 작성하면 다음 보고부터 자동 재사용됩니다. 유형·거래처·품목·MBO를 적어 이번달 목표의 근거를 남겨주세요. <b>수정하면 이번달 계획 전체가 새 내용으로 교체</b>됩니다.</div>
+        <div id="plan-list"></div>
+        <div style="margin-top:10px"><button class="row-add" onclick="addPlan()">＋ 계획 추가</button></div>
+      </div>
+    </div>
+
+    <!-- ③ 신약 진행상황 (기존 ② · 로직 무변경, 기본 접힘) -->
+    <div class="card fold" id="c-newdrug">
+      <div class="card-hd foldable" onclick="toggleCard('c-newdrug')">
+        <span>③ 신약 진행상황 <span class="cnt" id="list-cnt">0</span> <span class="sec-help">— 병원명을 탭하면 상세 입력</span></span>
+        <span class="card-caret">▾</span>
+      </div>
       <div class="card-bd" style="padding-top:10px">
         <div id="auto-groups"></div>
         <div class="sw" style="margin-top:6px">
@@ -367,14 +511,47 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#ee
       </div>
     </div>
 
-    <!-- ③ 매출증대 예측처(볼륨업) -->
-    <div class="card">
-      <div class="card-hd">③ 매출증대 예측처 (볼륨업) <span class="cnt grn" id="vu-cnt">0</span></div>
+    <!-- ④ 매출증대 예측처(볼륨업) — 기존 ③ · 로직 무변경, 기본 접힘 -->
+    <div class="card fold" id="c-vu">
+      <div class="card-hd foldable" onclick="toggleCard('c-vu')">
+        <span>④ 매출증대 예측처 (볼륨업) <span class="cnt grn" id="vu-cnt">0</span></span>
+        <span class="card-caret">▾</span>
+      </div>
       <div class="card-bd" style="padding-top:10px">
         <div id="vu-list" style="display:flex;flex-direction:column;gap:10px"></div>
         <div style="margin-top:12px">
           <button class="add-vu-btn" onclick="addVU()">＋ 볼륨업 예측처 추가 <span style="font-size:11px;font-weight:400">(거래처·품목·증대MBO)</span></button>
         </div>
+      </div>
+    </div>
+
+    </div><!-- /fg-col 좌 -->
+    <div class="fg-col">
+
+    <!-- ⑤ 오늘 한일 -->
+    <div class="card" id="c-done">
+      <div class="card-hd"><span>⑤ 오늘 한일 <span class="cnt" id="done-cnt">0</span></span> <span class="sec-help">업체별로 한 줄씩</span></div>
+      <div class="card-bd" style="padding-top:10px">
+        <div class="sec-note">만난 업체를 적고 <b>상태(순항·관찰·부진)</b>를 눌러주세요. 상태는 대시보드 업체 칩 색으로 그대로 반영됩니다.</div>
+        <div id="done-list"></div>
+        <div style="margin-top:10px"><button class="row-add" onclick="addDone()">＋ 한일 추가</button></div>
+      </div>
+    </div>
+
+    <!-- ⑥ 내일 할일 -->
+    <div class="card" id="c-todo">
+      <div class="card-hd"><span>⑥ 내일 할일 <span class="cnt" id="todo-cnt">0</span></span></div>
+      <div class="card-bd" style="padding-top:10px">
+        <div id="todo-list"></div>
+        <div style="margin-top:10px"><button class="row-add" onclick="addTodo()">＋ 할일 추가</button></div>
+      </div>
+    </div>
+
+    <!-- ⑦ 고민·이슈 -->
+    <div class="card" id="c-issue">
+      <div class="card-hd"><span>⑦ 고민·이슈</span> <span class="sec-help">선택</span></div>
+      <div class="card-bd">
+        <textarea class="fi" id="issue-txt" rows="3" placeholder="지원이 필요한 사항, 막힌 곳, 공유할 고민을 자유롭게 적어주세요" oninput="onIssueInput(this)"></textarea>
       </div>
     </div>
 
@@ -392,6 +569,8 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#ee
       </div>
     </div>
 
+    </div><!-- /fg-col 우 -->
+   </div><!-- /form-grid -->
   </div>
 </div>
 
@@ -407,6 +586,11 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#ee
   <div class="modal">
     <div class="m-hd">📧 이메일 보고문 <button class="m-x" onclick="closeMd('email-modal')">✕</button></div>
     <div class="m-bd">
+      <!-- [v39] 본문 모드 토글 — 기본=일일결산 전문 / 기존 신약보고 텍스트도 그대로 사용 가능 -->
+      <div class="em-mode">
+        <button id="em-md-daily" class="on" onclick="setEmailMode('daily')">일일결산 전문</button>
+        <button id="em-md-nd" onclick="setEmailMode('nd')">신약보고만 (기존)</button>
+      </div>
       <div class="email-meta">
         <div class="em-row"><label>받는 분</label><input type="text" id="em-to" placeholder="수신자 이메일 주소"></div>
         <div class="em-row"><label>제목</label><input type="text" id="em-subj" readonly></div>
@@ -797,8 +981,13 @@ function migrateIssue(v){if(v==='🟢')return'정상';if(v==='🟡')return'DC지
 function paintIssueSelect(sel){sel.className='iss-sel '+(sel.value?sel.value.replace(/[()]/g,''):'');}
 
 let data=[],rpm='',items=[];              // items = 신약진행 보고 대상(자동표시+검색추가)
-let volumeUp=[];                           // ③ 볼륨업 행
-let closing={예측액:'',목표:'',비고:'',잠금:false,_force:false};  // ① 마감예측 — 목표=baseline(첫주확정), 예측액=매주갱신, 잠금=목표확정
+let volumeUp=[];                           // ④ 볼륨업 행
+/* [v39] ① 목표 4칸 — 확정실적(서버 읽기전용) / 전월예측 / 목표 / 예측(8일부터). 목표확정=읽기전용+수정버튼 */
+let closing={전월예측:'',목표:'',예측:'',비고:'',목표확정:false,_force:false};
+/* [v39] 일일 입력(②⑤⑥⑦) — localStorage cso_daily_{지부장}_{일자}에 그대로 저장/복원 */
+let daily={계획:[],한일:[],할일:[],이슈:''};
+/* [v39] mode=crm 응답(01_architect_datamodel §11-4) — 프리필·업체 마스터 원천 */
+let crm=null, crmReady=false, crmLoading=false, vendorMaster=[];
 let hospitalMaster=[];                     // 전체병원리스트 마스터(자동완성). data에서 파생.
 let masterByBiz={}, masterByName={};
 
@@ -868,6 +1057,7 @@ function loadFromGAS(){
       showEl('c-rpm');
       buildRpm();
       loadPrenon();
+      loadCrm();          // [v39] 성과관리 CRM 프리필(확정실적·목표·월간계획·업체 마스터) — 실패해도 폼 사용 가능
     } else {
       hd.textContent='❌ 연결 실패';
       card.className='card load-err';
@@ -934,8 +1124,12 @@ function selRpm(r,btn){
   const badge=document.getElementById('rpm-badge');
   badge.textContent='👤 '+r;badge.style.display='block';
   step(3);showEl('c-report');
-  loadClosingLocal();
+  loadDaily();          // [v39] 서버 프리필(crm) + 오늘자 localStorage 임시저장 복원
   renderClosing();
+  renderPlans();
+  renderDone();
+  renderTodo();
+  renderIssue();
   buildAutoGroups();
   renderList();
   renderVU();
@@ -944,69 +1138,302 @@ function selRpm(r,btn){
   document.getElementById('c-report').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-/* ════════════ ① 이번달 마감예측 (월1회·잠금) ════════════ */
-function clKey(){return 'cso_closing_'+rpm+'_'+nowMonth();}
-function loadClosingLocal(){
-  closing={예측액:'',목표:'',비고:'',잠금:false,_force:false};
-  try{ const raw=localStorage.getItem(clKey()); if(raw){const o=JSON.parse(raw); closing.예측액=o.예측액||''; closing.목표=o.목표||''; closing.비고=o.비고||''; closing.잠금=!!o.잠금;} }catch(e){}
+/* ════════════════════════════════════════════════════════════
+   [v39] 성과관리 CRM — mode=crm 로드 · 공통 유틸 · 일일 임시저장
+   응답 계약 = 01_architect_datamodel §11-4 (meta·team·yearly·directors·activities·monthlyPlans·sales·vendors)
+   ════════════════════════════════════════════════════════════ */
+function loadCrm(){
+  if(crmReady||crmLoading) return;
+  crmLoading=true;
+  const cb='__crmFormCallback';
+  const sc=document.createElement('script'); sc.id='__crm_script';
+  window[cb]=function(res){
+    try{ document.head.removeChild(sc); }catch(e){}
+    crmLoading=false;
+    // ⚠ shape 가드: v38 미배포 백엔드는 mode=crm을 인식하지 못하고 기본 MBO 목록({success:true,status:'ok',data:[]})을 돌려준다.
+    //   meta·directors가 없으면 CRM 응답이 아니므로 프리필을 시도하지 않는다(빈 값으로 덮어쓰기 방지).
+    if(res && res.success && res.meta && Array.isArray(res.directors)){
+      crm=res; crmReady=true;
+      buildVendorMaster();
+      if(rpm){ loadDaily(); renderClosing(); renderPlans(); renderDone(); renderTodo(); renderIssue(); }
+    }
+  };
+  sc.onerror=function(){ try{document.head.removeChild(sc);}catch(e){} crmLoading=false; };
+  sc.src=GAS_URL+'?mode=crm&callback='+cb+'&t='+Date.now();
+  document.head.appendChild(sc);
 }
-function saveClosingLocal(){
-  try{ localStorage.setItem(clKey(), JSON.stringify({예측액:closing.예측액,목표:closing.목표,비고:closing.비고,잠금:closing.잠금})); }catch(e){}
+/* 업체명 자동완성 마스터 = 서버 vendors(최근 활동순) ∪ 기존 CSO 업체 datalist */
+function buildVendorMaster(){
+  const seen={}, out=[];
+  ((crm&&crm.vendors)||[]).forEach(v=>{const k=normVendorKey(v); if(!v||seen[k])return; seen[k]=1; out.push({name:v,recent:false});});
+  const me=myDir();
+  const rec={};
+  ((me&&me.vendorChips)||[]).forEach(c=>{ if(c&&c.name) rec[normVendorKey(c.name)]=1; });
+  out.forEach(o=>{ o.recent=!!rec[normVendorKey(o.name)]; });
+  try{
+    document.querySelectorAll('#vendor-list option').forEach(op=>{
+      const v=op.value||''; const k=normVendorKey(v);
+      if(!v||seen[k])return; seen[k]=1; out.push({name:v,recent:false});
+    });
+  }catch(e){}
+  vendorMaster=out;
 }
-/* [v33] 목표=그 달 첫 저장값 1회 고정(불변) · 예측=매주 갱신 · 잠금='목표 확정' */
-function clWeekOf(){const n=new Date();return Math.ceil(n.getDate()/7);}
+function normVendorKey(v){
+  let s=String(v==null?'':v);
+  s=s.replace(/㈜|\(\s*주\s*\)|주\s*\)|주식회사|유한회사/g,'');
+  s=s.replace(/[\s​()（）.·,\-]/g,'');
+  return s.toLowerCase();
+}
+function myDir(){ if(!crm||!Array.isArray(crm.directors))return null; return crm.directors.filter(d=>d&&d.name===rpm)[0]||null; }
+function crmMeta(){ return (crm&&crm.meta)||{}; }
+/* 이번달 예측 입력 활성 — 서버 meta.forecastOpen(=KST day>=8) 우선, 없으면 클라이언트 날짜 */
+function isForecastOpen(){ const m=crmMeta(); if(typeof m.forecastOpen==='boolean') return m.forecastOpen; return new Date().getDate()>=8; }
+/* 전월 실적예측 입력 필요 여부 — 서버가 전월 실적을 이미 확정(confirmedMonth === prevMonth)했으면 false */
+function isPrevNeeded(){ return crmMeta().prevForecastNeeded!==false; }
+function prevMonth(){ const m=crmMeta(); if(m.prevMonth) return m.prevMonth;
+  const n=new Date(); n.setDate(1); n.setMonth(n.getMonth()-1);
+  return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0'); }
+function monLbl(ym){ return ym?(parseInt(ym.slice(5,7),10)+'월'):'-'; }
+function eok(v){ return ((Number(v)||0)/1e8).toFixed(2)+'억'; }
+function numOf(v){ const n=Number(v); return isNaN(n)?0:n; }
+function autoGrow(el){ if(!el)return; el.style.height='auto'; el.style.height=(el.scrollHeight+2)+'px'; }
+function toggleCard(id){ const c=document.getElementById(id); if(c) c.classList.toggle('fold'); }
+
+/* ── 일일 임시저장 (localStorage cso_daily_{지부장}_{일자}) ── */
+function dailyKey(){ return 'cso_daily_'+rpm+'_'+today(); }
+function saveDaily(){
+  if(!rpm) return;
+  try{ localStorage.setItem(dailyKey(), JSON.stringify({
+    closing:{전월예측:closing.전월예측,목표:closing.목표,예측:closing.예측,비고:closing.비고,목표확정:closing.목표확정},
+    계획:daily.계획, 한일:daily.한일, 할일:daily.할일, 이슈:daily.이슈
+  })); }catch(e){}
+}
+function loadDaily(){
+  closing={전월예측:'',목표:'',예측:'',비고:'',목표확정:false,_force:false};
+  daily={계획:[],한일:[],할일:[],이슈:''};
+  buildVendorMaster();   // 작성자가 정해져야 '최근 미팅 업체' 상단 정렬이 확정된다
+  applyCrmPrefill();
+  try{
+    const raw=localStorage.getItem(dailyKey());
+    if(raw){
+      const o=JSON.parse(raw)||{};
+      if(o.closing){ ['전월예측','목표','예측','비고'].forEach(k=>{ if(o.closing[k]!=null&&o.closing[k]!=='') closing[k]=o.closing[k]; });
+                     if(o.closing.목표확정!=null) closing.목표확정=!!o.closing.목표확정; }
+      if(Array.isArray(o.계획)&&o.계획.length) daily.계획=o.계획;
+      if(Array.isArray(o.한일)&&o.한일.length) daily.한일=o.한일;
+      if(Array.isArray(o.할일)&&o.할일.length) daily.할일=o.할일;
+      if(typeof o.이슈==='string') daily.이슈=o.이슈;
+    }
+  }catch(e){}
+  if(!daily.한일.length) daily.한일=[{업체명:'',상태:'',내용:''}];
+  if(!daily.할일.length) daily.할일=[{업체명:'',내용:''}];
+}
+/* 서버 프리필 — §11-4 '폼 프리필 매핑' 표 그대로 */
+function applyCrmPrefill(){
+  const me=myDir(); if(!me) return;
+  const f=me.flow||{};
+  if(f.prevForecast && numOf(f.prevForecast.value)>0) closing.전월예측=numOf(f.prevForecast.value);
+  if(f.target && numOf(f.target.value)>0){ closing.목표=numOf(f.target.value); closing.목표확정=!!f.target.locked; }
+  if(f.forecast && numOf(f.forecast.value)>0 && f.forecast.hasInput!==false) closing.예측=numOf(f.forecast.value);
+  const ym=crmMeta().nowMonth||nowMonth();
+  const mp=((crm.monthlyPlans||{})[rpm]||{})[ym]||[];
+  if(mp.length) daily.계획=mp.map(p=>({유형:p.유형||'신약',거래처:p.거래처||'',품목:p.품목||'',MBO만:(numOf(p.MBO)/10000)||''}));
+}
+
+/* ════════════ ① 목표 — 4칸(확정실적·전월예측·이번달목표·이번달예측) ════════════ */
+/* 빈 값 안내문 — 렌더와 onGoalInput(값 지웠을 때)이 같은 문구를 쓰도록 한 곳에서 관리 */
+function goalHint(field){
+  if(field==='전월예측') return isPrevNeeded()?'미입력 — 원 단위 (7.9억 → 790000000)':'전월 실적이 확정되어 예측이 필요 없습니다';
+  if(field==='목표')     return '미입력 — 원 단위 (8.2억 → 820000000)';
+  return isForecastOpen()?'현재 시점 마감 예상':'매월 8일(2주차)부터 입력';
+}
 function renderClosing(){
-  const nm=nowMonth(), wk=clWeekOf();
-  const lbl=nm.slice(5,7).replace(/^0/,'')+'월 예측';
-  const tt=document.getElementById('cl-card-title'); if(tt) tt.textContent='① '+lbl;
-  document.getElementById('cl-month-lbl').textContent='— '+nm+' ('+wk+'주차) · 예측 매주 갱신';
+  const nm=crmMeta().nowMonth||nowMonth();
+  const pm=prevMonth();
+  const open=isForecastOpen();
+  const me=myDir();
+  const cm=crmMeta().confirmedMonth||(me&&me.confirmedMonth)||'';
+  const cVal=(me&&me.actuals&&cm)?me.actuals[cm]:null;
+  const partial=!!crmMeta().confirmedPartial;
+  const prevNeeded=isPrevNeeded();
+  const tt=document.getElementById('cl-card-title'); if(tt) tt.textContent='① 목표';
+  const ml=document.getElementById('cl-month-lbl');
+  if(ml) ml.textContent='— '+nm+(cm?(' · 확정 '+monLbl(cm)):'')+(open?' · 예측 입력중':' · 예측은 8일부터');
+
+  const goalFixed=(closing.목표확정 && numOf(closing.목표)>0 && !closing._force);
   const body=document.getElementById('cl-body');
-  const confirmed=(closing.잠금 && closing.목표!=='' && closing.목표!=null && !closing._force);
-  if(confirmed){
-    // 목표 확정됨 — 목표는 읽기전용 배지, 예측액만 매주 갱신 입력
-    const goal=Number(closing.목표)||0;
-    const v=closing.예측액||'';
-    const conv=v?((Number(v)||0)/1e8).toFixed(2)+'억원':'-';
-    body.innerHTML=`<div class="cl-lock">
-      <span class="lk-ico">🔒</span>
-      <div class="lk-txt">${nm} 목표 확정 — 예측은 매주 갱신
-        <div class="lk-amt">이번달 목표 ${(goal/1e8).toFixed(2)}억 (${goal.toLocaleString()}원·불변) · 예측만 재입력</div>
+  body.innerHTML=
+   `<div class="goal-grid">
+      <div class="gcell fixed">
+        <div class="gl">확정 실적 <span class="gbadge${cm?' on':''}">${cm?monLbl(cm):'대기'}${partial?' 일부':''}</span></div>
+        <div class="gv">${cVal!=null&&cVal!==''?eok(cVal):'-'}</div>
+        <div class="gs">${cVal!=null&&cVal!==''?(Number(cVal).toLocaleString()+'원 · 자동'):(crmReady?'실적 입력 대기':'불러오는 중...')}</div>
       </div>
-      <button class="btn-edit" onclick="unlockClosing()">목표 정정</button>
-    </div>
-    <div class="cl-amt-row" style="margin-top:4px">
-      <div class="cl-amt-wrap">
-        <label>${nm} (${wk}주차) 마감 매출예측액 (원) <span style="color:#16a34a">— 매주 갱신</span></label>
-        <input type="number" id="cl-amt" inputmode="numeric" placeholder="예) 1300000000" value="${esc(v)}" oninput="onClosingInput(this.value)">
+      <div class="gcell${prevNeeded?'':' off'}">
+        <div class="gl">전월(${monLbl(pm)}) 실적 예측 ${prevNeeded?'':'<span class="gbadge on">실적 확정</span>'}</div>
+        <input type="number" inputmode="numeric" id="cl-prev" placeholder="${prevNeeded?'미입력 — 예) 790000000':'실적 확정 — 입력 불필요'}" value="${esc(closing.전월예측===''?'':closing.전월예측)}" ${prevNeeded?'':'disabled'} oninput="onGoalInput('전월예측',this.value)">
+        <div class="gs" id="cl-conv-prev">${closing.전월예측!==''?eok(closing.전월예측)+'원':goalHint('전월예측')}</div>
       </div>
-      <div class="cl-conv" id="cl-conv">${conv}</div>
+      <div class="gcell accent">
+        <div class="gl">이번달(${monLbl(nm)}) 목표 ${goalFixed?'<span class="gbadge on">확정</span>':''}</div>
+        ${goalFixed
+          ? `<div class="gv">${eok(closing.목표)}</div>
+             <div class="gs" style="display:flex;align-items:center;justify-content:space-between;gap:6px"><span>${Number(closing.목표).toLocaleString()}원</span><button class="btn-mini" onclick="unlockGoal()">수정</button></div>`
+          : `<input type="number" inputmode="numeric" id="cl-goal" placeholder="미입력 — 예) 820000000" value="${esc(closing.목표===''?'':closing.목표)}" oninput="onGoalInput('목표',this.value)">
+             <div class="gs" id="cl-conv-goal">${closing.목표!==''?eok(closing.목표)+'원':goalHint('목표')}</div>`}
+      </div>
+      <div class="gcell${open?'':' off'}">
+        <div class="gl">이번달(${monLbl(nm)}) 예측 ${open?'':'<span class="gbadge wait">2주차부터</span>'}</div>
+        <input type="number" inputmode="numeric" id="cl-fc" placeholder="${open?'예) 835000000':'8일부터 입력'}" value="${esc(closing.예측===''?'':closing.예측)}" ${open?'':'disabled'} oninput="onGoalInput('예측',this.value)">
+        <div class="gs" id="cl-conv-fc">${open?(closing.예측!==''?eok(closing.예측)+'원':'현재 시점 마감 예상'):'매월 8일(2주차)부터 입력'}</div>
+      </div>
     </div>
-    <div class="ig full" style="margin-top:10px"><label>근거 메모 (선택)</label>
-      <input type="text" id="cl-note" placeholder="예) 처방신약 3건 + 볼륨업 2건 반영" value="${esc(closing.비고||'')}" oninput="closing.비고=this.value">
+    <div style="margin-top:10px"><label class="fl">근거 메모 (선택)</label>
+      <input class="fi" type="text" id="cl-note" placeholder="예) 처방신약 3건 + 볼륨업 2건 반영" value="${esc(closing.비고||'')}" oninput="closing.비고=this.value;saveDaily()">
+    </div>
+    ${closing._force?'<div style="font-size:11px;color:var(--watch);margin-top:6px">🔓 목표 정정 모드 — 제출 시 확정 목표까지 덮어씁니다.</div>':''}`;
+}
+function onGoalInput(field,v){
+  closing[field]=v;
+  const id={전월예측:'cl-conv-prev',목표:'cl-conv-goal',예측:'cl-conv-fc'}[field];
+  const el=id?document.getElementById(id):null;
+  if(el) el.textContent=(v!==''&&v!=null)?(eok(v)+'원'):goalHint(field);
+  saveDaily();
+}
+function unlockGoal(){ closing._force=true; renderClosing(); toast('🔓 목표 정정 모드 — 값 변경 후 전송하세요'); }
+
+/* ════════════ ② 이번달 주요계획 (월간계획 · 월 1회) ════════════ */
+const PLAN_TYPES=['신약','볼륨업','로컬'];
+function addPlan(){ daily.계획.push({유형:'신약',거래처:'',품목:'',MBO만:''}); renderPlans(); saveDaily();
+  const c=document.getElementById('c-plan'); if(c) c.classList.remove('fold'); }
+function delPlan(i){ daily.계획.splice(i,1); renderPlans(); saveDaily(); }
+function planField(i,f,v){ daily.계획[i][f]=v; if(f==='MBO만'){ const el=document.getElementById('pl-conv-'+i); if(el) el.textContent=planConv(v); } planSummary(); saveDaily(); }
+function planType(i,t){ daily.계획[i].유형=t; renderPlans(); saveDaily(); }
+function planConv(v){ const man=numOf(v); return man?(man.toLocaleString()+'만원 = '+(man/10000).toFixed(2)+'억'):'MBO(만원 단위)'; }
+function planSummary(){
+  const rows=(daily.계획||[]).filter(p=>String(p.거래처||'').trim()||String(p.품목||'').trim()||numOf(p.MBO만));
+  const sum=rows.reduce((a,p)=>a+numOf(p.MBO만),0);
+  const c=document.getElementById('plan-cnt'); if(c) c.textContent=rows.length;
+  const s=document.getElementById('plan-sum'); if(s) s.textContent='계획 '+rows.length+'건 · MBO 합 '+sum.toLocaleString()+'만';
+}
+function renderPlans(){
+  const cont=document.getElementById('plan-list'); if(!cont) return;
+  if(!daily.계획.length){ cont.innerHTML='<div class="row-empty">이번달 계획이 없습니다 — 아래 버튼으로 추가하세요</div>'; planSummary(); return; }
+  cont.innerHTML=daily.계획.map((p,i)=>{
+    const ph=(p.유형==='로컬')?'대표 업체명만 (예: 드림약품)':'거래처(병원명)';
+    return `<div class="rowbox">
+      <button class="row-del" onclick="delPlan(${i})">×</button>
+      <div class="seg" style="max-width:280px">
+        ${PLAN_TYPES.map(t=>`<button type="button" data-v="${t}" class="${p.유형===t?'on':''}" onclick="planType(${i},'${t}')">${t}</button>`).join('')}
+      </div>
+      <input class="fi" type="text" value="${esc(p.거래처||'')}" placeholder="${ph}" oninput="planField(${i},'거래처',this.value)">
+      <div class="f2">
+        <input class="fi" type="text" value="${esc(p.품목||'')}" placeholder="품목" oninput="planField(${i},'품목',this.value)">
+        <input class="fi" type="number" inputmode="numeric" value="${esc(p.MBO만===''?'':p.MBO만)}" placeholder="MBO(만원)" oninput="planField(${i},'MBO만',this.value)">
+      </div>
+      <div class="gs" id="pl-conv-${i}" style="font-size:11px;color:var(--gray3)">${planConv(p.MBO만)}</div>
     </div>`;
-    return;
-  }
-  // 첫 입력(또는 목표 정정 모드) — 입력값이 목표+예측 둘 다로 들어감
-  const v=closing.예측액||'';
-  const conv=v?((Number(v)||0)/1e8).toFixed(2)+'억원':'-';
-  body.innerHTML=`<div class="cl-amt-row">
-      <div class="cl-amt-wrap">
-        <label>${nm} 마감 매출예측액 (원) <span style="color:var(--gray3);font-weight:400">— 첫 입력값이 ${nm.slice(5,7).replace(/^0/,'')}월 목표로 고정됩니다</span></label>
-        <input type="number" id="cl-amt" inputmode="numeric" placeholder="예) 1300000000" value="${esc(v)}" oninput="onClosingInput(this.value)">
+  }).join('');
+  planSummary();
+}
+
+/* ════════════ ⑤ 오늘 한일 / ⑥ 내일 할일 — 업체명 자동완성 + 상태 세그먼트 ════════════ */
+const VSTATES=['순항','관찰','부진'];
+function addDone(){ daily.한일.push({업체명:'',상태:'',내용:''}); renderDone(); saveDaily(); }
+function delDone(i){ daily.한일.splice(i,1); if(!daily.한일.length) daily.한일=[{업체명:'',상태:'',내용:''}]; renderDone(); saveDaily(); }
+function doneField(i,f,v){ daily.한일[i][f]=v; doneCount(); saveDaily(); }
+function doneState(i,s){ daily.한일[i].상태=(daily.한일[i].상태===s?'':s); renderDone(); saveDaily(); }
+function doneCount(){ const n=(daily.한일||[]).filter(r=>String(r.업체명||'').trim()).length; const el=document.getElementById('done-cnt'); if(el) el.textContent=n; }
+function renderDone(){
+  const cont=document.getElementById('done-list'); if(!cont) return;
+  cont.innerHTML=daily.한일.map((r,i)=>`<div class="rowbox">
+      <button class="row-del" onclick="delDone(${i})">×</button>
+      <div class="vac" style="padding-right:34px">
+        <input class="fi" type="text" id="vin-done-${i}" value="${esc(r.업체명||'')}" placeholder="업체명 (자동완성)" autocomplete="off"
+          oninput="doneField(${i},'업체명',this.value);vacSearch('done',${i},this.value)" onkeydown="vacKey('done',${i},event)" onblur="vacClose('done',${i})">
+        <div class="vac-list" id="vac-done-${i}"></div>
       </div>
-      <div class="cl-conv" id="cl-conv">${conv}</div>
-    </div>
-    <div class="ig full" style="margin-top:10px"><label>근거 메모 (선택)</label>
-      <input type="text" id="cl-note" placeholder="예) 처방신약 3건 + 볼륨업 2건 반영" value="${esc(closing.비고||'')}" oninput="closing.비고=this.value">
-    </div>
-    ${closing._force?'<div style="font-size:11px;color:#b45309;margin-top:6px">🔓 목표 정정 모드 — 제출 시 목표(baseline)까지 강제 정정합니다.</div>':''}`;
+      <div class="seg st${(!r.상태&&String(r.업체명||'').trim())?' need':''}">
+        ${VSTATES.map(s=>`<button type="button" data-v="${s}" class="${r.상태===s?'on':''}" onclick="doneState(${i},'${s}')">${s}</button>`).join('')}
+      </div>
+      <textarea class="fi" rows="1" placeholder="미팅 주요사항" oninput="doneField(${i},'내용',this.value);autoGrow(this)">${esc(r.내용||'')}</textarea>
+    </div>`).join('');
+  cont.querySelectorAll('textarea').forEach(autoGrow);
+  doneCount();
 }
-function onClosingInput(v){
-  closing.예측액=v;
-  const c=document.getElementById('cl-conv');
-  if(c) c.textContent=v?((Number(v)||0)/1e8).toFixed(2)+'억원':'-';
+function addTodo(){ daily.할일.push({업체명:'',내용:''}); renderTodo(); saveDaily(); }
+function delTodo(i){ daily.할일.splice(i,1); if(!daily.할일.length) daily.할일=[{업체명:'',내용:''}]; renderTodo(); saveDaily(); }
+function todoField(i,f,v){ daily.할일[i][f]=v; todoCount(); saveDaily(); }
+function todoCount(){ const n=(daily.할일||[]).filter(r=>String(r.업체명||'').trim()).length; const el=document.getElementById('todo-cnt'); if(el) el.textContent=n; }
+function renderTodo(){
+  const cont=document.getElementById('todo-list'); if(!cont) return;
+  cont.innerHTML=daily.할일.map((r,i)=>`<div class="rowbox">
+      <button class="row-del" onclick="delTodo(${i})">×</button>
+      <div class="vac" style="padding-right:34px">
+        <input class="fi" type="text" id="vin-todo-${i}" value="${esc(r.업체명||'')}" placeholder="업체명 (자동완성)" autocomplete="off"
+          oninput="todoField(${i},'업체명',this.value);vacSearch('todo',${i},this.value)" onkeydown="vacKey('todo',${i},event)" onblur="vacClose('todo',${i})">
+        <div class="vac-list" id="vac-todo-${i}"></div>
+      </div>
+      <input class="fi" type="text" value="${esc(r.내용||'')}" placeholder="할 일 (한 줄)" oninput="todoField(${i},'내용',this.value)">
+    </div>`).join('');
+  todoCount();
 }
-function unlockClosing(){ closing._force=true; renderClosing(); toast('🔓 목표 정정 모드 — 값 변경 후 전송하세요(목표까지 덮어씀)'); }
+/* ⑦ 이슈 */
+function renderIssue(){ const t=document.getElementById('issue-txt'); if(t){ t.value=daily.이슈||''; autoGrow(t); } }
+function onIssueInput(el){ daily.이슈=el.value; autoGrow(el); saveDaily(); }
+
+/* ── 업체명 자동완성 (최근 미팅 업체 상단) ── */
+let vacState={kind:'',idx:-1,sel:-1,hits:[]};
+function vacSearch(kind,i,q){
+  if(!vendorMaster.length) buildVendorMaster();
+  const box=document.getElementById('vac-'+kind+'-'+i); if(!box) return;
+  const query=String(q||'').trim().toLowerCase(), key=normVendorKey(q);
+  if(!query){ box.style.display='none'; vacState.hits=[]; return; }
+  const hits=vendorMaster.filter(v=>v.name.toLowerCase().indexOf(query)>=0||normVendorKey(v.name).indexOf(key)>=0);
+  hits.sort((a,b)=>(b.recent?1:0)-(a.recent?1:0));
+  const top=hits.slice(0,10);
+  vacState={kind:kind,idx:i,sel:-1,hits:top};
+  if(!top.length){ box.style.display='none'; return; }
+  box.innerHTML=top.map((v,k)=>`<div class="vac-item" data-k="${k}" onmousedown="vacPick('${kind}',${i},${k})">${esc(v.name)}${v.recent?' <span class="rc">최근</span>':''}</div>`).join('');
+  box.style.display='block';
+}
+function vacKey(kind,i,e){
+  const box=document.getElementById('vac-'+kind+'-'+i); if(!box||box.style.display==='none')return;
+  const n=vacState.hits.length;
+  if(e.key==='ArrowDown'){e.preventDefault();vacState.sel=Math.min(n-1,vacState.sel+1);}
+  else if(e.key==='ArrowUp'){e.preventDefault();vacState.sel=Math.max(0,vacState.sel-1);}
+  else if(e.key==='Enter'){ if(vacState.sel>=0){e.preventDefault();vacPick(kind,i,vacState.sel);} return; }
+  else if(e.key==='Escape'){ box.style.display='none'; return; }
+  else return;
+  box.querySelectorAll('.vac-item').forEach((el,k)=>el.classList.toggle('sel',k===vacState.sel));
+}
+function vacPick(kind,i,k){
+  const v=vacState.hits[k]; if(!v) return;
+  if(kind==='done'){ daily.한일[i].업체명=v.name; } else { daily.할일[i].업체명=v.name; }
+  const inp=document.getElementById('vin-'+kind+'-'+i); if(inp) inp.value=v.name;
+  const box=document.getElementById('vac-'+kind+'-'+i); if(box) box.style.display='none';
+  if(kind==='done'){ doneCount(); renderDone(); } else { todoCount(); }
+  saveDaily();
+}
+function vacClose(kind,i){ setTimeout(()=>{ const b=document.getElementById('vac-'+kind+'-'+i); if(b) b.style.display='none'; },160); }
+
+/* ── payload 조립 (§11-3 스키마) ── */
+function collectPlanRows(){
+  const ym=crmMeta().nowMonth||nowMonth();
+  return (daily.계획||[])
+    .filter(p=>String(p.거래처||'').trim()||String(p.품목||'').trim()||numOf(p.MBO만))
+    .map(p=>({년월:ym,유형:p.유형||'신약',거래처:String(p.거래처||'').trim(),품목:String(p.품목||'').trim(),MBO:Math.round(numOf(p.MBO만)*10000)}));
+}
+function collectDoneRows(){
+  const d=today();
+  return (daily.한일||[]).filter(r=>String(r.업체명||'').trim())
+    .map(r=>({일자:d,업체명:String(r.업체명||'').trim(),상태:r.상태||'',내용:String(r.내용||'').trim()}));
+}
+function collectTodoRows(){
+  const d=today();
+  return (daily.할일||[]).filter(r=>String(r.업체명||'').trim())
+    .map(r=>({일자:d,업체명:String(r.업체명||'').trim(),내용:String(r.내용||'').trim()}));
+}
 
 /* ════════════ ② 신약 진행상황 — 자동표시 3종 ════════════ */
 /* ⓐ DC접수월=이번달 + 'DC신청' 전 / ⓑ DC접수 지연(DC접수월 지남 + 'DC신청' 전) / ⓒ 코딩월 도래(코딩예측월≤이번달 + '코딩' 전) — DC접수된 건(DC신청 이상)은 ⓒ 해당 시에만, 이슈상태 DC실패(재도전·종결)는 전체 제외 */
@@ -1347,11 +1774,25 @@ function saveExcel(){
     const rows=items.map(d=>[rpm,d.실납처명,d.기준품명,d.제품명,d.업체명,d.MBO,d.DC접수월,d.코딩예측월||'',d.상정과KOL||'',d.신약과정||'',d.이슈상태||'',d.진행사항,d.비고,today()]);
     const ws=XLSX.utils.aoa_to_sheet([hd,...rows]);XLSX.utils.book_append_sheet(wb,ws,'신약진행');
   }
-  // 마감예측
-  if(closing.예측액){
-    const goalV=(closing.목표!==''&&closing.목표!=null)?Number(closing.목표)||0:Number(closing.예측액)||0;
-    const ws=XLSX.utils.aoa_to_sheet([['지부장','년월','마감예측액','목표','비고'],[rpm,nowMonth(),Number(closing.예측액)||0,goalV,closing.비고||'']]);
-    XLSX.utils.book_append_sheet(wb,ws,'마감예측');
+  // 목표(마감예측 4칸) — [v39]
+  if(closing.전월예측!==''||closing.목표!==''||closing.예측!==''){
+    const ws=XLSX.utils.aoa_to_sheet([['지부장','년월','전월예측액','목표','마감예측액','비고'],
+      [rpm,nowMonth(),numOf(closing.전월예측),numOf(closing.목표),numOf(closing.예측),closing.비고||'']]);
+    XLSX.utils.book_append_sheet(wb,ws,'목표');
+  }
+  // [v39] 월간계획 · 한일 · 할일
+  const _pl=collectPlanRows(), _dn=collectDoneRows(), _td=collectTodoRows();
+  if(_pl.length){
+    const ws=XLSX.utils.aoa_to_sheet([['지부장','년월','유형','거래처','품목','MBO'],..._pl.map(p=>[rpm,p.년월,p.유형,p.거래처,p.품목,p.MBO])]);
+    XLSX.utils.book_append_sheet(wb,ws,'월간계획');
+  }
+  if(_dn.length){
+    const ws=XLSX.utils.aoa_to_sheet([['지부장','일자','업체명','상태','내용'],..._dn.map(r=>[rpm,r.일자,r.업체명,r.상태,r.내용])]);
+    XLSX.utils.book_append_sheet(wb,ws,'한일');
+  }
+  if(_td.length){
+    const ws=XLSX.utils.aoa_to_sheet([['지부장','일자','업체명','내용'],..._td.map(r=>[rpm,r.일자,r.업체명,r.내용])]);
+    XLSX.utils.book_append_sheet(wb,ws,'할일');
   }
   // 볼륨업
   if(volumeUp.length){
@@ -1364,53 +1805,140 @@ function saveExcel(){
   toast('✅ Excel 저장 완료');
 }
 
-/* ── 이메일 보고문 ── */
-function openEmail(){
-  if(!items.length && !closing.예측액 && !volumeUp.length){toast('보고할 내용을 먼저 입력하세요');return;}
-  const now=new Date();
-  const ds=`${now.getFullYear()}.${now.getMonth()+1}.${now.getDate()}`;
-  const subj=`[한올바이오파마 ETC·MS팀] CSO 매출예측 보고 — ${rpm} 지부장 (${ds})`;
-  document.getElementById('em-subj').value=subj;
+/* ══════════════ 이메일 보고문 ══════════════
+   [v39] 신약 블록을 buildNewDrugText()로 분리 — 산출 문자열은 기존 openEmail과 동일(게이트 16 diff 0).
+   모드 2종: daily=일일결산 전문(기본) / nd=신약보고만(기존 본문 그대로) */
+function buildNewDrugText(){
+  if(!items.length) return '';
+  let body='';
+  const sorted=[...items].sort((a,b)=>(ISSUE_ORDER[a.이슈상태]??5)-(ISSUE_ORDER[b.이슈상태]??5));
+  body+=`■ 신약 진행상황: ${sorted.length}건\n`;
+  sorted.forEach((d,i)=>{
+    const mbo=d.MBO?(d.MBO/10000).toLocaleString()+'만원':'-';
+    const iss=d.이슈상태?`[${d.이슈상태}] `:'';
+    body+=`[${i+1}] ${iss}${d.실납처명}${d._new?' [신규]':''}${d.is110?' [110대]':''}\n`;
+    body+=`  ∙ 제품: ${d.기준품명} / CSO: ${d.업체명||'-'} / MBO: ${mbo} / DC접수: ${d.DC접수월||'-'}\n`;
+    if(d.신약과정) body+=`  ∙ 신약과정: ${d.신약과정}\n`;
+    if(d.진행사항) body+=`  ∙ 진행: ${d.진행사항}\n`;
+  });
+  body+='\n';
+  return body;
+}
+function buildVolumeUpText(){
+  if(!volumeUp.length) return '';
+  let body='';
+  body+=`■ 매출증대 예측처(볼륨업): ${volumeUp.length}건\n`;
+  volumeUp.forEach((v,i)=>{
+    const mbo=v.증대MBO?(Number(v.증대MBO)/10000).toLocaleString()+'만원':'-';
+    body+=`[${i+1}] ${v.병원명||'-'} / ${v.품목||'-'} / 증대 ${mbo} / 목표 ${v.목표월||'-'} / ${v.상태||''}\n`;
+    if(v.내용) body+=`  ∙ ${v.내용}\n`;
+  });
+  body+='\n';
+  return body;
+}
+/* 기존(신약보고만) 본문 — 구조·문구 유지 */
+function buildLegacyEmail(){
   let body='안녕하십니까.\n';
   body+=`${rpm} 지부장입니다.\n\n`;
   body+=`${nowMonth()} CSO 병원영역 보고 드립니다.\n\n`;
   body+=`${'─'.repeat(32)}\n`;
-  // ① 마감예측
-  if(closing.예측액){
-    const amt=Number(closing.예측액)||0;
+  if(closing.예측!==''&&closing.예측!=null){
+    const amt=numOf(closing.예측);
     const mlbl=nowMonth().slice(5,7).replace(/^0/,'')+'월';
     body+=`■ ${mlbl} 예측: ${amt.toLocaleString()}원 (${(amt/1e8).toFixed(2)}억)\n`;
-    if(closing.목표!==''&&closing.목표!=null){const g=Number(closing.목표)||0; body+=`  목표(확정): ${g.toLocaleString()}원 (${(g/1e8).toFixed(2)}억)\n`;}
+    if(closing.목표!==''&&closing.목표!=null){const g=numOf(closing.목표); body+=`  목표(확정): ${g.toLocaleString()}원 (${(g/1e8).toFixed(2)}억)\n`;}
     if(closing.비고) body+=`  근거: ${closing.비고}\n`;
     body+='\n';
   }
-  // ② 신약진행
-  if(items.length){
-    const sorted=[...items].sort((a,b)=>(ISSUE_ORDER[a.이슈상태]??5)-(ISSUE_ORDER[b.이슈상태]??5));
-    body+=`■ 신약 진행상황: ${sorted.length}건\n`;
-    sorted.forEach((d,i)=>{
-      const mbo=d.MBO?(d.MBO/10000).toLocaleString()+'만원':'-';
-      const iss=d.이슈상태?`[${d.이슈상태}] `:'';
-      body+=`[${i+1}] ${iss}${d.실납처명}${d._new?' [신규]':''}${d.is110?' [110대]':''}\n`;
-      body+=`  ∙ 제품: ${d.기준품명} / CSO: ${d.업체명||'-'} / MBO: ${mbo} / DC접수: ${d.DC접수월||'-'}\n`;
-      if(d.신약과정) body+=`  ∙ 신약과정: ${d.신약과정}\n`;
-      if(d.진행사항) body+=`  ∙ 진행: ${d.진행사항}\n`;
-    });
-    body+='\n';
-  }
-  // ③ 볼륨업
-  if(volumeUp.length){
-    body+=`■ 매출증대 예측처(볼륨업): ${volumeUp.length}건\n`;
-    volumeUp.forEach((v,i)=>{
-      const mbo=v.증대MBO?(Number(v.증대MBO)/10000).toLocaleString()+'만원':'-';
-      body+=`[${i+1}] ${v.병원명||'-'} / ${v.품목||'-'} / 증대 ${mbo} / 목표 ${v.목표월||'-'} / ${v.상태||''}\n`;
-      if(v.내용) body+=`  ∙ ${v.내용}\n`;
-    });
-    body+='\n';
-  }
+  body+=buildNewDrugText();
+  body+=buildVolumeUpText();
   body+='감사합니다.\n';
   body+=`${rpm} 지부장 드림`;
-  document.getElementById('email-body').textContent=body;
+  return body;
+}
+/* 일일결산 전문 — 1.목표 ~ 5.내일 할일 */
+function buildDailyClosingEmail(){
+  const now=new Date();
+  const ds=`${now.getFullYear()}.${now.getMonth()+1}.${now.getDate()}`;
+  const nm=crmMeta().nowMonth||nowMonth(), pm=prevMonth();
+  const me=myDir();
+  const cm=crmMeta().confirmedMonth||(me&&me.confirmedMonth)||'';
+  const cVal=(me&&me.actuals&&cm)?me.actuals[cm]:null;
+  const won=v=>numOf(v).toLocaleString()+'원';
+  const both=v=>`${(numOf(v)/1e8).toFixed(2)}억 (${won(v)})`;
+  let body='안녕하십니까.\n';
+  body+=`${rpm} 지부장입니다.\n\n`;
+  body+=`${ds} 일일결산 보고 드립니다.\n\n`;
+  body+=`${'─'.repeat(32)}\n`;
+  // 1. 목표
+  body+='1. 목표\n';
+  if(cVal!=null&&cVal!=='') body+=`  ∙ 확정 실적(${monLbl(cm)}): ${both(cVal)}\n`;
+  if(closing.전월예측!==''&&closing.전월예측!=null) body+=`  ∙ ${monLbl(pm)} 실적 예측: ${both(closing.전월예측)}\n`;
+  if(closing.목표!==''&&closing.목표!=null) body+=`  ∙ ${monLbl(nm)} 목표: ${both(closing.목표)}${closing.목표확정?' (확정)':''}\n`;
+  if(closing.예측!==''&&closing.예측!=null) body+=`  ∙ ${monLbl(nm)} 예측: ${both(closing.예측)}\n`;
+  if(closing.비고) body+=`  ∙ 근거: ${closing.비고}\n`;
+  body+='\n';
+  // 2. 이번달 주요계획
+  const plans=collectPlanRows();
+  const planSum=plans.reduce((a,p)=>a+numOf(p.MBO),0);
+  body+=`2. 이번달 주요계획 (${plans.length}건 · MBO 합 ${Math.round(planSum/10000).toLocaleString()}만원)\n`;
+  if(plans.length){
+    plans.forEach((p,i)=>{
+      body+=`[${i+1}] [${p.유형}] ${p.거래처||'-'} / ${p.품목||'-'} / MBO ${Math.round(numOf(p.MBO)/10000).toLocaleString()}만원\n`;
+    });
+  } else { body+='  ∙ 등록된 계획 없음\n'; }
+  body+='\n';
+  // 3. 변화사항
+  body+='3. 변화사항\n';
+  const nd=buildNewDrugText(), vu=buildVolumeUpText();
+  body+=' 1) 신약 진행\n';
+  body+=nd?nd:'  ∙ 변동 없음\n\n';
+  body+=' 2) 매출증대(볼륨업)\n';
+  body+=vu?vu:'  ∙ 변동 없음\n\n';
+  body+=' 3) 고민·이슈\n';
+  body+=(daily.이슈||'').trim()?`${(daily.이슈||'').trim()}\n\n`:'  ∙ 없음\n\n';
+  // 4. 오늘 한일 (김종훈=오늘의 인사이트)
+  const doneRows=collectDoneRows();
+  body+=`4. ${rpm==='김종훈'?'오늘의 인사이트':'오늘 한일'} (${doneRows.length}건)\n`;
+  if(doneRows.length){
+    doneRows.forEach(r=>{ body+=`[${r.업체명}]${r.상태?` (${r.상태})`:''} ${r.내용||'-'}\n`; });
+  } else { body+='  ∙ 없음\n'; }
+  body+='\n';
+  // 5. 내일 할일
+  const todoRows=collectTodoRows();
+  body+=`5. 내일 할일 (${todoRows.length}건)\n`;
+  if(todoRows.length){
+    todoRows.forEach(r=>{ body+=`[${r.업체명}] ${r.내용||'-'}\n`; });
+  } else { body+='  ∙ 없음\n'; }
+  body+='\n';
+  body+='감사합니다.\n';
+  body+=`${rpm} 지부장 드림`;
+  return body;
+}
+let emailMode='daily';
+function setEmailMode(m){
+  emailMode=m;
+  const a=document.getElementById('em-md-daily'), b=document.getElementById('em-md-nd');
+  if(a) a.classList.toggle('on',m==='daily');
+  if(b) b.classList.toggle('on',m==='nd');
+  renderEmailBody();
+}
+function renderEmailBody(){
+  const now=new Date();
+  const ds=`${now.getFullYear()}.${now.getMonth()+1}.${now.getDate()}`;
+  const subj=(emailMode==='daily')
+    ? `[한올바이오파마 ETC·MS팀] 일일결산 보고 — ${rpm} 지부장 (${ds})`
+    : `[한올바이오파마 ETC·MS팀] CSO 매출예측 보고 — ${rpm} 지부장 (${ds})`;
+  document.getElementById('em-subj').value=subj;
+  document.getElementById('email-body').textContent=(emailMode==='daily')?buildDailyClosingEmail():buildLegacyEmail();
+}
+function openEmail(){
+  if(!rpm){toast('작성자(지부장)를 선택해주세요');return;}
+  // [v39] 진입 가드 확장 — 일일결산(계획·한일·할일·이슈)만 있어도 이메일 생성 허용
+  const hasGoalAny=(closing.전월예측!==''&&closing.전월예측!=null)||(closing.목표!==''&&closing.목표!=null)||(closing.예측!==''&&closing.예측!=null);
+  const hasDaily=!!(collectPlanRows().length||collectDoneRows().length||collectTodoRows().length||(daily.이슈||'').trim());
+  if(!items.length && !hasGoalAny && !volumeUp.length && !hasDaily){toast('보고할 내용을 먼저 입력하세요');return;}
+  renderEmailBody();
   document.getElementById('email-modal').classList.add('show');
   step(4);
 }

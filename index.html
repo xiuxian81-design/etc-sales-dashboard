@@ -7,7 +7,13 @@ window.__EMBEDDED_SALES__={"5149111208":{"p":{"알파본":{"s25":660824,"m1":609
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MBO 진행현황 대시보드</title>
+<title>MS팀 성과관리 대시보드</title>
+<style>
+/* ── 마루부리(MaruBuri) 웹폰트 — 저장소 동봉 fonts/ 상대경로 ── */
+@font-face{font-family:'MaruBuri';src:url('fonts/MaruBuri-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'MaruBuri';src:url('fonts/MaruBuri-SemiBold.woff2') format('woff2');font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:'MaruBuri';src:url('fonts/MaruBuri-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 /* ══════════════════════════════════════════
@@ -157,11 +163,13 @@ function toggleAutoRefresh(on) {
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script>Chart.register(ChartDataLabels);</script>
 <style>
-:root{--blue:#1a4fa0;--blue-lt:#e8effa;--blue-dk:#123575;--green:#16a34a;--green-lt:#dcfce7;--yellow:#ca8a04;--yellow-lt:#fef9c3;--red:#dc2626;--red-lt:#fee2e2;--gray1:#f1f5f9;--gray2:#e2e8f0;--gray3:#94a3b8;--gray4:#475569;--gray5:#1e293b;--shadow:0 1px 8px rgba(0,0,0,.09)}
+/* [v38 CRM] 애플 스타일 토큰 리스킨 — 변수값만 교체(기존 탭 3종의 DOM·JS 로직 무변경) */
+:root{--blue:#0071e3;--blue-lt:#eff5fe;--blue-dk:#0058b0;--green:#248a3d;--green-lt:#dff3e4;--green-dk:#1a6b2e;--yellow:#c76b00;--yellow-lt:#fdf1df;--red:#d70015;--red-lt:#fde8e8;--gray1:#f5f5f7;--gray2:#d2d2d7;--gray3:#86868b;--gray4:#6e6e73;--gray5:#1d1d1f;--shadow:0 1px 3px rgba(0,0,0,.04);
+  --ok:#248a3d;--ok-lt:#dff3e4;--watch:#c76b00;--watch-lt:#fdf1df;--bad:#d70015;--bad-lt:#fde8e8;--hair:#d2d2d7;--bg:#f5f5f7}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#eef2f9;color:var(--gray5);font-size:13px}
+body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var(--gray5);font-size:13px;-webkit-font-smoothing:antialiased}
 .hd{background:var(--blue);color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-.hd-left h1{font-size:16px;font-weight:700}.hd-left p{font-size:11px;opacity:.7;margin-top:2px}
+.hd-left h1{font-size:18px;font-weight:700;letter-spacing:-.02em}.hd-left p{font-size:11px;opacity:.75;margin-top:2px}
 .hd-right{display:flex;align-items:center;gap:10px}
 .upbtn{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.5);color:#fff;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;position:relative;overflow:hidden}
 .upbtn:hover{background:rgba(255,255,255,.3)}
@@ -171,7 +179,11 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#ee
 .tab-btn{padding:12px 20px;font-size:13px;font-weight:700;color:var(--gray4);cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;margin-bottom:-2px;transition:.15s}
 .tab-btn:hover{color:var(--blue)}.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
 .tab-panel{display:none}.tab-panel.active{display:block}
-.wrap{max-width:1300px;margin:0 auto;padding:16px 16px 40px}
+/* [v38 CRM] 가로 공간 활용 — 유동 폭(max 1440px) */
+.wrap{max-width:1440px;margin:0 auto;padding:18px 24px 44px}
+@media(min-width:1500px){.wrap{padding:18px 32px 44px}}
+@media(max-width:640px){.wrap{padding:14px 12px 36px}}
+.section-card,.chart-card,.sc,.filter-bar,.h110-filter,.prod-tabs,.col-toggle-bar,.issue-card{border-radius:14px}
 .upload-guide{background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:40px 20px;text-align:center}
 .upload-guide .ico{font-size:48px;margin-bottom:12px}
 .upload-guide h2{font-size:16px;font-weight:700;color:var(--blue);margin-bottom:6px}
@@ -322,18 +334,19 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#ee
 
 <div class="hd">
   <div class="hd-left">
-    <h1>📊 신약 진행현황 대시보드</h1>
-    <p>한올바이오파마 ETC마케팅기획본부</p>
+    <h1>MS팀 성과관리 대시보드</h1>
+    <p>한올바이오파마 ETC마케팅기획본부 · MS팀</p>
   </div>
   <div class="hd-right">
     <span class="last-update" id="last-update">파일을 불러오세요</span>
+    <a class="upbtn" id="btn-open-form" href="https://xiuxian81-design.github.io/etc-sales-dashboard/form.html" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block">📝 일일보고폼 열기</a>
     <button class="upbtn">📂 MBO Excel 불러오기<input type="file" id="file-in" accept=".xlsx,.xls"></button>
   </div>
 </div>
 
 <div class="tab-nav" id="tab-nav" style="display:none">
-  <button class="tab-btn active" onclick="switchTab('t-all',this)">📊 전체 현황</button>
-  <button class="tab-btn" onclick="switchTab('t-forecast',this)">💰 매출예측</button>
+  <button class="tab-btn active" onclick="switchTab('t-forecast',this)">📈 매출예측/고객관리</button>
+  <button class="tab-btn" onclick="switchTab('t-all',this)">📊 전체 현황</button>
   <button class="tab-btn" onclick="switchTab('t-110',this)">🏥 110대 세부현황</button>
   <button class="tab-btn" onclick="switchTab('t-prenon',this)">💊 프레논 교차판매</button>
 </div>
@@ -358,8 +371,8 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#ee
     <p>우측 상단 "MBO Excel 불러오기" 버튼으로 MBO_신약진행현황.xlsx를 선택하면 대시보드가 자동 생성됩니다</p>
   </div>
 
-  <!-- ① 전체 현황 탭 -->
-  <div class="tab-panel active" id="t-all">
+  <!-- ② 전체 현황 탭 (기본 활성은 매출예측/고객관리 탭으로 이동) -->
+  <div class="tab-panel" id="t-all">
     <div class="filter-bar" id="filter-bar">
       <label>RPM</label>
       <select id="f-rpm"><option value="">전체</option></select>
@@ -437,23 +450,29 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#ee
     </div>
   </div>
 
-  <!-- 💰 매출예측 탭 (신설) — mode=forecast JSONP 로드. 원→억/만/% 환산은 프론트 -->
-  <div class="tab-panel" id="t-forecast">
-    <div id="fc-status" style="background:#fff;border:1px solid var(--gray2);border-radius:10px;padding:14px 16px;margin-bottom:14px;font-size:13px;color:var(--gray4)">
-      매출예측 데이터를 불러옵니다... <span style="color:var(--gray3)">(상단 “실시간 불러오기”의 URL 사용)</span>
+  <!-- ① 매출예측/고객관리 탭 (기본 활성) — mode=crm JSONP 단일 호출. 원→억/만/% 환산은 프론트 -->
+  <div class="tab-panel active" id="t-forecast">
+    <div id="fc-status" style="background:#fff;border:1px solid var(--gray2);border-radius:14px;padding:14px 16px;margin-bottom:14px;font-size:13px;color:var(--gray4)">
+      성과관리 데이터를 불러옵니다... <span style="color:var(--gray3)">(상단 “실시간 불러오기”의 URL 사용)</span>
     </div>
-    <!-- 1) 본부지표 -->
-    <div id="fc-hq"></div>
-    <!-- 2) 연도별 월별매출표 -->
-    <div id="fc-yearly"></div>
-    <!-- 3) 지부장 4인 표 -->
-    <div id="fc-directors"></div>
-    <!-- 4) 신약예측(PRN) -->
-    <div id="fc-newdrug"></div>
-    <!-- 5) 대웅바이오 현황 -->
-    <div id="fc-dwb"></div>
-    <!-- 6) 볼륨업 현황 -->
-    <div id="fc-volumeup"></div>
+    <!-- 전체 모드 -->
+    <div id="crm-overview">
+      <!-- 1) 본부지표(MS팀) -->
+      <div id="fc-hq"></div>
+      <!-- 1-b) 2배 경로 -->
+      <div id="crm-double"></div>
+      <!-- 2) 연도별 월별매출표 -->
+      <div id="fc-yearly"></div>
+      <!-- 3) 지부장 통합 표 (실적 + CRM 요약) — 행 클릭 시 상세 -->
+      <div id="crm-directors"></div>
+    </div>
+    <!-- 지부장 상세 모드 -->
+    <div id="crm-detail" style="display:none"></div>
+    <!-- (구 매출예측 탭 잔존 컨테이너 — v38부터 렌더하지 않음. 레거시 함수 null-guard 호환용) -->
+    <div id="fc-directors" style="display:none"></div>
+    <div id="fc-newdrug" style="display:none"></div>
+    <div id="fc-dwb" style="display:none"></div>
+    <div id="fc-volumeup" style="display:none"></div>
   </div>
 
   <!-- ② 110대 병원 탭 -->
@@ -1057,7 +1076,7 @@ function switchTab(panelId,btn){
   btn.classList.add('active');
   if(panelId==='t-110sum' && typeof render110sum==='function') render110sum();
   if(panelId==='t-prenon') loadPrenonDash();
-  if(panelId==='t-forecast') loadForecast();
+  if(panelId==='t-forecast') loadCrm();   // [v38] 매출예측/고객관리 = mode=crm 단일 호출
 }
 
 /* ── 필터 초기화 ── */
@@ -2259,14 +2278,18 @@ function renderFcHQ(hq, meta){
   var annual = (meta && meta.nowMonth) ? null : null; // 누계는 yearly에서 별도 표기. 여기선 본부 이번달 중심.
   var lockTxt = hq.inputLocked ? '<span style="background:#dcfce7;color:#166534;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px">지부장 마감예측 입력됨</span>'
                                : '<span style="background:#fef9c3;color:#92400e;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px">입력 전 — 증감 기준=전월매출</span>';
+  // [v38] mode=crm 페이로드에는 근거1·2(PRN·볼륨업)가 없다 → 값이 없을 땐 0억으로 오표시하지 않고 줄 자체를 숨긴다
+  var hasEv = (hq.evidence!=null || hq.evidence1!=null || hq.evidence2!=null);
+  var evLine1 = hasEv ? (' · 근거 '+fcEok(hq.evidence)+'억 · gap '+fcEok(hq.gap)+'억') : '';
+  var evLine2 = hasEv ? ('<div style="font-size:10px;color:var(--gray3);margin-top:2px">근거1(PRN) '+fcEok(hq.evidence1)+'억 · 근거2(볼륨업) '+fcEok(hq.evidence2)+'억 · 근거확보율 '+(Number(hq.target)>0?Math.round((Number(hq.evidence)||0)/Number(hq.target)*100):0)+'%</div>') : '';
   el.innerHTML=
     '<div class="section-card"><h3>🏛️ 본부 지표 <span style="font-size:11px;color:var(--gray3);font-weight:400">'+fcEsc(hq.currentMonth||meta.nowMonth||'')+' 기준</span></h3>'
     +'<div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px">'
       +'<div style="flex:1;min-width:170px;background:var(--blue-lt);border:1px solid #c7d7f0;border-radius:10px;padding:14px 16px">'
         +'<div style="font-size:11px;color:var(--blue-dk)">이번달 매출예측</div>'
         +'<div style="font-size:26px;font-weight:800;color:var(--blue-dk)">'+fcEok(hq.current)+'<span style="font-size:14px">억원</span></div>'
-        +'<div style="font-size:11px;color:var(--gray4);margin-top:3px">목표 '+fcEok(hq.target)+'억 · 근거 '+fcEok(hq.evidence)+'억 · gap '+fcEok(hq.gap)+'억</div>'
-        +'<div style="font-size:10px;color:var(--gray3);margin-top:2px">근거1(PRN) '+fcEok(hq.evidence1)+'억 · 근거2(볼륨업) '+fcEok(hq.evidence2)+'억 · 근거확보율 '+(Number(hq.target)>0?Math.round((Number(hq.evidence)||0)/Number(hq.target)*100):0)+'%</div></div>'
+        +'<div style="font-size:11px;color:var(--gray4);margin-top:3px">목표 '+fcEok(hq.target)+'억'+evLine1+'</div>'
+        +evLine2+'</div>'
       +deltaCard('전월 대비', delta.prevMonth)
       +deltaCard('직전 3개월 평균 대비', delta.avg3Month)
       +deltaCard('전년 동월 대비', delta.prevYear)
@@ -2465,5 +2488,420 @@ function renderFcVolumeUp(vu, meta){
 .fc-tbl tbody tr:hover{background:#f8fafc}
 #t-forecast .section-card{margin-bottom:14px}
 </style>
+
+<!-- ══════════════════════════════════════════
+     📈 매출예측/고객관리 (MS팀 성과관리 CRM · v38)
+     mode=crm JSONP 단일 호출 → 본부지표·2배경로·연도별표·지부장 통합표 → 행 클릭 시 지부장 상세 8블록 → 업체 칩 클릭 시 업체 상세
+     응답 계약 = _workspace\01_architect_datamodel.md §11-4 (meta·team·yearly·directors·activities·monthlyPlans·sales·vendors)
+     ══════════════════════════════════════════ -->
+<style>
+.crm-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:50px;background:var(--gray1);color:var(--gray4)}
+.crm-badge.on{background:var(--ok-lt);color:var(--ok)}
+.crm-badge.wait{background:var(--watch-lt);color:var(--watch)}
+.crm-badge.bad{background:var(--bad-lt);color:var(--bad)}
+.crm-stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.crm-stat .b{background:#fff;border:1px solid var(--hair);border-radius:14px;padding:13px 15px}
+.crm-stat .b .l{font-size:11px;color:var(--gray3)}
+.crm-stat .b .v{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-top:3px}
+.crm-stat .b .s{font-size:11px;color:var(--gray4);margin-top:2px}
+.crm-strip{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.crm-step{flex:1;min-width:130px;border:1px solid var(--hair);border-radius:14px;padding:11px 13px;background:#fff}
+.crm-step.wait{background:var(--gray1);color:var(--gray3);border-style:dashed}
+.crm-step.goal{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue) inset;background:var(--blue-lt)}
+.crm-step.fc{border-style:dashed;border-color:var(--blue)}
+.crm-step .l{font-size:11px;color:var(--gray3)}
+.crm-step .v{font-size:19px;font-weight:800;letter-spacing:-.02em;margin-top:2px}
+.crm-step .s{font-size:10px;color:var(--gray3);margin-top:2px}
+.crm-arrow{align-self:center;color:var(--gray3);font-size:14px}
+.crm-stage{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.crm-stage .st{border:1px solid var(--hair);border-radius:14px;padding:10px 12px;background:#fff;text-align:center}
+.crm-stage .st .l{font-size:11px;color:var(--gray4);font-weight:700}
+.crm-stage .st .c{font-size:20px;font-weight:800;color:var(--gray5);margin-top:2px}
+.crm-stage .st .m{font-size:11px;color:var(--gray3)}
+.crm-stage .st .r{font-size:10px;color:var(--watch);font-weight:700;margin-top:2px}
+.crm-chips{display:flex;flex-wrap:wrap;gap:8px}
+.crm-chip{border:1px solid var(--hair);border-radius:50px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;background:#fff;color:var(--gray4);display:inline-flex;align-items:center;gap:6px;transition:.12s}
+.crm-chip:hover{box-shadow:0 1px 6px rgba(0,0,0,.10)}
+.crm-chip.순항{background:var(--ok-lt);color:var(--ok);border-color:#b8e3c5}
+.crm-chip.관찰{background:var(--watch-lt);color:var(--watch);border-color:#f2d6a8}
+.crm-chip.부진{background:var(--bad-lt);color:var(--bad);border-color:#f4c2c2}
+.crm-chip.none{background:var(--gray1);color:var(--gray3)}
+.crm-chip.sel{box-shadow:0 0 0 2px var(--blue)}
+.crm-chip .n{font-size:10px;font-weight:800;opacity:.75}
+.crm-sig{font-size:9.5px;font-weight:800;padding:1px 6px;border-radius:5px;background:var(--bad);color:#fff}
+.crm-sig.n{background:var(--watch)}
+.crm-red{border:1px solid #f4c2c2;background:var(--bad-lt);border-radius:14px;padding:11px 13px;margin-top:10px}
+.crm-red h4{font-size:12px;font-weight:800;color:var(--bad);margin-bottom:6px}
+.crm-row{border-bottom:1px solid var(--gray1);padding:7px 0;font-size:12px}
+.crm-row:last-child{border-bottom:none}
+.crm-back{border:1px solid var(--hair);background:#fff;border-radius:50px;padding:7px 15px;font-size:12px;font-weight:700;color:var(--gray4);cursor:pointer;font-family:inherit}
+.crm-back:hover{border-color:var(--blue);color:var(--blue)}
+.crm-tbl tbody tr.clickable{cursor:pointer}
+.crm-tbl tbody tr.clickable:hover td{background:var(--blue-lt)}
+.vd-card{border:1px solid var(--blue);border-radius:14px;padding:14px 16px;margin-top:10px;background:#fff;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.vd-bars{display:flex;align-items:flex-end;gap:8px;height:110px;padding-top:16px}
+.vd-bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}
+.vd-bar .bar{width:100%;max-width:46px;background:linear-gradient(180deg,#4aa3ff,#0071e3);border-radius:6px 6px 0 0;min-height:2px;position:relative}
+.vd-bar .bv{font-size:9.5px;color:var(--gray4);margin-bottom:3px;white-space:nowrap}
+.vd-bar .bl{font-size:10px;color:var(--gray3);margin-top:4px}
+.vd-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:12px}
+.vd-kpi .k{border:1px solid var(--hair);border-radius:12px;padding:9px 11px;background:#fff}
+.vd-kpi .k .l{font-size:10.5px;color:var(--gray3)}
+.vd-kpi .k .v{font-size:17px;font-weight:800;margin-top:2px;letter-spacing:-.02em}
+.vd-tl{margin-top:12px}
+.vd-tl details{border:1px solid var(--hair);border-radius:12px;margin-bottom:6px;background:#fff}
+.vd-tl summary{padding:9px 12px;font-size:12px;font-weight:700;color:var(--gray4);cursor:pointer;list-style:none}
+.vd-tl summary::-webkit-details-marker{display:none}
+.vd-tl .it{padding:8px 12px;border-top:1px solid var(--gray1);font-size:12px;display:flex;gap:8px;align-items:flex-start}
+.vd-tl .it .d{color:var(--gray3);font-size:11px;white-space:nowrap;min-width:76px}
+.kb{font-size:9.5px;font-weight:800;padding:1px 6px;border-radius:5px;white-space:nowrap}
+.kb.한일{background:var(--blue-lt);color:var(--blue-dk)}
+.kb.할일{background:var(--watch-lt);color:var(--watch)}
+.kb.이슈{background:var(--bad-lt);color:var(--bad)}
+.tb{font-size:9.5px;font-weight:800;padding:1px 6px;border-radius:5px}
+.tb.신약{background:var(--blue-lt);color:var(--blue-dk)}
+.tb.볼륨업{background:var(--ok-lt);color:var(--ok)}
+.tb.로컬{background:#f3e8ff;color:#7c3aed}
+.crm-pbar{height:7px;background:var(--gray2);border-radius:99px;overflow:hidden;margin-top:8px}
+.crm-pbar i{display:block;height:100%;background:var(--blue);border-radius:99px}
+</style>
+<script>
+var crmData=null, crmLoaded=false, crmLoading=false;
+var crmView={mode:'all', dirIdx:-1, vendorIdx:-1};
+
+/* ── 로드 (loadForecast 템플릿 복제 · 콜백만 __crmCallback으로 분리) ── */
+function loadCrm(){
+  if(crmLoaded||crmLoading)return;
+  crmLoading=true;
+  var url=(document.getElementById('gs-sheet-url').value||'').trim();
+  var st=document.getElementById('fc-status');
+  if(!url){st.innerHTML='<span style="color:var(--bad)">먼저 상단 “🔄 실시간 불러오기”를 실행해 URL을 활성화하세요</span>';crmLoading=false;return;}
+  st.innerHTML='⏳ 성과관리 데이터를 불러오는 중...';
+  window.__crmCallback=function(res){
+    var sc=document.getElementById('__crm_script');if(sc)sc.remove();
+    crmLoading=false;
+    // ⚠ shape 가드: v38 미배포 백엔드는 mode=crm을 인식하지 못하고 기본 MBO 목록을 success:true로 돌려준다.
+    //   meta·directors가 없으면 0억으로 그려 오해를 부르므로 렌더하지 않고 안내만 띄운다.
+    if(res&&res.success&&res.meta&&Array.isArray(res.directors)){crmData=res;crmLoaded=true;renderCrm();}
+    else if(res&&res.success){st.innerHTML='<span style="color:var(--watch)">⚠ 백엔드가 <b>mode=crm</b>을 아직 지원하지 않습니다 — Apps Script v38 배포 + <b>setupCrmSheets()</b> 1회 실행 후 새로고침하세요</span>';}
+    else{st.innerHTML='<span style="color:var(--bad)">성과관리 로드 실패: '+fcEsc(res&&res.message?res.message:'응답없음')+' — 백엔드 setupCrmSheets 실행/재배포 여부를 확인하세요</span>';}
+  };
+  var s=document.createElement('script');s.id='__crm_script';
+  s.src=url+'?mode=crm&callback=__crmCallback&_='+Date.now();
+  s.onerror=function(){crmLoading=false;st.innerHTML='<span style="color:var(--bad)">연결 실패 — 네트워크/URL 확인</span>';s.remove();};
+  document.head.appendChild(s);
+}
+function refreshCrm(){crmLoaded=false;crmLoading=false;crmView={mode:'all',dirIdx:-1,vendorIdx:-1};loadCrm();}
+
+/* ── 공통 유틸 ── */
+function crmMeta(){return (crmData&&crmData.meta)||{};}
+function crmDirs(){return (crmData&&Array.isArray(crmData.directors))?crmData.directors:[];}
+function crmMoney(v){var n=Number(v)||0;if(!n)return'-';return (Math.abs(n)>=1e8)?(fcEok(n,2)+'억'):(fcMan(n)+'만');}
+function crmMon(m){return m?(parseInt(m.slice(5,7),10)+'월'):'-';}
+function crmPctTxt(p){if(p==null||p===''||isNaN(p))return'-';var v=Math.round(Number(p)*10)/10;return (v>0?'+':'')+v.toFixed(1)+'%';}
+function crmPctColor(p){if(p==null||isNaN(p))return'var(--gray3)';return Number(p)>0?'var(--ok)':(Number(p)<0?'var(--bad)':'var(--gray4)');}
+/* team → renderFcHQ 입력 shape (근거1·2는 crm 페이로드에 없어 미전달 → renderFcHQ가 해당 줄을 숨김) */
+function crmHqShape(t){
+  t=t||{};
+  var o={currentMonth:t.currentMonth,current:t.forecastSum,target:t.targetSum,inputLocked:t.inputLocked,delta:t.delta};
+  if(t.evidence!=null)o.evidence=t.evidence;
+  if(t.evidence1!=null)o.evidence1=t.evidence1;
+  if(t.evidence2!=null)o.evidence2=t.evidence2;
+  if(t.gap!=null)o.gap=t.gap;
+  return o;
+}
+
+/* ── 최상위 렌더 ── */
+function renderCrm(){
+  if(!crmData)return;
+  var meta=crmMeta();
+  document.getElementById('fc-status').innerHTML=
+    '✅ 성과관리 로드 완료 — 기준월 <b>'+fcEsc(meta.nowMonth||'-')+'</b>'
+    +(meta.confirmedMonth?' · 확정 실적 기준 <b>'+fcEsc(crmMon(meta.confirmedMonth))+'</b>'+(meta.confirmedPartial?' <span style="color:var(--watch)">(일부 미입력)</span>':''):'')
+    +' · 단위 원(표시 환산: 억/만원) '
+    +'<button onclick="refreshCrm()" style="margin-left:10px;padding:5px 13px;font-size:11px;font-weight:700;border:none;border-radius:8px;background:var(--blue);color:#fff;cursor:pointer">🔄 새로고침</button>'
+    +(meta.generatedAt?'<span style="margin-left:10px;color:var(--gray3);font-size:11px">생성 '+fcEsc(meta.generatedAt)+'</span>':'');
+  // CRM 탭은 MBO Excel 없이도 독립 동작 → 로드되면 탭 바를 바로 노출(기존 노출 지점은 그대로 유지)
+  var nav=document.getElementById('tab-nav'); if(nav&&nav.style.display==='none') nav.style.display='flex';
+  renderFcHQ(crmHqShape(crmData.team||{}), meta);
+  renderCrmDouble((crmData.team||{}).doublePath||null);
+  renderFcYearly(crmData.yearly||{}, meta);
+  renderCrmDirectors();
+  if(crmView.mode==='dir'&&crmView.dirIdx>=0){
+    document.getElementById('crm-overview').style.display='none';
+    document.getElementById('crm-detail').style.display='block';
+    renderCrmDirector();
+  }else{
+    document.getElementById('crm-overview').style.display='block';
+    document.getElementById('crm-detail').style.display='none';
+    document.getElementById('crm-detail').innerHTML='';
+  }
+}
+
+/* ── 2배 성장 경로 ── */
+function renderCrmDouble(dp){
+  var el=document.getElementById('crm-double');
+  if(!dp){el.innerHTML='';return;}
+  var pct=(dp.achievePct==null?null:Number(dp.achievePct));
+  var bar=Math.max(0,Math.min(100,pct==null?0:pct));
+  var diffC=(Number(dp.diff)||0)>=0?'var(--ok)':'var(--bad)';
+  el.innerHTML='<div class="section-card"><h3>🚀 2배 성장 경로 '
+    +'<span style="font-size:11px;color:var(--gray3);font-weight:400">'+fcEsc(dp.formula||'')+(dp.estimated?' · <span style="color:var(--watch)">(가정 — 산식 확정 전)</span>':'')+'</span></h3>'
+    +'<div class="crm-stat">'
+      +'<div class="b"><div class="l">이번달 목표선</div><div class="v">'+crmMoney(dp.target)+'</div><div class="s">기준 '+crmMoney(dp.base)+' ('+fcEsc(dp.baseLabel||'')+') · t='+fcEsc(String(dp.t==null?'-':dp.t))+'개월</div></div>'
+      +'<div class="b"><div class="l">달성률</div><div class="v" style="color:'+(pct!=null&&pct>=100?'var(--ok)':'var(--gray5)')+'">'+(pct==null?'-':pct.toFixed(1)+'%')+'</div>'
+        +'<div class="s" style="color:'+diffC+'">차이 '+((Number(dp.diff)||0)>=0?'+':'−')+crmMoney(Math.abs(Number(dp.diff)||0))+'</div>'
+        +'<div class="crm-pbar"><i style="width:'+bar+'%"></i></div></div>'
+      +'<div class="b"><div class="l">2배 도달</div><div class="v">'+fcEsc(dp.targetAt||'-')+'</div><div class="s">목표 '+crmMoney(dp.targetValue)+' · 배가 '+fcEsc(String(dp.months==null?'-':dp.months))+'개월</div></div>'
+    +'</div></div>';
+}
+
+/* ── 지부장 통합 표 (실적 + CRM 요약) ── */
+function crmMonthCols(){
+  var meta=crmMeta(), set={};
+  crmDirs().forEach(function(d){(d.actualMonths||[]).forEach(function(m){if(m)set[m]=1;});});
+  var cm=meta.confirmedMonth||'';
+  var arr=Object.keys(set).filter(function(m){return cm?(m<=cm):true;}).sort();
+  var yr=(meta.nowMonth||'').slice(0,4);
+  if(yr)arr=arr.filter(function(m){return m.slice(0,4)===yr;});
+  return arr;
+}
+function renderCrmDirectors(){
+  var el=document.getElementById('crm-directors'), meta=crmMeta(), dirs=crmDirs();
+  if(!dirs.length){el.innerHTML='<div class="section-card"><h3>👥 지부장 성과 통합</h3><div class="no-data">지부장 데이터가 없습니다</div></div>';return;}
+  var cols=crmMonthCols();
+  var head='<tr><th style="text-align:left">지부장</th>';
+  cols.forEach(function(m){head+='<th>'+parseInt(m.slice(5,7),10)+'월</th>';});
+  head+='<th style="background:var(--gray1)">'+crmMon(meta.prevMonth)+' 예측</th>'
+      +'<th style="background:var(--blue-lt);color:var(--blue-dk)">'+crmMon(meta.nowMonth)+' 목표</th>'
+      +'<th style="background:var(--gray1)">파이프라인<br><span style="font-size:9px;color:var(--gray3)">건 · MBO</span></th>'
+      +'<th style="background:var(--gray1)">업체 상태<br><span style="font-size:9px;color:var(--gray3)">순항·관찰·부진</span></th>'
+      +'<th style="background:var(--gray1)">이슈</th><th></th></tr>';
+  var body='', sumM={}, sumPrev=0, sumGoal=0, sumCnt=0, sumMbo=0, sumIss=0;
+  dirs.forEach(function(d,i){
+    var f=d.flow||{}, ac=d.actuals||{}, pl=(d.pipeline&&d.pipeline.total)||{}, vs=d.vendorSummary||{};
+    var row='<tr class="clickable" onclick="crmOpenDir('+i+')"><td style="text-align:left;font-weight:700">'+fcEsc(d.name)+'</td>';
+    cols.forEach(function(m){
+      var v=ac[m];
+      row+='<td>'+(v!=null&&v!==''?fcEok(v):'<span style="color:var(--gray3)">-</span>')+'</td>';
+      sumM[m]=(sumM[m]||0)+(Number(v)||0);
+    });
+    var pv=(f.prevForecast&&f.prevForecast.value!=null)?Number(f.prevForecast.value):null;
+    var gv=(f.target&&f.target.value!=null)?Number(f.target.value):null;
+    sumPrev+=pv||0; sumGoal+=gv||0;
+    sumCnt+=Number(pl.count)||0; sumMbo+=Number(pl.mbo)||0; sumIss+=Number(d.issueCount)||0;
+    row+='<td style="background:var(--gray1)">'+(pv?fcEok(pv):'<span style="color:var(--gray3)">-</span>')+'</td>';
+    row+='<td style="background:var(--blue-lt);color:var(--blue-dk);font-weight:700">'+(gv?fcEok(gv):'<span style="color:var(--gray3)">-</span>')+'</td>';
+    row+='<td style="background:var(--gray1)">'+(Number(pl.count)||0)+'건 <span style="color:var(--gray3)">·</span> '+fcEok(pl.mbo)+'억</td>';
+    row+='<td style="background:var(--gray1)"><span style="color:var(--ok);font-weight:700">'+(Number(vs['순항'])||0)+'</span> · <span style="color:var(--watch);font-weight:700">'+(Number(vs['관찰'])||0)+'</span> · <span style="color:var(--bad);font-weight:700">'+(Number(vs['부진'])||0)+'</span>'
+       +((Number(vs.signalCount)||0)?' <span class="crm-sig">신호 '+(Number(vs.signalCount)||0)+'</span>':'')+'</td>';
+    row+='<td style="background:var(--gray1)">'+((Number(d.issueCount)||0)?('<span class="crm-badge bad">'+d.issueCount+'</span>'):'<span style="color:var(--gray3)">-</span>')+'</td>';
+    row+='<td style="color:var(--blue);font-weight:700">상세 ›</td></tr>';
+    body+=row;
+  });
+  var sumRow='<tr style="background:var(--gray1);font-weight:700"><td style="text-align:left">MS팀 합계</td>';
+  cols.forEach(function(m){sumRow+='<td>'+fcEok(sumM[m]||0)+'</td>';});
+  sumRow+='<td>'+fcEok(sumPrev)+'</td><td style="color:var(--blue-dk)">'+fcEok(sumGoal)+'</td><td>'+sumCnt+'건 · '+fcEok(sumMbo)+'억</td><td>-</td><td>'+(sumIss||'-')+'</td><td></td></tr>';
+  el.innerHTML='<div class="section-card"><h3>👥 지부장 성과 통합 <span style="font-size:11px;color:var(--gray3);font-weight:400">단위: 억원 · 실적=확정월까지 · 행을 클릭하면 지부장 상세로 전환</span></h3>'
+    +'<div class="tbl-wrap"><table class="btbl fc-tbl crm-tbl"><thead>'+head+'</thead><tbody>'+body+sumRow+'</tbody></table></div></div>';
+}
+function crmOpenDir(i){ crmView={mode:'dir',dirIdx:i,vendorIdx:-1}; renderCrm(); window.scrollTo({top:0,behavior:'smooth'}); }
+function crmBackAll(){ crmView={mode:'all',dirIdx:-1,vendorIdx:-1}; renderCrm(); }
+function crmToggleVendor(i){ crmView.vendorIdx=(crmView.vendorIdx===i?-1:i); renderCrmDirector(); }
+
+/* ── 지부장 상세 8블록 ── */
+function renderCrmDirector(){
+  var el=document.getElementById('crm-detail'), meta=crmMeta();
+  var d=crmDirs()[crmView.dirIdx];
+  if(!d){el.innerHTML='';return;}
+  var h='';
+  /* 헤더 */
+  h+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">'
+    +'<button class="crm-back" onclick="crmBackAll()">‹ 전체</button>'
+    +'<div style="font-size:19px;font-weight:800;letter-spacing:-.02em">'+fcEsc(d.name)+' 지부장</div>'
+    +'<span class="crm-badge'+(meta.confirmedMonth?' on':'')+'">확정 실적 기준: '+fcEsc(crmMon(meta.confirmedMonth))+(meta.confirmedPartial?' (일부)':'')+'</span></div>';
+
+  /* 1. 평가 실적 현황 */
+  var cm=meta.confirmedMonth||d.confirmedMonth||'';
+  var cVal=(d.actuals&&cm)?d.actuals[cm]:null;
+  var g=d.growth||{}, g3=g.vs3||{}, gy=g.vsPrevYear||{};
+  h+='<div class="section-card"><h3>📌 1. 평가 실적 현황</h3><div class="crm-stat">'
+    +'<div class="b"><div class="l">'+fcEsc(crmMon(cm))+' 확정 실적</div><div class="v">'+crmMoney(cVal)+'</div><div class="s">'+(cVal!=null&&cVal!==''?(Number(cVal).toLocaleString()+'원'):'실적 입력 대기')+'</div></div>'
+    +'<div class="b"><div class="l">성장 vs 직전 3개월 평균</div><div class="v" style="color:'+crmPctColor(g3.pct)+'">'+crmPctTxt(g3.pct)+'</div><div class="s">기준 '+crmMoney(g3.ref)+' · 차이 '+((Number(g3.diff)||0)>=0?'+':'−')+crmMoney(Math.abs(Number(g3.diff)||0))+'</div></div>'
+    +'<div class="b"><div class="l">성장 vs 전년 평균</div><div class="v" style="color:'+crmPctColor(gy.pct)+'">'+crmPctTxt(gy.pct)+'</div><div class="s">'+(gy.ref==null?'전년 데이터 없음':('기준 '+crmMoney(gy.ref)))+'</div></div>'
+    +'</div></div>';
+
+  /* 2. 실적 흐름 스트립 */
+  var f=d.flow||{};
+  var strip='<div class="crm-strip">';
+  if(f.confirmed) strip+='<div class="crm-step"><div class="l">확정 실적 '+fcEsc(crmMon(f.confirmed.month))+'</div><div class="v">'+crmMoney(f.confirmed.value)+'</div><div class="s">자동(지부장별실적)</div></div><div class="crm-arrow">→</div>';
+  (f.waiting||[]).forEach(function(m){ strip+='<div class="crm-step wait"><div class="l">'+fcEsc(crmMon(m))+'</div><div class="v" style="font-size:15px">실적 대기</div><div class="s">마감 전</div></div><div class="crm-arrow">→</div>'; });
+  if(f.prevForecast) strip+='<div class="crm-step"><div class="l">'+fcEsc(crmMon(f.prevForecast.month))+' 전월 예측</div><div class="v">'+(f.prevForecast.missing?'<span style="font-size:15px;color:var(--gray3)">미입력</span>':crmMoney(f.prevForecast.value))+'</div><div class="s">'+fcEsc(f.prevForecast.updatedAt||'')+'</div></div><div class="crm-arrow">→</div>';
+  if(f.target) strip+='<div class="crm-step goal"><div class="l">'+fcEsc(crmMon(f.target.month))+' 목표'+(f.target.locked?' 🔒':'')+'</div><div class="v">'+crmMoney(f.target.value)+'</div><div class="s">'+fcEsc(f.target.fixedAt||'')+'</div></div>';
+  if(f.forecast&&f.forecast.hasInput) strip+='<div class="crm-arrow">→</div><div class="crm-step fc"><div class="l">'+fcEsc(crmMon(f.forecast.month))+' 예측'+(f.forecast.week?(' '+f.forecast.week+'주'):'')+'</div><div class="v">'+crmMoney(f.forecast.value)+'</div><div class="s">'+fcEsc(f.forecast.updatedAt||'')+'</div></div>';
+  strip+='</div>';
+  h+='<div class="section-card"><h3>📈 2. 실적 흐름</h3>'+strip+'</div>';
+
+  /* 3. 목표근거 표 (월간계획) */
+  var plans=d.plans||[];
+  var pbody=plans.length?plans.map(function(p){
+    return '<tr><td><span class="tb '+fcEsc(p['유형']||'')+'">'+fcEsc(p['유형']||'-')+'</span></td>'
+      +'<td style="text-align:left;font-weight:600">'+fcEsc(p['거래처']||'-')+'</td>'
+      +'<td style="text-align:left">'+fcEsc(p['품목']||'-')+'</td>'
+      +'<td style="font-weight:700">'+fcMan(p['MBO'])+'만</td></tr>';
+  }).join(''):'<tr><td colspan="4" style="color:var(--gray3);padding:14px">이번달 등록된 계획이 없습니다 (폼 ② 이번달 주요계획)</td></tr>';
+  h+='<div class="section-card"><h3>🎯 3. 목표 근거 <span style="font-size:11px;color:var(--gray3);font-weight:400">'+fcEsc(meta.nowMonth||'')+' · '+plans.length+'건 · MBO 합 '+fcMan(d.planSum)+'만원</span></h3>'
+    +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead><tr><th>유형</th><th style="text-align:left">거래처</th><th style="text-align:left">품목</th><th>MBO</th></tr></thead><tbody>'+pbody+'</tbody></table></div></div>';
+
+  /* 4. 신약 파이프라인 5구간 */
+  var pipe=d.pipeline||{}, stages=pipe.stages||[], ptot=pipe.total||{};
+  var scells=stages.length?stages.map(function(s){
+    return '<div class="st"><div class="l">'+fcEsc(s.label||s.key||'')+'</div><div class="c">'+(Number(s.count)||0)+'</div><div class="m">'+fcEok(s.mbo)+'억</div>'
+      +((Number(s.riskCount)||0)?'<div class="r">이슈 '+s.riskCount+'</div>':'')+'</div>';
+  }).join(''):'<div class="no-data">파이프라인 데이터가 없습니다</div>';
+  h+='<div class="section-card"><h3>🔁 4. 신약 파이프라인 <span style="font-size:11px;color:var(--gray3);font-weight:400">현재까지 보고 전체 기준 · 합계 '+(Number(ptot.count)||0)+'건 · MBO '+fcEok(ptot.mbo)+'억</span></h3>'
+    +'<div class="crm-stage">'+scells+'</div></div>';
+
+  /* 5. 신약 진행사항 (track) + 지연·실패 별도 박스 */
+  var nd=d.newDrugs||{}, track=nd.track||[], delayed=nd.delayed||[];
+  var tbody=track.length?track.map(function(r){
+    return '<tr><td style="text-align:left;font-weight:600">'+fcEsc(r['실납처명']||'-')+'</td>'
+      +'<td style="text-align:left">'+fcEsc(r['기준품명']||'-')+'</td>'
+      +'<td>'+fcEsc(r['업체명']||'-')+'</td>'
+      +'<td style="font-weight:700">'+fcMan(r['MBO'])+'만</td>'
+      +'<td><span class="crm-badge">'+fcEsc(r['신약과정']||'-')+'</span></td>'
+      +'<td>'+fcEsc(r['DC접수월']||'-')+'</td><td>'+fcEsc(r['코딩예측월']||'-')+'</td>'
+      +'<td style="text-align:left;color:var(--gray4)">'+fcEsc(r['진행사항']||'-')+'</td></tr>';
+  }).join(''):'<tr><td colspan="8" style="color:var(--gray3);padding:14px">DC신청~처방 단계의 정상 진행 건이 없습니다</td></tr>';
+  h+='<div class="section-card"><h3>💉 5. 신약 진행사항 <span style="font-size:11px;color:var(--gray3);font-weight:400">이번달 보고 누계 '+(Number(nd.monthCount)||0)+'건 · 목록은 DC신청~처방 단계만</span></h3>'
+    +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead><tr><th style="text-align:left">병원</th><th style="text-align:left">품목</th><th>CSO</th><th>MBO</th><th>단계</th><th>DC접수</th><th>코딩예측</th><th style="text-align:left">진행사항</th></tr></thead><tbody>'+tbody+'</tbody></table></div>';
+  if(delayed.length){
+    h+='<div class="crm-red"><h4>⚠️ DC 지연·실패 '+delayed.length+'건 (사유 병기)</h4>'
+      +delayed.map(function(r){
+        return '<div class="crm-row"><b>'+fcEsc(r['실납처명']||'-')+'</b> <span style="color:var(--gray4)">'+fcEsc(r['기준품명']||'')+'</span> '
+          +'<span class="crm-badge bad">'+fcEsc(r['이슈상태']||'-')+'</span> <span class="crm-badge">'+fcEsc(r['신약과정']||'-')+'</span> '
+          +'<span style="color:var(--gray4)">MBO '+fcMan(r['MBO'])+'만</span>'
+          +'<div style="color:var(--gray4);margin-top:3px">사유: '+fcEsc(r['사유']||'-')+(r['작성일']?(' <span style="color:var(--gray3)">· '+fcEsc(r['작성일'])+'</span>'):'')+'</div></div>';
+      }).join('')+'</div>';
+  }
+  h+='</div>';
+
+  /* 6. 매출 볼륨업 */
+  var vu=d.volumeUp||{}, vrows=vu.rows||[];
+  var vbody=vrows.length?vrows.map(function(r){
+    var stColor={'달성':'var(--ok)','진행':'var(--blue)','예정':'var(--watch)','보류':'var(--gray3)'}[r['상태']]||'var(--gray4)';
+    return '<tr><td style="text-align:left;font-weight:600">'+fcEsc(r['병원명']||'-')+'</td><td>'+fcEsc(r['품목']||'-')+'</td>'
+      +'<td style="text-align:left;color:var(--gray4)">'+fcEsc(r['내용']||'-')+'</td>'
+      +'<td style="font-weight:700">'+fcMan(r['증대MBO'])+'만</td><td>'+fcEsc(r['목표월']||'-')+'</td>'
+      +'<td style="color:'+stColor+';font-weight:700">'+fcEsc(r['상태']||'-')+'</td></tr>';
+  }).join(''):'<tr><td colspan="6" style="color:var(--gray3);padding:14px">등록된 볼륨업 건이 없습니다</td></tr>';
+  h+='<div class="section-card"><h3>📈 6. 매출 볼륨업 <span style="font-size:11px;color:var(--gray3);font-weight:400">'+vrows.length+'건 · 총 증대MBO '+fcMan(vu.total)+'만원</span></h3>'
+    +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead><tr><th style="text-align:left">병원명</th><th>품목</th><th style="text-align:left">내용</th><th>증대MBO</th><th>목표월</th><th>상태</th></tr></thead><tbody>'+vbody+'</tbody></table></div></div>';
+
+  /* 7. 미팅 업체 칩 (+ 업체 상세 카드) */
+  var chips=d.vendorChips||[], vs=d.vendorSummary||{};
+  var chipHtml=chips.length?chips.map(function(c,i){
+    var cls=(Number(c.count)||0)===0&&!c.status?'none':(c.status||'none');
+    var sig=(c.signals||[]).map(function(s){return '<span class="crm-sig'+(s==='방치'?' n':'')+'">'+fcEsc(s)+'</span>';}).join('');
+    return '<button class="crm-chip '+fcEsc(cls)+(crmView.vendorIdx===i?' sel':'')+'" onclick="crmToggleVendor('+i+')">'
+      +fcEsc(c.name||c.key||'-')+'<span class="n">'+(Number(c.count)||0)+'회</span>'+sig+'</button>';
+  }).join(''):'<div class="no-data">이번달 미팅 기록이 없습니다 (폼 ⑤ 오늘 한일)</div>';
+  h+='<div class="section-card"><h3>🏢 7. 미팅 업체 <span style="font-size:11px;color:var(--gray3);font-weight:400">'+fcEsc(meta.nowMonth||'')+' 누적 · 총 '+(Number(vs.total)||chips.length)+'처 · '
+    +'<span style="color:var(--ok)">순항 '+(Number(vs['순항'])||0)+'</span> · <span style="color:var(--watch)">관찰 '+(Number(vs['관찰'])||0)+'</span> · <span style="color:var(--bad)">부진 '+(Number(vs['부진'])||0)+'</span> · 칩을 클릭하면 업체 상세</span></h3>'
+    +'<div class="crm-chips">'+chipHtml+'</div>'
+    +renderCrmVendor(d)+'</div>';
+
+  /* 8. 이슈·고민 (월 누적, 지난달 접힘) */
+  var iss=d.issues||[];
+  var ibody=iss.length?iss.map(function(gp,gi){
+    var open=(gp.month===meta.nowMonth)?' open':'';
+    var items=(gp.items||[]).map(function(it){
+      return '<div class="it"><span class="d">'+fcEsc(it['일자']||'')+'</span><span>'+fcEsc(it['내용']||'').replace(/\n/g,'<br>')+'</span></div>';
+    }).join('');
+    return '<details'+open+'><summary>'+fcEsc(gp.month||'')+' · '+((gp.items||[]).length)+'건</summary>'+items+'</details>';
+  }).join(''):'<div class="no-data">등록된 이슈가 없습니다</div>';
+  h+='<div class="section-card"><h3>💬 8. 고민·이슈 <span style="font-size:11px;color:var(--gray3);font-weight:400">월별 누적 · 이번달만 펼침</span></h3><div class="vd-tl">'+ibody+'</div></div>';
+
+  h+='<div style="margin-top:6px"><button class="crm-back" onclick="crmBackAll()">‹ 전체 지부장 보기</button></div>';
+  el.innerHTML=h;
+}
+
+/* ── 업체 상세 카드 (칩 클릭 토글) ── */
+function renderCrmVendor(d){
+  if(crmView.vendorIdx<0)return'';
+  var c=(d.vendorChips||[])[crmView.vendorIdx];
+  if(!c)return'';
+  var meta=crmMeta(), sales=(crmData&&crmData.sales)||{}, sv=(sales.vendors||{})[c.key]||null;
+  var months=sales.months||[];
+  var h='<div class="vd-card">';
+  h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">'
+    +'<b style="font-size:15px">'+fcEsc(c.name||c.key||'-')+'</b>'
+    +(c.status?'<span class="crm-chip '+fcEsc(c.status)+'" style="cursor:default;padding:3px 10px">'+fcEsc(c.status)+'</span>':'')
+    +(c.rank?'<span class="crm-badge">담당 매출 '+c.rank+'위</span>':'')
+    +(c.lastDate?'<span class="crm-badge">최근 활동 '+fcEsc(c.lastDate)+'</span>':'')
+    +(c.signals||[]).map(function(s){return '<span class="crm-sig'+(s==='방치'?' n':'')+'">'+fcEsc(s)+(s==='불일치'?' — 순항 판정인데 매출 2개월 연속 하락':' — 매출 상위인데 이번달 미팅 0회')+'</span>';}).join('')
+    +'</div>';
+  /* 월 매출 추이 미니 막대 */
+  if(sv&&months.length){
+    var vals=months.map(function(m){return Number((sv.monthly||{})[m])||0;});
+    var mx=Math.max.apply(null,vals.concat([1]));
+    h+='<div style="font-size:11px;color:var(--gray3);margin-top:4px">월 매출 추이 (최근 '+months.length+'개월)</div>'
+      +'<div class="vd-bars">'+months.map(function(m,i){
+        var v=vals[i], hp=mx>0?Math.max(2,Math.round(v/mx*100)):2;
+        return '<div class="vd-bar"><div class="bv">'+(v?crmMoney(v):'-')+'</div><div class="bar" style="height:'+hp+'%"></div><div class="bl">'+fcEsc(crmMon(m))+'</div></div>';
+      }).join('')+'</div>';
+  }else{
+    h+='<div class="no-data" style="padding:14px">업체실적 데이터가 없습니다 — 활동 이력만 표시합니다</div>';
+  }
+  /* 활동↔성과 4지표 */
+  h+='<div class="vd-kpi">'
+    +'<div class="k"><div class="l">이번달 미팅</div><div class="v">'+(Number(c.count)||0)+'회</div></div>'
+    +'<div class="k"><div class="l">매출 전월比</div><div class="v" style="color:'+crmPctColor(sv&&sv.momPct)+'">'+crmPctTxt(sv&&sv.momPct)+'</div></div>'
+    +'<div class="k"><div class="l">3개월 미팅</div><div class="v">'+(Number(c.count3m)||0)+'회</div></div>'
+    +'<div class="k"><div class="l">3개월 매출 추세</div><div class="v" style="color:'+crmPctColor(sv&&sv.trend3Pct)+'">'+crmPctTxt(sv&&sv.trend3Pct)+'</div></div>'
+    +'</div>';
+  /* 활동 타임라인 — 예정(할일) → 한일 역순, 월 단위 접힘 */
+  var acts=((crmData&&crmData.activities)||{})[d.name]||[];
+  var mine=acts.filter(function(a){return (a.vendorKey||a['업체명'])===c.key||a['업체명']===c.name;});
+  if(mine.length){
+    var byMon={}, order=[];
+    var todo=mine.filter(function(a){return a['구분']==='할일';});
+    var done=mine.filter(function(a){return a['구분']!=='할일';});
+    todo.sort(function(a,b){return String(b['일자']||'').localeCompare(String(a['일자']||''));});
+    done.sort(function(a,b){return String(b['일자']||'').localeCompare(String(a['일자']||''));});
+    todo.concat(done).forEach(function(a){
+      var m=String(a['일자']||'').slice(0,7)||'-';
+      if(!byMon[m]){byMon[m]=[];order.push(m);}
+      byMon[m].push(a);
+    });
+    order.sort(function(a,b){return b.localeCompare(a);});
+    h+='<div class="vd-tl"><div style="font-size:11px;color:var(--gray3);margin-bottom:5px">활동 타임라인 (예정 할일 → 한일 역순)</div>'
+      +order.map(function(m){
+        var open=(m===meta.nowMonth)?' open':'';
+        return '<details'+open+'><summary>'+fcEsc(m)+' · '+byMon[m].length+'건</summary>'
+          +byMon[m].map(function(a){
+            return '<div class="it"><span class="d">'+fcEsc(a['일자']||'')+'</span>'
+              +'<span class="kb '+fcEsc(a['구분']||'')+'">'+fcEsc(a['구분']||'')+'</span>'
+              +(a['상태']?'<span class="crm-chip '+fcEsc(a['상태'])+'" style="cursor:default;padding:1px 8px;font-size:10px">'+fcEsc(a['상태'])+'</span>':'')
+              +'<span style="flex:1">'+fcEsc(a['내용']||'-').replace(/\n/g,'<br>')+'</span></div>';
+          }).join('')+'</details>';
+      }).join('')+'</div>';
+  }else{
+    h+='<div class="no-data" style="padding:12px">이 업체의 활동 이력이 없습니다</div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+/* 기본 탭(매출예측/고객관리) 자동 로드 — 상단 URL이 이미 채워져 있으면 페이지 진입 즉시 */
+(function(){
+  function bootCrm(){
+    var el=document.getElementById('gs-sheet-url');
+    if(el&&String(el.value||'').trim()) loadCrm();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bootCrm);
+  else bootCrm();
+})();
+</script>
 </body>
 </html>
