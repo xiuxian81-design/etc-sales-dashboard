@@ -56,7 +56,9 @@ async function sendToSheets() {
   const planRows = collectPlanRows(), doneRows = collectDoneRows(), todoRows = collectTodoRows();
   const issueTxt = (daily.이슈 || '').trim();
   const hasDaily = !!(planRows.length || doneRows.length || todoRows.length || issueTxt);
-  if (!items.length && !hasClosing && !volumeUp.length && !hasDaily) { toast('목표·주요계획·신약진행·볼륨업·한일/할일/이슈 중 하나 이상 입력하세요'); return; }
+  // [v39b] ★신약은 '실제로 작성(수정)한 건'만 전송 — 열어만 본 자동표시 건은 제외(작성일·보고 누계 오염 방지)
+  const ndItems = dirtyItems();
+  if (!ndItems.length && !hasClosing && !volumeUp.length && !hasDaily) { toast('목표·주요계획·신약진행·볼륨업·한일/할일/이슈 중 하나 이상 입력하세요'); return; }
   // ⑤ 한일의 상태(순항/관찰/부진)는 필수 — 대시보드 업체 칩 색의 원천
   if (doneRows.some(r => !r.상태)) { toast('오늘 한일의 상태(순항/관찰/부진)를 선택해주세요'); renderDone(); return; }
 
@@ -70,7 +72,7 @@ async function sendToSheets() {
     date: today(),
     보고월: reportMonth,
     force: !!closing._force,           // 마감예측 잠금 무시(수정요청) 강제
-    items: items.map(item => ({
+    items: ndItems.map(item => ({
       신청월:     item.신청월 || '',
       사업자번호: String(item.사업자번호 || ''),
       기준품명:   item.기준품명 || '',
@@ -137,8 +139,11 @@ async function sendToSheets() {
   const finalizeClosing = () => {
     if (hasClosing && hasGoal) closing.목표확정 = true;
     closing._force = false;
+    // [v39b] 전송된 신약 건은 스냅샷을 현재값으로 갱신 → dirty에서 빠져 같은 값이 재전송되지 않는다
+    ndItems.forEach(it => { if (!it._new) it._snap = snapOf(it); });
     saveDaily();
     renderClosing();
+    renderAutoGroups();
   };
 
   try {
@@ -416,6 +421,19 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
 .vac-item:last-child{border-bottom:none}
 .vac-item:hover,.vac-item.sel{background:var(--blue-lt)}
 .vac-item .rc{font-size:10px;font-weight:700;color:var(--blue);background:var(--blue-lt);border-radius:5px;padding:1px 6px}
+/* 목록 미매칭(자유 입력) 표시 — 차단 아님 */
+.newbadge{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px;background:var(--purple-lt);color:var(--purple);pointer-events:none;display:none}
+.newbadge.on{display:inline-block}
+/* ③ 신약 — 확인 대상 병원명 칩 리스트 */
+.nd-chips{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 4px}
+.nd-chip{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:7px 12px;border:1px solid var(--hair);border-radius:12px;background:#fff;cursor:pointer;font-family:inherit;text-align:left;transition:.12s;max-width:100%}
+.nd-chip:hover{border-color:var(--blue);background:var(--blue-lt)}
+.nd-chip .h{font-size:13px;font-weight:700;color:var(--gray5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.nd-chip .m{font-size:11px;color:var(--gray3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px}
+.nd-chip .b{font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:5px;background:var(--blue);color:#fff;flex-shrink:0}
+.nd-chip .b.o{background:var(--gray2);color:var(--gray4)}
+.nd-chip.open{border-color:var(--blue);background:var(--blue-lt)}
+.nd-chip.dirty{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue) inset;background:#fff}
 /* 상태 칩(요약) */
 .chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:50px;background:var(--gray1);color:var(--gray4)}
 .chip.순항{background:var(--ok-lt);color:var(--ok)}
@@ -489,13 +507,14 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
       </div>
     </div>
 
-    <!-- ③ 신약 진행상황 (기존 ② · 로직 무변경, 기본 접힘) -->
+    <!-- ③ 신약 진행상황 — [v39b] 확인 대상은 병원명 칩 리스트, 칩을 눌러야 편집 카드가 열리고 '수정한 건만' 전송 -->
     <div class="card fold" id="c-newdrug">
       <div class="card-hd foldable" onclick="toggleCard('c-newdrug')">
-        <span>③ 신약 진행상황 <span class="cnt" id="list-cnt">0</span> <span class="sec-help">— 병원명을 탭하면 상세 입력</span></span>
+        <span>③ 신약 진행상황 <span class="cnt" id="list-cnt">0</span> <span class="sec-help">— 병원명을 눌러 편집 · 수정한 건만 전송</span></span>
         <span class="card-caret">▾</span>
       </div>
       <div class="card-bd" style="padding-top:10px">
+        <div class="sec-note" id="nd-summary"></div>
         <div id="auto-groups"></div>
         <div class="sw" style="margin-top:6px">
           <span class="si-ico">🔍</span>
@@ -504,7 +523,7 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
         </div>
         <div class="sr-wrap" id="sr-wrap"></div>
         <div class="rlist" id="rlist" style="margin-top:10px"></div>
-        <div class="empty-msg" id="empty-msg" style="display:none">자동 표시 대상이 없습니다.<br>위 검색으로 블럭을 추가하거나 신규 블럭을 등록하세요.</div>
+        <div class="empty-msg" id="empty-msg" style="display:none">열어 둔 블럭이 없습니다.<br>위 <b>병원명 칩</b>을 눌러 편집하거나, 검색·신규 블럭으로 추가하세요.</div>
         <div style="margin-top:12px">
           <button class="add-new-btn" onclick="openNB()">＋ 신규 블럭 추가 <span style="font-size:11px;font-weight:400">(리스트에 없는 새 거래처)</span></button>
         </div>
@@ -1237,15 +1256,35 @@ function applyCrmPrefill(){
   if(f.forecast && numOf(f.forecast.value)>0 && f.forecast.hasInput!==false) closing.예측=numOf(f.forecast.value);
   const ym=crmMeta().nowMonth||nowMonth();
   const mp=((crm.monthlyPlans||{})[rpm]||{})[ym]||[];
-  if(mp.length) daily.계획=mp.map(p=>({유형:p.유형||'신약',거래처:p.거래처||'',품목:p.품목||'',MBO만:(numOf(p.MBO)/10000)||''}));
+  if(mp.length) daily.계획=mp.map(p=>({유형:planTypeNorm(p.유형),거래처:p.거래처||'',품목:p.품목||'',MBO만:(numOf(p.MBO)/10000)||''}));
 }
 
 /* ════════════ ① 목표 — 4칸(확정실적·전월예측·이번달목표·이번달예측) ════════════ */
+/* [v39b] 입력 단위 = 억원(소수). ★closing.*는 항상 '원'을 담는다 — payload·localStorage·시트 저장 형식 불변(§11 계약).
+   입력칸만 억으로 표시하고, 사용자가 실제로 타이핑할 때만 ×1e8 반올림해 덮어쓴다.
+   → 서버 프리필 값(예 778,752,329원)은 표시만 '7.79'로 반올림되고 원본은 그대로 보존된다(미편집 시 오염 0). */
+function wonToEok(won){
+  if(won===''||won==null) return '';
+  const n=Number(won); if(!isFinite(n)) return '';
+  if(n===0) return '0';
+  let s=(n/1e8).toFixed(2);
+  if(s.indexOf('.')>=0) s=s.replace(/0+$/,'').replace(/\.$/,'');
+  return s;
+}
+function eokToWon(v){
+  if(v===''||v==null) return '';
+  const s=String(v).replace(/[^0-9.]/g,'');
+  if(s==='') return '';
+  const n=parseFloat(s);
+  if(isNaN(n)) return '';
+  return Math.round(n*1e8);
+}
+function goalConv(won){ return wonToEok(won)+'억 = '+(Number(won)||0).toLocaleString()+'원'; }
 /* 빈 값 안내문 — 렌더와 onGoalInput(값 지웠을 때)이 같은 문구를 쓰도록 한 곳에서 관리 */
 function goalHint(field){
-  if(field==='전월예측') return isPrevNeeded()?'미입력 — 원 단위 (7.9억 → 790000000)':'전월 실적이 확정되어 예측이 필요 없습니다';
-  if(field==='목표')     return '미입력 — 원 단위 (8.2억 → 820000000)';
-  return isForecastOpen()?'현재 시점 마감 예상':'매월 8일(2주차)부터 입력';
+  if(field==='전월예측') return isPrevNeeded()?'미입력 — 억 단위 (예: 7.9)':'전월 실적이 확정되어 예측이 필요 없습니다';
+  if(field==='목표')     return '미입력 — 억 단위 (예: 8.2)';
+  return isForecastOpen()?'미입력 — 억 단위 (예: 8.35)':'매월 8일(2주차)부터 입력';
 }
 function renderClosing(){
   const nm=crmMeta().nowMonth||nowMonth();
@@ -1270,22 +1309,22 @@ function renderClosing(){
         <div class="gs">${cVal!=null&&cVal!==''?(Number(cVal).toLocaleString()+'원 · 자동'):(crmReady?'실적 입력 대기':'불러오는 중...')}</div>
       </div>
       <div class="gcell${prevNeeded?'':' off'}">
-        <div class="gl">전월(${monLbl(pm)}) 실적 예측 ${prevNeeded?'':'<span class="gbadge on">실적 확정</span>'}</div>
-        <input type="number" inputmode="numeric" id="cl-prev" placeholder="${prevNeeded?'미입력 — 예) 790000000':'실적 확정 — 입력 불필요'}" value="${esc(closing.전월예측===''?'':closing.전월예측)}" ${prevNeeded?'':'disabled'} oninput="onGoalInput('전월예측',this.value)">
-        <div class="gs" id="cl-conv-prev">${closing.전월예측!==''?eok(closing.전월예측)+'원':goalHint('전월예측')}</div>
+        <div class="gl">전월(${monLbl(pm)}) 실적 예측 <span style="color:var(--gray3);font-weight:400">억원</span> ${prevNeeded?'':'<span class="gbadge on">실적 확정</span>'}</div>
+        <input type="text" inputmode="decimal" id="cl-prev" placeholder="${prevNeeded?'미입력 — 예) 7.9':'실적 확정 — 입력 불필요'}" value="${esc(wonToEok(closing.전월예측))}" ${prevNeeded?'':'disabled'} oninput="onGoalInput('전월예측',this.value)">
+        <div class="gs" id="cl-conv-prev">${closing.전월예측!==''&&closing.전월예측!=null?goalConv(closing.전월예측):goalHint('전월예측')}</div>
       </div>
       <div class="gcell accent">
-        <div class="gl">이번달(${monLbl(nm)}) 목표 ${goalFixed?'<span class="gbadge on">확정</span>':''}</div>
+        <div class="gl">이번달(${monLbl(nm)}) 목표 <span style="color:var(--gray3);font-weight:400">억원</span> ${goalFixed?'<span class="gbadge on">확정</span>':''}</div>
         ${goalFixed
           ? `<div class="gv">${eok(closing.목표)}</div>
              <div class="gs" style="display:flex;align-items:center;justify-content:space-between;gap:6px"><span>${Number(closing.목표).toLocaleString()}원</span><button class="btn-mini" onclick="unlockGoal()">수정</button></div>`
-          : `<input type="number" inputmode="numeric" id="cl-goal" placeholder="미입력 — 예) 820000000" value="${esc(closing.목표===''?'':closing.목표)}" oninput="onGoalInput('목표',this.value)">
-             <div class="gs" id="cl-conv-goal">${closing.목표!==''?eok(closing.목표)+'원':goalHint('목표')}</div>`}
+          : `<input type="text" inputmode="decimal" id="cl-goal" placeholder="미입력 — 예) 8.2" value="${esc(wonToEok(closing.목표))}" oninput="onGoalInput('목표',this.value)">
+             <div class="gs" id="cl-conv-goal">${closing.목표!==''&&closing.목표!=null?goalConv(closing.목표):goalHint('목표')}</div>`}
       </div>
       <div class="gcell${open?'':' off'}">
-        <div class="gl">이번달(${monLbl(nm)}) 예측 ${open?'':'<span class="gbadge wait">2주차부터</span>'}</div>
-        <input type="number" inputmode="numeric" id="cl-fc" placeholder="${open?'예) 835000000':'8일부터 입력'}" value="${esc(closing.예측===''?'':closing.예측)}" ${open?'':'disabled'} oninput="onGoalInput('예측',this.value)">
-        <div class="gs" id="cl-conv-fc">${open?(closing.예측!==''?eok(closing.예측)+'원':'현재 시점 마감 예상'):'매월 8일(2주차)부터 입력'}</div>
+        <div class="gl">이번달(${monLbl(nm)}) 예측 <span style="color:var(--gray3);font-weight:400">억원</span> ${open?'':'<span class="gbadge wait">2주차부터</span>'}</div>
+        <input type="text" inputmode="decimal" id="cl-fc" placeholder="${open?'미입력 — 예) 8.35':'8일부터 입력'}" value="${esc(wonToEok(closing.예측))}" ${open?'':'disabled'} oninput="onGoalInput('예측',this.value)">
+        <div class="gs" id="cl-conv-fc">${closing.예측!==''&&closing.예측!=null?goalConv(closing.예측):goalHint('예측')}</div>
       </div>
     </div>
     <div style="margin-top:10px"><label class="fl">근거 메모 (선택)</label>
@@ -1294,21 +1333,43 @@ function renderClosing(){
     ${closing._force?'<div style="font-size:11px;color:var(--watch);margin-top:6px">🔓 목표 정정 모드 — 제출 시 확정 목표까지 덮어씁니다.</div>':''}`;
 }
 function onGoalInput(field,v){
-  closing[field]=v;
+  closing[field]=eokToWon(v);            // 입력=억 → 저장=원(정수). payload·시트 계약 불변
   const id={전월예측:'cl-conv-prev',목표:'cl-conv-goal',예측:'cl-conv-fc'}[field];
   const el=id?document.getElementById(id):null;
-  if(el) el.textContent=(v!==''&&v!=null)?(eok(v)+'원'):goalHint(field);
+  if(el) el.textContent=(closing[field]!==''&&closing[field]!=null)?goalConv(closing[field]):goalHint(field);
   saveDaily();
 }
 function unlockGoal(){ closing._force=true; renderClosing(); toast('🔓 목표 정정 모드 — 값 변경 후 전송하세요'); }
 
 /* ════════════ ② 이번달 주요계획 (월간계획 · 월 1회) ════════════ */
-const PLAN_TYPES=['신약','볼륨업','로컬'];
+/* [v39b] 유형 '로컬' → '업체'로 명칭 변경(payload 유형 값도 '업체'. 백엔드는 문자열 그대로 저장 → 계약 무변경) */
+const PLAN_TYPES=['신약','볼륨업','업체'];
+function planTypeNorm(t){ const s=String(t||'').trim(); return (s==='로컬')?'업체':(s||'신약'); }
 function addPlan(){ daily.계획.push({유형:'신약',거래처:'',품목:'',MBO만:''}); renderPlans(); saveDaily();
   const c=document.getElementById('c-plan'); if(c) c.classList.remove('fold'); }
 function delPlan(i){ daily.계획.splice(i,1); renderPlans(); saveDaily(); }
-function planField(i,f,v){ daily.계획[i][f]=v; if(f==='MBO만'){ const el=document.getElementById('pl-conv-'+i); if(el) el.textContent=planConv(v); } planSummary(); saveDaily(); }
+function planField(i,f,v){ daily.계획[i][f]=v;
+  if(f==='MBO만'){ const el=document.getElementById('pl-conv-'+i); if(el) el.textContent=planConv(v); }
+  if(f==='거래처') updatePlanNew(i);
+  planSummary(); saveDaily(); }
 function planType(i,t){ daily.계획[i].유형=t; renderPlans(); saveDaily(); }
+/* 거래처 자동완성 소스 — 신약·볼륨업=병원 마스터(137처) / 업체=업체 마스터(mode=crm vendors ∪ CSO datalist) */
+let hospOptCache=null, hospOptLen=-1;
+function hospOptions(){
+  if(hospOptCache && hospOptLen===hospitalMaster.length) return hospOptCache;
+  hospOptCache=hospitalMaster.map(h=>({name:h.병원명,recent:false,sub:(h.사업자번호||'')+(h.시군구?(' · '+h.시군구):'')}));
+  hospOptLen=hospitalMaster.length;
+  return hospOptCache;
+}
+/* 목록 미매칭 여부 — 자유 입력은 항상 허용하고 '신규' 배지만 띄운다(차단·경고 아님) */
+function planIsKnown(i){
+  const p=daily.계획[i]||{}; const v=String(p.거래처||'').trim();
+  if(!v) return true;
+  const src=vacSource('plan',i);
+  if(planTypeNorm(p.유형)==='업체'){ const k=normVendorKey(v); return src.some(o=>normVendorKey(o.name)===k); }
+  const k=normHosp(v); return src.some(o=>normHosp(o.name)===k);
+}
+function updatePlanNew(i){ const el=document.getElementById('pl-new-'+i); if(el) el.classList.toggle('on',!planIsKnown(i)); }
 function planConv(v){ const man=numOf(v); return man?(man.toLocaleString()+'만원 = '+(man/10000).toFixed(2)+'억'):'MBO(만원 단위)'; }
 function planSummary(){
   const rows=(daily.계획||[]).filter(p=>String(p.거래처||'').trim()||String(p.품목||'').trim()||numOf(p.MBO만));
@@ -1320,13 +1381,19 @@ function renderPlans(){
   const cont=document.getElementById('plan-list'); if(!cont) return;
   if(!daily.계획.length){ cont.innerHTML='<div class="row-empty">이번달 계획이 없습니다 — 아래 버튼으로 추가하세요</div>'; planSummary(); return; }
   cont.innerHTML=daily.계획.map((p,i)=>{
-    const ph=(p.유형==='로컬')?'대표 업체명만 (예: 드림약품)':'거래처(병원명)';
+    const ty=planTypeNorm(p.유형);
+    const ph=(ty==='업체')?'대표 업체명 (자동완성 · 자유 입력 가능)':'거래처 병원명 (자동완성 · 자유 입력 가능)';
     return `<div class="rowbox">
       <button class="row-del" onclick="delPlan(${i})">×</button>
       <div class="seg" style="max-width:280px">
-        ${PLAN_TYPES.map(t=>`<button type="button" data-v="${t}" class="${p.유형===t?'on':''}" onclick="planType(${i},'${t}')">${t}</button>`).join('')}
+        ${PLAN_TYPES.map(t=>`<button type="button" data-v="${t}" class="${ty===t?'on':''}" onclick="planType(${i},'${t}')">${t}</button>`).join('')}
       </div>
-      <input class="fi" type="text" value="${esc(p.거래처||'')}" placeholder="${ph}" oninput="planField(${i},'거래처',this.value)">
+      <div class="vac">
+        <input class="fi" type="text" id="vin-plan-${i}" style="padding-right:56px" value="${esc(p.거래처||'')}" placeholder="${ph}" autocomplete="off"
+          oninput="planField(${i},'거래처',this.value);vacSearch('plan',${i},this.value)" onkeydown="vacKey('plan',${i},event)" onblur="vacClose('plan',${i})">
+        <span class="newbadge" id="pl-new-${i}">신규</span>
+        <div class="vac-list" id="vac-plan-${i}"></div>
+      </div>
       <div class="f2">
         <input class="fi" type="text" value="${esc(p.품목||'')}" placeholder="품목" oninput="planField(${i},'품목',this.value)">
         <input class="fi" type="number" inputmode="numeric" value="${esc(p.MBO만===''?'':p.MBO만)}" placeholder="MBO(만원)" oninput="planField(${i},'MBO만',this.value)">
@@ -1334,6 +1401,7 @@ function renderPlans(){
       <div class="gs" id="pl-conv-${i}" style="font-size:11px;color:var(--gray3)">${planConv(p.MBO만)}</div>
     </div>`;
   }).join('');
+  daily.계획.forEach((p,i)=>updatePlanNew(i));
   planSummary();
 }
 
@@ -1384,17 +1452,23 @@ function onIssueInput(el){ daily.이슈=el.value; autoGrow(el); saveDaily(); }
 
 /* ── 업체명 자동완성 (최근 미팅 업체 상단) ── */
 let vacState={kind:'',idx:-1,sel:-1,hits:[]};
+/* kind: done·todo=업체 마스터 / plan=유형에 따라 병원 마스터 ↔ 업체 마스터 */
+function vacSource(kind,i){
+  if(kind!=='plan') return vendorMaster;
+  return (planTypeNorm((daily.계획[i]||{}).유형)==='업체') ? vendorMaster : hospOptions();
+}
 function vacSearch(kind,i,q){
   if(!vendorMaster.length) buildVendorMaster();
   const box=document.getElementById('vac-'+kind+'-'+i); if(!box) return;
   const query=String(q||'').trim().toLowerCase(), key=normVendorKey(q);
   if(!query){ box.style.display='none'; vacState.hits=[]; return; }
-  const hits=vendorMaster.filter(v=>v.name.toLowerCase().indexOf(query)>=0||normVendorKey(v.name).indexOf(key)>=0);
+  const src=vacSource(kind,i);
+  const hits=src.filter(v=>v.name.toLowerCase().indexOf(query)>=0||normVendorKey(v.name).indexOf(key)>=0);
   hits.sort((a,b)=>(b.recent?1:0)-(a.recent?1:0));
   const top=hits.slice(0,10);
   vacState={kind:kind,idx:i,sel:-1,hits:top};
   if(!top.length){ box.style.display='none'; return; }
-  box.innerHTML=top.map((v,k)=>`<div class="vac-item" data-k="${k}" onmousedown="vacPick('${kind}',${i},${k})">${esc(v.name)}${v.recent?' <span class="rc">최근</span>':''}</div>`).join('');
+  box.innerHTML=top.map((v,k)=>`<div class="vac-item" data-k="${k}" onmousedown="vacPick('${kind}',${i},${k})"><span>${esc(v.name)}</span>${v.recent?' <span class="rc">최근</span>':''}${v.sub?` <span style="font-size:10px;color:var(--gray3)">${esc(v.sub)}</span>`:''}</div>`).join('');
   box.style.display='block';
 }
 function vacKey(kind,i,e){
@@ -1409,10 +1483,14 @@ function vacKey(kind,i,e){
 }
 function vacPick(kind,i,k){
   const v=vacState.hits[k]; if(!v) return;
-  if(kind==='done'){ daily.한일[i].업체명=v.name; } else { daily.할일[i].업체명=v.name; }
+  if(kind==='done')      daily.한일[i].업체명=v.name;
+  else if(kind==='todo') daily.할일[i].업체명=v.name;
+  else if(kind==='plan') daily.계획[i].거래처=v.name;
   const inp=document.getElementById('vin-'+kind+'-'+i); if(inp) inp.value=v.name;
   const box=document.getElementById('vac-'+kind+'-'+i); if(box) box.style.display='none';
-  if(kind==='done'){ doneCount(); renderDone(); } else { todoCount(); }
+  if(kind==='done')      { doneCount(); renderDone(); }
+  else if(kind==='todo') { todoCount(); }
+  else if(kind==='plan') { updatePlanNew(i); planSummary(); }
   saveDaily();
 }
 function vacClose(kind,i){ setTimeout(()=>{ const b=document.getElementById('vac-'+kind+'-'+i); if(b) b.style.display='none'; },160); }
@@ -1422,7 +1500,7 @@ function collectPlanRows(){
   const ym=crmMeta().nowMonth||nowMonth();
   return (daily.계획||[])
     .filter(p=>String(p.거래처||'').trim()||String(p.품목||'').trim()||numOf(p.MBO만))
-    .map(p=>({년월:ym,유형:p.유형||'신약',거래처:String(p.거래처||'').trim(),품목:String(p.품목||'').trim(),MBO:Math.round(numOf(p.MBO만)*10000)}));
+    .map(p=>({년월:ym,유형:planTypeNorm(p.유형),거래처:String(p.거래처||'').trim(),품목:String(p.품목||'').trim(),MBO:Math.round(numOf(p.MBO만)*10000)}));
 }
 function collectDoneRows(){
   const d=today();
@@ -1453,27 +1531,72 @@ function autoGroupOf(d){
   if(cd && cd<=nm && sIdx>=0 && sIdx<STAGE_IDX['코딩']) return 'c';
   return '';
 }
+/* [v39b] ★자동표시 대상은 items에 선적재하지 않는다 — 미작성 건이 제출 시 서버로 흘러가 작성일·보고 누계를
+   오염시키던 문제(박본님 지적 "작성을 안 해도 왜 업데이트가 되는가")를 구조적으로 제거.
+   대상은 '병원명 칩 리스트'로만 보여주고, 칩을 눌러야 편집 카드가 열리며 items에 들어간다.
+   제출·이메일·엑셀은 모두 dirtyItems()(원본 스냅샷 대비 실제 변경분 + 신규블럭)만 대상으로 한다. */
+let autoTargets=[];
+/* 스냅샷 대상 = 서버로 전송되는 보고 필드 전부 */
+const DIRTY_FIELDS=['신청월','사업자번호','기준품명','RPM연락처','실납처명','is110','시군구','제품명',
+  '업체사업자번호','업체명','업체연락처','MBO','DC접수월','코딩예측월','상정과KOL','신약과정','이슈상태','진행사항','비고'];
+function snapOf(it){ const o={}; DIRTY_FIELDS.forEach(k=>{ o[k]=(it[k]==null?'':it[k]); }); return JSON.stringify(o); }
+function isDirtyItem(it){ return !!it._new || (it._snap!=null && snapOf(it)!==it._snap); }
+function dirtyItems(){ return items.filter(isDirtyItem); }
 function buildAutoGroups(){
-  // 작성자 담당 중 자동표시 대상만 items에 미리 적재(중복 방지)
   const mine=data.filter(d=>d.담당RPM===rpm);
-  const auto=mine.map(d=>({d,g:autoGroupOf(d)})).filter(x=>x.g);
-  auto.forEach(x=>{
-    if(!items.some(it=>it._id===x.d._id)){
-      const copy=Object.assign({}, x.d); copy._autoGrp=x.g; items.push(copy);
-    }
-  });
+  autoTargets=mine.map(d=>({d:d,g:autoGroupOf(d)})).filter(x=>x.g);
   renderAutoGroups();
 }
+const AUTO_LABELS={a:'ⓐ 이번달 DC접수 예정',b:'ⓑ DC접수 지연',c:'ⓒ 코딩 확인'};
 function renderAutoGroups(){
-  const cont=document.getElementById('auto-groups');
-  const labels={a:['ⓐ 이번달 DC접수','a'],b:['ⓑ DC접수 지연','b'],c:['ⓒ 코딩월 도래','c']};
+  const cont=document.getElementById('auto-groups'); if(!cont) return;
   let html='';
   ['a','b','c'].forEach(g=>{
-    const cnt=items.filter(it=>it._autoGrp===g).length;
-    html+=`<div class="auto-grp"><span class="auto-lbl ${g}">${labels[g][0]} <b>${cnt}</b></span></div>`;
+    const list=autoTargets.filter(t=>t.g===g);
+    html+=`<div class="auto-grp"><span class="auto-lbl ${g}">${AUTO_LABELS[g]} <b>${list.length}</b></span>`;
+    if(list.length){
+      html+='<div class="nd-chips">'+list.map(t=>{
+        const it=items.filter(x=>x._id===t.d._id)[0];
+        const open=!!it, dirty=(it&&isDirtyItem(it));
+        return `<button type="button" class="nd-chip${open?' open':''}${dirty?' dirty':''}" onclick="openAuto(${t.d._id})">
+          <span class="h">${esc(t.d.실납처명||'-')}</span><span class="m">${esc(t.d.기준품명||'-')}</span>${dirty?'<span class="b">수정</span>':(open?'<span class="b o">열림</span>':'')}</button>`;
+      }).join('')+'</div>';
+    } else {
+      html+='<div class="auto-empty">해당 없음</div>';
+    }
+    html+='</div>';
   });
   cont.innerHTML=html;
+  renderNdSummary();
 }
+function renderNdSummary(){
+  const el=document.getElementById('nd-summary');
+  const dn=dirtyItems().length;
+  const c=document.getElementById('list-cnt'); if(c) c.textContent=dn;
+  if(el) el.innerHTML='확인 대상 <b>'+autoTargets.length+'처</b> · 열어 본 건 <b>'+items.length+'</b> · '
+    +'<b style="color:'+(dn?'var(--blue)':'var(--gray3)')+'">작성(전송 대상) '+dn+'건</b>'
+    +'<span style="color:var(--gray3)"> — 수정한 건만 전송·이메일에 포함됩니다</span>';
+}
+/* 칩 클릭 = 편집 카드 열기(스냅샷 저장) / 이미 열려 있으면 닫기 */
+function openAuto(id){
+  const ex=items.findIndex(x=>x._id===id);
+  if(ex>=0){
+    if(isDirtyItem(items[ex]) && !confirm('수정한 내용이 있습니다. 닫으면 이 건의 수정이 취소됩니다. 닫을까요?')) return;
+    items.splice(ex,1);
+    renderList(); renderAutoGroups();
+    return;
+  }
+  const d=data.filter(x=>x._id===id)[0]; if(!d) return;
+  const t=autoTargets.filter(x=>x.d._id===id)[0];
+  const copy=Object.assign({},d);
+  copy._autoGrp=t?t.g:''; copy._open=true; copy._snap=snapOf(copy);
+  items.push(copy);
+  renderList(); renderAutoGroups();
+  const el=document.getElementById('ri-'+(items.length-1));
+  if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+}
+/* 카드 내 입력 후 칩·카운트 갱신(포커스 영향 없음 — 칩은 별도 DOM) */
+function refreshDirtyUI(){ renderAutoGroups(); }
 
 /* ── 그 외 담당 블럭 검색 추가 (기존 방식) ── */
 const si=document.getElementById('si'),srw=document.getElementById('sr-wrap'),siClr=document.getElementById('si-clr');
@@ -1507,13 +1630,15 @@ function doSearch(){
 function addItem(id){
   if(items.some(x=>x._id===id))return;
   const d=data.find(d=>d._id===id);if(!d)return;
-  items.push(Object.assign({_open:true}, d));renderList();doSearch();toast(`✅ ${d.실납처명} 추가됨`);
+  const copy=Object.assign({_open:true}, d);
+  copy._snap=snapOf(copy);                  // [v39b] 검색 추가분도 동일한 dirty 기준
+  items.push(copy);renderList();renderAutoGroups();doSearch();toast(`✅ ${d.실납처명} 추가됨`);
 }
 
 /* ── 목록 렌더 (자동표시는 그룹 보더, 나머지는 일반) ── */
 function renderList(){
   const rl=document.getElementById('rlist'),em=document.getElementById('empty-msg');
-  document.getElementById('list-cnt').textContent=items.length;
+  renderNdSummary();
   rl.innerHTML='';
   if(!items.length){em.style.display='block';return;}
   em.style.display='none';
@@ -1606,8 +1731,9 @@ function setF(i,f,v){
     const orig=items[i]._원래DC월||'';
     if(orig && v && orig!==v) toast(`⚠️ DC월 변경됨: ${orig} → ${v}`);
   }
+  refreshDirtyUI();     // [v39b] 변경 즉시 칩 '수정' 배지·전송 대상 카운트 갱신
 }
-function setIssue(i,sel){items[i].이슈상태=sel.value;paintIssueSelect(sel);}
+function setIssue(i,sel){items[i].이슈상태=sel.value;paintIssueSelect(sel);refreshDirtyUI();}
 function removeItem(i){items.splice(i,1);renderList();renderAutoGroups();toast('제거됨');}
 
 /* ── 신규 블럭 모달 + 마스터 자동완성 ── */
@@ -1768,10 +1894,11 @@ function pnSearch(){
 /* ── Excel 백업 저장 ── */
 function saveExcel(){
   const wb=XLSX.utils.book_new();
-  // 신약진행
-  if(items.length){
+  // 신약진행 — [v39b] 전송/이메일과 동일한 dirty 집합
+  const _nd=dirtyItems();
+  if(_nd.length){
     const hd=['담당RPM','실납처명','기준품명','제품명','업체명','MBO','DC접수월','코딩예측월','상정과/KOL','신약과정','이슈상태','진행사항','비고','작성일'];
-    const rows=items.map(d=>[rpm,d.실납처명,d.기준품명,d.제품명,d.업체명,d.MBO,d.DC접수월,d.코딩예측월||'',d.상정과KOL||'',d.신약과정||'',d.이슈상태||'',d.진행사항,d.비고,today()]);
+    const rows=_nd.map(d=>[rpm,d.실납처명,d.기준품명,d.제품명,d.업체명,d.MBO,d.DC접수월,d.코딩예측월||'',d.상정과KOL||'',d.신약과정||'',d.이슈상태||'',d.진행사항,d.비고,today()]);
     const ws=XLSX.utils.aoa_to_sheet([hd,...rows]);XLSX.utils.book_append_sheet(wb,ws,'신약진행');
   }
   // 목표(마감예측 4칸) — [v39]
@@ -1809,9 +1936,12 @@ function saveExcel(){
    [v39] 신약 블록을 buildNewDrugText()로 분리 — 산출 문자열은 기존 openEmail과 동일(게이트 16 diff 0).
    모드 2종: daily=일일결산 전문(기본) / nd=신약보고만(기존 본문 그대로) */
 function buildNewDrugText(){
-  if(!items.length) return '';
+  // [v39b] ★대상 = dirtyItems() — 실제로 작성(수정)한 건 + 신규블럭만. 열어만 본 자동표시 건은 이메일에도 안 실린다.
+  //   (텍스트 포맷·정렬·문구는 기존과 100% 동일 — 대상 선정만 바뀐다)
+  const src=dirtyItems();
+  if(!src.length) return '';
   let body='';
-  const sorted=[...items].sort((a,b)=>(ISSUE_ORDER[a.이슈상태]??5)-(ISSUE_ORDER[b.이슈상태]??5));
+  const sorted=[...src].sort((a,b)=>(ISSUE_ORDER[a.이슈상태]??5)-(ISSUE_ORDER[b.이슈상태]??5));
   body+=`■ 신약 진행상황: ${sorted.length}건\n`;
   sorted.forEach((d,i)=>{
     const mbo=d.MBO?(d.MBO/10000).toLocaleString()+'만원':'-';
@@ -1937,7 +2067,7 @@ function openEmail(){
   // [v39] 진입 가드 확장 — 일일결산(계획·한일·할일·이슈)만 있어도 이메일 생성 허용
   const hasGoalAny=(closing.전월예측!==''&&closing.전월예측!=null)||(closing.목표!==''&&closing.목표!=null)||(closing.예측!==''&&closing.예측!=null);
   const hasDaily=!!(collectPlanRows().length||collectDoneRows().length||collectTodoRows().length||(daily.이슈||'').trim());
-  if(!items.length && !hasGoalAny && !volumeUp.length && !hasDaily){toast('보고할 내용을 먼저 입력하세요');return;}
+  if(!dirtyItems().length && !hasGoalAny && !volumeUp.length && !hasDaily){toast('보고할 내용을 먼저 입력하세요');return;}
   renderEmailBody();
   document.getElementById('email-modal').classList.add('show');
   step(4);

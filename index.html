@@ -2562,6 +2562,7 @@ function renderFcVolumeUp(vu, meta){
 .tb.신약{background:var(--blue-lt);color:var(--blue-dk)}
 .tb.볼륨업{background:var(--ok-lt);color:var(--ok)}
 .tb.로컬{background:#f3e8ff;color:#7c3aed}
+.tb.업체{background:#f3e8ff;color:#7c3aed}
 .crm-pbar{height:7px;background:var(--gray2);border-radius:99px;overflow:hidden;margin-top:8px}
 .crm-pbar i{display:block;height:100%;background:var(--blue);border-radius:99px}
 </style>
@@ -2600,6 +2601,8 @@ function crmMoney(v){var n=Number(v)||0;if(!n)return'-';return (Math.abs(n)>=1e8
 function crmMon(m){return m?(parseInt(m.slice(5,7),10)+'월'):'-';}
 function crmPctTxt(p){if(p==null||p===''||isNaN(p))return'-';var v=Math.round(Number(p)*10)/10;return (v>0?'+':'')+v.toFixed(1)+'%';}
 function crmPctColor(p){if(p==null||isNaN(p))return'var(--gray3)';return Number(p)>0?'var(--ok)':(Number(p)<0?'var(--bad)':'var(--gray4)');}
+/* [v39b] 계획 유형 표기 통일 — 구 데이터의 '로컬'도 '업체'로 렌더(같은 보라 배지) */
+function crmPlanType(t){var s=String(t==null?'':t).trim();return (s==='로컬')?'업체':(s||'-');}
 /* team → renderFcHQ 입력 shape (근거1·2는 crm 페이로드에 없어 미전달 → renderFcHQ가 해당 줄을 숨김) */
 function crmHqShape(t){
   t=t||{};
@@ -2745,7 +2748,8 @@ function renderCrmDirector(){
   /* 3. 목표근거 표 (월간계획) */
   var plans=d.plans||[];
   var pbody=plans.length?plans.map(function(p){
-    return '<tr><td><span class="tb '+fcEsc(p['유형']||'')+'">'+fcEsc(p['유형']||'-')+'</span></td>'
+    var ty=crmPlanType(p['유형']);
+    return '<tr><td><span class="tb '+fcEsc(ty)+'">'+fcEsc(ty)+'</span></td>'
       +'<td style="text-align:left;font-weight:600">'+fcEsc(p['거래처']||'-')+'</td>'
       +'<td style="text-align:left">'+fcEsc(p['품목']||'-')+'</td>'
       +'<td style="font-weight:700">'+fcMan(p['MBO'])+'만</td></tr>';
