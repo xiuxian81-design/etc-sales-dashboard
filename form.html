@@ -48,9 +48,11 @@ function nowMonth(){const n=new Date();return n.getFullYear()+'-'+String(n.getMo
 async function sendToSheets() {
   if (!rpm) { toast('작성자(지부장)를 선택해주세요'); return; }
   // [v39] ① 목표 4칸 — 전월 실적예측 / 이번달 목표 / 이번달 예측(8일부터) 중 하나라도 값이 있으면 마감예측 전송
-  const hasGoal   = (closing.목표     != null && closing.목표     !== '');
-  const hasPrevFc = (isPrevNeeded() && closing.전월예측 != null && closing.전월예측 !== '');
-  const hasFcAmt  = (isForecastOpen() && closing.예측 != null && closing.예측 !== '');
+  // [fix1-M5] 0은 빈값과 동일 취급 — 0을 보내면 서버 hasAmt 가드를 통과해 기존 예측을 0으로 덮어쓴다
+  const amtOk     = v => (v != null && v !== '' && Number(v) !== 0);
+  const hasGoal   = amtOk(closing.목표);
+  const hasPrevFc = (isPrevNeeded()   && amtOk(closing.전월예측));
+  const hasFcAmt  = (isForecastOpen() && amtOk(closing.예측));
   const hasClosing = hasGoal || hasPrevFc || hasFcAmt;
   // [v39] CRM 일일 섹션(②월간계획·⑤한일·⑥할일·⑦이슈) 단독 제출 허용 — 게이트 11
   const planRows = collectPlanRows(), doneRows = collectDoneRows(), todoRows = collectTodoRows();
@@ -135,12 +137,19 @@ async function sendToSheets() {
   if (todoRows.length) payload.할일 = todoRows;
   if (issueTxt)        payload.이슈 = issueTxt;
 
-  // 전송 성공 후 로컬 상태 확정 — 목표를 보냈으면 '목표 확정'(읽기전용+수정 버튼)으로 전환
-  const finalizeClosing = () => {
+  // ★전송이 '확실히 성공'했을 때만 호출한다(fix1-H2). 실패·미확인이면 스냅샷을 유지해 재전송이 가능해야 한다.
+  const finalizeSend = () => {
     if (hasClosing && hasGoal) closing.목표확정 = true;
     closing._force = false;
     // [v39b] 전송된 신약 건은 스냅샷을 현재값으로 갱신 → dirty에서 빠져 같은 값이 재전송되지 않는다
-    ndItems.forEach(it => { if (!it._new) it._snap = snapOf(it); });
+    // [fix1-M4] 신규블럭(_new)도 _sent 표시 후 스냅샷을 찍어 dirty에서 뺀다 → 2회차 전송에서 중복 재전송 없음
+    // [fix1-H1] 전송분을 lastSentItems에 보관 → 전송 직후 이메일·엑셀에서 신약이 사라지지 않는다
+    ndItems.forEach(it => {
+      it._sent = true;
+      it._snap = snapOf(it);
+      if (lastSentItems.indexOf(it) < 0) lastSentItems.push(it);
+    });
+    lastSentDate = today();
     saveDaily();
     renderClosing();
     renderAutoGroups();
@@ -154,7 +163,7 @@ async function sendToSheets() {
             toast(`✅ 전송 완료! ${result.message || ''}`);
             btn.textContent = '✅ 전송 완료';
             // 마감예측 성공 시: 목표를 보냈으면 목표 확정(읽기전용) 전환 — 백엔드 목표확정일·잠금 기록과 동기
-            finalizeClosing();
+            finalizeSend();
           } else {
             toast(`⚠️ 서버 응답: ${result ? result.message : '알 수 없는 오류'}`);
             btn.textContent = '⚠️ 확인 필요';
@@ -173,7 +182,12 @@ async function sendToSheets() {
       // [v38] 외부 호스팅(github.io) 제출. 기존 no-cors는 서버 응답을 못 읽어 '중복병합·재등록차단' 안내가 지부장에게 미노출.
       //   GAS doPost는 {success,message}를 반환하고, 폼은 text/plain 전송이라 preflight 없는 단순요청 → cors 읽기 시도 가능.
       //   읽기 성공: 서버 실제 메시지 표시. 읽기 실패(CORS 미허용/네트워크): 요청은 이미 전송됐으므로 기존 '전송됨' 문구로 폴백(재전송 없음 → 중복 위험 0).
-      let serverMsg = '', serverOk = null;
+      // [fix1-H2] 성공 판정을 3분기로 분리한다.
+      //   serverOk===true  → 저장 확인됨 → finalizeSend()(스냅샷 갱신)
+      //   serverOk===false → 서버가 거부 → 스냅샷 유지(재전송 가능)
+      //   serverOk===null  → 응답을 못 읽음(저장 여부 미확정) 또는 네트워크/HTTP 실패 → 스냅샷 유지
+      //   ⚠ 예전에는 실패해도 무조건 finalizeClosing()을 호출해 작성분이 사라졌다(재전송 불가).
+      let serverMsg = '', serverOk = null, netErr = null;
       try {
         const resp = await fetch(GAS_URL, {
           method: 'POST',
@@ -182,15 +196,24 @@ async function sendToSheets() {
           headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
           body: JSON.stringify(payload)
         });
-        try { const r = await resp.json(); if (r) { serverOk = (r.success !== false); serverMsg = r.message || ''; } } catch(_) { /* 응답 본문 파싱 불가(opaque 등) — 폴백 */ }
-      } catch(_) { /* 응답 읽기 차단/네트워크 — 요청은 전송됨. 폴백 */ }
-      finalizeClosing();
-      if (serverMsg) {
-        toast((serverOk ? '✅ ' : '⚠️ ') + serverMsg);
-        btn.textContent = serverOk ? '✅ 전송 완료' : '⚠️ 확인 필요';
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        try { const r = await resp.json(); if (r) { serverOk = (r.success !== false); serverMsg = r.message || ''; } } catch(_) { /* 응답 본문 파싱 불가(opaque 등) — 저장 여부 미확정 */ }
+      } catch(e) { netErr = e; }
+
+      if (netErr) {
+        toast('❌ 전송 실패: ' + (netErr.message || netErr) + ' — 작성 내용은 그대로 있습니다. 다시 전송하세요');
+        btn.textContent = '❌ 전송 실패';
+      } else if (serverOk === true) {
+        finalizeSend();
+        toast('✅ ' + (serverMsg || '전송 완료'));
+        btn.textContent = '✅ 전송 완료';
+      } else if (serverOk === false) {
+        toast('⚠️ ' + (serverMsg || '서버가 저장을 거부했습니다 — 내용 확인 후 다시 전송하세요'));
+        btn.textContent = '⚠️ 확인 필요';
       } else {
-        toast(`📤 전송됨 — Google Sheets에서 저장 확인을 권장합니다.`);
-        btn.textContent = '📤 전송됨 (확인 권장)';
+        // 서버 upsert(지부장+일자+키)라 다시 보내도 행이 중복되지 않는다 → 재전송을 권장한다
+        toast('⚠️ 전송 결과 미확인 — 시트에서 반영 여부 확인 후 미반영이면 다시 전송하세요');
+        btn.textContent = '⚠️ 확인 필요';
       }
       btn.disabled = false;
       setTimeout(() => { btn.textContent = '📤 Google Sheets 전송'; }, 4000);
@@ -424,6 +447,12 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
 /* 목록 미매칭(자유 입력) 표시 — 차단 아님 */
 .newbadge{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px;background:var(--purple-lt);color:var(--purple);pointer-events:none;display:none}
 .newbadge.on{display:inline-block}
+/* [fix1-M8] 자동완성 드롭다운이 카드 밖으로 나올 수 있게 — .card{overflow:hidden}에 잘리던 문제 */
+#c-plan,#c-done,#c-todo,#c-vu{overflow:visible}
+#c-plan>.card-hd,#c-done>.card-hd,#c-todo>.card-hd,#c-vu>.card-hd{border-radius:16px 16px 0 0}
+/* [fix1-H3] 억원 칸 자릿수 초과 경고 */
+.gcell input.over{border-color:var(--bad);box-shadow:0 0 0 3px rgba(215,0,21,.12)}
+.gcell .gs.warn{color:var(--bad);font-weight:700}
 /* ③ 신약 — 확인 대상 병원명 칩 리스트 */
 .nd-chips{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 4px}
 .nd-chip{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:7px 12px;border:1px solid var(--hair);border-radius:12px;background:#fff;cursor:pointer;font-family:inherit;text-align:left;transition:.12s;max-width:100%}
@@ -1000,6 +1029,8 @@ function migrateIssue(v){if(v==='🟢')return'정상';if(v==='🟡')return'DC지
 function paintIssueSelect(sel){sel.className='iss-sel '+(sel.value?sel.value.replace(/[()]/g,''):'');}
 
 let data=[],rpm='',items=[];              // items = 신약진행 보고 대상(자동표시+검색추가)
+/* [fix1-H1] 이번 세션에 실제로 전송된 신약 건 — 전송 후 이메일·엑셀에서 신약이 사라지지 않게 한다 */
+let lastSentItems=[], lastSentDate='';
 let volumeUp=[];                           // ④ 볼륨업 행
 /* [v39] ① 목표 4칸 — 확정실적(서버 읽기전용) / 전월예측 / 목표 / 예측(8일부터). 목표확정=읽기전용+수정버튼 */
 let closing={전월예측:'',목표:'',예측:'',비고:'',목표확정:false,_force:false};
@@ -1138,6 +1169,7 @@ function buildRpm(){
 }
 function selRpm(r,btn){
   rpm=r; items=[]; volumeUp=[];
+  lastSentItems=[]; lastSentDate='';       // [fix1-H1] 작성자 변경 시 전송 이력 초기화
   document.querySelectorAll('.rpm-btn').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   const badge=document.getElementById('rpm-badge');
@@ -1271,15 +1303,47 @@ function wonToEok(won){
   if(s.indexOf('.')>=0) s=s.replace(/0+$/,'').replace(/\.$/,'');
   return s;
 }
-function eokToWon(v){
-  if(v===''||v==null) return '';
-  const s=String(v).replace(/[^0-9.]/g,'');
-  if(s==='') return '';
+/* [fix1-H3] 입력 정규화 — 전각(０-９．，)→반각, 콤마·공백 제거, 부호·문자 제거(음수 차단), 중복 소수점 방어 */
+const EOK_MAX = 1000;   // 1,000억 초과 = 원 단위를 그대로 친 오입력으로 간주하고 차단
+function normNumStr(v){
+  let s=String(v==null?'':v);
+  s=s.replace(/[０-９．，]/g, ch => String.fromCharCode(ch.charCodeAt(0)-0xFEE0));  // 전각→반각
+  s=s.replace(/\s/g,'');
+  // 음수는 매출 목표에 존재하지 않는다 → 부호를 떼어 양수로 만들지 않고 '무효'로 처리(조용한 부호 뒤집힘 방지)
+  if(/[-−–—]/.test(s)) return '';
+  // 콤마: 소수점이 없고 마지막 콤마 뒤가 1~2자리면 소수점 오타로 간주(8,3 → 8.3 = 8.3억).
+  //       그 외(1,000 처럼 3자리)는 천단위 구분자로 보고 제거. ★'8,3'을 83억으로 읽던 10배 오류 차단
+  if(s.indexOf('.')<0 && s.indexOf(',')>=0){
+    const last=s.lastIndexOf(',');
+    const tail=s.slice(last+1);
+    s = /^\d{1,2}$/.test(tail) ? (s.slice(0,last).replace(/,/g,'')+'.'+tail) : s.replace(/,/g,'');
+  } else {
+    s=s.replace(/,/g,'');
+  }
+  s=s.replace(/[^0-9.]/g,'');
+  const i=s.indexOf('.');
+  if(i>=0) s=s.slice(0,i+1)+s.slice(i+1).replace(/\./g,'');   // 중복 소수점 방어
+  return s;
+}
+/* 억 단위 숫자값(범위검사용). 값이 없으면 null */
+function eokValue(v){
+  const s=normNumStr(v);
+  if(s===''||s==='.') return null;
   const n=parseFloat(s);
-  if(isNaN(n)) return '';
+  return isNaN(n)?null:n;
+}
+function eokToWon(v){
+  const n=eokValue(v);
+  if(n==null) return '';
   return Math.round(n*1e8);
 }
-function goalConv(won){ return wonToEok(won)+'억 = '+(Number(won)||0).toLocaleString()+'원'; }
+/* 반올림이 일어났으면 '=' 대신 '≈' */
+function goalConv(won){
+  const n=Number(won)||0;
+  const e=wonToEok(won);
+  const back=Math.round((parseFloat(e)||0)*1e8);
+  return e+'억 '+(back===n?'=':'≈')+' '+n.toLocaleString()+'원';
+}
 /* 빈 값 안내문 — 렌더와 onGoalInput(값 지웠을 때)이 같은 문구를 쓰도록 한 곳에서 관리 */
 function goalHint(field){
   if(field==='전월예측') return isPrevNeeded()?'미입력 — 억 단위 (예: 7.9)':'전월 실적이 확정되어 예측이 필요 없습니다';
@@ -1333,9 +1397,20 @@ function renderClosing(){
     ${closing._force?'<div style="font-size:11px;color:var(--watch);margin-top:6px">🔓 목표 정정 모드 — 제출 시 확정 목표까지 덮어씁니다.</div>':''}`;
 }
 function onGoalInput(field,v){
+  const el=document.getElementById({전월예측:'cl-conv-prev',목표:'cl-conv-goal',예측:'cl-conv-fc'}[field]);
+  const inp=document.getElementById({전월예측:'cl-prev',목표:'cl-goal',예측:'cl-fc'}[field]);
+  const ev=eokValue(v);
+  // [fix1-H3] 자릿수 방어 — 원 단위(예 820000000)를 그대로 친 경우 전송하지 않고 안내
+  if(ev!=null && ev>EOK_MAX){
+    closing[field]='';
+    if(inp) inp.classList.add('over');
+    if(el){ el.classList.add('warn'); el.textContent='⚠ 억 단위로 입력하세요 — 예) 8.2 (지금 값 '+ev.toLocaleString()+'억)'; }
+    saveDaily();
+    return;
+  }
+  if(inp) inp.classList.remove('over');
+  if(el) el.classList.remove('warn');
   closing[field]=eokToWon(v);            // 입력=억 → 저장=원(정수). payload·시트 계약 불변
-  const id={전월예측:'cl-conv-prev',목표:'cl-conv-goal',예측:'cl-conv-fc'}[field];
-  const el=id?document.getElementById(id):null;
   if(el) el.textContent=(closing[field]!==''&&closing[field]!=null)?goalConv(closing[field]):goalHint(field);
   saveDaily();
 }
@@ -1385,7 +1460,7 @@ function renderPlans(){
     const ph=(ty==='업체')?'대표 업체명 (자동완성 · 자유 입력 가능)':'거래처 병원명 (자동완성 · 자유 입력 가능)';
     return `<div class="rowbox">
       <button class="row-del" onclick="delPlan(${i})">×</button>
-      <div class="seg" style="max-width:280px">
+      <div class="seg" style="max-width:280px;width:calc(100% - 48px)">
         ${PLAN_TYPES.map(t=>`<button type="button" data-v="${t}" class="${ty===t?'on':''}" onclick="planType(${i},'${t}')">${t}</button>`).join('')}
       </div>
       <div class="vac">
@@ -1540,8 +1615,22 @@ let autoTargets=[];
 const DIRTY_FIELDS=['신청월','사업자번호','기준품명','RPM연락처','실납처명','is110','시군구','제품명',
   '업체사업자번호','업체명','업체연락처','MBO','DC접수월','코딩예측월','상정과KOL','신약과정','이슈상태','진행사항','비고'];
 function snapOf(it){ const o={}; DIRTY_FIELDS.forEach(k=>{ o[k]=(it[k]==null?'':it[k]); }); return JSON.stringify(o); }
-function isDirtyItem(it){ return !!it._new || (it._snap!=null && snapOf(it)!==it._snap); }
+/* [fix1-M4] 신규블럭은 '전송 전'에만 무조건 dirty — 전송 성공(_sent) 후엔 스냅샷 비교로 넘어간다(중복 재전송 방지) */
+function isDirtyItem(it){
+  if(it._new && !it._sent) return true;
+  return (it._snap!=null && snapOf(it)!==it._snap);
+}
 function dirtyItems(){ return items.filter(isDirtyItem); }
+/* [fix1-H1] 이메일·엑셀 대상 = 지금 dirty ∪ 이번 세션 전송분(중복 제거).
+   전송 성공 시 dirty가 비워지므로, 표준 동선(전송 → 이메일 생성 → 복붙)에서 신약이 0건이 되던 문제를 막는다.
+   폼 제출(payload.items)은 종전대로 dirty만 쓴다. */
+function reportItems(){
+  if(lastSentDate && lastSentDate!==today()){ lastSentItems=[]; lastSentDate=''; }
+  const out=[], seen={};
+  dirtyItems().forEach(it=>{ const k=String(it._id); if(!seen[k]){ seen[k]=1; out.push(it); } });
+  lastSentItems.forEach(it=>{ const k=String(it._id); if(!seen[k]){ seen[k]=1; out.push(it); } });
+  return out;
+}
 function buildAutoGroups(){
   const mine=data.filter(d=>d.담당RPM===rpm);
   autoTargets=mine.map(d=>({d:d,g:autoGroupOf(d)})).filter(x=>x.g);
@@ -1778,11 +1867,9 @@ function acPick(ctx,idx){
     document.getElementById('nb-sgg').value=h.시군구||'';
     document.getElementById('nb-is110').checked=!!h.is110;
     document.getElementById('nb-matchinfo').innerHTML='<span style="color:#166534">✅ 마스터 매칭 — 사업자번호·110대·지역 자동채움</span>';
-  } else if(ctx==='vu'){
-    document.getElementById('vu-h').value=h.병원명;
-    document.getElementById('vu-biz').value=h.사업자번호||'';
   }
-  document.getElementById('ac-'+ctx).style.display='none';
+  // [fix1-M8] 볼륨업(ctx='vu0','vu1'…)은 아래 래퍼가 처리한다. 여기선 존재하는 박스만 닫는다.
+  const _box=document.getElementById('ac-'+ctx); if(_box) _box.style.display='none';
 }
 function addNB(){
   const h=V('nb-h'),p=V('nb-p');
@@ -1791,7 +1878,9 @@ function addNB(){
   const m=matchHospital(h,biz);  // 미등록 플래그 판정
   const is110=document.getElementById('nb-is110').checked;
   const issVal=document.getElementById('nb-iss').value;
-  const rpmTel=(items.find(x=>x.담당RPM===rpm&&x.RPM연락처)||{}).RPM연락처||'';  // [v38] 동일 지부장 기존행에서 RPM연락처 자동채움(C열 공란 방지)
+  // [v38] 동일 지부장 기존행에서 RPM연락처 자동채움(C열 공란 방지)
+  // [fix1-M6] 소스를 items → data 로 교정. items는 '열어 본 건'만 담으므로(v39b) 비어 있으면 못 찾아 항상 공란이었다.
+  const rpmTel=(data.find(x=>x.담당RPM===rpm&&x.RPM연락처)||{}).RPM연락처||'';
   items.push({_id:Date.now(),_new:true,_open:true,_미등록:(m.미등록==='미등록'),담당RPM:rpm,신청월:today().slice(0,4)+'년',
     RPM연락처:rpmTel,사업자번호:biz,실납처명:h,is110:is110,시군구:V('nb-sgg'),제품명:p,기준품명:p,
     업체사업자번호:V('nb-cbiz'),업체명:V('nb-c'),업체연락처:V('nb-ct'),MBO:Number(V('nb-m'))||0,
@@ -1819,12 +1908,12 @@ function renderVU(){
       <div class="row2">
         <div class="ig full ac-wrap">
           <label>거래처(병원명) <span style="font-size:10px;color:var(--gray3);font-weight:400">마스터 자동완성</span></label>
-          <input type="text" id="vu-h" value="${esc(v.병원명)}" placeholder="병원명 입력..." autocomplete="off"
-            oninput="vuField(${i},'병원명',this.value);acSearch('vu',this.value)" onkeydown="acKey('vu',event)" onfocus="vuFocus(${i})">
-          ${i===0?'<div class="ac-list" id="ac-vu"></div>':''}
+          <input type="text" id="vu-h-${i}" value="${esc(v.병원명)}" placeholder="병원명 입력..." autocomplete="off"
+            oninput="vuField(${i},'병원명',this.value);acSearch('vu${i}',this.value)" onkeydown="acKey('vu${i}',event)" onfocus="vuFocus(${i})">
+          <div class="ac-list" id="ac-vu${i}"></div>
         </div>
         <div class="ig"><label>사업자번호 <span style="font-size:10px;color:var(--gray3);font-weight:400">자동채움</span></label>
-          <input type="text" id="vu-biz" value="${esc(v.사업자번호)}" placeholder="자동 또는 직접" oninput="vuField(${i},'사업자번호',this.value)"></div>
+          <input type="text" id="vu-biz-${i}" value="${esc(v.사업자번호)}" placeholder="자동 또는 직접" oninput="vuField(${i},'사업자번호',this.value)"></div>
         <div class="ig"><label>품목</label><input type="text" value="${esc(v.품목)}" placeholder="예) 바이오탑" oninput="vuField(${i},'품목',this.value)"></div>
         <div class="ig"><label>증대 MBO (원) <span style="font-size:10px;color:var(--gray3);font-weight:400">${conv}</span></label>
           <input type="number" value="${v.증대MBO}" placeholder="예) 5000000" oninput="vuField(${i},'증대MBO',this.value)"></div>
@@ -1844,12 +1933,18 @@ function renderVU(){
 function vuField(i,f,v){ volumeUp[i][f]=v; if(f==='증대MBO'){const r=document.querySelectorAll('.vu-row')[i]; if(r){const lab=r.querySelectorAll('.ig')[3].querySelector('span'); if(lab) lab.textContent=v?((Number(v)||0)/10000).toLocaleString()+'만원':'';}} }
 function vuFocus(i){ acState._vuIdx=i; }
 function delVU(i){ volumeUp.splice(i,1); renderVU(); }
-/* 볼륨업 자동완성 pick은 현재 포커스 행에 채움 */
+/* 볼륨업 자동완성 pick — [fix1-M8] ctx가 행별로 'vu0','vu1'… 이라 인덱스를 ctx에서 직접 얻는다(id 중복 제거) */
 (function(){
   const _origPick=acPick;
   window.acPick=function(ctx,idx){
     const h=acState.hits[idx];
-    if(ctx==='vu' && h){ const i=acState._vuIdx||0; volumeUp[i].병원명=h.병원명; volumeUp[i].사업자번호=h.사업자번호||''; renderVU(); document.getElementById('ac-vu') && (document.getElementById('ac-vu').style.display='none'); return; }
+    if(/^vu\d+$/.test(String(ctx)) && h){
+      const i=parseInt(String(ctx).slice(2),10)||0;
+      if(volumeUp[i]){ volumeUp[i].병원명=h.병원명; volumeUp[i].사업자번호=h.사업자번호||''; }
+      const box=document.getElementById('ac-'+ctx); if(box) box.style.display='none';
+      renderVU();
+      return;
+    }
     _origPick(ctx,idx);
   };
 })();
@@ -1894,8 +1989,8 @@ function pnSearch(){
 /* ── Excel 백업 저장 ── */
 function saveExcel(){
   const wb=XLSX.utils.book_new();
-  // 신약진행 — [v39b] 전송/이메일과 동일한 dirty 집합
-  const _nd=dirtyItems();
+  // 신약진행 — [v39b/fix1-H1] 이메일과 동일한 집합(dirty ∪ 이번 세션 전송분)
+  const _nd=reportItems();
   if(_nd.length){
     const hd=['담당RPM','실납처명','기준품명','제품명','업체명','MBO','DC접수월','코딩예측월','상정과/KOL','신약과정','이슈상태','진행사항','비고','작성일'];
     const rows=_nd.map(d=>[rpm,d.실납처명,d.기준품명,d.제품명,d.업체명,d.MBO,d.DC접수월,d.코딩예측월||'',d.상정과KOL||'',d.신약과정||'',d.이슈상태||'',d.진행사항,d.비고,today()]);
@@ -1936,9 +2031,10 @@ function saveExcel(){
    [v39] 신약 블록을 buildNewDrugText()로 분리 — 산출 문자열은 기존 openEmail과 동일(게이트 16 diff 0).
    모드 2종: daily=일일결산 전문(기본) / nd=신약보고만(기존 본문 그대로) */
 function buildNewDrugText(){
-  // [v39b] ★대상 = dirtyItems() — 실제로 작성(수정)한 건 + 신규블럭만. 열어만 본 자동표시 건은 이메일에도 안 실린다.
+  // [v39b] ★대상 = 작성(수정)한 건 + 신규블럭만. 열어만 본 자동표시 건은 이메일에도 안 실린다.
+  // [fix1-H1] 전송 후에도 그대로 보이도록 reportItems()(dirty ∪ 이번 세션 전송분) 사용
   //   (텍스트 포맷·정렬·문구는 기존과 100% 동일 — 대상 선정만 바뀐다)
-  const src=dirtyItems();
+  const src=reportItems();
   if(!src.length) return '';
   let body='';
   const sorted=[...src].sort((a,b)=>(ISSUE_ORDER[a.이슈상태]??5)-(ISSUE_ORDER[b.이슈상태]??5));
@@ -2067,7 +2163,7 @@ function openEmail(){
   // [v39] 진입 가드 확장 — 일일결산(계획·한일·할일·이슈)만 있어도 이메일 생성 허용
   const hasGoalAny=(closing.전월예측!==''&&closing.전월예측!=null)||(closing.목표!==''&&closing.목표!=null)||(closing.예측!==''&&closing.예측!=null);
   const hasDaily=!!(collectPlanRows().length||collectDoneRows().length||collectTodoRows().length||(daily.이슈||'').trim());
-  if(!dirtyItems().length && !hasGoalAny && !volumeUp.length && !hasDaily){toast('보고할 내용을 먼저 입력하세요');return;}
+  if(!reportItems().length && !hasGoalAny && !volumeUp.length && !hasDaily){toast('보고할 내용을 먼저 입력하세요');return;}
   renderEmailBody();
   document.getElementById('email-modal').classList.add('show');
   step(4);
