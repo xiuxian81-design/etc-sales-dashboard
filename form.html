@@ -12,11 +12,18 @@
      · 이메일: buildNewDrugText()(기존 신약 블록 텍스트 불변 추출) + buildDailyClosingEmail()(일일결산 전문). 모달 토글 2종
      · localStorage 임시저장 cso_daily_{지부장}_{yyyy-MM-dd} (oninput 저장·재방문 복원)
      · 디자인: 마루부리 웹폰트(fonts/*.woff2) + 애플 스타일 토큰 리스킨 + 데스크톱(≥900px) 2열 그리드(좌 ①②③④ / 우 ⑤⑥⑦)
-     · 무변경: ③신약 진행상황(자동그룹·검색·신규블럭) / ④볼륨업 / 프레논 조회 / JSONP 로딩 / sendToSheets 전송 경로 -->
+     · 무변경: ③신약 진행상황(자동그룹·검색·신규블럭) / ④볼륨업 / 프레논 조회 / JSONP 로딩 / sendToSheets 전송 경로
+     v39b-fix2 (2026-08-07) — 적대검증 확정 결함 6건. form.html 단일 파일만 수정(GAS·시트 스키마·payload 계약 무변경):
+     U1  removeItem(카드 헤더 ×)에 작성분 confirm 가드 + .ri-del 히트영역 44×44(.row-del 기준과 통일)
+     U2  selRpm 진입 가드 — 동일인 재탭 무시 + 작성분 있을 때 작성자 전환 confirm(무경고 전량 초기화 차단)
+     U3  볼륨업 localStorage 영속화(saveDaily/loadDaily) + beforeunload 이탈 경고. ※신약 items 영속화는 이월(스냅샷 정합)
+     U5  ③ 신약 카드 접힘 헤더에 '대상 N처 · 작성 M건' 요약 + 대상 1처 이상이면 기본 펼침
+     U13 openNB 리셋 범위를 acPick 기록 범위와 일치(병원명 포함 5개 동시 초기화) — 110대·사업자번호 침묵 유실 차단
+     U14 viewport maximum-scale 제거(핀치줌 허용) -->
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CSO 병원영역 일일보고</title>
 <style>
 /* ── 마루부리(MaruBuri) 웹폰트 — 저장소 동봉 fonts/ 상대경로 ── */
@@ -292,8 +299,9 @@ body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var
 .ri-hl{flex:1;min-width:0}
 .ri-hn{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ri-hm{font-size:11px;color:var(--gray3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ri-del{background:none;border:none;color:var(--gray3);font-size:20px;cursor:pointer;flex-shrink:0;line-height:1;padding:0 4px}
-.ri-del:hover{color:#dc2626}
+/* [fix2-U1] 카드 헤더 × 히트영역 44×44 — .row-del 기준과 통일(▾ 캐럿과 인접해 오탭 유발하던 문제). 아이콘·위치 불변 */
+.ri-del{background:none;border:none;color:var(--gray3);font-size:20px;cursor:pointer;flex-shrink:0;line-height:1;padding:0;width:44px;height:44px;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px}
+.ri-del:hover{color:#dc2626;background:#fee2e2}
 .ri-bd{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
 .ri.collapsed .ri-bd{display:none}
 .ri-hd{cursor:pointer}
@@ -540,7 +548,7 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
     <div class="card fold" id="c-newdrug">
       <div class="card-hd foldable" onclick="toggleCard('c-newdrug')">
         <span>③ 신약 진행상황 <span class="cnt" id="list-cnt">0</span> <span class="sec-help">— 병원명을 눌러 편집 · 수정한 건만 전송</span></span>
-        <span class="card-caret">▾</span>
+        <span style="display:flex;align-items:center;gap:8px"><span class="fold-sum" id="nd-fold-sum">대상 0처 · 작성 0건</span><span class="card-caret">▾</span></span>
       </div>
       <div class="card-bd" style="padding-top:10px">
         <div class="sec-note" id="nd-summary"></div>
@@ -1168,6 +1176,11 @@ function buildRpm(){
   });
 }
 function selRpm(r,btn){
+  // [fix2-U2] 작성자 버튼은 누를 때마다 items·volumeUp·lastSentItems를 무경고로 비웠다(같은 사람 재탭도 초기화).
+  //   ① 동일인 재탭은 아무 것도 하지 않는다(최초 선택은 rpm='' 이라 통과)  ② 다른 사람으로 바꿀 땐 작성분이 있으면 되묻는다.
+  if(rpm===r) return;
+  const nd=dirtyItems().length, vu=volumeUp.length, ls=lastSentItems.length;
+  if(rpm && (nd||vu||ls) && !confirm('작성 중인 신약 '+nd+'건·볼륨업 '+vu+'건이 있습니다.\n작성자를 '+r+'(으)로 바꾸면 모두 지워집니다. 바꿀까요?')) return;
   rpm=r; items=[]; volumeUp=[];
   lastSentItems=[]; lastSentDate='';       // [fix1-H1] 작성자 변경 시 전송 이력 초기화
   document.querySelectorAll('.rpm-btn').forEach(b=>b.classList.remove('on'));
@@ -1254,9 +1267,13 @@ function toggleCard(id){ const c=document.getElementById(id); if(c) c.classList.
 function dailyKey(){ return 'cso_daily_'+rpm+'_'+today(); }
 function saveDaily(){
   if(!rpm) return;
+  // [fix2-U3] volumeUp 영속화 — 100% 수기 입력인데 새로고침·앱 전환만으로 전소되던 유일한 섹션.
+  //   volumeUp은 서버 식별자(_id·_snap)에 의존하지 않는 자기완결 객체라 그대로 직렬화해도 스냅샷 정합이 깨지지 않는다.
+  //   (신약 items는 서버 원본 data와의 스냅샷 정합 문제로 의도적으로 저장하지 않는다 — beforeunload 경고로 대체)
   try{ localStorage.setItem(dailyKey(), JSON.stringify({
     closing:{전월예측:closing.전월예측,목표:closing.목표,예측:closing.예측,비고:closing.비고,목표확정:closing.목표확정},
-    계획:daily.계획, 한일:daily.한일, 할일:daily.할일, 이슈:daily.이슈
+    계획:daily.계획, 한일:daily.한일, 할일:daily.할일, 이슈:daily.이슈,
+    volumeUp:volumeUp
   })); }catch(e){}
 }
 function loadDaily(){
@@ -1274,10 +1291,13 @@ function loadDaily(){
       if(Array.isArray(o.한일)&&o.한일.length) daily.한일=o.한일;
       if(Array.isArray(o.할일)&&o.할일.length) daily.할일=o.할일;
       if(typeof o.이슈==='string') daily.이슈=o.이슈;
+      // [fix2-U3] 볼륨업 복원 — 메모리에 이미 작성분이 있으면(crm 응답 도착 후 재호출 등) 덮어쓰지 않는다
+      if(Array.isArray(o.volumeUp) && o.volumeUp.length && !volumeUp.length) volumeUp=o.volumeUp;
     }
   }catch(e){}
   if(!daily.한일.length) daily.한일=[{업체명:'',상태:'',내용:''}];
   if(!daily.할일.length) daily.할일=[{업체명:'',내용:''}];
+  renderVU();
 }
 /* 서버 프리필 — §11-4 '폼 프리필 매핑' 표 그대로 */
 function applyCrmPrefill(){
@@ -1634,6 +1654,9 @@ function reportItems(){
 function buildAutoGroups(){
   const mine=data.filter(d=>d.담당RPM===rpm);
   autoTargets=mine.map(d=>({d:d,g:autoGroupOf(d)})).filter(x=>x.g);
+  // [fix2-U5] 오늘 챙길 대상처가 1곳이라도 있으면 ③은 기본 펼침(작성자 선택 시 1회). 0처면 접힌 채로 둔다.
+  const nd=document.getElementById('c-newdrug');
+  if(nd) nd.classList.toggle('fold', autoTargets.length===0);
   renderAutoGroups();
 }
 const AUTO_LABELS={a:'ⓐ 이번달 DC접수 예정',b:'ⓑ DC접수 지연',c:'ⓒ 코딩 확인'};
@@ -1662,6 +1685,10 @@ function renderNdSummary(){
   const el=document.getElementById('nd-summary');
   const dn=dirtyItems().length;
   const c=document.getElementById('list-cnt'); if(c) c.textContent=dn;
+  // [fix2-U5] 접힘 상태에서도 '오늘 챙길 대상처가 몇 곳인지'가 보여야 한다.
+  //   배지 숫자는 작성(dirty) 건수라 접힌 채 '0'만 보이면 "할 게 없다"로 읽혀 누락을 만든다.
+  const fs=document.getElementById('nd-fold-sum');
+  if(fs) fs.textContent='대상 '+autoTargets.length+'처 · 작성 '+dn+'건';
   if(el) el.innerHTML='확인 대상 <b>'+autoTargets.length+'처</b> · 열어 본 건 <b>'+items.length+'</b> · '
     +'<b style="color:'+(dn?'var(--blue)':'var(--gray3)')+'">작성(전송 대상) '+dn+'건</b>'
     +'<span style="color:var(--gray3)"> — 수정한 건만 전송·이메일에 포함됩니다</span>';
@@ -1823,16 +1850,30 @@ function setF(i,f,v){
   refreshDirtyUI();     // [v39b] 변경 즉시 칩 '수정' 배지·전송 대상 카운트 갱신
 }
 function setIssue(i,sel){items[i].이슈상태=sel.value;paintIssueSelect(sel);refreshDirtyUI();}
-function removeItem(i){items.splice(i,1);renderList();renderAutoGroups();toast('제거됨');}
+/* [fix2-U1] 카드 헤더 × 는 신규블럭의 유일한 제거 수단이라 손으로 친 실납처명·사업자번호·제품명·업체명·MBO가
+   통째로 사라지는 유일 경로였다(openAuto 칩 접기에만 confirm이 있었음). 작성분이 있으면 반드시 되묻는다. */
+function removeItem(i){
+  if(!items[i]) return;
+  if(isDirtyItem(items[i]) && !confirm('작성한 내용이 있습니다. 이 건을 목록에서 빼면 작성 내용이 사라집니다. 뺄까요?')) return;
+  items.splice(i,1);renderList();renderAutoGroups();toast('제거됨');
+}
 
 /* ── 신규 블럭 모달 + 마스터 자동완성 ── */
 let acState={ctx:'',sel:-1,hits:[]};
+/* [fix2-U13] 병원 식별 블록은 acPick이 {병원명·사업자번호·시군구·110대·매칭안내} 5개를 '한 묶음'으로 채운다.
+   기존 openNB는 파생값 4개만 지우고 원천값(병원명)은 남겨, 모달을 닫았다 다시 열면
+   화면엔 병원명이 있는데 사업자번호·시군구·110대는 빈 채로 저장돼 110대 세부현황에서 누락됐다.
+   → 리셋 범위를 acPick의 기록 범위와 정확히 일치시킨다(병원명 포함 5개 동시 초기화).
+   ※ '병원명 유지 + 파생값 재계산'은 채택하지 않았다. 마스터 미등록 병원에서 사용자가 손으로 넣은 사업자번호와
+     직전에 고른 다른 병원의 잔여 사업자번호를 구분할 수 없어, 이름과 남의 사업자번호를 조용히 재결합시킬 수 있다. */
 function openNB(){
   document.getElementById('nb-modal').classList.add('show');
+  document.getElementById('nb-h').value='';
   document.getElementById('nb-is110').checked=false;
   document.getElementById('nb-biz').value='';
   document.getElementById('nb-sgg').value='';
   document.getElementById('nb-matchinfo').innerHTML='';
+  const acb=document.getElementById('ac-nb'); if(acb){acb.style.display='none';acb.innerHTML='';}
   const iss=document.getElementById('nb-iss');if(iss){iss.value='';paintIssueSelect(iss);}
 }
 function acSearch(ctx,q){
@@ -1896,7 +1937,7 @@ function addNB(){
 /* ════════════ ③ 매출증대 예측처 (볼륨업) ════════════ */
 function addVU(){
   volumeUp.push({병원명:'',사업자번호:'',품목:'',내용:'',증대MBO:'',목표월:nowMonth(),상태:'진행',진행:''});
-  renderVU();
+  renderVU(); saveDaily();   // [fix2-U3] 볼륨업도 임시저장 대상
 }
 function renderVU(){
   document.getElementById('vu-cnt').textContent=volumeUp.length;
@@ -1930,9 +1971,9 @@ function renderVU(){
     </div>`;
   }).join('');
 }
-function vuField(i,f,v){ volumeUp[i][f]=v; if(f==='증대MBO'){const r=document.querySelectorAll('.vu-row')[i]; if(r){const lab=r.querySelectorAll('.ig')[3].querySelector('span'); if(lab) lab.textContent=v?((Number(v)||0)/10000).toLocaleString()+'만원':'';}} }
+function vuField(i,f,v){ volumeUp[i][f]=v; if(f==='증대MBO'){const r=document.querySelectorAll('.vu-row')[i]; if(r){const lab=r.querySelectorAll('.ig')[3].querySelector('span'); if(lab) lab.textContent=v?((Number(v)||0)/10000).toLocaleString()+'만원':'';}} saveDaily(); }
 function vuFocus(i){ acState._vuIdx=i; }
-function delVU(i){ volumeUp.splice(i,1); renderVU(); }
+function delVU(i){ volumeUp.splice(i,1); renderVU(); saveDaily(); }
 /* 볼륨업 자동완성 pick — [fix1-M8] ctx가 행별로 'vu0','vu1'… 이라 인덱스를 ctx에서 직접 얻는다(id 중복 제거) */
 (function(){
   const _origPick=acPick;
@@ -1942,7 +1983,7 @@ function delVU(i){ volumeUp.splice(i,1); renderVU(); }
       const i=parseInt(String(ctx).slice(2),10)||0;
       if(volumeUp[i]){ volumeUp[i].병원명=h.병원명; volumeUp[i].사업자번호=h.사업자번호||''; }
       const box=document.getElementById('ac-'+ctx); if(box) box.style.display='none';
-      renderVU();
+      renderVU(); saveDaily();   // [fix2-U3]
       return;
     }
     _origPick(ctx,idx);
@@ -2182,6 +2223,12 @@ function showEl(id){document.getElementById(id).style.display='block';}
 function closeMd(id){document.getElementById(id).classList.remove('show');}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
 document.querySelectorAll('.mbg').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('show');}));
+/* [fix2-U3] 이탈 경고 — 신약 items는 서버 원본(data)과의 스냅샷 정합 때문에 localStorage에 담지 않는다(U3-2단계 이월).
+   대신 작성분이 남아 있는 채로 새로고침·탭 닫기를 하면 브라우저 기본 경고를 띄워 침묵 유실을 막는다. */
+window.addEventListener('beforeunload',function(e){
+  if(!rpm) return;
+  if(dirtyItems().length || volumeUp.length){ e.preventDefault(); e.returnValue=''; }
+});
 /* 페이지 로드 시 자동 데이터 로드 */
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', loadFromGAS);
