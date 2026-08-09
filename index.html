@@ -459,7 +459,7 @@ body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var
     <div id="crm-overview">
       <!-- 1) 본부지표(MS팀) -->
       <div id="fc-hq"></div>
-      <!-- 1-b) 2배 경로 -->
+      <!-- 1-b) 성장 경로(2027년 연간 1,000억) -->
       <div id="crm-double"></div>
       <!-- 2) 연도별 월별매출표 -->
       <div id="fc-yearly"></div>
@@ -2681,21 +2681,25 @@ function renderCrm(){
   }
 }
 
-/* ── 2배 성장 경로 ── */
+/* ── 성장 경로 — [2026-08-09 확정] 목표 = 2027년 연간 1,000억(구 '2배' 폐기) ── */
 function renderCrmDouble(dp){
   var el=document.getElementById('crm-double');
   if(!dp){el.innerHTML='';return;}
   var pct=(dp.achievePct==null?null:Number(dp.achievePct));
   var bar=Math.max(0,Math.min(100,pct==null?0:pct));
   var diffC=(Number(dp.diff)||0)>=0?'var(--ok)':'var(--bad)';
-  el.innerHTML='<div class="section-card"><h3>🚀 2배 성장 경로 '
+  var ann=Number(dp.targetAnnual)||0;                       // 목표 연간(원)
+  var annTxt=ann?(Math.round(ann/1e8).toLocaleString()+'억'):'-';
+  var yr=dp.targetYear||dp.targetAt||'-';
+  el.innerHTML='<div class="section-card"><h3>🚀 '+fcEsc(String(yr))+'년 '+fcEsc(annTxt)+' 성장 경로 '
     +'<span style="font-size:11px;color:var(--gray3);font-weight:400">'+fcEsc(dp.formula||'')+(dp.estimated?' · <span style="color:var(--watch)">(가정 — 산식 확정 전)</span>':'')+'</span></h3>'
     +'<div class="crm-stat">'
       +'<div class="b"><div class="l">이번달 목표선</div><div class="v">'+crmMoney(dp.target)+'</div><div class="s">기준 '+crmMoney(dp.base)+' ('+fcEsc(dp.baseLabel||'')+') · t='+fcEsc(String(dp.t==null?'-':dp.t))+'개월</div></div>'
       +'<div class="b"><div class="l">달성률</div><div class="v" style="color:'+(pct!=null&&pct>=100?'var(--ok)':'var(--gray5)')+'">'+(pct==null?'-':pct.toFixed(1)+'%')+'</div>'
         +'<div class="s" style="color:'+diffC+'">차이 '+((Number(dp.diff)||0)>=0?'+':'−')+crmMoney(Math.abs(Number(dp.diff)||0))+'</div>'
         +'<div class="crm-pbar"><i style="width:'+bar+'%"></i></div></div>'
-      +'<div class="b"><div class="l">2배 도달</div><div class="v">'+fcEsc(dp.targetAt||'-')+'</div><div class="s">목표 '+crmMoney(dp.targetValue)+' · 배가 '+fcEsc(String(dp.months==null?'-':dp.months))+'개월</div></div>'
+      +'<div class="b"><div class="l">'+fcEsc(String(yr))+'년 목표</div><div class="v">'+fcEsc(annTxt)+'</div>'
+        +'<div class="s">'+fcEsc(String(yr))+'-12 월 '+crmMoney(dp.targetValue)+' · '+fcEsc(String(dp.months==null?'-':dp.months))+'개월 경로</div></div>'
     +'</div></div>';
 }
 
