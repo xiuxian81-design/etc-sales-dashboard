@@ -2534,6 +2534,17 @@ function renderFcVolumeUp(vu, meta){
 .crm-red h4{font-size:12px;font-weight:800;color:var(--bad);margin-bottom:6px}
 .crm-row{border-bottom:1px solid var(--gray1);padding:7px 0;font-size:12px}
 .crm-row:last-child{border-bottom:none}
+/* [fix3] 5블록 안내문 · 오래된 지연건 접기 */
+.crm-note{font-size:11.5px;line-height:1.55;color:var(--gray4);background:var(--gray1);border-radius:10px;padding:8px 11px;margin-bottom:9px}
+.crm-note b{color:var(--gray5)}
+.crm-red .crm-sub{font-size:11px;color:var(--gray4);margin:-3px 0 6px}
+.crm-old{margin-top:8px;border:1px dashed #e6b6b6;border-radius:11px;background:rgba(255,255,255,.6)}
+.crm-old>summary{padding:8px 11px;font-size:12px;font-weight:800;color:var(--bad);cursor:pointer;list-style:none}
+.crm-old>summary::-webkit-details-marker{display:none}
+.crm-old>summary:after{content:' ▾ 펼치기';font-weight:700;color:var(--gray4)}
+.crm-old[open]>summary:after{content:' ▴ 접기'}
+.crm-old .ob{padding:0 11px 4px}
+.crm-empty{font-size:11.5px;color:var(--gray4);padding:6px 0}
 .crm-back{border:1px solid var(--hair);background:#fff;border-radius:50px;padding:7px 15px;font-size:12px;font-weight:700;color:var(--gray4);cursor:pointer;font-family:inherit}
 .crm-back:hover{border-color:var(--blue);color:var(--blue)}
 .crm-tbl tbody tr.clickable{cursor:pointer}
@@ -2603,6 +2614,35 @@ function crmPctTxt(p){if(p==null||p===''||isNaN(p))return'-';var v=Math.round(Nu
 function crmPctColor(p){if(p==null||isNaN(p))return'var(--gray3)';return Number(p)>0?'var(--ok)':(Number(p)<0?'var(--bad)':'var(--gray4)');}
 /* [v39b] 계획 유형 표기 통일 — 구 데이터의 '로컬'도 '업체'로 렌더(같은 보라 배지) */
 function crmPlanType(t){var s=String(t==null?'':t).trim();return (s==='로컬')?'업체':(s||'-');}
+/* [fix3] 보고일·경과 표기 헬퍼 — 기준일=meta.today, 기준월=meta.nowMonth (없으면 클라이언트 today 폴백) */
+function crmToday(){var t=crmMeta().today,s=String(t==null?'':t);if(/^\d{4}-\d{2}-\d{2}/.test(s))return s.slice(0,10);var n=new Date();return n.getFullYear()+'-'+('0'+(n.getMonth()+1)).slice(-2)+'-'+('0'+n.getDate()).slice(-2);}
+function crmYmd(v){var m=String(v==null?'':v).match(/(\d{4})[-.\/](\d{1,2})[-.\/](\d{1,2})/);if(!m)return null;return {y:+m[1],m:+m[2],d:+m[3]};}
+function crmNowMonth(){var s=String(crmMeta().nowMonth||'');var m=s.match(/(\d{4})[-.\/](\d{1,2})/);if(m)return {y:+m[1],m:+m[2]};var t=crmYmd(crmToday());return t?{y:t.y,m:t.m}:null;}
+function crmMonthShift(delta){var n=crmNowMonth();if(!n)return '';var t=n.y*12+(n.m-1)+delta;return Math.floor(t/12)+'-'+('0'+(t%12+1)).slice(-2);}
+/* 작성일 → 기준월 대비 개월 차(0=이번달, 1=지난달 …). 날짜 없으면 null */
+function crmMonthsAgo(v){var a=crmYmd(v),n=crmNowMonth();if(!a||!n)return null;return (n.y-a.y)*12+(n.m-a.m);}
+/* 작성일 → 기준일 대비 경과일. 날짜 없으면 null */
+function crmDaysAgo(v){var a=crmYmd(v),b=crmYmd(crmToday());if(!a||!b)return null;return Math.round((Date.UTC(b.y,b.m-1,b.d)-Date.UTC(a.y,a.m-1,a.d))/86400000);}
+function crmMD(v){var a=crmYmd(v);return a?(a.m+'/'+a.d):'';}
+function crmAgeColor(ma){return (ma==null)?'var(--gray3)':(ma>=3?'var(--bad)':(ma>=2?'var(--watch)':'var(--gray4)'));}
+/* 표 셀용 — 이번달 보고분은 초록 배지로 강조, 그 외는 '7/24 보고 / 16일 전' */
+function crmReportCell(v){
+  var md=crmMD(v);
+  if(!md) return '<span style="color:var(--gray3)">보고일 없음</span>';
+  var ma=crmMonthsAgo(v), da=crmDaysAgo(v);
+  if(ma===0) return '<span class="crm-badge on" style="white-space:nowrap">'+fcEsc(md)+' 보고</span>';
+  return '<span style="color:'+crmAgeColor(ma)+';font-weight:600;white-space:nowrap">'+fcEsc(md)+' 보고</span>'
+    +(da==null?'':'<div style="font-size:10px;color:var(--gray3);white-space:nowrap">'+da+'일 전</div>');
+}
+/* 지연·실패 박스용 — '마지막 보고 7/24 · 16일째 미갱신' */
+function crmAgeTxt(v){
+  var md=crmMD(v);
+  if(!md) return '<span style="color:var(--gray3)">마지막 보고일 없음</span>';
+  var ma=crmMonthsAgo(v), da=crmDaysAgo(v);
+  if(ma===0) return '<span class="crm-badge on" style="white-space:nowrap">'+fcEsc(md)+' 보고 · 이번달</span>';
+  return '<span style="color:'+crmAgeColor(ma)+';font-weight:'+(ma!=null&&ma>=3?'800':'600')+'">마지막 보고 '+fcEsc(md)
+    +(da==null?'':' · '+da+'일째 미갱신')+'</span>';
+}
 /* team → renderFcHQ 입력 shape (근거1·2는 crm 페이로드에 없어 미전달 → renderFcHQ가 해당 줄을 숨김) */
 function crmHqShape(t){
   t=t||{};
@@ -2766,27 +2806,49 @@ function renderCrmDirector(){
   h+='<div class="section-card"><h3>🔁 4. 신약 파이프라인 <span style="font-size:11px;color:var(--gray3);font-weight:400">현재까지 보고 전체 기준 · 합계 '+(Number(ptot.count)||0)+'건 · MBO '+fcEok(ptot.mbo)+'억</span></h3>'
     +'<div class="crm-stage">'+scells+'</div></div>';
 
-  /* 5. 신약 진행사항 (track) + 지연·실패 별도 박스 */
+  /* 5. 진행 중인 신약 (track) + 지연·실패 별도 박스
+     [fix3] 표기 변경만 — 백엔드가 보내는 목록(월 무관 전체)은 그대로 전부 표시.
+            ① 제목에 '전체 N건 (이번달 보고 M건)' 병기 + 안내문
+            ② 각 행에 마지막 보고일(작성일) 표시, 이번달 보고분 배지 강조
+            ③ 지연·실패는 경과일 표기 + 3개월 이상 미갱신 건 접기 */
   var nd=d.newDrugs||{}, track=nd.track||[], delayed=nd.delayed||[];
+  var ndMonth=Number(nd.monthCount)||0;
+  var recentFrom=crmMonthShift(-2); /* 최근 = 기준월 대비 2개월 이내 보고분 */
+  var trackThisMonth=track.filter(function(r){return crmMonthsAgo(r['작성일'])===0;}).length;
   var tbody=track.length?track.map(function(r){
     return '<tr><td style="text-align:left;font-weight:600">'+fcEsc(r['실납처명']||'-')+'</td>'
       +'<td style="text-align:left">'+fcEsc(r['기준품명']||'-')+'</td>'
       +'<td>'+fcEsc(r['업체명']||'-')+'</td>'
       +'<td style="font-weight:700">'+fcMan(r['MBO'])+'만</td>'
       +'<td><span class="crm-badge">'+fcEsc(r['신약과정']||'-')+'</span></td>'
+      +'<td>'+crmReportCell(r['작성일'])+'</td>'
       +'<td>'+fcEsc(r['DC접수월']||'-')+'</td><td>'+fcEsc(r['코딩예측월']||'-')+'</td>'
       +'<td style="text-align:left;color:var(--gray4)">'+fcEsc(r['진행사항']||'-')+'</td></tr>';
-  }).join(''):'<tr><td colspan="8" style="color:var(--gray3);padding:14px">DC신청~처방 단계의 정상 진행 건이 없습니다</td></tr>';
-  h+='<div class="section-card"><h3>💉 5. 신약 진행사항 <span style="font-size:11px;color:var(--gray3);font-weight:400">이번달 보고 누계 '+(Number(nd.monthCount)||0)+'건 · 목록은 DC신청~처방 단계만</span></h3>'
-    +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead><tr><th style="text-align:left">병원</th><th style="text-align:left">품목</th><th>CSO</th><th>MBO</th><th>단계</th><th>DC접수</th><th>코딩예측</th><th style="text-align:left">진행사항</th></tr></thead><tbody>'+tbody+'</tbody></table></div>';
+  }).join(''):'<tr><td colspan="9" style="color:var(--gray3);padding:14px">DC신청~처방 단계의 정상 진행 건이 없습니다</td></tr>';
+  h+='<div class="section-card"><h3 style="flex-wrap:wrap;gap:4px">💉 5. 진행 중인 신약 — 전체 '+track.length+'건 (이번달 보고 '+ndMonth+'건)'
+    +'<span style="font-size:11px;color:var(--gray3);font-weight:400">목록은 DC신청~처방 단계만 · 기준월 '+fcEsc(meta.nowMonth||'')+'</span></h3>'
+    +'<div class="crm-note">이 목록은 <b>이번달 보고와 무관하게 지금 진행 중인 건 전부</b>(DC신청~처방 단계)입니다. '
+    +'괄호 안 <b>이번달 보고 '+ndMonth+'건</b>은 '+fcEsc(meta.nowMonth||'')+'에 새로 보고가 올라온 건수로, <b>모든 단계를 합한 수</b>라 위 목록 건수와 그대로 대응하지 않습니다'
+    +'(위 목록 '+track.length+'건 중 이번달 보고가 갱신된 건은 <b>'+trackThisMonth+'건</b>). '
+    +'각 행의 <b>마지막 보고</b>가 오래됐다면 진행이 멈춘 것이 아니라 <b>보고가 갱신되지 않은 것</b>입니다.</div>'
+    +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead><tr><th style="text-align:left">병원</th><th style="text-align:left">품목</th><th>CSO</th><th>MBO</th><th>단계</th><th>마지막 보고</th><th>DC접수</th><th>코딩예측</th><th style="text-align:left">진행사항</th></tr></thead><tbody>'+tbody+'</tbody></table></div>';
   if(delayed.length){
-    h+='<div class="crm-red"><h4>⚠️ DC 지연·실패 '+delayed.length+'건 (사유 병기)</h4>'
-      +delayed.map(function(r){
-        return '<div class="crm-row"><b>'+fcEsc(r['실납처명']||'-')+'</b> <span style="color:var(--gray4)">'+fcEsc(r['기준품명']||'')+'</span> '
-          +'<span class="crm-badge bad">'+fcEsc(r['이슈상태']||'-')+'</span> <span class="crm-badge">'+fcEsc(r['신약과정']||'-')+'</span> '
-          +'<span style="color:var(--gray4)">MBO '+fcMan(r['MBO'])+'만</span>'
-          +'<div style="color:var(--gray4);margin-top:3px">사유: '+fcEsc(r['사유']||'-')+(r['작성일']?(' <span style="color:var(--gray3)">· '+fcEsc(r['작성일'])+'</span>'):'')+'</div></div>';
-      }).join('')+'</div>';
+    var dRow=function(r){
+      return '<div class="crm-row"><b>'+fcEsc(r['실납처명']||'-')+'</b> <span style="color:var(--gray4)">'+fcEsc(r['기준품명']||'')+'</span> '
+        +'<span class="crm-badge bad">'+fcEsc(r['이슈상태']||'-')+'</span> <span class="crm-badge">'+fcEsc(r['신약과정']||'-')+'</span> '
+        +'<span style="color:var(--gray4)">MBO '+fcMan(r['MBO'])+'만</span> '+crmAgeTxt(r['작성일'])
+        +'<div style="color:var(--gray4);margin-top:3px">사유: '+fcEsc(r['사유']||'-')+(r['작성일']?(' <span style="color:var(--gray3)">· '+fcEsc(r['작성일'])+'</span>'):'')+'</div></div>';
+    };
+    var dRecent=[], dOld=[];
+    delayed.forEach(function(r){ var ma=crmMonthsAgo(r['작성일']); if(ma!=null&&ma>=3) dOld.push(r); else dRecent.push(r); });
+    h+='<div class="crm-red"><h4>⚠️ DC 지연·실패 '+delayed.length+'건 (사유 병기) — 최근 보고 '+dRecent.length+'건 · 3개월 이상 미갱신 '+dOld.length+'건</h4>'
+      +'<div class="crm-sub">기준월 '+fcEsc(meta.nowMonth||'')+' · 최근 = '+fcEsc(recentFrom)+' 이후 보고분</div>'
+      +(dRecent.length?dRecent.map(dRow).join(''):'<div class="crm-empty">'+fcEsc(recentFrom)+' 이후 새로 보고된 지연·실패 건은 없습니다.</div>');
+    if(dOld.length){
+      h+='<details class="crm-old"><summary>🕓 3개월 이상 미갱신 '+dOld.length+'건 ('+fcEsc(recentFrom)+' 이후 보고 없음)</summary>'
+        +'<div class="ob">'+dOld.map(dRow).join('')+'</div></details>';
+    }
+    h+='</div>';
   }
   h+='</div>';
 
