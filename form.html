@@ -19,7 +19,13 @@
      U3  볼륨업 localStorage 영속화(saveDaily/loadDaily) + beforeunload 이탈 경고. ※신약 items 영속화는 이월(스냅샷 정합)
      U5  ③ 신약 카드 접힘 헤더에 '대상 N처 · 작성 M건' 요약 + 대상 1처 이상이면 기본 펼침
      U13 openNB 리셋 범위를 acPick 기록 범위와 일치(병원명 포함 5개 동시 초기화) — 110대·사업자번호 침묵 유실 차단
-     U14 viewport maximum-scale 제거(핀치줌 허용) -->
+     U14 viewport maximum-scale 제거(핀치줌 허용)
+     v39b-fix4 (2026-08-09) — 지부장 피드백 2건. form.html 단일 파일 수정:
+     V ④볼륨업에 'CSO 업체명' 칸 신설 — 거래처(병원명) 선택·입력 시 MBO 원장(data)에서 담당 업체명을 자동 채움('자동' 배지).
+       매칭 = ①사업자번호 ②정규화 병원명, 후보 다수면 작성일 최신 행. 손으로 고친 값은 덮지 않고 배지 해제. 업체명은 자유입력+자동완성(vendorMaster).
+       payload 볼륨업[]에 '업체명' 1키 추가(백엔드 병행 확장, 빈 값이면 기존 값 보존) — 나머지 8키·타입·단위 무변경.
+     P ②이번달 주요계획 — 작성 완료(거래처 채워진) 행은 한 줄 텍스트로 표시하고 삭제(×)만 제공, 새로 추가한 행만 입력칸.
+       수정=삭제 후 재작성(confirm 가드). payload·저장 계약(월 단위 전체교체) 무변경 — 표시만 바뀜. -->
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -129,6 +135,7 @@ async function sendToSheets() {
       담당RPM:   rpm,
       사업자번호: String(v.사업자번호 || ''),
       병원명:    v.병원명 || '',
+      업체명:    v.업체명 || '',        // [fix4-V] 신규 1키 — 백엔드 '업체명' 컬럼(빈 값이면 기존 값 보존)
       품목:      v.품목 || '',
       내용:      v.내용 || '',
       증대MBO:   Number(v.증대MBO) || 0,
@@ -445,6 +452,14 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
 .tbadge.신약{background:#eef5fe;color:#0058b0}
 .tbadge.볼륨업{background:var(--ok-lt);color:var(--ok)}
 .tbadge.로컬{background:var(--purple-lt);color:var(--purple)}
+.tbadge.업체{background:var(--purple-lt);color:var(--purple)}
+/* [fix4-P] ② 주요계획 — 작성 완료 행은 읽기용 한 줄 텍스트(수정=삭제 후 재작성) */
+.rowbox.rb-text{min-height:52px;justify-content:center;padding-right:46px}
+.plantext{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:13.5px;line-height:1.5;color:var(--gray5);word-break:break-word}
+.plantext .pt-cust{font-weight:700}
+.plantext .pt-sep{color:var(--gray2)}
+.plantext .pt-item{color:var(--gray4)}
+.plantext .pt-mbo{font-size:12px;font-weight:700;color:var(--gray4);background:var(--gray1);border-radius:6px;padding:2px 7px}
 /* 업체명 자동완성 */
 .vac{position:relative}
 .vac-list{position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid var(--gray2);border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.14);max-height:220px;overflow-y:auto;display:none;z-index:70;margin-top:3px}
@@ -455,6 +470,11 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
 /* 목록 미매칭(자유 입력) 표시 — 차단 아님 */
 .newbadge{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px;background:var(--purple-lt);color:var(--purple);pointer-events:none;display:none}
 .newbadge.on{display:inline-block}
+/* [fix4-V] 볼륨업 업체명 — 병원명에서 자동 채움된 상태 표시(사용자가 고치면 사라짐) */
+.vu-cwrap{position:relative}
+.vu-cwrap input{min-height:44px;padding-right:52px}
+.autobadge{position:absolute;right:8px;bottom:13px;font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px;background:var(--ok-lt);color:var(--ok);pointer-events:none;display:none}
+.autobadge.on{display:inline-block}
 /* [fix1-M8] 자동완성 드롭다운이 카드 밖으로 나올 수 있게 — .card{overflow:hidden}에 잘리던 문제 */
 #c-plan,#c-done,#c-todo,#c-vu{overflow:visible}
 #c-plan>.card-hd,#c-done>.card-hd,#c-todo>.card-hd,#c-vu>.card-hd{border-radius:16px 16px 0 0}
@@ -538,7 +558,7 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
         <span style="display:flex;align-items:center;gap:8px"><span class="fold-sum" id="plan-sum">계획 0건</span><span class="card-caret">▾</span></span>
       </div>
       <div class="card-bd" style="padding-top:10px">
-        <div class="sec-note">월 1회만 작성하면 다음 보고부터 자동 재사용됩니다. 유형·거래처·품목·MBO를 적어 이번달 목표의 근거를 남겨주세요. <b>수정하면 이번달 계획 전체가 새 내용으로 교체</b>됩니다.</div>
+        <div class="sec-note">월 1회만 작성하면 다음 보고부터 자동 재사용됩니다. 유형·거래처·품목·MBO를 적어 이번달 목표의 근거를 남겨주세요. <b>작성된 계획은 아래처럼 글로 표시</b>되며, <b>고칠 땐 × 로 지우고 다시 추가</b>하세요. 전송하면 이번달 계획 전체가 새 내용으로 교체됩니다.</div>
         <div id="plan-list"></div>
         <div style="margin-top:10px"><button class="row-add" onclick="addPlan()">＋ 계획 추가</button></div>
       </div>
@@ -1048,6 +1068,8 @@ let daily={계획:[],한일:[],할일:[],이슈:''};
 let crm=null, crmReady=false, crmLoading=false, vendorMaster=[];
 let hospitalMaster=[];                     // 전체병원리스트 마스터(자동완성). data에서 파생.
 let masterByBiz={}, masterByName={};
+/* [fix4-V] 병원 → 담당 CSO 업체명 인덱스(볼륨업 업체명 자동채움). data(MBO 원장)에서 파생 — 사업자번호/정규화 병원명 2키, 작성일 최신 행 승. */
+let vendorByBiz={}, vendorByName={};
 
 /* ── GAS 데이터 자동 로드 (JSONP) — 기존 패턴 유지 ── */
 function loadFromGAS(){
@@ -1154,6 +1176,40 @@ function buildHospitalMaster(){
     if(biz) masterByBiz[biz]=rec;
     const nk=normHosp(name); if(nk) masterByName[nk]=rec;
   });
+  buildVendorIndex();
+}
+/* ── [fix4-V] 병원 → 담당 CSO 업체명 인덱스 ──
+   같은 병원에 여러 행(품목별)이 있고 업체가 바뀐 이력도 있어, '작성일이 가장 최신인 행'의 업체명을 대표값으로 쓴다.
+   작성일이 비었거나 파싱 불가면 ord=0 → data 뒤쪽(최근 적재) 행이 이긴다(>= 비교). */
+function dateOrd(v){
+  if(v==null||v==='') return 0;
+  const s=String(v);
+  const m=s.match(/(\d{4})[-.\/](\d{1,2})[-.\/](\d{1,2})/);
+  if(m) return Number(m[1])*10000+Number(m[2])*100+Number(m[3]);
+  const d=new Date(s);
+  if(!isNaN(d)) return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+  return 0;
+}
+function buildVendorIndex(){
+  vendorByBiz={}; vendorByName={};
+  data.forEach(d=>{
+    const ven=String(d.업체명||'').trim(); if(!ven) return;
+    const ord=dateOrd(d.작성일);
+    const biz=normBiz(d.사업자번호);
+    const nk=normHosp(d.실납처명);
+    if(biz && (!vendorByBiz[biz] || ord>=vendorByBiz[biz].ord)) vendorByBiz[biz]={업체명:ven,ord:ord};
+    if(nk  && (!vendorByName[nk] || ord>=vendorByName[nk].ord)) vendorByName[nk]={업체명:ven,ord:ord};
+  });
+}
+/* 병원명·사업자번호 → 담당 업체명 (①사업자번호 일치 ②정규화 병원명 일치). 없으면 ''
+   ★사업자번호는 '지금 병원명과 맞을 때만' 신뢰한다 — 자동완성으로 A병원을 고른 뒤 병원명만 손으로 B로 고치면
+     사업자번호는 A의 값이 남는데(기존 동작), 그걸 그대로 믿으면 B에 A의 업체가 조용히 붙는다. */
+function lookupVendor(name,biz){
+  const b=normBiz(biz), nk=normHosp(name);
+  const bizTrust = b && (!nk || !masterByBiz[b] || normHosp(masterByBiz[b].병원명)===nk);
+  if(bizTrust && vendorByBiz[b]) return vendorByBiz[b].업체명;
+  if(nk && vendorByName[nk]) return vendorByName[nk].업체명;
+  return '';
 }
 /* ── 병원명 ↔ 마스터 매칭 (§6) — 사업자번호 우선, 폴백 정규화 병원명 ── */
 function matchHospital(name, biz){
@@ -1272,7 +1328,9 @@ function saveDaily(){
   //   (신약 items는 서버 원본 data와의 스냅샷 정합 문제로 의도적으로 저장하지 않는다 — beforeunload 경고로 대체)
   try{ localStorage.setItem(dailyKey(), JSON.stringify({
     closing:{전월예측:closing.전월예측,목표:closing.목표,예측:closing.예측,비고:closing.비고,목표확정:closing.목표확정},
-    계획:daily.계획, 한일:daily.한일, 할일:daily.할일, 이슈:daily.이슈,
+    // [fix4-P] _edit(작성 중 표시)는 화면 상태일 뿐이라 저장하지 않는다 → 새로고침하면 작성분은 모두 텍스트로 복원
+    계획:(daily.계획||[]).map(p=>({유형:p.유형,거래처:p.거래처,품목:p.품목,MBO만:p.MBO만})),
+    한일:daily.한일, 할일:daily.할일, 이슈:daily.이슈,
     volumeUp:volumeUp
   })); }catch(e){}
 }
@@ -1440,9 +1498,17 @@ function unlockGoal(){ closing._force=true; renderClosing(); toast('🔓 목표 
 /* [v39b] 유형 '로컬' → '업체'로 명칭 변경(payload 유형 값도 '업체'. 백엔드는 문자열 그대로 저장 → 계약 무변경) */
 const PLAN_TYPES=['신약','볼륨업','업체'];
 function planTypeNorm(t){ const s=String(t||'').trim(); return (s==='로컬')?'업체':(s||'신약'); }
-function addPlan(){ daily.계획.push({유형:'신약',거래처:'',품목:'',MBO만:''}); renderPlans(); saveDaily();
+/* [fix4-P] _edit = '지금 화면에서 작성 중인 행' 표시. 새로 추가한 행만 입력칸으로 뜨고, 나머지(서버 프리필·임시저장 복원분)는
+   한 줄 텍스트로 보인다. localStorage에는 저장하지 않으므로(saveDaily에서 제거) 새로고침하면 작성분은 모두 텍스트가 된다. */
+function addPlan(){ daily.계획.push({유형:'신약',거래처:'',품목:'',MBO만:'',_edit:true}); renderPlans(); saveDaily();
   const c=document.getElementById('c-plan'); if(c) c.classList.remove('fold'); }
-function delPlan(i){ daily.계획.splice(i,1); renderPlans(); saveDaily(); }
+function delPlan(i){
+  // [fix4-P] 텍스트로 굳은 행은 삭제가 유일한 수정 경로 → 내용이 있으면 반드시 되묻는다(removeItem 문구와 통일)
+  const p=daily.계획[i]||{};
+  const has=String(p.거래처||'').trim()||String(p.품목||'').trim()||numOf(p.MBO만);
+  if(has && !confirm('작성한 내용이 있습니다. 이 계획을 지우면 작성 내용이 사라집니다. 지울까요?')) return;
+  daily.계획.splice(i,1); renderPlans(); saveDaily();
+}
 function planField(i,f,v){ daily.계획[i][f]=v;
   if(f==='MBO만'){ const el=document.getElementById('pl-conv-'+i); if(el) el.textContent=planConv(v); }
   if(f==='거래처') updatePlanNew(i);
@@ -1472,11 +1538,28 @@ function planSummary(){
   const c=document.getElementById('plan-cnt'); if(c) c.textContent=rows.length;
   const s=document.getElementById('plan-sum'); if(s) s.textContent='계획 '+rows.length+'건 · MBO 합 '+sum.toLocaleString()+'만';
 }
+/* [fix4-P] 작성 완료 판정 = '거래처가 채워진 행'(지부장 확인 기준 = 어느 거래처의 계획인지). 편집 중(_edit)인 행은 제외. */
+function planDone(p){ return !p._edit && !!String(p.거래처||'').trim(); }
+/* 작성 완료 행의 한 줄 표시 — 예) [신약] 제생병원 · 프레논OD · MBO 500만 */
+function planLine(p){
+  const ty=planTypeNorm(p.유형);
+  let h=`<span class="tbadge ${esc(ty)}">${esc(ty)}</span><span class="pt-cust">${esc(String(p.거래처||'').trim())}</span>`;
+  const item=String(p.품목||'').trim();
+  if(item) h+=`<span class="pt-sep">·</span><span class="pt-item">${esc(item)}</span>`;
+  const man=numOf(p.MBO만);
+  if(man) h+=`<span class="pt-mbo">MBO ${man.toLocaleString()}만</span>`;
+  return h;
+}
 function renderPlans(){
   const cont=document.getElementById('plan-list'); if(!cont) return;
   if(!daily.계획.length){ cont.innerHTML='<div class="row-empty">이번달 계획이 없습니다 — 아래 버튼으로 추가하세요</div>'; planSummary(); return; }
   cont.innerHTML=daily.계획.map((p,i)=>{
     const ty=planTypeNorm(p.유형);
+    // [fix4-P] 작성 완료 행 = 읽기용 한 줄 텍스트 + 삭제(×)만. 고치려면 지우고 다시 쓴다.
+    if(planDone(p)) return `<div class="rowbox rb-text">
+      <button class="row-del" onclick="delPlan(${i})" title="삭제 후 다시 작성">×</button>
+      <div class="plantext">${planLine(p)}</div>
+    </div>`;
     const ph=(ty==='업체')?'대표 업체명 (자동완성 · 자유 입력 가능)':'거래처 병원명 (자동완성 · 자유 입력 가능)';
     return `<div class="rowbox">
       <button class="row-del" onclick="delPlan(${i})">×</button>
@@ -1547,7 +1630,7 @@ function onIssueInput(el){ daily.이슈=el.value; autoGrow(el); saveDaily(); }
 
 /* ── 업체명 자동완성 (최근 미팅 업체 상단) ── */
 let vacState={kind:'',idx:-1,sel:-1,hits:[]};
-/* kind: done·todo=업체 마스터 / plan=유형에 따라 병원 마스터 ↔ 업체 마스터 */
+/* kind: done·todo·vuc(볼륨업 업체명)=업체 마스터 / plan=유형에 따라 병원 마스터 ↔ 업체 마스터 */
 function vacSource(kind,i){
   if(kind!=='plan') return vendorMaster;
   return (planTypeNorm((daily.계획[i]||{}).유형)==='업체') ? vendorMaster : hospOptions();
@@ -1581,11 +1664,14 @@ function vacPick(kind,i,k){
   if(kind==='done')      daily.한일[i].업체명=v.name;
   else if(kind==='todo') daily.할일[i].업체명=v.name;
   else if(kind==='plan') daily.계획[i].거래처=v.name;
-  const inp=document.getElementById('vin-'+kind+'-'+i); if(inp) inp.value=v.name;
+  // [fix4-V] 볼륨업 업체명 — 목록에서 고른 값은 '사용자 선택'이므로 자동 배지를 뗀다
+  else if(kind==='vuc' && volumeUp[i]) { volumeUp[i].업체명=v.name; volumeUp[i]._업체자동=false; }
+  const inp=document.getElementById(kind==='vuc'?('vu-c-'+i):('vin-'+kind+'-'+i)); if(inp) inp.value=v.name;
   const box=document.getElementById('vac-'+kind+'-'+i); if(box) box.style.display='none';
   if(kind==='done')      { doneCount(); renderDone(); }
   else if(kind==='todo') { todoCount(); }
   else if(kind==='plan') { updatePlanNew(i); planSummary(); }
+  else if(kind==='vuc')  { const bd=document.getElementById('vu-auto-'+i); if(bd) bd.classList.remove('on'); }
   saveDaily();
 }
 function vacClose(kind,i){ setTimeout(()=>{ const b=document.getElementById('vac-'+kind+'-'+i); if(b) b.style.display='none'; },160); }
@@ -1936,8 +2022,27 @@ function addNB(){
 
 /* ════════════ ③ 매출증대 예측처 (볼륨업) ════════════ */
 function addVU(){
-  volumeUp.push({병원명:'',사업자번호:'',품목:'',내용:'',증대MBO:'',목표월:nowMonth(),상태:'진행',진행:''});
+  volumeUp.push({병원명:'',사업자번호:'',업체명:'',품목:'',내용:'',증대MBO:'',목표월:nowMonth(),상태:'진행',진행:'',_업체자동:false});
   renderVU(); saveDaily();   // [fix2-U3] 볼륨업도 임시저장 대상
+}
+/* ── [fix4-V] 거래처(병원) → 담당 업체명 자동 채움 ──
+   지부장 요청: "거래처가 작성되면 해당 업체도 동시에 자동 작성. 다만 아는 업체와 다를 수 있으니 수정도 가능하게."
+   ★규칙 — 채우는 건 ① 칸이 비었을 때 ② 직전 값도 자동채움(_업체자동)이었을 때뿐. 손으로 고친 값은 절대 덮지 않는다.
+   매칭 실패(신규 병원 등)면 조용히 통과(안내 없음). 단 직전 자동값이 남아 있으면 지워 다른 병원의 업체가 붙는 걸 막는다. */
+function vuApplyVendor(i){
+  const v=volumeUp[i]; if(!v) return false;
+  const cur=String(v.업체명||'').trim();
+  if(cur && !v._업체자동) return false;                 // 지부장이 직접 쓴 값 — 보존
+  const found=lookupVendor(v.병원명,v.사업자번호);
+  if(found===cur) return false;
+  v.업체명=found; v._업체자동=!!found;
+  return true;
+}
+/* 자동채움 결과를 재렌더 없이 DOM에 반영(입력 중 포커스·커서 보존) */
+function vuSyncVendorDom(i){
+  const v=volumeUp[i]||{};
+  const inp=document.getElementById('vu-c-'+i); if(inp) inp.value=v.업체명||'';
+  const bd=document.getElementById('vu-auto-'+i); if(bd) bd.classList.toggle('on',!!v._업체자동&&!!String(v.업체명||'').trim());
 }
 function renderVU(){
   document.getElementById('vu-cnt').textContent=volumeUp.length;
@@ -1955,8 +2060,14 @@ function renderVU(){
         </div>
         <div class="ig"><label>사업자번호 <span style="font-size:10px;color:var(--gray3);font-weight:400">자동채움</span></label>
           <input type="text" id="vu-biz-${i}" value="${esc(v.사업자번호)}" placeholder="자동 또는 직접" oninput="vuField(${i},'사업자번호',this.value)"></div>
+        <div class="ig full vac vu-cwrap"><label>CSO 업체명 <span style="font-size:10px;color:var(--gray3);font-weight:400">거래처 입력 시 자동 · 수정 가능</span></label>
+          <input type="text" id="vu-c-${i}" value="${esc(v.업체명||'')}" placeholder="업체명 (자동완성 · 직접 입력 가능)" autocomplete="off"
+            oninput="vuField(${i},'업체명',this.value);vacSearch('vuc',${i},this.value)" onkeydown="vacKey('vuc',${i},event)" onblur="vacClose('vuc',${i})">
+          <span class="autobadge${(v._업체자동&&String(v.업체명||'').trim())?' on':''}" id="vu-auto-${i}">자동</span>
+          <div class="vac-list" id="vac-vuc-${i}"></div>
+        </div>
         <div class="ig"><label>품목</label><input type="text" value="${esc(v.품목)}" placeholder="예) 바이오탑" oninput="vuField(${i},'품목',this.value)"></div>
-        <div class="ig"><label>증대 MBO (원) <span style="font-size:10px;color:var(--gray3);font-weight:400">${conv}</span></label>
+        <div class="ig"><label>증대 MBO (원) <span style="font-size:10px;color:var(--gray3);font-weight:400" id="vu-conv-${i}">${conv}</span></label>
           <input type="number" value="${v.증대MBO}" placeholder="예) 5000000" oninput="vuField(${i},'증대MBO',this.value)"></div>
         <div class="ig"><label>목표월</label><input type="month" value="${esc(v.목표월)}" oninput="vuField(${i},'목표월',this.value)"></div>
         <div class="ig"><label>상태</label>
@@ -1971,7 +2082,16 @@ function renderVU(){
     </div>`;
   }).join('');
 }
-function vuField(i,f,v){ volumeUp[i][f]=v; if(f==='증대MBO'){const r=document.querySelectorAll('.vu-row')[i]; if(r){const lab=r.querySelectorAll('.ig')[3].querySelector('span'); if(lab) lab.textContent=v?((Number(v)||0)/10000).toLocaleString()+'만원':'';}} saveDaily(); }
+function vuField(i,f,v){
+  volumeUp[i][f]=v;
+  // [fix4-V] 증대MBO 환산 라벨 — .ig 인덱스(3) 대신 id로 잡는다(업체명 칸 추가로 인덱스가 밀려 깨지던 참조 제거)
+  if(f==='증대MBO'){ const lab=document.getElementById('vu-conv-'+i); if(lab) lab.textContent=v?((Number(v)||0)/10000).toLocaleString()+'만원':''; }
+  // [fix4-V] 거래처(병원명·사업자번호)가 바뀌면 업체명을 다시 채운다 — 재렌더 없이 DOM만 동기화(입력 중 커서 보존)
+  if(f==='병원명'||f==='사업자번호'){ if(vuApplyVendor(i)) vuSyncVendorDom(i); }
+  // 업체명을 손으로 고치면 '자동' 배지 해제 → 이후 거래처가 바뀌어도 덮어쓰지 않는다
+  if(f==='업체명'){ volumeUp[i]._업체자동=false; const bd=document.getElementById('vu-auto-'+i); if(bd) bd.classList.remove('on'); }
+  saveDaily();
+}
 function vuFocus(i){ acState._vuIdx=i; }
 function delVU(i){ volumeUp.splice(i,1); renderVU(); saveDaily(); }
 /* 볼륨업 자동완성 pick — [fix1-M8] ctx가 행별로 'vu0','vu1'… 이라 인덱스를 ctx에서 직접 얻는다(id 중복 제거) */
@@ -1981,7 +2101,7 @@ function delVU(i){ volumeUp.splice(i,1); renderVU(); saveDaily(); }
     const h=acState.hits[idx];
     if(/^vu\d+$/.test(String(ctx)) && h){
       const i=parseInt(String(ctx).slice(2),10)||0;
-      if(volumeUp[i]){ volumeUp[i].병원명=h.병원명; volumeUp[i].사업자번호=h.사업자번호||''; }
+      if(volumeUp[i]){ volumeUp[i].병원명=h.병원명; volumeUp[i].사업자번호=h.사업자번호||''; vuApplyVendor(i); }  // [fix4-V] 업체명 동시 자동채움
       const box=document.getElementById('ac-'+ctx); if(box) box.style.display='none';
       renderVU(); saveDaily();   // [fix2-U3]
       return;
