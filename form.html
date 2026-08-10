@@ -39,7 +39,16 @@
         → 병원명이 마스터에 매칭되면 수기 타이핑 경로에서도 사업자번호를 마스터 값으로 자동 보정(키 일원화).
      L1 품목 없는 볼륨업 행은 서버가 버리는데 폼은 '전송 완료'를 띄우던 문제 → 제출 전 차단 + 해당 칸 강조.
      L2 계획 전량 삭제 복원은 미채택 — 서버 saveMonthlyPlans_가 빈 배열을 명시적으로 no-op 처리(전량삭제 사고 방지)해
-        빈 배열 전송으로는 지워지지 않는다. 오해를 막는 안내 문구만 추가(상세 사유는 회신 참조). -->
+        빈 배열 전송으로는 지워지지 않는다. 오해를 막는 안내 문구만 추가(상세 사유는 회신 참조).
+     v39b-fix6 (2026-08-10) — MBO 입력 단위 만원 통일. form.html 단일 파일만 수정(GAS·시트·payload 계약 무변경):
+     ③ 신약 MBO(카드 + 신규블럭 모달 nb-m) · ④ 볼륨업 증대MBO 입력을 '원' → '만원'으로 전환(②주요계획 MBO만 기준에 통일).
+     ★저장 모델은 원 단위 정수 그대로 — items[].MBO·volumeUp[].증대MBO 는 계속 '원'을 담는다(①억원 처리와 동일 원칙).
+       화면만 wonToMan()으로 만원 표시하고, 사용자가 실제로 타이핑한 칸만 manToWon()으로 ×10000 반올림해 덮어쓴다.
+       → 서버에서 온 값(예 7,000,000원)은 '700'으로 보이기만 하고, 그 칸을 안 건드리면 7,000,000원이 그대로 전송된다(반올림 오염 0).
+       → payload·시트·이메일 신약 텍스트·Excel 값 diff 0 / DIRTY_FIELDS 스냅샷 비교(MBO 원 단위) 무변경 → dirty 판정 회귀 0
+       → 볼륨업 localStorage(원 단위로 이미 저장된 기존 임시저장분)도 마이그레이션 없이 그대로 복원된다
+     · 자릿수 방어 MAN_MAX=100,000만원(=10억) 초과 = 원 단위 오입력으로 간주 → 값을 저장하지 않고 경고(①EOK_MAX와 동일 방식).
+       ①과 달리 기존 값을 ''로 지우지 않는다(신약 MBO를 0으로 덮어쓰면 시트 원장이 파괴됨) → 대신 _mboBad 플래그로 제출을 차단. -->
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -101,6 +110,18 @@ async function sendToSheets() {
     const first = document.getElementById('vu-prod-' + vuNoProd[0]);
     if (first) { first.scrollIntoView({behavior:'smooth', block:'center'}); try{ first.focus(); }catch(e){} }
     toast('④ 볼륨업 ' + vuNoProd.length + '건 — 품목을 입력해 주세요 (품목이 없으면 저장되지 않습니다)');
+    return;
+  }
+  // [fix6] ③④ MBO 자릿수 오입력(만원 칸에 원 단위) — 값이 저장되지 않은 상태라 그대로 보내면 '화면 숫자 ≠ 전송 값'이 된다.
+  //   경고를 띄운 칸이 남아 있으면 전송을 막고 그 칸으로 데려간다(카드가 접혀 있으면 펼친다).
+  const badNd = items.filter(it => it._mboBad);
+  const badVu = volumeUp.filter(v => v._mboBad);
+  if (badNd.length || badVu.length) {
+    let el = null;
+    if (badNd.length) { const c = document.getElementById('c-newdrug'); if (c) c.classList.remove('fold'); el = document.getElementById('nd-mbo-' + items.indexOf(badNd[0])); }
+    else              { const c = document.getElementById('c-vu');      if (c) c.classList.remove('fold'); el = document.getElementById('vu-mbo-' + volumeUp.indexOf(badVu[0])); }
+    if (el) { el.scrollIntoView({behavior:'smooth', block:'center'}); try{ el.focus(); }catch(e){} }
+    toast('MBO는 만원 단위로 입력하세요 — 예) 500 (5,000,000원 아님)');
     return;
   }
 
@@ -511,6 +532,10 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
 /* [fix1-H3] 억원 칸 자릿수 초과 경고 */
 .gcell input.over{border-color:var(--bad);box-shadow:0 0 0 3px rgba(215,0,21,.12)}
 .gcell .gs.warn{color:var(--bad);font-weight:700}
+/* [fix6] ③신약·④볼륨업 MBO(만원) — 환산 힌트 + 자릿수 초과 경고(①억원 가드와 동일 톤) */
+.ig input.over{border-color:var(--bad);background:var(--bad-lt);box-shadow:0 0 0 3px rgba(215,0,21,.12)}
+.mbo-hint{font-size:11px;color:var(--gray3);line-height:1.4;word-break:keep-all}
+.mbo-hint.warn{color:var(--bad);font-weight:700}
 /* ③ 신약 — 확인 대상 병원명 칩 리스트 */
 .nd-chips{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 4px}
 .nd-chip{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:7px 12px;border:1px solid var(--hair);border-radius:12px;background:#fff;cursor:pointer;font-family:inherit;text-align:left;transition:.12s;max-width:100%}
@@ -735,7 +760,8 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
         <div class="ig"><label>CSO 업체명</label><input type="text" id="nb-c" placeholder="업체명 검색 또는 직접 입력" list="vendor-list" autocomplete="off"></div>
         <div class="ig"><label>업체 사업자번호 <span style="font-size:10px;color:var(--gray3);font-weight:400">CSO 사업자(J열)</span></label><input type="text" id="nb-cbiz" placeholder="000-00-00000"></div>
         <div class="ig"><label>CSO 연락처</label><input type="text" id="nb-ct" placeholder="010-0000-0000"></div>
-        <div class="ig"><label>MBO 금액 (원)</label><input type="number" id="nb-m" placeholder="5000000"></div>
+        <div class="ig"><label>MBO (만원)</label><input type="number" inputmode="numeric" id="nb-m" placeholder="예) 500" oninput="nbMboHint(this.value)">
+          <div class="mbo-hint" id="nb-mboh">만원 단위 — 예) 500</div></div>
         <div class="ig"><label>DC접수월</label><input type="month" id="nb-ld"></div>
         <div class="ig"><label>코딩예측월</label><input type="month" id="nb-cd"></div>
         <div class="ig full"><label>상정과/KOL <span style="font-size:10px;color:var(--gray3);font-weight:400">상정과 및 담당 DR</span></label><input type="text" id="nb-kol" placeholder="예) 내과 / 홍길동 DR"></div>
@@ -1609,6 +1635,44 @@ function onGoalInput(field,v){
 }
 function unlockGoal(){ closing._force=true; renderClosing(); toast('🔓 목표 정정 모드 — 값 변경 후 전송하세요'); }
 
+/* ════════════ [fix6] MBO 만원 입력 공용 헬퍼 (③신약 · ④볼륨업 · 신규블럭 모달) ════════════
+   ★저장 모델은 '원' 정수 그대로 — items[].MBO / volumeUp[].증대MBO 는 계속 원을 담는다(①억원과 동일 원칙).
+     ① 화면 표시만 wonToMan()  ② 사용자가 타이핑한 칸만 manToWon()으로 ×10000 반올림해 덮어쓴다.
+   → 미편집 칸은 서버 원본(원)이 무손실 보존되고, payload·시트·이메일·Excel·dirty 스냅샷 계약이 전부 불변. */
+const MAN_MAX = 100000;   // 10만 만원(=10억) 초과 = 원 단위를 그대로 친 오입력으로 간주하고 차단
+/* 원 → 만원 표시문자열 (2,000원 → '0.2' / 7,000,000원 → '700'). 빈값·0은 빈 문자열 처리는 호출부에서 판단 */
+function wonToMan(won){
+  if(won===''||won==null) return '';
+  const n=Number(won); if(!isFinite(n)) return '';
+  if(n===0) return '0';
+  let s=(n/10000).toFixed(2);
+  if(s.indexOf('.')>=0) s=s.replace(/0+$/,'').replace(/\.$/,'');
+  return s;
+}
+/* 만원 단위 숫자값(범위검사용). 값이 없으면 null — 전각·콤마·음수 방어는 ①과 같은 normNumStr 재사용 */
+function manValue(v){
+  const s=normNumStr(v);
+  if(s===''||s==='.') return null;
+  const n=parseFloat(s);
+  return isNaN(n)?null:n;
+}
+/* 입력(만원) → 저장(원 정수). 값이 없으면 '' */
+function manToWon(v){
+  const n=manValue(v);
+  if(n==null) return '';
+  return Math.round(n*10000);
+}
+/* 환산 힌트 — 반올림이 일어났으면 '=' 대신 '≈' (②planConv 톤 통일) */
+function manConv(won){
+  const n=Number(won)||0;
+  const m=wonToMan(won);
+  const back=Math.round((parseFloat(m)||0)*10000);
+  return m+'만원 '+(back===n?'=':'≈')+' '+n.toLocaleString()+'원';
+}
+function manHint(){ return '만원 단위 — 예) 500'; }
+/* 자릿수 초과 경고 문구(③④ 공통) */
+function manOverMsg(mv){ return '⚠ 만원 단위로 입력하세요 — 예) 500 (지금 값 '+mv.toLocaleString()+'만원)'; }
+
 /* ════════════ ② 이번달 주요계획 (월간계획 · 월 1회) ════════════ */
 /* [v39b] 유형 '로컬' → '업체'로 명칭 변경(payload 유형 값도 '업체'. 백엔드는 문자열 그대로 저장 → 계약 무변경) */
 const PLAN_TYPES=['신약','볼륨업','업체'];
@@ -1978,6 +2042,8 @@ function renderList(){
   sorted.forEach(({it})=>{const realIdx=items.indexOf(it);const d=document.createElement('div');d.innerHTML=buildRI(it,realIdx);rl.appendChild(d.firstElementChild);});
 }
 function buildRI(it,i){
+  // [fix6] 렌더되는 MBO 칸의 값은 항상 모델(원)에서 나오므로 화면상 '자릿수 오입력' 상태는 이 순간 사라진다 → 플래그 해제
+  it._mboBad=false;
   const mbo=it.MBO?(it.MBO/10000).toLocaleString()+'만원':'-';
   const sb=it.신약과정?`<span style="background:${SC[it.신약과정]||'#e2e8f0'};color:${STC[it.신약과정]||'#475569'};border-radius:4px;font-size:10px;padding:1px 6px;font-weight:700;margin-left:4px">${it.신약과정}</span>`:'';
   const issCls=it.이슈상태?it.이슈상태.replace(/[()]/g,''):'';
@@ -2011,8 +2077,9 @@ function buildRI(it,i){
         ${!it._new?`<div class="ig"><label>🏢 CSO 업체명 <span style="font-size:10px;color:var(--gray3);font-weight:400">변경 시 수정</span>${vendorHistIcon}</label>
           <input type="text" value="${esc(it.업체명||'')}" placeholder="업체명 검색 또는 직접 입력" list="vendor-list" autocomplete="off" onchange="setF(${i},'업체명',this.value)">
         </div>
-        <div class="ig"><label>💰 MBO 금액 (원) <span style="font-size:10px;color:var(--gray3);font-weight:400">변경 시 수정</span>${mboHistIcon}</label>
-          <input type="number" value="${it.MBO||''}" placeholder="예) 5000000" onchange="setF(${i},'MBO',Number(this.value)||0)">
+        <div class="ig"><label>💰 MBO (만원) <span style="font-size:10px;color:var(--gray3);font-weight:400">변경 시 수정</span>${mboHistIcon}</label>
+          <input type="number" inputmode="numeric" id="nd-mbo-${i}" value="${esc(numOf(it.MBO)?wonToMan(it.MBO):'')}" placeholder="예) 500" onchange="setMboMan(${i},this.value)">
+          <div class="mbo-hint" id="nd-mboh-${i}">${numOf(it.MBO)?esc(manConv(it.MBO)):manHint()}</div>
         </div>`:''}
         <div class="ig"><label>신약과정</label>
           <select onchange="setF(${i},'신약과정',this.value)">
@@ -2060,6 +2127,27 @@ function setF(i,f,v){
   }
   refreshDirtyUI();     // [v39b] 변경 즉시 칩 '수정' 배지·전송 대상 카운트 갱신
 }
+/* [fix6] ③ 신약 MBO — 입력=만원 / 저장=원(정수). 오입력(10만 만원 초과)은 저장하지 않고 경고만 남긴다.
+   ①(closing)과 달리 기존 값을 ''로 지우지 않는다 — 신약 MBO를 0으로 덮어쓰면 시트 원장이 파괴되기 때문.
+   대신 _mboBad 플래그를 세워 sendToSheets가 제출을 막는다(화면 숫자 ≠ 전송 값 침묵 불일치 차단). */
+function setMboMan(i,v){
+  const it=items[i]; if(!it) return;
+  const inp=document.getElementById('nd-mbo-'+i), h=document.getElementById('nd-mboh-'+i);
+  const mv=manValue(v);
+  if(mv!=null && mv>MAN_MAX){
+    it._mboBad=true;
+    if(inp) inp.classList.add('over');
+    if(h){ h.classList.add('warn'); h.textContent=manOverMsg(mv); }
+    return;
+  }
+  it._mboBad=false;
+  if(inp) inp.classList.remove('over');
+  if(h) h.classList.remove('warn');
+  const won=manToWon(v);
+  it.MBO=(won===''?0:won);              // 종전 Number(this.value)||0 과 동일하게 빈값=0
+  if(h) h.textContent=numOf(it.MBO)?manConv(it.MBO):manHint();
+  refreshDirtyUI();
+}
 function setIssue(i,sel){items[i].이슈상태=sel.value;paintIssueSelect(sel);refreshDirtyUI();}
 /* [fix2-U1] 카드 헤더 × 는 신규블럭의 유일한 제거 수단이라 손으로 친 실납처명·사업자번호·제품명·업체명·MBO가
    통째로 사라지는 유일 경로였다(openAuto 칩 접기에만 confirm이 있었음). 작성분이 있으면 반드시 되묻는다. */
@@ -2084,6 +2172,7 @@ function openNB(){
   document.getElementById('nb-biz').value='';
   document.getElementById('nb-sgg').value='';
   document.getElementById('nb-matchinfo').innerHTML='';
+  nbMboHint(document.getElementById('nb-m').value);   // [fix6] 재진입 시 MBO 힌트·경고 상태 동기화
   const acb=document.getElementById('ac-nb'); if(acb){acb.style.display='none';acb.innerHTML='';}
   const iss=document.getElementById('nb-iss');if(iss){iss.value='';paintIssueSelect(iss);}
 }
@@ -2123,9 +2212,24 @@ function acPick(ctx,idx){
   // [fix1-M8] 볼륨업(ctx='vu0','vu1'…)은 아래 래퍼가 처리한다. 여기선 존재하는 박스만 닫는다.
   const _box=document.getElementById('ac-'+ctx); if(_box) _box.style.display='none';
 }
+/* [fix6] 신규블럭 모달 MBO(만원) — 실시간 환산 힌트 + 자릿수 초과 표시. 저장은 addNB에서 원으로 변환 */
+function nbMboHint(v){
+  const inp=document.getElementById('nb-m'), h=document.getElementById('nb-mboh');
+  const mv=manValue(v);
+  if(mv!=null && mv>MAN_MAX){
+    if(inp) inp.classList.add('over');
+    if(h){ h.classList.add('warn'); h.textContent=manOverMsg(mv); }
+    return;
+  }
+  if(inp) inp.classList.remove('over');
+  if(h){ h.classList.remove('warn'); const won=manToWon(v); h.textContent=(won===''||won===0)?manHint():manConv(won); }
+}
 function addNB(){
   const h=V('nb-h'),p=V('nb-p');
   if(!h||!p){toast('병원명과 기준품명은 필수입니다');return;}
+  // [fix6] 만원 칸에 원 단위를 친 경우 — 5조가 저장되는 사고를 막고 그 자리에서 되돌린다
+  const mboMan=manValue(V('nb-m'));
+  if(mboMan!=null && mboMan>MAN_MAX){ nbMboHint(V('nb-m')); toast('MBO는 만원 단위로 입력하세요 — 예) 500 (5,000,000원 아님)'); const el=document.getElementById('nb-m'); if(el) el.focus(); return; }
   const biz=V('nb-biz');
   const m=matchHospital(h,biz);  // 미등록 플래그 판정
   const is110=document.getElementById('nb-is110').checked;
@@ -2135,10 +2239,11 @@ function addNB(){
   const rpmTel=(data.find(x=>x.담당RPM===rpm&&x.RPM연락처)||{}).RPM연락처||'';
   items.push({_id:Date.now(),_new:true,_open:true,_미등록:(m.미등록==='미등록'),담당RPM:rpm,신청월:today().slice(0,4)+'년',
     RPM연락처:rpmTel,사업자번호:biz,실납처명:h,is110:is110,시군구:V('nb-sgg'),제품명:p,기준품명:p,
-    업체사업자번호:V('nb-cbiz'),업체명:V('nb-c'),업체연락처:V('nb-ct'),MBO:Number(V('nb-m'))||0,
+    업체사업자번호:V('nb-cbiz'),업체명:V('nb-c'),업체연락처:V('nb-ct'),MBO:manToWon(V('nb-m'))||0,   // [fix6] 입력=만원 → 저장=원
     DC접수월:V('nb-ld'),코딩예측월:V('nb-cd'),상정과KOL:V('nb-kol'),신약과정:document.getElementById('nb-st').value,
     이슈상태:issVal,진행사항:V('nb-n'),작성일:today(),비고:V('nb-e')});
   ['nb-h','nb-p','nb-c','nb-cbiz','nb-ct','nb-m','nb-ld','nb-cd','nb-kol','nb-n','nb-e','nb-biz','nb-sgg'].forEach(id=>document.getElementById(id).value='');
+  nbMboHint('');   // [fix6] MBO 환산 힌트·경고 초기화
   document.getElementById('nb-st').value='';
   document.getElementById('nb-matchinfo').innerHTML='';
   const iss=document.getElementById('nb-iss');if(iss){iss.value='';paintIssueSelect(iss);}
@@ -2212,7 +2317,10 @@ function renderVU(){
   document.getElementById('vu-cnt').textContent=volumeUp.length;
   const cont=document.getElementById('vu-list');
   cont.innerHTML=volumeUp.map((v,i)=>{
-    const conv=v.증대MBO?((Number(v.증대MBO)||0)/10000).toLocaleString()+'만원':'';
+    // [fix6] 렌더 값은 항상 모델(원)에서 나오므로 자릿수 오입력 상태는 이 순간 사라진다 → 플래그 해제
+    //   (volumeUp은 localStorage에 통째로 저장되므로 새로고침 후 플래그가 굳는 것도 여기서 함께 풀린다)
+    v._mboBad=false;
+    const conv=numOf(v.증대MBO)?manConv(v.증대MBO):manHint();
     return `<div class="vu-row">
       <button class="vu-del" onclick="delVU(${i})">×</button>
       <div class="row2">
@@ -2232,8 +2340,9 @@ function renderVU(){
           <div class="vu-multi" id="vu-multi-${i}" style="display:${vuMultiHint(i)?'block':'none'}">이 병원은 거래 업체가 여러 곳입니다 — 직접 선택해 주세요</div>
         </div>
         <div class="ig"><label>품목</label><input type="text" id="vu-prod-${i}" value="${esc(v.품목)}" placeholder="예) 바이오탑" oninput="vuField(${i},'품목',this.value)"></div>
-        <div class="ig"><label>증대 MBO (원) <span style="font-size:10px;color:var(--gray3);font-weight:400" id="vu-conv-${i}">${conv}</span></label>
-          <input type="number" value="${v.증대MBO}" placeholder="예) 5000000" oninput="vuField(${i},'증대MBO',this.value)"></div>
+        <div class="ig"><label>증대 MBO (만원)</label>
+          <input type="number" inputmode="numeric" id="vu-mbo-${i}" value="${esc(numOf(v.증대MBO)?wonToMan(v.증대MBO):'')}" placeholder="예) 500" oninput="vuField(${i},'증대MBO',this.value)">
+          <div class="mbo-hint" id="vu-conv-${i}">${esc(conv)}</div></div>
         <div class="ig"><label>목표월</label><input type="month" value="${esc(v.목표월)}" oninput="vuField(${i},'목표월',this.value)"></div>
         <div class="ig"><label>상태</label>
           <select onchange="vuField(${i},'상태',this.value)">
@@ -2247,10 +2356,30 @@ function renderVU(){
     </div>`;
   }).join('');
 }
+/* [fix6] ④ 증대MBO — 입력=만원 / 저장=원(정수). 다른 필드와 달리 원문 문자열을 그대로 담지 않는다.
+   ★모델을 원으로 유지하는 이유: 볼륨업은 localStorage에 통째로 직렬화되어 이미 '원'으로 저장된 임시저장분이 라이브에 존재한다.
+     모델을 만원으로 바꾸면 복원 시 5,000,000(원)이 5,000,000만원=5,000억으로 읽혀 10,000배 오염된다(마이그레이션 불가).
+   ①과 달리 오입력 시 기존 값을 지우지 않고 보존 + _mboBad로 제출 차단(화면 숫자 ≠ 전송 값 침묵 불일치 차단). */
+function vuSetMboMan(i,v){
+  const row=volumeUp[i]; if(!row) return;
+  const inp=document.getElementById('vu-mbo-'+i), h=document.getElementById('vu-conv-'+i);
+  const mv=manValue(v);
+  if(mv!=null && mv>MAN_MAX){
+    row._mboBad=true;
+    if(inp) inp.classList.add('over');
+    if(h){ h.classList.add('warn'); h.textContent=manOverMsg(mv); }
+    saveDaily(); return;
+  }
+  row._mboBad=false;
+  if(inp) inp.classList.remove('over');
+  if(h) h.classList.remove('warn');
+  row.증대MBO=manToWon(v);              // 빈값은 '' — 종전 초기값·payload Number('')||0 과 동일
+  if(h) h.textContent=numOf(row.증대MBO)?manConv(row.증대MBO):manHint();
+  saveDaily();
+}
 function vuField(i,f,v){
+  if(f==='증대MBO'){ vuSetMboMan(i,v); return; }   // [fix6] 만원→원 변환 경로(재렌더 없음 — 커서 보존)
   volumeUp[i][f]=v;
-  // [fix4-V] 증대MBO 환산 라벨 — .ig 인덱스(3) 대신 id로 잡는다(업체명 칸 추가로 인덱스가 밀려 깨지던 참조 제거)
-  if(f==='증대MBO'){ const lab=document.getElementById('vu-conv-'+i); if(lab) lab.textContent=v?((Number(v)||0)/10000).toLocaleString()+'만원':''; }
   // [fix5-L1] 품목을 채우면 미입력 강조 해제
   if(f==='품목'){ const pe=document.getElementById('vu-prod-'+i); if(pe&&String(v||'').trim()) pe.classList.remove('need'); }
   // [fix5-M2] 사업자번호를 손으로 입력하면 이후 자동 로직이 이 값을 지우거나 덮지 않는다
