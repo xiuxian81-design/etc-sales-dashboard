@@ -25,7 +25,21 @@
        매칭 = ①사업자번호 ②정규화 병원명, 후보 다수면 작성일 최신 행. 손으로 고친 값은 덮지 않고 배지 해제. 업체명은 자유입력+자동완성(vendorMaster).
        payload 볼륨업[]에 '업체명' 1키 추가(백엔드 병행 확장, 빈 값이면 기존 값 보존) — 나머지 8키·타입·단위 무변경.
      P ②이번달 주요계획 — 작성 완료(거래처 채워진) 행은 한 줄 텍스트로 표시하고 삭제(×)만 제공, 새로 추가한 행만 입력칸.
-       수정=삭제 후 재작성(confirm 가드). payload·저장 계약(월 단위 전체교체) 무변경 — 표시만 바뀜. -->
+       수정=삭제 후 재작성(confirm 가드). payload·저장 계약(월 단위 전체교체) 무변경 — 표시만 바뀜.
+     v39b-fix5 (2026-08-10) — 배포 후 적대검증 확정 결함 5건. form.html 단일 파일 수정(GAS·시트·payload 계약 무변경):
+     H  [HIGH] mode=crm 응답이 늦게 도착하면 작성 중인 ②주요계획이 파괴되던 문제(loadDaily 재호출 → daily 통째 리셋).
+        → applyCrmLate() 신설: ①목표는 '빈 칸만' 채우고, 서버 월간계획은 mergeServerPlans()로 '없는 행만' 병합.
+          지운 계획은 daily.계획삭제 키 이력으로 되살리지 않는다. 입력 중(포커스가 카드 안)이면 renderWhenIdle로 재렌더 보류.
+          ⑤⑥⑦은 crm에서 오는 값이 없으므로 재렌더 자체를 없앴다(입력 중 포커스 파괴 제거).
+     M1 볼륨업 CSO 업체명 자동채움이 품목을 무시해 오답을 '자동' 배지와 함께 붙이던 문제(라이브 원장 193행 중 20건·10.4%).
+        → buildVendorIndex가 병원별 업체 가짓수(n)를 함께 세고, 2곳 이상이면 lookupVendor가 '' 반환(+'여러 곳' 안내).
+     M2 자동완성으로 A병원을 고른 뒤 병원명만 B로 고치면 사업자번호가 A로 남아 시트에 A병원으로 저장되던 문제.
+        → _biz자동·_acName 기록 + vuSyncBiz()가 주인 불일치 시 사업자번호 초기화(DOM 동기화 포함). 수기 입력 번호는 보존.
+     M3 사업자번호 유무로 서버 upsert 키가 갈려 같은 병원·품목·목표월이 중복행으로 쌓이던 문제.
+        → 병원명이 마스터에 매칭되면 수기 타이핑 경로에서도 사업자번호를 마스터 값으로 자동 보정(키 일원화).
+     L1 품목 없는 볼륨업 행은 서버가 버리는데 폼은 '전송 완료'를 띄우던 문제 → 제출 전 차단 + 해당 칸 강조.
+     L2 계획 전량 삭제 복원은 미채택 — 서버 saveMonthlyPlans_가 빈 배열을 명시적으로 no-op 처리(전량삭제 사고 방지)해
+        빈 배열 전송으로는 지워지지 않는다. 오해를 막는 안내 문구만 추가(상세 사유는 회신 참조). -->
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -76,6 +90,19 @@ async function sendToSheets() {
   if (!ndItems.length && !hasClosing && !volumeUp.length && !hasDaily) { toast('목표·주요계획·신약진행·볼륨업·한일/할일/이슈 중 하나 이상 입력하세요'); return; }
   // ⑤ 한일의 상태(순항/관찰/부진)는 필수 — 대시보드 업체 칩 색의 원천
   if (doneRows.some(r => !r.상태)) { toast('오늘 한일의 상태(순항/관찰/부진)를 선택해주세요'); renderDone(); return; }
+  // [fix5-L1] ④ 볼륨업 — 서버 saveVolumeUps_는 품목 없는 행을 조용히 버린다(`if (!prod) return;`).
+  //   그런데 폼은 그대로 '전송 완료'를 띄워, 지부장은 저장된 줄 안다. 병원명만 쓰고 품목이 빈 행은 전송을 막는다.
+  //   (병원명·품목 모두 빈 완전 빈 행은 그대로 무시 — 추가만 하고 안 쓴 줄까지 붙잡지 않는다)
+  const vuNoProd = [];
+  volumeUp.forEach((v, i) => { if (String(v.병원명 || '').trim() && !String(v.품목 || '').trim()) vuNoProd.push(i); });
+  if (vuNoProd.length) {
+    const c = document.getElementById('c-vu'); if (c) c.classList.remove('fold');
+    vuNoProd.forEach(i => { const el = document.getElementById('vu-prod-' + i); if (el) el.classList.add('need'); });
+    const first = document.getElementById('vu-prod-' + vuNoProd[0]);
+    if (first) { first.scrollIntoView({behavior:'smooth', block:'center'}); try{ first.focus(); }catch(e){} }
+    toast('④ 볼륨업 ' + vuNoProd.length + '건 — 품목을 입력해 주세요 (품목이 없으면 저장되지 않습니다)');
+    return;
+  }
 
   const btn = document.getElementById('btn-sheets');
   btn.textContent = '📤 전송 중...';
@@ -431,6 +458,9 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
 .seg.st button.on[data-v="관찰"]{background:var(--watch-lt);color:var(--watch)}
 .seg.st button.on[data-v="부진"]{background:var(--bad-lt);color:var(--bad)}
 .seg.need{box-shadow:0 0 0 1.5px var(--bad) inset;border-radius:10px}
+/* [fix5-L1] 필수 미입력(볼륨업 품목) 강조 / [fix5-M1] 다중업체 병원 안내 */
+.ig input.need{border-color:var(--bad);background:var(--bad-lt)}
+.vu-multi{margin-top:4px;font-size:11px;color:var(--watch);line-height:1.4}
 /* ① 목표 4칸 */
 .goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .gcell{border:1px solid var(--hair);border-radius:12px;padding:10px 11px;background:#fff;display:flex;flex-direction:column;gap:5px}
@@ -545,8 +575,8 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
    <div class="form-grid">
     <div class="fg-col">
 
-    <!-- ① 목표 (마감예측 4칸) -->
-    <div class="card">
+    <!-- ① 목표 (마감예측 4칸) — [fix5-H] id=c-cl : CRM 늦은 응답이 '입력 중'이면 재렌더를 미루기 위한 카드 식별자 -->
+    <div class="card" id="c-cl">
       <div class="card-hd"><span id="cl-card-title">① 목표</span> <span class="sec-help" id="cl-month-lbl"></span></div>
       <div class="card-bd" id="cl-body"></div>
     </div>
@@ -1063,7 +1093,7 @@ let volumeUp=[];                           // ④ 볼륨업 행
 /* [v39] ① 목표 4칸 — 확정실적(서버 읽기전용) / 전월예측 / 목표 / 예측(8일부터). 목표확정=읽기전용+수정버튼 */
 let closing={전월예측:'',목표:'',예측:'',비고:'',목표확정:false,_force:false};
 /* [v39] 일일 입력(②⑤⑥⑦) — localStorage cso_daily_{지부장}_{일자}에 그대로 저장/복원 */
-let daily={계획:[],한일:[],할일:[],이슈:''};
+let daily={계획:[],한일:[],할일:[],이슈:'',계획삭제:[]};   // [fix5-H] 계획삭제 = 지운 계획 키 이력(서버 병합이 되살리지 않게)
 /* [v39] mode=crm 응답(01_architect_datamodel §11-4) — 프리필·업체 마스터 원천 */
 let crm=null, crmReady=false, crmLoading=false, vendorMaster=[];
 let hospitalMaster=[];                     // 전체병원리스트 마스터(자동완성). data에서 파생.
@@ -1190,26 +1220,45 @@ function dateOrd(v){
   if(!isNaN(d)) return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
   return 0;
 }
+/* [fix5-M1] ★인덱스는 '대표 업체명'과 함께 '그 병원에 붙은 업체 가짓수(n)'를 센다.
+   원장 실측(라이브 193행): 병원 145곳 중 18곳이 업체 2곳 이상이고, 최신 작성일 1개만 고르던 기존 규칙은
+   그 병원들에서 20건(10.4%)을 '자동' 배지와 함께 틀린 업체로 채웠다(품목이 다르면 업체도 다른데 키에 품목이 없음).
+   → 모호하면 채우지 않는다. 가짓수는 normVendorKey로 세어 '에스디코아'↔'에스디코아주식회사' 같은 표기차는 1곳으로 본다.
+   ※'키에 품목 추가'는 채택하지 않았다 — 볼륨업 품목은 자유 텍스트('바이오탑')인데 원장은 '바이오탑아이세립' 등이라
+     정규화 없이는 거의 매칭되지 않아 자동채움이 사실상 무력화된다. */
 function buildVendorIndex(){
   vendorByBiz={}; vendorByName={};
+  const put=function(map,key,ven,ord){
+    if(!key) return;
+    const e=map[key]||(map[key]={업체명:'',ord:-1,n:0,set:{}});
+    const vk=normVendorKey(ven);
+    if(vk && !e.set[vk]){ e.set[vk]=1; e.n++; }
+    if(ord>=e.ord){ e.업체명=ven; e.ord=ord; }
+  };
   data.forEach(d=>{
     const ven=String(d.업체명||'').trim(); if(!ven) return;
     const ord=dateOrd(d.작성일);
-    const biz=normBiz(d.사업자번호);
-    const nk=normHosp(d.실납처명);
-    if(biz && (!vendorByBiz[biz] || ord>=vendorByBiz[biz].ord)) vendorByBiz[biz]={업체명:ven,ord:ord};
-    if(nk  && (!vendorByName[nk] || ord>=vendorByName[nk].ord)) vendorByName[nk]={업체명:ven,ord:ord};
+    put(vendorByBiz, normBiz(d.사업자번호), ven, ord);
+    put(vendorByName, normHosp(d.실납처명), ven, ord);
   });
 }
-/* 병원명·사업자번호 → 담당 업체명 (①사업자번호 일치 ②정규화 병원명 일치). 없으면 ''
+/* 병원 → 인덱스 엔트리(①사업자번호 일치 ②정규화 병원명 일치). 없으면 null
    ★사업자번호는 '지금 병원명과 맞을 때만' 신뢰한다 — 자동완성으로 A병원을 고른 뒤 병원명만 손으로 B로 고치면
      사업자번호는 A의 값이 남는데(기존 동작), 그걸 그대로 믿으면 B에 A의 업체가 조용히 붙는다. */
-function lookupVendor(name,biz){
+function vendorEntry(name,biz){
   const b=normBiz(biz), nk=normHosp(name);
   const bizTrust = b && (!nk || !masterByBiz[b] || normHosp(masterByBiz[b].병원명)===nk);
-  if(bizTrust && vendorByBiz[b]) return vendorByBiz[b].업체명;
-  if(nk && vendorByName[nk]) return vendorByName[nk].업체명;
-  return '';
+  if(bizTrust && vendorByBiz[b]) return vendorByBiz[b];
+  if(nk && vendorByName[nk]) return vendorByName[nk];
+  return null;
+}
+/* 담당 업체가 2곳 이상이라 자동으로 정할 수 없는 병원인가 — 안내 문구용 */
+function vendorAmbiguous(name,biz){ const e=vendorEntry(name,biz); return !!(e && e.n>1); }
+/* 병원명·사업자번호 → 담당 업체명. 없거나 모호(2곳 이상)하면 '' */
+function lookupVendor(name,biz){
+  const e=vendorEntry(name,biz);
+  if(!e || e.n>1) return '';       // [fix5-M1] 모호하면 채우지 않는다 → 빈칸 + 배지 off로 자연 처리
+  return e.업체명;
 }
 /* ── 병원명 ↔ 마스터 매칭 (§6) — 사업자번호 우선, 폴백 정규화 병원명 ── */
 function matchHospital(name, biz){
@@ -1275,7 +1324,11 @@ function loadCrm(){
     if(res && res.success && res.meta && Array.isArray(res.directors)){
       crm=res; crmReady=true;
       buildVendorMaster();
-      if(rpm){ loadDaily(); renderClosing(); renderPlans(); renderDone(); renderTodo(); renderIssue(); }
+      // [fix5-H] ★loadDaily()를 다시 부르지 않는다. loadDaily는 daily를 통째로 리셋한 뒤 localStorage로 복원하는데,
+      //   ① 작성 중이던 계획 행의 _edit(입력칸 표시)가 날아가 고칠 수 없는 텍스트로 굳고
+      //   ② 서버 월간계획이 localStorage 값으로 통째 교체돼 화면에서 사라진 채 제출되면(월 단위 전체교체) 시트에서 지워졌다.
+      //   → 손대지 않은 항목만 채우고, 서버 계획은 '없는 행만' 병합하는 applyCrmLate()로 교체.
+      if(rpm) applyCrmLate();
     }
   };
   sc.onerror=function(){ try{document.head.removeChild(sc);}catch(e){} crmLoading=false; };
@@ -1330,13 +1383,15 @@ function saveDaily(){
     closing:{전월예측:closing.전월예측,목표:closing.목표,예측:closing.예측,비고:closing.비고,목표확정:closing.목표확정},
     // [fix4-P] _edit(작성 중 표시)는 화면 상태일 뿐이라 저장하지 않는다 → 새로고침하면 작성분은 모두 텍스트로 복원
     계획:(daily.계획||[]).map(p=>({유형:p.유형,거래처:p.거래처,품목:p.품목,MBO만:p.MBO만})),
+    // [fix5-H] 지운 계획의 키 이력 — 서버 월간계획 병합이 '지운 행'을 되살리지 않게 한다
+    계획삭제:(daily.계획삭제||[]),
     한일:daily.한일, 할일:daily.할일, 이슈:daily.이슈,
     volumeUp:volumeUp
   })); }catch(e){}
 }
 function loadDaily(){
   closing={전월예측:'',목표:'',예측:'',비고:'',목표확정:false,_force:false};
-  daily={계획:[],한일:[],할일:[],이슈:''};
+  daily={계획:[],한일:[],할일:[],이슈:'',계획삭제:[]};
   buildVendorMaster();   // 작성자가 정해져야 '최근 미팅 업체' 상단 정렬이 확정된다
   applyCrmPrefill();
   try{
@@ -1346,6 +1401,7 @@ function loadDaily(){
       if(o.closing){ ['전월예측','목표','예측','비고'].forEach(k=>{ if(o.closing[k]!=null&&o.closing[k]!=='') closing[k]=o.closing[k]; });
                      if(o.closing.목표확정!=null) closing.목표확정=!!o.closing.목표확정; }
       if(Array.isArray(o.계획)&&o.계획.length) daily.계획=o.계획;
+      if(Array.isArray(o.계획삭제)) daily.계획삭제=o.계획삭제;
       if(Array.isArray(o.한일)&&o.한일.length) daily.한일=o.한일;
       if(Array.isArray(o.할일)&&o.할일.length) daily.할일=o.할일;
       if(typeof o.이슈==='string') daily.이슈=o.이슈;
@@ -1353,20 +1409,79 @@ function loadDaily(){
       if(Array.isArray(o.volumeUp) && o.volumeUp.length && !volumeUp.length) volumeUp=o.volumeUp;
     }
   }catch(e){}
+  // [fix5-H] 서버 월간계획은 localStorage 복원 '뒤에' 병합한다.
+  //   (프리필 → 복원 순서였을 때는 복원이 daily.계획을 통째로 갈아끼워 서버 행이 조용히 사라졌다)
+  mergeServerPlans();
   if(!daily.한일.length) daily.한일=[{업체명:'',상태:'',내용:''}];
   if(!daily.할일.length) daily.할일=[{업체명:'',내용:''}];
   renderVU();
 }
-/* 서버 프리필 — §11-4 '폼 프리필 매핑' 표 그대로 */
+/* 서버 프리필 — §11-4 '폼 프리필 매핑' 표 그대로. [fix5-H] ①목표 4칸만 담당(월간계획은 mergeServerPlans) */
 function applyCrmPrefill(){
   const me=myDir(); if(!me) return;
   const f=me.flow||{};
   if(f.prevForecast && numOf(f.prevForecast.value)>0) closing.전월예측=numOf(f.prevForecast.value);
   if(f.target && numOf(f.target.value)>0){ closing.목표=numOf(f.target.value); closing.목표확정=!!f.target.locked; }
   if(f.forecast && numOf(f.forecast.value)>0 && f.forecast.hasInput!==false) closing.예측=numOf(f.forecast.value);
+}
+/* [fix5-H] 계획 행 식별 키 — 유형+거래처+품목(대소문자·공백·괄호 무시). 병합·삭제이력 대조용 */
+function planKey(p){
+  return planTypeNorm(p&&p.유형)+'|'+normHosp(p&&p.거래처)+'|'+normHosp(p&&p.품목);
+}
+/* [fix5-H] 서버 월간계획 병합 — 덮어쓰지 않고 '화면에 없는 행만' 추가한다.
+   ★유실 차단의 핵심: 프리필이 늦게 도착해도 서버에 이미 있던 이번달 계획이 payload(월 단위 전체교체)에서 빠지지 않는다.
+   지부장이 지운 행(계획삭제 이력)은 되살리지 않는다 — 삭제가 새로고침마다 되돌아가는 것도 유실이다. */
+function mergeServerPlans(){
+  if(!crm||!rpm) return false;
   const ym=crmMeta().nowMonth||nowMonth();
   const mp=((crm.monthlyPlans||{})[rpm]||{})[ym]||[];
-  if(mp.length) daily.계획=mp.map(p=>({유형:planTypeNorm(p.유형),거래처:p.거래처||'',품목:p.품목||'',MBO만:(numOf(p.MBO)/10000)||''}));
+  if(!mp.length) return false;
+  const have={}; (daily.계획||[]).forEach(p=>{ have[planKey(p)]=1; });
+  const del={};  (daily.계획삭제||[]).forEach(k=>{ del[k]=1; });
+  let added=0;
+  mp.forEach(p=>{
+    const row={유형:planTypeNorm(p.유형),거래처:p.거래처||'',품목:p.품목||'',MBO만:(numOf(p.MBO)/10000)||''};
+    const k=planKey(row);
+    if(have[k]||del[k]) return;
+    have[k]=1; daily.계획.push(row); added++;
+  });
+  return added>0;
+}
+/* [fix5-H] 사용자가 지금 입력 중인 카드는 재렌더하지 않는다(포커스·커서·조합 중 한글 보호).
+   포커스가 그 카드 밖으로 나가는 순간 딱 한 번 실행한다. */
+function isTypingIn(cardId){
+  const c=document.getElementById(cardId), a=document.activeElement;
+  return !!(c && a && c!==a && c.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName||''));
+}
+function renderWhenIdle(cardId,fn){
+  const c=document.getElementById(cardId);
+  if(!c || !isTypingIn(cardId)){ fn(); return; }
+  const h=function(){
+    setTimeout(function(){
+      if(isTypingIn(cardId)) return;              // 같은 카드 안 다른 칸으로 이동 — 계속 대기
+      c.removeEventListener('focusout',h,true);
+      fn();
+    },0);
+  };
+  c.addEventListener('focusout',h,true);
+}
+/* [fix5-H] CRM 응답이 '작성 시작 후'에 도착했을 때의 반영 — 파괴 없는 프리필.
+   ① 목표 4칸: 사용자가 아직 손대지 않은(빈) 칸만 채운다   ② 월간계획: 없는 행만 병합
+   ③ ⑤한일·⑥할일·⑦이슈: crm에서 오는 값이 없으므로 재렌더하지 않는다(입력 중 포커스 파괴 제거) */
+function applyCrmLate(){
+  if(!rpm) return;
+  const me=myDir();
+  const filled=v=>(v!==''&&v!=null);
+  if(me){
+    const f=me.flow||{};
+    if(!filled(closing.전월예측) && f.prevForecast && numOf(f.prevForecast.value)>0) closing.전월예측=numOf(f.prevForecast.value);
+    if(!filled(closing.목표)     && f.target       && numOf(f.target.value)>0){ closing.목표=numOf(f.target.value); closing.목표확정=!!f.target.locked; }
+    if(!filled(closing.예측)     && f.forecast     && numOf(f.forecast.value)>0 && f.forecast.hasInput!==false) closing.예측=numOf(f.forecast.value);
+  }
+  const added=mergeServerPlans();
+  saveDaily();
+  renderWhenIdle('c-cl',renderClosing);
+  if(added) renderWhenIdle('c-plan',renderPlans); else planSummary();
 }
 
 /* ════════════ ① 목표 — 4칸(확정실적·전월예측·이번달목표·이번달예측) ════════════ */
@@ -1507,6 +1622,8 @@ function delPlan(i){
   const p=daily.계획[i]||{};
   const has=String(p.거래처||'').trim()||String(p.품목||'').trim()||numOf(p.MBO만);
   if(has && !confirm('작성한 내용이 있습니다. 이 계획을 지우면 작성 내용이 사라집니다. 지울까요?')) return;
+  // [fix5-H] 지운 키를 기록 → 늦게 도착한 서버 월간계획 병합이 이 행을 되살리지 않는다
+  if(has){ const k=planKey(p); if(!daily.계획삭제) daily.계획삭제=[]; if(daily.계획삭제.indexOf(k)<0) daily.계획삭제.push(k); }
   daily.계획.splice(i,1); renderPlans(); saveDaily();
 }
 function planField(i,f,v){ daily.계획[i][f]=v;
@@ -1552,7 +1669,15 @@ function planLine(p){
 }
 function renderPlans(){
   const cont=document.getElementById('plan-list'); if(!cont) return;
-  if(!daily.계획.length){ cont.innerHTML='<div class="row-empty">이번달 계획이 없습니다 — 아래 버튼으로 추가하세요</div>'; planSummary(); return; }
+  if(!daily.계획.length){
+    // [fix5-L2] 전부 지운 상태 안내 — 서버는 빈 배열을 no-op으로 처리(saveMonthlyPlans_ '② 빈 배열 no-op')하므로
+    //   폼 전송만으로는 시트의 이번달 계획이 지워지지 않는다. 지워진 것으로 오해하지 않도록 사실을 그대로 알린다.
+    const cleared=(daily.계획삭제||[]).length>0;
+    cont.innerHTML='<div class="row-empty">'+(cleared
+      ? '계획을 모두 지웠습니다 — 새 계획을 추가해 전송하면 그 내용으로 교체됩니다.<br>※ 비운 상태로 전송해도 시트에 이미 저장된 이번달 계획은 남습니다(관리자 삭제 필요).'
+      : '이번달 계획이 없습니다 — 아래 버튼으로 추가하세요')+'</div>';
+    planSummary(); return;
+  }
   cont.innerHTML=daily.계획.map((p,i)=>{
     const ty=planTypeNorm(p.유형);
     // [fix4-P] 작성 완료 행 = 읽기용 한 줄 텍스트 + 삭제(×)만. 고치려면 지우고 다시 쓴다.
@@ -1671,7 +1796,7 @@ function vacPick(kind,i,k){
   if(kind==='done')      { doneCount(); renderDone(); }
   else if(kind==='todo') { todoCount(); }
   else if(kind==='plan') { updatePlanNew(i); planSummary(); }
-  else if(kind==='vuc')  { const bd=document.getElementById('vu-auto-'+i); if(bd) bd.classList.remove('on'); }
+  else if(kind==='vuc')  { const bd=document.getElementById('vu-auto-'+i); if(bd) bd.classList.remove('on'); vuSyncMultiDom(i); }
   saveDaily();
 }
 function vacClose(kind,i){ setTimeout(()=>{ const b=document.getElementById('vac-'+kind+'-'+i); if(b) b.style.display='none'; },160); }
@@ -2022,7 +2147,8 @@ function addNB(){
 
 /* ════════════ ③ 매출증대 예측처 (볼륨업) ════════════ */
 function addVU(){
-  volumeUp.push({병원명:'',사업자번호:'',업체명:'',품목:'',내용:'',증대MBO:'',목표월:nowMonth(),상태:'진행',진행:'',_업체자동:false});
+  // [fix5-M2] _biz자동 = 지금 사업자번호가 '자동으로 채워진 값'인가(=손으로 친 값이면 false). _acName = 그 번호의 주인 병원명
+  volumeUp.push({병원명:'',사업자번호:'',업체명:'',품목:'',내용:'',증대MBO:'',목표월:nowMonth(),상태:'진행',진행:'',_업체자동:false,_biz자동:false,_acName:''});
   renderVU(); saveDaily();   // [fix2-U3] 볼륨업도 임시저장 대상
 }
 /* ── [fix4-V] 거래처(병원) → 담당 업체명 자동 채움 ──
@@ -2043,6 +2169,44 @@ function vuSyncVendorDom(i){
   const v=volumeUp[i]||{};
   const inp=document.getElementById('vu-c-'+i); if(inp) inp.value=v.업체명||'';
   const bd=document.getElementById('vu-auto-'+i); if(bd) bd.classList.toggle('on',!!v._업체자동&&!!String(v.업체명||'').trim());
+  vuSyncMultiDom(i);
+}
+/* [fix5-M1] 거래 업체가 여러 곳이라 자동으로 정할 수 없는 병원 안내 — 빈칸일 때만 노출 */
+function vuMultiHint(i){
+  const v=volumeUp[i]||{};
+  return !!(String(v.병원명||'').trim() && !String(v.업체명||'').trim() && vendorAmbiguous(v.병원명,v.사업자번호));
+}
+function vuSyncMultiDom(i){
+  const el=document.getElementById('vu-multi-'+i); if(el) el.style.display=vuMultiHint(i)?'block':'none';
+}
+/* ── [fix5-M2·M3] 병원명이 바뀔 때 사업자번호 재결속 ──
+   M3(중복행 차단): 마스터에 매칭되면 수기 타이핑이어도 사업자번호를 마스터 값으로 채운다.
+     서버 upsert 키가 '사업자번호 || 명:정규화병원명'이라, 같은 병원·품목·목표월인데 한 번은 번호 있고 한 번은 없으면
+     서로 다른 행으로 쌓여 MBO가 이중 계상된다 → 번호를 항상 자동 보정해 키를 하나로 통일한다.
+   M2(오귀속 차단): 자동으로 채워졌던 번호는, 병원명이 그 번호의 주인 병원이 아니게 되는 순간 비운다.
+     (A병원 자동완성 후 병원명만 B로 고치면 번호는 A 그대로 남아 서버가 A행에 저장했다 — 화면 B / 시트 A)
+   ★손으로 친 번호(_biz자동=false)는 어느 경우에도 건드리지 않는다 — 마스터 미등록 병원 보호. */
+function vuSyncBiz(i){
+  const v=volumeUp[i]; if(!v) return false;
+  const nk=normHosp(v.병원명);
+  const m=nk?masterByName[nk]:null;
+  const hand=!!String(v.사업자번호||'').trim() && !v._biz자동;    // 지부장이 직접 친 번호
+  if(m){
+    if(hand) return false;                                        // 수기 번호 존중
+    const nb=m.사업자번호||'';
+    const changed=(String(v.사업자번호||'')!==nb);
+    v.사업자번호=nb; v._biz자동=true; v._acName=m.병원명;
+    return changed;
+  }
+  if(v._biz자동 && v._acName && normHosp(v._acName)!==nk){
+    const had=!!String(v.사업자번호||'').trim();
+    v.사업자번호=''; v._biz자동=false; v._acName='';
+    return had;
+  }
+  return false;
+}
+function vuSyncBizDom(i){
+  const inp=document.getElementById('vu-biz-'+i); if(inp) inp.value=(volumeUp[i]||{}).사업자번호||'';
 }
 function renderVU(){
   document.getElementById('vu-cnt').textContent=volumeUp.length;
@@ -2065,8 +2229,9 @@ function renderVU(){
             oninput="vuField(${i},'업체명',this.value);vacSearch('vuc',${i},this.value)" onkeydown="vacKey('vuc',${i},event)" onblur="vacClose('vuc',${i})">
           <span class="autobadge${(v._업체자동&&String(v.업체명||'').trim())?' on':''}" id="vu-auto-${i}">자동</span>
           <div class="vac-list" id="vac-vuc-${i}"></div>
+          <div class="vu-multi" id="vu-multi-${i}" style="display:${vuMultiHint(i)?'block':'none'}">이 병원은 거래 업체가 여러 곳입니다 — 직접 선택해 주세요</div>
         </div>
-        <div class="ig"><label>품목</label><input type="text" value="${esc(v.품목)}" placeholder="예) 바이오탑" oninput="vuField(${i},'품목',this.value)"></div>
+        <div class="ig"><label>품목</label><input type="text" id="vu-prod-${i}" value="${esc(v.품목)}" placeholder="예) 바이오탑" oninput="vuField(${i},'품목',this.value)"></div>
         <div class="ig"><label>증대 MBO (원) <span style="font-size:10px;color:var(--gray3);font-weight:400" id="vu-conv-${i}">${conv}</span></label>
           <input type="number" value="${v.증대MBO}" placeholder="예) 5000000" oninput="vuField(${i},'증대MBO',this.value)"></div>
         <div class="ig"><label>목표월</label><input type="month" value="${esc(v.목표월)}" oninput="vuField(${i},'목표월',this.value)"></div>
@@ -2086,10 +2251,16 @@ function vuField(i,f,v){
   volumeUp[i][f]=v;
   // [fix4-V] 증대MBO 환산 라벨 — .ig 인덱스(3) 대신 id로 잡는다(업체명 칸 추가로 인덱스가 밀려 깨지던 참조 제거)
   if(f==='증대MBO'){ const lab=document.getElementById('vu-conv-'+i); if(lab) lab.textContent=v?((Number(v)||0)/10000).toLocaleString()+'만원':''; }
+  // [fix5-L1] 품목을 채우면 미입력 강조 해제
+  if(f==='품목'){ const pe=document.getElementById('vu-prod-'+i); if(pe&&String(v||'').trim()) pe.classList.remove('need'); }
+  // [fix5-M2] 사업자번호를 손으로 입력하면 이후 자동 로직이 이 값을 지우거나 덮지 않는다
+  if(f==='사업자번호'){ volumeUp[i]._biz자동=false; volumeUp[i]._acName=''; }
+  // [fix5-M2·M3] 병원명이 바뀌면 사업자번호를 먼저 재결속(마스터 매칭=보정 / 주인 불일치=초기화) → 그 다음 업체명 자동채움
+  if(f==='병원명'){ if(vuSyncBiz(i)) vuSyncBizDom(i); }
   // [fix4-V] 거래처(병원명·사업자번호)가 바뀌면 업체명을 다시 채운다 — 재렌더 없이 DOM만 동기화(입력 중 커서 보존)
-  if(f==='병원명'||f==='사업자번호'){ if(vuApplyVendor(i)) vuSyncVendorDom(i); }
+  if(f==='병원명'||f==='사업자번호'){ if(vuApplyVendor(i)) vuSyncVendorDom(i); else vuSyncMultiDom(i); }
   // 업체명을 손으로 고치면 '자동' 배지 해제 → 이후 거래처가 바뀌어도 덮어쓰지 않는다
-  if(f==='업체명'){ volumeUp[i]._업체자동=false; const bd=document.getElementById('vu-auto-'+i); if(bd) bd.classList.remove('on'); }
+  if(f==='업체명'){ volumeUp[i]._업체자동=false; const bd=document.getElementById('vu-auto-'+i); if(bd) bd.classList.remove('on'); vuSyncMultiDom(i); }
   saveDaily();
 }
 function vuFocus(i){ acState._vuIdx=i; }
@@ -2101,7 +2272,9 @@ function delVU(i){ volumeUp.splice(i,1); renderVU(); saveDaily(); }
     const h=acState.hits[idx];
     if(/^vu\d+$/.test(String(ctx)) && h){
       const i=parseInt(String(ctx).slice(2),10)||0;
-      if(volumeUp[i]){ volumeUp[i].병원명=h.병원명; volumeUp[i].사업자번호=h.사업자번호||''; vuApplyVendor(i); }  // [fix4-V] 업체명 동시 자동채움
+      // [fix4-V] 업체명 동시 자동채움 / [fix5-M2] 이 사업자번호는 '자동으로 채워진 값'이고 주인은 h.병원명임을 기록
+      //   → 이후 병원명만 손으로 고치면 vuSyncBiz가 남의 사업자번호를 지운다(화면 B / 시트 A 저장 차단)
+      if(volumeUp[i]){ volumeUp[i].병원명=h.병원명; volumeUp[i].사업자번호=h.사업자번호||''; volumeUp[i]._biz자동=true; volumeUp[i]._acName=h.병원명; vuApplyVendor(i); }
       const box=document.getElementById('ac-'+ctx); if(box) box.style.display='none';
       renderVU(); saveDaily();   // [fix2-U3]
       return;
