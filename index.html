@@ -513,8 +513,9 @@ body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var
         <label class="ct on" data-c="m4"><input type="checkbox" checked>26.4월</label>
         <label class="ct on" data-c="m5"><input type="checkbox" checked>26.5월</label>
         <label class="ct on" data-c="m6"><input type="checkbox" checked>26.6월</label>
+        <span style="width:1px;height:18px;background:var(--gray2);margin:0 2px"></span>
+        <label class="ct" id="ct-loc" onclick="toggleLoc()" title="지역·담당RPM 열 펼치기/접기">📍 지역/RPM</label>
       </div>
-      <label class="ct" id="ct-loc" onclick="toggleLoc()" style="cursor:pointer">📍 지역/RPM</label>
       <div style="margin-left:auto;display:flex;gap:6px">
         <button class="preset-btn" onclick="ctPreset('all')">전체</button>
         <button class="preset-btn" onclick="ctPreset('sales')">매출만</button>
@@ -662,6 +663,8 @@ function ctPreset(p){
   const on=presets[p]||presets.all;
   COL_KEYS.forEach(c=>h110Cols[c]=on.indexOf(c)>=0?1:0);
   document.querySelectorAll('.col-toggle label.ct').forEach(l=>{
+    /* 지역/RPM 칩은 COL_KEYS 소속이 아니다 — 프리셋이 상태를 덮어쓰지 않게 별도 처리 */
+    if(l.id==='ct-loc'){ if(h110ShowLoc) l.classList.add('on'); else l.classList.remove('on'); return; }
     if(h110Cols[l.dataset.c]) l.classList.add('on'); else l.classList.remove('on');
   });
   if(typeof render110==='function') render110();
