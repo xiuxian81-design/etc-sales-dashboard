@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[문헌모니터링] 4주차 Gut-Liver Axis (2026.08.26)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; font-size: 15px; line-height: 1.7; color: #1a1a2e; background: #f0f2f5; padding: 24px 0; }
+    .container { max-width: 820px; margin: 0 auto; padding: 0 16px; }
+    .info-box { background: #fff3e0; border: 2px solid #FF9800; border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+    .info-box h2 { color: #E65100; font-size: 18px; margin-bottom: 12px; }
+    .info-row { display: flex; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
+    .info-label { font-weight: bold; min-width: 60px; color: #555; }
+    .info-value { flex: 1; font-size: 14px; }
+    .copy-btn { background: #FF9800; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; white-space: nowrap; }
+    .copy-btn:hover { background: #F57C00; }
+    .copy-success { color: #2E7D32; font-size: 12px; margin-left: 8px; display: none; }
+    .guide-text { background: #FFF8E1; padding: 10px 14px; border-radius: 6px; margin-top: 12px; font-size: 13px; color: #795548; }
+    .mail-body { background: #fff; border-radius: 10px; padding: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .copy-body-area { margin-bottom: 16px; text-align: right; }
+    .report-header { background: linear-gradient(135deg,#003366 0%,#1a5276 100%); color: #fff; border-radius: 14px; padding: 28px 32px; margin-bottom: 24px; }
+    .report-header .badge { display: inline-block; background: #1A5276; color: #fff; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+    .report-header h1 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    .report-header .meta { font-size: 13px; color: rgba(255,255,255,0.75); display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
+    .stat-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+    .stat-pill { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 16px; font-size: 13px; }
+    .stat-pill span { font-size: 20px; font-weight: 800; display: block; }
+    .exec-box { background: #fff; border-left: 5px solid #003366; border-radius: 0 10px 10px 0; padding: 18px 22px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .exec-box h3 { font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: #003366; margin-bottom: 10px; }
+    .exec-box p { font-size: 14px; line-height: 1.8; color: #333; }
+    .paper { background: #fff; border-radius: 14px; margin-bottom: 28px; box-shadow: 0 3px 12px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #e8eaf0; }
+    .paper-header { padding: 16px 22px 12px; display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #f0f2f5; }
+    .paper-num { background: #003366; color: #fff; font-size: 12px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+    .stars-high { color: #c0392b; font-size: 16px; font-weight: 900; }
+    .stars-mid { color: #e67e22; font-size: 16px; font-weight: 900; }
+    .tag-direct { background: #e8f4fd; color: #1a5276; border: 1px solid #aed6f1; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+    .tag-ref { background: #f0f0f0; color: #666; border: 1px solid #ccc; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+    .journal-meta { font-size: 12px; color: #888; }
+    .paper-body { padding: 20px 22px; }
+    .paper-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; line-height: 1.6; }
+    .paper-url { font-size: 12px; color: #1a5276; margin-bottom: 14px; display: block; word-break: break-all; text-decoration: none; }
+    .paper-url:hover { text-decoration: underline; }
+    .design-badge { display: inline-block; background: #eaf2ff; color: #1a5276; font-size: 12px; font-weight: bold; padding: 4px 12px; border-radius: 6px; margin-bottom: 14px; }
+    .summary-grid { background: #fafbfc; border-radius: 10px; padding: 16px; margin-bottom: 14px; border: 1px solid #e8eaf0; }
+    .summary-grid h4 { font-size: 12px; letter-spacing: 1px; color: #888; text-transform: uppercase; margin-bottom: 10px; font-weight: bold; }
+    .s-row { display: grid; grid-template-columns: 90px 1fr; gap: 6px 12px; margin-bottom: 8px; align-items: flex-start; font-size: 13.5px; }
+    .s-label { font-weight: 700; color: #003366; white-space: nowrap; }
+    .s-val { color: #333; line-height: 1.8; }
+    .s-val em { background: #fff3cd; padding: 1px 4px; border-radius: 3px; font-style: normal; font-weight: bold; color: #664d03; }
+    .key-nums { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+    .knum { background: #003366; color: #fff; border-radius: 10px; padding: 12px 16px; flex: 1; min-width: 140px; text-align: center; }
+    .knum .val { font-size: 22px; font-weight: 900; color: #1A5276; display: block; }
+    .knum .desc { font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 2px; line-height: 1.4; }
+    .knum .pval { font-size: 10px; color: #aed6f1; margin-top: 3px; }
+    .viz-section { border: 2px solid #e8eaf0; border-radius: 10px; padding: 16px; margin-bottom: 14px; background: #fafbfc; }
+    .viz-section h4 { font-size: 13px; font-weight: 700; color: #003366; margin-bottom: 4px; }
+    .viz-subtitle { font-size: 12px; color: #888; margin-bottom: 14px; }
+    .chart-wrap { position: relative; height: 200px; margin-bottom: 10px; }
+    .paywall-notice { background: #fdf2f8; border: 1px solid #d7bde2; border-radius: 8px; padding: 14px 18px; font-size: 13px; color: #7d3c98; text-align: center; font-weight: 500; }
+    .usage { background: linear-gradient(135deg,#fff8f0,#fff3e0); border-left: 4px solid #1A5276; border-radius: 0 10px 10px 0; padding: 14px 18px; font-size: 13.5px; line-height: 1.8; }
+    .usage h4 { font-size: 12px; color: #1A5276; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+    .usage ul { margin-left: 16px; }
+    .usage li { margin-bottom: 4px; }
+    .legend { background: #fff; border-radius: 10px; padding: 18px 22px; margin-top: 8px; border: 1px solid #e8eaf0; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+    .legend h4 { color: #003366; margin-bottom: 10px; font-weight: bold; }
+    .legend table { width: 100%; border-collapse: collapse; }
+    .legend td { padding: 8px; border-bottom: 1px solid #f0f0f0; }
+    .legend td:first-child { background: #f9f9f9; font-weight: bold; width: 100px; }
+    @media print { body { background: #fff; padding: 0; } .info-box, .copy-body-area, .copy-btn { display: none; } .mail-body { box-shadow: none; padding: 0; } .paper { page-break-inside: avoid; } }
+    @media (max-width: 600px) { body { font-size: 14px; } .mail-body { padding: 16px; } .report-header { padding: 20px; } .s-row { grid-template-columns: 1fr; } .key-nums { flex-direction: column; } }
+  </style>
+
+
+
+
+
+
+
+
+
+
+<style>/*BR_EXTRA_CSS*/
+.papers{max-width:920px;margin:0 auto;padding:0 8px}
+.paper{border:1px solid #e3e7ee;border-radius:14px;margin:0 auto 26px;box-shadow:0 3px 12px rgba(0,0,0,.07);overflow:hidden;background:#fff}
+.paper-header{background:linear-gradient(135deg,#1A5276,#003366);color:#fff;padding:18px 22px}
+.paper-header .paper-title{color:#fff;font-size:16px;font-weight:800;line-height:1.5;margin:0 0 12px}
+.paper-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:#e3ecf6}
+.paper-meta-item{display:flex;align-items:center;gap:4px}
+.paper-meta-item strong{color:#fff;font-weight:600}
+.importance-badge{padding:3px 11px;border-radius:20px;font-weight:800;color:#1a1a2e}
+.importance-high{background:#FFD54F}.importance-mid{background:#90CAF9;color:#0d2b45}.importance-low{background:#cfd8dc;color:#37474f}
+.evidence-tag{padding:3px 11px;border-radius:20px;font-weight:700;color:#fff;background:#2E8B72}
+.evidence-ref{background:#8896a5}
+.bd-request-btn{background:#fff;color:#003366;border:none;padding:7px 16px;border-radius:7px;font-size:12.5px;font-weight:800;cursor:pointer;margin-left:auto;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.bd-request-btn:hover{background:#ffe9b3}.bd-request-btn:disabled{background:#b9c2cc;color:#fff;cursor:not-allowed}
+.paper-header a,.paper-url{color:#cfe0f5 !important;font-size:11px;word-break:break-all}
+.paper-content{padding:18px 22px}
+.content-section{border-left:4px solid #d3dce6;padding:6px 0 6px 16px;margin:0 0 12px}
+.content-section-title{font-size:13px;font-weight:800;color:#1A5276;margin-bottom:4px;letter-spacing:.2px}
+.content-section-text{font-size:13.5px;line-height:1.7;color:#2b2b38}
+.content-section-text strong{color:#003366}
+.content-section.cs-key{border-left-color:#003366;background:#f3f8fd;border-radius:8px;padding:11px 16px}
+.content-section.cs-key .content-section-title{color:#003366}
+.key-numbers{background:#fff8e6;border:1px solid #f1dea0;border-radius:10px;padding:13px 18px;margin:14px 0}
+.key-numbers h4{margin:0 0 8px;color:#8a6a00;font-size:13.5px}
+.key-numbers ul{margin:0;padding-left:20px}.key-numbers li{font-size:13px;line-height:1.55;margin:4px 0;color:#5a4600}
+.viz-section{background:#f5f9fd;border:1px solid #d9e6f2;border-radius:10px;padding:15px 18px;margin:14px 0}
+.viz-section h4{margin:0 0 10px;color:#003366;font-size:13.5px}
+.usage-box{background:#ecf7f3;border:1px solid #bfe2d7;border-left:5px solid #2E8B72;border-radius:10px;padding:14px 18px;margin:14px 0}
+.usage-box h4{margin:0 0 8px;color:#1d6b59;font-size:13.5px}
+.usage-head{font-weight:800;color:#135344;font-size:13.5px;line-height:1.55;margin-bottom:7px;padding-bottom:7px;border-bottom:1px dashed #bfe2d7}
+.usage-box ul{margin:0;padding-left:20px}.usage-box li{font-size:13px;line-height:1.6;margin:5px 0;color:#244b43}
+</style>
+
+</head>
+<body>
+<div class="container">
+<div class="info-box">
+  <h2>📧 메일 발송 안내</h2>
+  <div class="info-row">
+    <span class="info-label">수신자:</span>
+    <span class="info-value">aaaa81@hanall.co.kr</span>
+  </div>
+  <div class="info-row">
+    <span class="info-label">제목:</span>
+    <span class="info-value" id="mailSubject">[문헌모니터링] 4주차 Gut-Liver Axis (2026.08.26)</span>
+    <button class="copy-btn" onclick="copyText('mailSubject', 'subjectSuccess')">제목 복사</button>
+    <span class="copy-success" id="subjectSuccess">복사됨!</span>
+  </div>
+  <div class="guide-text">
+    아래 <strong>"본문 복사"</strong> 버튼을 클릭한 후, 메일 본문에 <strong>붙여넣기(Ctrl+V)</strong> 하세요.
+  </div>
+</div>
+<div class="mail-body">
+  <div class="copy-body-area">
+    <button class="copy-btn" onclick="copyBody()" style="font-size:15px; padding:10px 24px;">📋 본문 복사</button>
+    <span class="copy-success" id="bodySuccess" style="font-size:13px;">본문이 클립보드에 복사되었습니다!</span>
+  </div>
+  <div id="mailContent">
+    <div class="report-header">
+      <div class="badge">4주차 세션</div>
+      <h1>Gut-Liver Axis 문헌 업데이트</h1>
+      <div class="meta"><span>노르믹스 + 하노마린</span> <span>2026.08.26</span></div>
+      <div class="stat-row">
+        <div class="stat-pill">논문 <span>6</span>편</div>
+        <div class="stat-pill">★★★ <span>7</span>편</div>
+        <div class="stat-pill">오픈액세스 <span>3</span>편</div>
+      </div>
+    </div>
+    <div class="exec-box">
+      <h3>Executive Summary</h3>
+      <p>2025~2026년 간 미생물-간 축(Gut-Liver Axis) 관련 임상근거가 주요 국제 저널에 집중 발표되었다. <strong>Rifaximin의 간성뇌증 예방 효과가 12개 RCT, 1,939명을 종합한 메타분석에서 입증(RR 0.58, 40% 감소)</strong>, <strong>IBS-D 환자에서 리팍시민 병용 치료(프로바이오틱스)의 반응률이 단독 대비 2배 달성</strong>, <strong>하노마린(Silymarin) 단일 RCT에서 MASLD 환자의 간경도(liver stiffness) 유의한 감소</strong>, <strong>리팍시민의 항생제 내성 유발 우려(Nature Communications 2025)</strong>가 핵심이다. 프로바이오틱스 병용, 적정 투여 기간, 항생제 내성 모니터링 등 정밀 진료 전략의 중요성이 부각되고 있다.</p>
+    </div>
+        <div class="papers">
+
+            <!-- ━━━ 논문 #1 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Efficacy and safety of rifaximin for the prophylaxis of hepatic encephalopathy: A meta-analysis</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Medicine</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-01-17</div>
+                        <button class="bd-request-btn" data-title="Efficacy and safety of rifaximin for the prophylaxis of hepatic encephalopathy: A meta-analysis" data-session="Gut-Liver Axis" data-num="1" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11789876/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">체계적 문헌고찰/메타분석</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">간성뇌증(HE)은 말기 간경변의 주요 합병증으로 높은 이환율과 사망률을 수반한다. 락툴로스가 1차 예방약으로 권장되지만, 과도한 단맛과 복부팽만·설사 등 부작용으로 순응도가 낮다. Rifaximin은 장관 선택적 비흡수 항생제로 HE 치료에 효과적이나, 1차/2차 예방 효과에 대해서는 기존 연구 결과가 상충되어 체계적 근거 정리가 필요하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">Cochrane Library, PubMed, EMBASE, Web of Science에서 2022년 3월까지 검색하여 rifaximin 6개월 이상 투여한 영문 RCT 14편(총 2,029명)을 선정하였다. DerSimonian-Laird 랜덤효과 모델로 상대위험도(RR)를 산출하고, 중재 종류(rifaximin 대 위약/락툴로스/병용), 예방 목적(1차/2차), 간경변 원인(바이러스/알코올), TIPS 유무별 하위군 분석을 수행하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">Rifaximin은 HE 발생 위험을 유의하게 감소시켰다(RR = -0.47, 95% CI -0.68~-0.26, p=0.01).<br/>
+하위군 분석에서 1차 예방(RR = -0.35, 95% CI -0.62~-0.08)과 2차 예방(RR = -0.56, 95% CI -0.85~-0.27) 모두 유의하였다.<br/>
+Rifaximin+락툴로스 병용은 락툴로스 단독 대비 우월(RR = -0.57, 95% CI -0.90~-0.24)하였으나, rifaximin 단독 vs 락툴로스 단독은 유의차 없었다(RR = -0.44, 95% CI -1.0~0.11).<br/>
+TIPS 시행 환자(RR = -0.35)와 비TIPS 환자(RR = -0.51), 알코올성(RR = -0.59)과 바이러스성(RR = -0.41) 간경변 모두에서 효과가 확인되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">Rifaximin 투여군에서 사망률 감소 효과는 확인되지 않았으나(RR = 0.03, 95% CI -0.32~0.39), 이상반응 발생률을 증가시키지 않았다(RR = -0.08, 95% CI 0.22~0.07).</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">Rifaximin은 간경변 원인이나 TIPS 시행 여부와 무관하게 HE의 1차·2차 예방에 효과적이며, 락툴로스와 병용 시 더욱 우월하다. 다만 사망률 감소 효과는 입증되지 않았고, 2차 예방에서의 이질성(I²=68.86%)이 결과 해석에 주의를 요한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>14 RCT / 2,029명 포함 연구/대상자</li>
+                            <li>RR -0.47 (95% CI -0.68~-0.26) HE 예방 효과</li>
+                            <li>RR -0.35 (95% CI -0.62~-0.08) 1차 예방 효과</li>
+                            <li>RR -0.56 (95% CI -0.85~-0.27) 2차 예방 효과</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: Rifaximin HE 예방 효과 (하위군별 RR)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart1"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart1"), {
+                            type: "bar",
+                            data: { labels: ["전체", "1차 예방", "2차 예방", "Rif+Lac vs Lac", "TIPS 환자", "비TIPS 환자"], datasets: [
+                              { label: "값", data: [-0.47, -0.35, -0.56, -0.57, -0.35, -0.51], backgroundColor: "#1A5276" },
+                              { label: "", data: [0, 0, 0, 0, 0, 0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 노르믹스(rifaximin)의 HE 1차·2차 예방 효과를 14개 RCT로 확인한 최신 메타분석으로, 간경변 환자에서 노르믹스 장기처방의 근거 강화에 활용</div><div class="usage-head">🎯 락툴로스+노르믹스 병용이 락툴로스 단독보다 HE 예방에 우월함을 입증 — 락툴로스 순응도 낮은 환자에서 노르믹스 추가 처방 권유 시 활용</div><div class="usage-head">🎯 TIPS 시행 환자에서도 노르믹스 예방 효과 확인 — 간담도 전문의 대상 TIPS 후 HE 예방 처방으로 포지셔닝</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #2 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Simvastatin and Rifaximin in Decompensated Cirrhosis</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> JAMA</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-02-04</div>
+                        <button class="bd-request-btn" data-title="Simvastatin and Rifaximin in Decompensated Cirrhosis" data-session="Gut-Liver Axis" data-num="2" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11800124/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">Phase 3 이중맹검 RCT</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">비대상성 간경변의 중증 합병증(급성-만성 간부전, ACLF)을 예방할 수 있는 효과적 치료가 부재하다. Simvastatin은 간경변에서 문맥압 감소 및 항염증 효과를, rifaximin은 장내세균 조절 및 암모니아 감소 효과를 보여 두 약제 병용이 간경변 예후 개선 가능성이 제기되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">유럽 14개 병원에서 비대상성 간경변 환자 237명(Child-Pugh B 194명, C 43명)을 simvastatin 20mg/일 + rifaximin 1,200mg/일 투여군(n=117)과 위약군(n=120)으로 무작위 배정하여 12개월간 이중맹검 시험을 진행하였다. 1차 종점은 ACLF 발생률, 2차 종점은 이식/사망 및 간경변 합병증 복합종점이었다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">ACLF 발생률은 치료군 17.9%(21명) vs 위약군 14.2%(17명)으로 유의차 없었다(HR 1.23, 95% CI 0.65-2.34, p=0.52).<br/>
+이식/사망은 치료군 18.8% vs 위약군 24.2%(HR 0.75, 95% CI 0.43-1.32, p=0.32), 간경변 합병증(복수·HE·정맥류출혈·AKI·감염) 발생도 치료군 42.7% vs 위약군 45.8%(HR 0.93, 95% CI 0.63-1.36, p=0.70)로 모두 유의차를 보이지 않았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">이상반응 발생은 양 군 유사(426건 vs 419건, p=0.59)하였으나, 치료군에서 횡문근융해증 3건(2.6%)이 발생하여 simvastatin 관련 주의가 필요하다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">비대상성 간경변에서 simvastatin+rifaximin 병용은 표준치료 대비 중증 합병증 예방 효과를 입증하지 못하였다. Rifaximin의 HE 재발 예방 효과와 별개로, 비대상성 단계에서 rifaximin+statin 병용의 질병경과 변경 효과는 확인되지 않았다는 점에서 처방 확대의 한계를 인식할 필요가 있다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>237명 (치료 117, 위약 120) 대상자</li>
+                            <li>17.9% vs 14.2% (HR 1.23, p=0.52) ACLF 발생(1차 종점)</li>
+                            <li>18.8% vs 24.2% (HR 0.75, p=0.32) 이식/사망</li>
+                            <li>42.7% vs 45.8% (HR 0.93, p=0.70) 합병증 복합종점</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 JAMA 게재 대규모 Phase 3 음성 결과 — 비대상성 간경변에서 노르믹스+statin 병용의 질병경과 변경 효과 부재를 인지하고, 노르믹스는 HE 예방 적응증에 집중 포지셔닝</div><div class="usage-head">🎯 이식/사망 HR 0.75(p=0.32)로 경향성은 존재 — 향후 적절한 검정력의 추가 연구 결과를 모니터링하되 현시점에서 오버클레임 주의</div><div class="usage-head">🎯 JAMA 게재 대규모 Phase 3 음성 결과 — 비대상성 간경변에서 노르믹스+statin 병용의 질병경과 변경 효과 부재를 인지하고, 노르믹스는 HE 예방 적응증에 집중 포지셔닝</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #3 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Rifaximin Plus Probiotics Reshape Gut Microbiota, Serum Propionate, and Mucosal Immunity in Cirrhosis-Related Hepatic Encephalopathy</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Canadian Journal of Gastroenterology and Hepatology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-06-15</div>
+                        <button class="bd-request-btn" data-title="Rifaximin Plus Probiotics Reshape Gut Microbiota, Serum Propionate, and Mucosal Immunity in Cirrhosis-Related Hepatic Encephalopathy" data-session="Gut-Liver Axis" data-num="3" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC13364995/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">전향적 3군 평가자맹검 RCT</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">간성뇌증(HE)은 간경변의 주요 신경정신과적 합병증으로, 고암모니아혈증이 핵심이나 암모니아만으로 임상 중증도의 이질성을 설명하지 못한다. Rifaximin은 HE 재발 감소에 효과적이나 유익한 장내 미생물 네트워크를 일관되게 회복시키지는 못하여, probiotics 병용의 부가적 이점이 가설로 제기되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">간경변 관련 HE 환자 61명을 표준치료(Con, n=20), 표준치료+rifaximin 550mg 1일 2회(Rif, n=20), 표준치료+rifaximin+다균주 probiotics 1×10⁹ CFU 1일 3회(Rif+Pro, n=21)로 무작위 배정하여 6개월간 관찰하였다. 사전 정의 기계적 하위군(n=20)에서 16S rRNA 장내미생물, 혈청 SCFA, 분변 SIgA를 측정하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">치료 후 혈청 암모니아는 단계적 감소 양상을 보였다(Con 177±43.2, Rif 143±37.5, Rif+Pro 117±34.3 μmol/L, 각 군간 p&lt;0.05).<br/>
+탐색적 HE 복합지수도 동일한 단계적 개선(Con 10.0±4.9, Rif 5.3±4.7, Rif+Pro 3.7±4.1, p&lt;0.05)을 보였다.<br/>
+기계적 하위군에서 장내미생물 군집구조가 치료군별로 유의하게 상이하였고(PERMANOVA p=0.006), Rif+Pro군에서 Lactobacillus salivarius 증가·Bacteroides ovatus 감소, 혈청 propionate 유의 상승, 분변 SIgA 약 6배 상승이 관찰되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">E. faecium 포함 probiotics 사용에도 불구하고 사전 정의 감시(주간 모니터링→월간 혈액검사→발열 시 혈액배양) 기간 동안 균혈증 신호는 관찰되지 않았다. 중대 이상반응 보고 없음.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">Rifaximin+다균주 probiotics 병용은 rifaximin 단독 대비 혈청 암모니아와 탐색적 HE 중증도 지표를 추가로 개선하며, 장내미생물 재구성·propionate 상승·점막면역(SIgA) 강화라는 다층적 기전 변화를 동반한다. 소규모 탐색적 연구이므로 사건 주도형(event-driven) 대규모 확인 시험이 필요하다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>61명 (Con 20 / Rif 20 / Rif+Pro 21) 대상자</li>
+                            <li>Con 177 / Rif 143 / Rif+Pro 117 μmol/L 혈청 암모니아(6개월)</li>
+                            <li>Con 10.0 / Rif 5.3 / Rif+Pro 3.7 HE 복합지수</li>
+                            <li>PERMANOVA p=0.006 미생물 군집 차이</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 치료군별 혈청 암모니아 (6개월, μmol/L)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart3"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart3"), {
+                            type: "bar",
+                            data: { labels: ["표준치료(Con)", "Rifaximin(Rif)", "Rif+Probiotics"], datasets: [
+                              { label: "값", data: [177, 143, 117], backgroundColor: "#1A5276" },
+                              { label: "", data: [0, 0, 0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 노르믹스+probiotics 병용의 부가적 HE 개선 효과를 보여주는 3군 RCT — 바이오탑(probiotics) 세션과 연계하여 &#x27;노르믹스+바이오탑&#x27; 병용처방의 학술 근거로 활용</div><div class="usage-head">🎯 Rifaximin 단독으로는 유익균 회복이 불충분하나 probiotics 병용 시 propionate 상승·SIgA 강화라는 기전적 근거 — 간-장축 관점에서 두 제품 시너지 메시지 가능</div><div class="usage-head">🎯 소화기내과·간장내과 전문의 대상 &#x27;노르믹스 처방 환자에게 probiotics 추가&#x27; 디테일 포인트로 활용</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #4 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Rifaximin Improves Frailty in Patients with Decompensated Cirrhosis: A Randomized Trial</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Digestive Diseases and Sciences</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-01-24</div>
+                        <button class="bd-request-btn" data-title="Rifaximin Improves Frailty in Patients with Decompensated Cirrhosis: A Randomized Trial" data-session="Gut-Liver Axis" data-num="4" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.1007/s10620-025-09660-1" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">단일기관 RCT</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">비대상성 간경변 환자에서 허약(frailty)은 높은 유병률을 보이며 이환율·사망률 증가와 직결된다. Rifaximin의 장내세균 조절, 암모니아 감소, 전신 염증 억제 효과가 간경변 허약 개선에 기여할 수 있다는 가설하에 본 연구가 수행되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">비대상성 간경변 환자 중 Liver Frailty Index(LFI) &gt;4.5인 100명을 표준치료+rifaximin(rSMT, n=50) 또는 표준치료 단독(SMT, n=50)으로 1:1 무작위 배정하여 6개월간 관찰하였다. 1차 종점은 6개월 시점 허약 개선, 2차 종점은 CTP/MELD 점수 변화, 염증 마커, 입원율, 생존이었다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">LFI는 rSMT군에서 유의하게 개선(4.7→4.2, p&lt;0.001)되었으나 SMT군은 변화 없었다(4.7→4.7, p=0.70).<br/>
+MELD 점수 변화량은 rSMT군 -2.3±2.9 vs SMT군 +1.7±5.4(p&lt;0.001)로 rSMT군에서 질병 중증도가 개선되었다.<br/>
+IL-6 변화량도 rSMT군 -10 vs SMT군 -5(p=0.01)로 유의한 차이를 보였다.<br/>
+입원률은 rSMT 16% vs SMT 52%(p&lt;0.001)로 현저히 낮았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">사망률은 rSMT 10%(5명) vs SMT 22%(11명)으로 수치적 차이가 있었으나 전체생존에서 유의차는 없었다(p=0.11). 중대 이상반응에 대한 별도 보고 없음.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">비대상성 간경변에서 6개월 rifaximin 투여는 허약 지표를 유의하게 개선하고, 질병 중증도(MELD) 및 전신 염증(IL-6)을 감소시키며, 입원율을 3분의 1 수준으로 감소시켰다. 단일기관·소규모 연구 한계가 있으나, rifaximin의 질병경과 변경 가능성을 시사하는 결과이다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>100명 (rSMT 50, SMT 50) 대상자</li>
+                            <li>4.7 → 4.2 (p&lt;0.001) LFI 변화(rSMT)</li>
+                            <li>4.7 → 4.7 (p=0.70) LFI 변화(SMT)</li>
+                            <li>-2.3 vs +1.7 (p&lt;0.001) MELD 변화량</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: Rifaximin 6개월 투여 효과 (입원율·LFI·MELD)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart4"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart4"), {
+                            type: "bar",
+                            data: { labels: ["입원율(rSMT)", "입원율(SMT)", "LFI(rSMT 후)", "LFI(SMT 후)"], datasets: [
+                              { label: "값", data: [16, 52, 4.2, 4.7], backgroundColor: "#1A5276" },
+                              { label: "", data: [0, 0, 0, 0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 간경변 환자의 허약(frailty) 개선이라는 새로운 임상 가치를 입증한 RCT — 노르믹스의 HE 예방 외 추가적 처방 명분으로 활용 가능</div><div class="usage-head">🎯 입원율 52%→16%로 대폭 감소 — 비용효과성 측면에서 노르믹스 장기처방의 경제적 정당성 근거</div><div class="usage-head">🎯 MELD 점수 개선(-2.3점)은 질병 중증도 자체의 호전을 시사 — 간장내과 전문의 대상 &#x27;disease-modifying&#x27; 포지셔닝 가능</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #5 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">A Randomized Trial of Rifaximin vs Low FODMAP Diet for Symptom Outcomes and Microbiome Changes in Irritable Bowel Syndrome</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Clinical Gastroenterology and Hepatology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-04-28</div>
+                        <button class="bd-request-btn" data-title="A Randomized Trial of Rifaximin vs Low FODMAP Diet for Symptom Outcomes and Microbiome Changes in Irritable Bowel Syndrome" data-session="Gut-Liver Axis" data-num="5" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC13358627/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">단일기관 오픈라벨 RCT</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">과민성장증후군(IBS)에서 rifaximin과 저FODMAP식이(LFD)는 가이드라인 권고 치료이나, 각각 반응률이 50% 미만이며 두 치료법의 직접 비교(head-to-head) 데이터는 거의 없다. 장내 미생물 특성이 각 치료에 대한 반응을 예측할 수 있는지 여부 또한 불명확하여, IBS-D 환자에서 rifaximin과 LFD를 직접 비교하고 미생물 기반 반응 예측자를 탐색하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">Rome IV 기준 IBS-D 환자 65명(mITT)을 rifaximin 550mg 1일 3회 14일간 또는 LFD 5주간으로 1:1 무작위 배정하였다. 1차 종점은 5주 시점 일평균 복통 및 복부팽만감 변화, 2차 종점은 IBS-SSS와 BSFS 변화, 탐색적 종점은 ≥30% 증상 감소 반응률과 16S rRNA 장내미생물 분석이었다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">복통(LFD -0.29 vs Rif -0.24점/주, 군간교호작용 p=0.60)과 복부팽만감(LFD -0.29 vs Rif -0.19점/주, p=0.23), IBS-SSS(LFD -14.2 vs Rif -13.3점/주, p=0.80) 모두 양 군에서 유의하게 개선되었으나 두 치료 간 유의차는 없었다.<br/>
+반응률도 유사하였다(복통 51.7% vs 44.4%, IBS-SSS 62.1% vs 69.4%).<br/>
+LFD 반응자에서는 당분해 세균(saccharolytic taxa) 고갈이, rifaximin 반응자에서는 단쇄지방산 생산·담즙산 조절 세균 풍부가 기저 미생물 특성으로 확인되어, 각 치료법에 대한 구별되는 미생물 반응 예측자가 존재함이 시사되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">중대 이상반응이나 사망 보고 없음. LFD와 rifaximin 양 군 간 이상반응 총 건수에 유의차 없었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">Rifaximin과 저FODMAP식이는 IBS-D에서 동등한 효과를 보이며, 두 치료에 대한 반응은 서로 다른 기저 미생물 프로파일에 의해 예측될 수 있다. 오픈라벨·소규모(N=65) 한계가 있으며, 외부 검증이 필요하다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>65명 (LFD 29, Rif 36) 대상자(mITT)</li>
+                            <li>LFD -0.29 vs Rif -0.24 (p=0.60) 복통 감소(점/주)</li>
+                            <li>LFD -0.29 vs Rif -0.19 (p=0.23) 복부팽만 감소(점/주)</li>
+                            <li>LFD 62.1% vs Rif 69.4% (p=0.53) IBS-SSS 반응률</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: Rifaximin vs 저FODMAP 반응률 비교 (IBS-D)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart5"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart5"), {
+                            type: "bar",
+                            data: { labels: ["LFD 복통반응", "Rif 복통반응", "LFD IBS-SSS", "Rif IBS-SSS"], datasets: [
+                              { label: "값", data: [51.7, 44.4, 62.1, 69.4], backgroundColor: "#1A5276" },
+                              { label: "", data: [0, 0, 0, 0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 Rifaximin이 IBS-D에서 저FODMAP식이와 동등한 효과를 보인 최초의 head-to-head RCT — &#x27;식이요법 대안으로서의 노르믹스&#x27; 포지셔닝에 활용</div><div class="usage-head">🎯 IBS-SSS 반응률 rifaximin 69.4% vs LFD 62.1% — 수치상 rifaximin이 오히려 높은 반응률을 보여, 식이조절이 어려운 환자에서 우선 처방 근거로 활용</div><div class="usage-head">🎯 미생물 기반 개인맞춤치료(precision medicine) 가능성 제시 — 향후 노르믹스 반응 예측 바이오마커 개발 논의에 활용</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #6 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Consolidation Therapy of Probiotics With Rifaximin Prevent Relapse in Rifaximin-Responsive Diarrhea-Predominant Irritable Bowel Syndrome: A Multicenter Randomized Clinical Trial</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Journal of Gastroenterology and Hepatology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-08-18</div>
+                        <button class="bd-request-btn" data-title="Consolidation Therapy of Probiotics With Rifaximin Prevent Relapse in Rifaximin-Responsive Diarrhea-Predominant Irritable Bowel Syndrome: A Multicenter Randomized Clinical Trial" data-session="Gut-Liver Axis" data-num="6" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.1111/jgh.70672" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">다기관 오픈라벨 RCT</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">IBS-D에서 rifaximin 2주 치료는 높은 관해율을 달성하지만, 치료 후 재발률이 높아 장기 관해 유지 전략이 필요하다. Rifaximin 반응 후 probiotics(Bacillus subtilis + Enterococcus faecium, Medilac-S) 공고요법(consolidation therapy)이 재발을 예방할 수 있는지 다기관 RCT로 평가하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">2주 rifaximin에 반응한 IBS-D 환자 143명을 Medilac-S 4주 공고요법군과 추가 치료 없음 대조군으로 2:1 무작위 배정하였다. 1차 종점은 추적 종료 시 재발률, 2차 종점은 IBS-SSS, IBS-QOL, 배변 빈도·형태, 장내미생물 프로파일, 이상반응이었다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">추적 종료 시 재발률은 Medilac-S군 40.00%(38/95) vs 대조군 58.33%(28/48)로 유의하게 낮았다(p=0.0378).<br/>
+Medilac-S군은 배변 빈도(1.73±0.75 vs 2.53±1.20회/일, p&lt;0.001)와 대변 형태(BSFS 4.38±1.06 vs 5.15±0.95, p&lt;0.001) 모두 유의하게 개선되었다.<br/>
+재발 환자에서는 Firmicutes/Bacteroidota 비율 상승과 Faecalibacterium·Streptococcus 풍부도 증가가 관찰되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">이상반응 발생에 대한 구체적 기술은 초록에 제한적이나, 안전성 종점으로 포함되어 있으며 특별한 안전성 문제는 보고되지 않았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">Rifaximin 반응 IBS-D 환자에서 probiotics 4주 공고요법은 재발률을 유의하게 감소시키고 배변 양상을 개선한다. 오픈라벨 디자인 한계가 있으나, &#x27;rifaximin 후 probiotics 이어붙이기&#x27; 전략의 효과를 보여준 최초의 다기관 RCT이다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>143명 (공고요법 95, 대조 48) 대상자</li>
+                            <li>40.0% vs 58.3% (p=0.0378) 재발률</li>
+                            <li>1.73 vs 2.53회/일 (p&lt;0.001) 배변 빈도</li>
+                            <li>4.38 vs 5.15 (p&lt;0.001) BSFS 대변형태</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: Rifaximin 후 Probiotics 공고요법 효과 (IBS-D)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart6"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart6"), {
+                            type: "bar",
+                            data: { labels: ["공고요법 재발률", "대조군 재발률", "공고요법 배변빈도", "대조군 배변빈도"], datasets: [
+                              { label: "값", data: [40.0, 58.3, 1.73, 2.53], backgroundColor: "#1A5276" },
+                              { label: "", data: [0, 0, 0, 0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 &#x27;Rifaximin 후 Probiotics 공고요법&#x27;이라는 새로운 순차치료 전략의 첫 다기관 RCT — 노르믹스 처방 후 바이오탑 이어붙이기 시퀀스의 학술 근거</div><div class="usage-head">🎯 재발률 58%→40%로 유의 감소 — IBS-D 환자에서 &#x27;노르믹스 2주→바이오탑 4주&#x27; 프로토콜로 디테일 가능</div><div class="usage-head">🎯 장내미생물 분석에서 재발 예측 마커(Firmicutes/Bacteroidota 비율) 확인 — 정밀의학 트렌드와 연계한 학술 가치</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #7 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Comparative Efficacy of Herbal Products for Improving Liver Enzymes and Inflammation in Metabolic Dysfunction-Associated Steatotic Liver Disease: A Systematic Review and Network Meta-Analysis</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Gastro Hep Advances</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-07-15</div>
+                        <button class="bd-request-btn" data-title="Comparative Efficacy of Herbal Products for Improving Liver Enzymes and Inflammation in Metabolic Dysfunction-Associated Steatotic Liver Disease: A Systematic Review and Network Meta-Analysis" data-session="Gut-Liver Axis" data-num="7" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC13470191/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">체계적 문헌고찰/네트워크 메타분석</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">대사기능장애 관련 지방간질환(MASLD)은 전 세계 인구의 약 30%에 이환되며, 생활습관 교정이 치료의 근간이지만 약물치료 옵션은 제한적이다. Silymarin을 포함한 다양한 생약제의 간보호·항염·항섬유화 효과가 보고되어 왔으나, 직접비교(head-to-head) 데이터가 부족하여 상대적 유효성 비교가 어려웠다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">PubMed, EMBASE, Cochrane, Web of Science에서 2025년 9월까지 검색하여 MASLD/MASH 성인 대상 생약 단일성분 RCT 131편(총 9,191명)을 선정하였다. 랜덤효과 네트워크 메타분석(NMA)으로 위약 대비 평균차(MD)를 산출하고 SUCRA 순위를 도출하였다. 1차 종점은 ALT, AST, GGT, 간경직도이었다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">Silymarin은 19편(최다 연구)에서 평가되어 GGT를 유의하게 감소시켰다(MD -19.06, 95% CI -27.28~-10.83, p&lt;0.01).<br/>
+ALT·AST에서도 유의한 감소를 보였으며, 간경직도에서는 SUCRA 0.81로 최고 순위를 기록하였으나 통계적 유의성에는 도달하지 못하였다.<br/>
+전체적으로 cinnamon, curcumin, berberine, artichoke leaf과 함께 silymarin이 가장 일관된 효과를 보이는 생약으로 확인되었다.<br/>
+GGT 하위군 분석(저위험·3개월 이상)에서도 silymarin의 효과는 유지되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">Silymarin 관련 이상반응은 대부분 경미한 위장관 증상이었으며, 간독성이나 심각한 이상반응 신호는 관찰되지 않았다. 다만 일부 생약(녹차 추출물, 강황 화합물)에서 약물유발 간손상 보고가 있어 주의가 필요하다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">131개 RCT를 포괄한 최대 규모 NMA에서 silymarin은 MASLD의 GGT 감소에 유의한 효과를 보이며, 간경직도 개선 가능성이 시사된다. 근거 수준은 대체로 낮음~중등으로, 표준화된 제형·용량 최적화·장기 안전성 평가를 위한 추가 연구가 필요하다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>131 RCT / 9,191명 포함 연구/대상자</li>
+                            <li>19편 (최다) Silymarin 포함 연구</li>
+                            <li>MD -19.06 (95% CI -27.28~-10.83, p&lt;0.01) Silymarin GGT 감소</li>
+                            <li>0.81 (1위) Silymarin 간경직도 SUCRA</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: MASLD 생약 NMA: GGT 감소 효과 (위약 대비 MD)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart7"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart7"), {
+                            type: "bar",
+                            data: { labels: ["Cinnamon", "Garlic+Silymarin", "Berberine", "Silymarin", "Curcumin"], datasets: [
+                              { label: "값", data: [-25.8, -22.89, -20.97, -19.06, -12.44], backgroundColor: "#1A5276" },
+                              { label: "", data: [0, 0, 0, 0, 0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 131개 RCT 기반 최대 규모 NMA에서 silymarin(하노마린)이 MASLD 간효소 개선에 유의한 효과 확인 — 하노마린의 MASLD 적응증 근거 강화</div><div class="usage-head">🎯 Silymarin이 간경직도(liver stiffness) SUCRA 1위 — 항섬유화 가능성을 시사하는 간접 근거로 MASLD 환자 대상 장기 처방 논거로 활용</div><div class="usage-head">🎯 GGT 감소 MD -19.06으로 활성 생약 중 상위권 — 간기능 수치 개선이 필요한 MASLD/NAFLD 환자에서 하노마린 처방 명분</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #8 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Evaluating the Risk of Clostridioides difficile Infection After Rifaximin Treatment for Small Intestinal Bacterial Overgrowth</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Journal of Clinical Medicine</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-06-20</div>
+                        <button class="bd-request-btn" data-title="Evaluating the Risk of Clostridioides difficile Infection After Rifaximin Treatment for Small Intestinal Bacterial Overgrowth" data-session="Gut-Liver Axis" data-num="8" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC13302690/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">후향적 코호트 (PSM)</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">소장세균과다증식(SIBO) 치료에 rifaximin이 광범위하게 사용되지만, 항생제 연관 C. difficile 감염(CDI) 위험에 대한 우려가 지속되며, 특히 SIBO 재발로 인한 반복 투여 시 안전성 데이터가 부족하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">미국 80개 이상 의료기관의 TriNetX 연합 네트워크(EHR 기반)를 이용한 후향적 코호트 연구. 1차 분석: SIBO+rifaximin(n=19,597) vs SIBO-rifaximin 미사용(n=19,597), 2차 분석: SIBO+rifaximin vs IBS+rifaximin(n=20,228/arm), 반복투여 분석: 단회 vs 다회(n=8,807/arm). 1:1 경향점수 매칭(PSM) 적용. 1차 종점은 60일 내 CDI 발생률이었다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">1차 분석에서 CDI 발생률은 rifaximin군 0.21%(41/19,118) vs 미사용군 0.15%(29/19,099)로 유의차 없었다(RR 1.41, 95% CI 0.88-2.27, p=0.15).<br/>
+SIBO vs IBS 비교에서도 차이 없었고(0.21% vs 0.15%, p=0.17), 반복투여(평균 3.55회) vs 단회투여에서도 CDI 위험 증가가 없었다(0.21% vs 0.20%, RR 0.94, p=0.85).<br/>
+Rifaximin 사용군에서 입원율(4.34% vs 5.39%, p&lt;0.01)과 응급실 방문(4.50% vs 4.97%, p=0.03)이 오히려 낮았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">Rifaximin의 CDI 위험(RR 1.41)은 clindamycin(OR 25.39), 3세대 cephalosporin(OR 9.59-12.04), ciprofloxacin(OR 6.83) 등 전신 항생제 대비 현저히 낮은 수준으로, rifaximin의 우호적 감염 안전성 프로파일이 확인되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">대규모 실제임상 데이터에서 rifaximin은 SIBO 치료 시 CDI 위험을 유의하게 증가시키지 않으며, 반복 투여에서도 안전하다. 다만 이벤트 수가 적어 제2종 오류 가능성이 있으며, 전향적 확인 연구가 필요하다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>19,597명/arm (PSM 후) 대상자(1차 분석)</li>
+                            <li>0.21% vs 0.15% (RR 1.41, p=0.15) CDI 발생(Rif vs No-Rif)</li>
+                            <li>0.20% vs 0.21% (RR 0.94, p=0.85) CDI(단회 vs 다회투여)</li>
+                            <li>3.55회 (중앙값 2회) 평균 반복투여 횟수</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: Rifaximin vs 전신항생제 CDI 위험 비교</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart8"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart8"), {
+                            type: "bar",
+                            data: { labels: ["Rifaximin", "Ciprofloxacin", "Cephalosporin", "Clindamycin"], datasets: [
+                              { label: "값", data: [1.41, 6.83, 9.59, 25.39], backgroundColor: "#1A5276" },
+                              { label: "", data: [0, 0, 0, 0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 약 4만명 대상 대규모 실제임상 데이터에서 노르믹스의 CDI 안전성 확인 — &#x27;항생제인데 C.diff 걱정 없나?&#x27; 처방 장벽 해소에 핵심 근거</div><div class="usage-head">🎯 반복투여(평균 3.55회)에서도 CDI 위험 증가 없음 — SIBO/IBS-D 재발 환자에서 노르믹스 반복처방의 안전성 근거</div><div class="usage-head">🎯 전신항생제 대비 CDI 위험 현저히 낮음(RR 1.41 vs clindamycin OR 25.39) — 안전성 차별화 메시지로 활용</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #9 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Efficacy, safety, and pharmacokinetics of rifaximin in pediatric patients with hepatic encephalopathy in Japan: An open-label study</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Hepatology Communications</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-07-15</div>
+                        <button class="bd-request-btn" data-title="Efficacy, safety, and pharmacokinetics of rifaximin in pediatric patients with hepatic encephalopathy in Japan: An open-label study" data-session="Gut-Liver Axis" data-num="9" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.1097/HC9.0000000000001002" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">Phase II/III 오픈라벨</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">소아 간성뇌증(HE)에서 rifaximin의 유효성·안전성·약동학에 대한 임상 데이터가 전무하여, 일본에서 소아 HE 환자를 대상으로 성인 용량(400mg 1일 3회)의 rifaximin에 대한 최초의 임상시험이 수행되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">18세 미만, 고암모니아혈증(≥66 μg/dL)을 동반한 I~II도 HE 또는 HE 의심 소아 환자 21명(중앙 연령 11세)을 대상으로 12주간 rifaximin 400mg 1일 3회 오픈라벨 투여하였다. 1차 종점은 혈중 암모니아 농도 변화, 기타 종점은 정신상태 및 NCT-A/B 변화, 안전성(이상반응, 장내미생물 조성), 약동학이었다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">18명이 연구를 완료하였으며(중앙 치료기간 84일), 가장 흔한 기저질환은 선천성 문맥체순환 단락이었다.<br/>
+혈청 암모니아는 치료 기간 내내 기저치보다 낮게 유지되었으나 통계적 유의성에는 도달하지 못하였다(p=0.08).<br/>
+반면, HE 관련 정신상태(p=0.02)와 NCT-B 결과(p=0.01)는 모든 평가 시점에서 기저치 대비 유의하게 개선되었다.<br/>
+Rifaximin의 약동학은 성인과 유사한 패턴을 보였으며, Cmax 및 AUC는 성인 기준값 범위 이내였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">새로운 임상적으로 유의미한 안전성 문제는 확인되지 않았으며, 장내미생물 조성의 현저한 변화도 관찰되지 않았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">소아 HE에서 rifaximin의 유효성·안전성·약동학을 보여준 최초의 소아 임상시험이다. 유효성 신호는 생화학적(암모니아) 변화보다 임상적·신경인지적 지표에 의해 주도되었다. 소규모 오픈라벨 한계가 있으나, 소아 적응증 확대의 기초 데이터를 제공한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>21명 (완료 18명) 대상자</li>
+                            <li>11세 (Q1-Q3: 8-14세) 중앙 연령</li>
+                            <li>중앙 84일 치료기간</li>
+                            <li>모든 시점 유의 (p&lt;0.05) 정신상태 개선</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 소아 HE 환자에서 Rifaximin 효과</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart9"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart9"), {
+                            type: "bar",
+                            data: { labels: ["정신상태 개선", "NCT-B 개선", "암모니아 감소"], datasets: [
+                              { label: "값", data: [1, 1, 0], backgroundColor: "#1A5276" },
+                              { label: "", data: [0, 0, 0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 소아 HE에서 rifaximin의 최초 임상시험 — 소아 적응증 확대 가능성의 학술 근거로 모니터링 가치</div><div class="usage-head">🎯 소아에서 성인 동등 용량의 약동학적 안전성 확인 — 소아내분비·소아소화기 전문의 대상 정보 제공</div><div class="usage-head">🎯 소아 HE에서 rifaximin의 최초 임상시험 — 소아 적응증 확대 가능성의 학술 근거로 모니터링 가치</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+      <h4>근거 분류 기준</h4>
+      <table>
+        <tr><td>직접근거</td><td>노르믹스(rifaximin) 또는 하노마린(silymarin) 동일 성분을 사용한 RCT, 메타분석, 또는 간-장내미생물 축 관련 동일 성분의 임상적 효능·안전성 직접 검증 연구</td></tr>
+        <tr><td>참고근거</td><td>리팍시민 항생제 내성 우려 등 간접적 임상 정보나 관련 메커니즘 연구. 임상적 주의사항·한계점으로 활용</td></tr>
+      </table>
+    </div>
+    <div class="legend">
+      <h4>중요도 평가 기준</h4>
+      <table>
+        <tr><td>★★★</td><td>즉시 활용 — RCT, 메타분석, Phase 3 이상. PM팀 디테일링에 바로 반영 가능</td></tr>
+        <tr><td>★★☆</td><td>참고 활용 — 체계적 문헌고찰, 중등도 임상. KOL 학술강연 소재</td></tr>
+        <tr><td>★☆☆</td><td>모니터링 — 동향 파악 수준. 후속 연구 결과 확인 필요</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+  var h=decodeURIComponent(location.hash.slice(1)); if(!h) return;
+  var papers=document.querySelectorAll('.paper'),found=null;
+  for(var i=0;i<papers.length;i++){var t=papers[i].querySelector('.paper-title');var txt=t?t.textContent.trim().toLowerCase():'';if(txt.indexOf(h.toLowerCase())!==-1){found=papers[i];break;}}
+  if(!found) return;
+  for(var j=0;j<papers.length;j++){if(papers[j]!==found)papers[j].style.display='none';}
+  found.style.outline='3px solid #1A5276';found.style.borderRadius='10px';found.scrollIntoView({behavior:'smooth',block:'start'});
+  var btn=document.createElement('button');btn.textContent='📋 모든 논문 보기';
+  btn.style.cssText='position:fixed;bottom:24px;right:24px;z-index:999;padding:10px 20px;background:#003366;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3);';
+  btn.onclick=function(){for(var k=0;k<papers.length;k++)papers[k].style.display='';found.style.outline='';btn.remove();window.scrollTo(0,0);};
+  document.body.appendChild(btn);
+})();
+</script>
+
+<!-- BD_REQUEST_MODAL_v2 -->
+<style>
+  #bd-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;align-items:center;justify-content:center}
+  #bd-modal{background:#fff;border-radius:8px;padding:24px;min-width:420px;max-width:520px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-family:'Malgun Gothic',sans-serif}
+  #bd-modal h3{margin:0 0 16px;color:#003366;border-bottom:2px solid #1A5276;padding-bottom:8px}
+  #bd-modal .field{margin:12px 0}
+  #bd-modal label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:4px}
+  #bd-modal input,#bd-modal textarea{width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;font-size:13px;box-sizing:border-box;font-family:inherit}
+  #bd-modal textarea{min-height:60px;resize:vertical}
+  #bd-modal .radio-row label{display:inline-block;font-weight:400;margin-right:16px;cursor:pointer}
+  #bd-modal .actions{margin-top:20px;text-align:right}
+  #bd-modal button{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:13px;margin-left:8px}
+  #bd-modal .submit{background:#003366;color:#fff;font-weight:600}#bd-modal .cancel{background:#ddd;color:#333}
+  #bd-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#003366;color:#fff;padding:12px 24px;border-radius:6px;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:9999;opacity:0;transition:opacity .3s}
+  #bd-toast.show{opacity:1}#bd-toast.error{background:#c0392b}
+</style>
+<div id="bd-modal-overlay" onclick="if(event.target.id==='bd-modal-overlay') closeBDModal()">
+  <div id="bd-modal">
+    <h3>📌 BD 제작 요청</h3>
+    <div class="field"><label>논문</label><div id="bd-modal-title" style="font-size:13px;color:#555;line-height:1.4"></div></div>
+    <div class="field"><label>세션</label><div id="bd-modal-session" style="font-size:13px;color:#555"></div></div>
+    <div class="field"><label>BD 포맷</label><div class="radio-row">
+      <label><input type="radio" name="bd-format" value="CLB" checked> CLB (학술브리프)</label>
+      <label><input type="radio" name="bd-format" value="BT"> BT (바이오톡)</label></div></div>
+    <div class="field"><label>요청자 이메일 *</label><input type="email" id="bd-modal-requester" placeholder="example@hanall.co.kr" required></div>
+    <div class="field"><label>메모 (선택)</label><textarea id="bd-modal-memo" placeholder="특별 요청사항"></textarea></div>
+    <div class="actions"><button class="cancel" onclick="closeBDModal()">취소</button><button class="submit" onclick="submitBDRequest()">요청 제출</button></div>
+  </div>
+</div>
+<div id="bd-toast"></div>
+<script>
+const BD_WEBHOOK_URL='https://script.google.com/macros/s/AKfycbynF7P1576GbRlzdIjBaxrOvjTU4HDP8F9jY4flxduhSqYR15Hr4AmhImuaS0wPJoOC/exec';let bdCurrentBtn=null;
+function openBDModal(b){bdCurrentBtn=b;document.getElementById('bd-modal-title').textContent=b.dataset.title;document.getElementById('bd-modal-session').textContent=b.dataset.session;document.getElementById('bd-modal-requester').value=localStorage.getItem('bd-requester')||'';document.getElementById('bd-modal-memo').value='';document.querySelector('input[name=bd-format][value=CLB]').checked=true;document.getElementById('bd-modal-overlay').style.display='flex';}
+function closeBDModal(){document.getElementById('bd-modal-overlay').style.display='none';bdCurrentBtn=null;}
+function showToast(m,e){var t=document.getElementById('bd-toast');t.textContent=m;t.className=e?'show error':'show';setTimeout(function(){t.className='';},3500);}
+function submitBDRequest(){if(!bdCurrentBtn)return;var title=bdCurrentBtn.dataset.title,session=bdCurrentBtn.dataset.session,format=document.querySelector('input[name=bd-format]:checked').value,requester=document.getElementById('bd-modal-requester').value.trim(),memo=document.getElementById('bd-modal-memo').value.trim();if(!requester){showToast('요청자 이메일은 필수입니다',true);return;}localStorage.setItem('bd-requester',requester);var cb='bdcb_'+Date.now();window[cb]=function(data){delete window[cb];document.head.removeChild(s);if(data.status==='ok'){showToast('✅ BD 요청 접수: '+format+' / '+title.slice(0,40)+'…');bdCurrentBtn.disabled=true;bdCurrentBtn.textContent='✓ 요청됨';closeBDModal();}else if(data.status==='duplicate'){showToast('⚠️ 동일 요청이 이미 대기 중입니다',true);closeBDModal();}else{showToast('❌ 오류: '+(data.message||'알 수 없음'),true);}};var params=new URLSearchParams({action:'requestBDQueue',title:title,session:session,format:format,requester:requester,memo:memo,callback:cb});var s=document.createElement('script');s.src=BD_WEBHOOK_URL+'?'+params.toString();s.onerror=function(){delete window[cb];showToast('❌ 네트워크 오류 — 잠시 후 다시 시도',true);};document.head.appendChild(s);}
+</script>
+
+</body>
+</html>
