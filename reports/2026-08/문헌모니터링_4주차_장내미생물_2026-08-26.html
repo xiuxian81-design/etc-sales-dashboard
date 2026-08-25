@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[문헌모니터링] 4주차 장내미생물 (2026.08.26)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; font-size: 15px; line-height: 1.7; color: #1a1a2e; background: #f0f2f5; }
+.container { max-width: 820px; margin: 0 auto; padding: 24px 16px; }
+.report-header { background: linear-gradient(135deg,#003366 0%,#1a5276 100%); color: #fff; border-radius: 14px; padding: 28px 32px; margin-bottom: 24px; }
+.report-header .badge { display: inline-block; background: #1A5276; color: #fff; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+.report-header h1 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+.report-header .meta { font-size: 13px; color: rgba(255,255,255,0.75); display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
+.stat-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+.stat-pill { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 16px; font-size: 13px; }
+.stat-pill span { font-size: 20px; font-weight: 800; display: block; }
+.exec-box { background: #fff; border-left: 5px solid #003366; border-radius: 0 10px 10px 0; padding: 18px 22px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.exec-box h3 { font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: #003366; margin-bottom: 10px; }
+.exec-box p { font-size: 14px; line-height: 1.9; color: #333; }
+.paper { background: #fff; border-radius: 14px; margin-bottom: 28px; box-shadow: 0 3px 12px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #e8eaf0; }
+.paper-header { padding: 16px 22px 12px; display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #f0f2f5; }
+.paper-num { background: #003366; color: #fff; font-size: 12px; font-weight: bold; padding: 3px 10px; border-radius: 20px; white-space: nowrap; margin-top: 2px; }
+.stars-high { color: #c0392b; font-size: 16px; font-weight: 900; }
+.stars-mid  { color: #e67e22; font-size: 16px; font-weight: 900; }
+.stars-low  { color: #95a5a6; font-size: 16px; font-weight: 900; }
+.tag-direct { background: #e8f4fd; color: #1a5276; border: 1px solid #aed6f1; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+.tag-ref    { background: #f0f0f0; color: #666; border: 1px solid #ccc; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+.tag-open   { background: #e8f8e8; color: #1e8449; border: 1px solid #a9dfbf; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+.tag-wall   { background: #fdf2f8; color: #7d3c98; border: 1px solid #d7bde2; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+.journal-meta { font-size: 12px; color: #888; margin-top: 2px; }
+.paper-body { padding: 20px 22px; }
+.paper-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; line-height: 1.5; }
+.paper-title-ko { font-size: 13px; color: #555; margin-bottom: 6px; font-style: italic; }
+.paper-url { font-size: 12px; color: #1a5276; margin-bottom: 14px; display: block; word-break: break-all; }
+.design-badge { display: inline-block; background: #eaf2ff; color: #1a5276; font-size: 12px; font-weight: bold; padding: 3px 12px; border-radius: 6px; margin-bottom: 14px; }
+.summary-grid { background: #fafbfc; border-radius: 10px; padding: 16px; margin-bottom: 14px; border: 1px solid #e8eaf0; }
+.summary-grid h4 { font-size: 12px; letter-spacing: 1px; color: #888; text-transform: uppercase; margin-bottom: 10px; }
+.s-row { display: grid; grid-template-columns: 80px 1fr; gap: 6px 12px; margin-bottom: 8px; align-items: baseline; font-size: 13.5px; }
+.s-label { font-weight: 700; color: #003366; white-space: nowrap; }
+.s-val { color: #333; line-height: 1.8; }
+.s-val em { background: #fff3cd; padding: 0 4px; border-radius: 3px; font-style: normal; font-weight: bold; color: #664d03; }
+.key-nums { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.knum { background: #003366; color: #fff; border-radius: 10px; padding: 12px 16px; flex: 1; min-width: 140px; text-align: center; }
+.knum .val { font-size: 22px; font-weight: 900; color: #1A5276; display: block; }
+.knum .desc { font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 2px; line-height: 1.4; }
+.knum .pval { font-size: 10px; color: #aed6f1; margin-top: 3px; }
+.viz-section { border: 2px solid #e8eaf0; border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+.viz-section h4 { font-size: 13px; font-weight: 700; color: #003366; margin-bottom: 4px; }
+.viz-subtitle { font-size: 12px; color: #888; margin-bottom: 14px; }
+.chart-wrap { position: relative; height: 200px; }
+.paywall-notice { background: #fdf2f8; border: 1px solid #d7bde2; border-radius: 8px; padding: 14px 18px; font-size: 13px; color: #7d3c98; }
+.usage { background: linear-gradient(135deg,#fff8f0,#fff3e0); border-left: 4px solid #1A5276; border-radius: 0 10px 10px 0; padding: 14px 18px; font-size: 13.5px; line-height: 1.8; }
+.usage h4 { font-size: 12px; color: #1A5276; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+.usage ul { margin-left: 16px; }
+.usage li { margin-bottom: 4px; }
+.legend { background: #fff; border-radius: 10px; padding: 18px 22px; margin-top: 8px; border: 1px solid #e8eaf0; font-size: 13px; }
+.legend h4 { color: #003366; margin-bottom: 10px; font-size: 14px; }
+.legend-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+.legend-row span { padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+  </style>
+
+
+
+
+
+
+
+
+
+
+<style>/*BR_EXTRA_CSS*/
+.papers{max-width:920px;margin:0 auto;padding:0 8px}
+.paper{border:1px solid #e3e7ee;border-radius:14px;margin:0 auto 26px;box-shadow:0 3px 12px rgba(0,0,0,.07);overflow:hidden;background:#fff}
+.paper-header{background:linear-gradient(135deg,#1A5276,#003366);color:#fff;padding:18px 22px}
+.paper-header .paper-title{color:#fff;font-size:16px;font-weight:800;line-height:1.5;margin:0 0 12px}
+.paper-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:#e3ecf6}
+.paper-meta-item{display:flex;align-items:center;gap:4px}
+.paper-meta-item strong{color:#fff;font-weight:600}
+.importance-badge{padding:3px 11px;border-radius:20px;font-weight:800;color:#1a1a2e}
+.importance-high{background:#FFD54F}.importance-mid{background:#90CAF9;color:#0d2b45}.importance-low{background:#cfd8dc;color:#37474f}
+.evidence-tag{padding:3px 11px;border-radius:20px;font-weight:700;color:#fff;background:#2E8B72}
+.evidence-ref{background:#8896a5}
+.bd-request-btn{background:#fff;color:#003366;border:none;padding:7px 16px;border-radius:7px;font-size:12.5px;font-weight:800;cursor:pointer;margin-left:auto;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.bd-request-btn:hover{background:#ffe9b3}.bd-request-btn:disabled{background:#b9c2cc;color:#fff;cursor:not-allowed}
+.paper-header a,.paper-url{color:#cfe0f5 !important;font-size:11px;word-break:break-all}
+.paper-content{padding:18px 22px}
+.content-section{border-left:4px solid #d3dce6;padding:6px 0 6px 16px;margin:0 0 12px}
+.content-section-title{font-size:13px;font-weight:800;color:#1A5276;margin-bottom:4px;letter-spacing:.2px}
+.content-section-text{font-size:13.5px;line-height:1.7;color:#2b2b38}
+.content-section-text strong{color:#003366}
+.content-section.cs-key{border-left-color:#003366;background:#f3f8fd;border-radius:8px;padding:11px 16px}
+.content-section.cs-key .content-section-title{color:#003366}
+.key-numbers{background:#fff8e6;border:1px solid #f1dea0;border-radius:10px;padding:13px 18px;margin:14px 0}
+.key-numbers h4{margin:0 0 8px;color:#8a6a00;font-size:13.5px}
+.key-numbers ul{margin:0;padding-left:20px}.key-numbers li{font-size:13px;line-height:1.55;margin:4px 0;color:#5a4600}
+.viz-section{background:#f5f9fd;border:1px solid #d9e6f2;border-radius:10px;padding:15px 18px;margin:14px 0}
+.viz-section h4{margin:0 0 10px;color:#003366;font-size:13.5px}
+.usage-box{background:#ecf7f3;border:1px solid #bfe2d7;border-left:5px solid #2E8B72;border-radius:10px;padding:14px 18px;margin:14px 0}
+.usage-box h4{margin:0 0 8px;color:#1d6b59;font-size:13.5px}
+.usage-head{font-weight:800;color:#135344;font-size:13.5px;line-height:1.55;margin-bottom:7px;padding-bottom:7px;border-bottom:1px dashed #bfe2d7}
+.usage-box ul{margin:0;padding-left:20px}.usage-box li{font-size:13px;line-height:1.6;margin:5px 0;color:#244b43}
+</style>
+
+</head>
+<body>
+<div class="container">
+  <!-- ━━━ 헤더 ━━━ -->
+  <div class="report-header">
+    <span class="badge">장내미생물 세션 | 2026년 4주차</span>
+    <h1>월간 문헌 모니터링 리포트</h1>
+    <div class="meta">
+      <div>보고일: 2026.08.26</div>
+      <div>세션: 바이오탑 (C. butyricum, S. boulardii)</div>
+      <div>담당PM: 임범성 팀장, 박지현 PM</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-pill">
+        <span>6</span>
+        신규 논문
+      </div>
+      <div class="stat-pill">
+        <span>4</span>
+        ★★★ 우수
+      </div>
+      <div class="stat-pill">
+        <span>4</span>
+        직접근거
+      </div>
+      <div class="stat-pill">
+        <span>5</span>
+        오픈액세스
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━ Executive Summary ━━━ -->
+  <div class="exec-box">
+    <h3>Executive Summary</h3>
+    <p>
+      <strong>① 바이오탑 낙산균(CBTOA) 기전 최초 규명</strong> — 2025년 3월 IJMS에 C. butyricum TO-A가 장내 락테이트·아세테이트를 기질로 낙산을 효율 생성하는 분자 경로가 첫 규명되었다. 경쟁 제품 대비 균주 차별화 근거 즉시 활용 가능.<br><br>
+      <strong>② TIPS 후 간성뇌증 예방 RCT</strong> — C. butyricum 투여가 오현성 간성뇌증 발생률을 3분의 1 수준으로 저하(26.5%→8.2%, p=0.016). 간 전문의 대상 고품질 임상근거.<br><br>
+      <strong>③ S. boulardii 다중 임상근거</strong> — H. pylori 박멸 11% 향상(19 RCT), 항생제 연관 설사 50% 감소 등 소화기 전역에서 효능 입증.
+    </p>
+  </div>
+
+    <!-- ━━━ 논문 #1 (장내미생물) ━━━ -->
+        <div class="papers">
+
+            <!-- ━━━ 논문 #1 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">A Randomized Controlled Trial of Probiotic Intervention for Reducing the Risk of Bronchopulmonary Dysplasia in Preterm Infants</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Archives of Medical Research</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-03-26</div>
+                        <button class="bd-request-btn" data-title="A Randomized Controlled Trial of Probiotic Intervention for Reducing the Risk of Bronchopulmonary Dysplasia in Preterm Infants" data-session="장내미생물" data-num="1" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.1016/j.arcmed.2026.103408" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">RCT</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">기관지폐이형성증(BPD)은 극소 저체중 미숙아에서 가장 흔한 만성 폐질환으로, 장기 호흡기·신경발달 예후에 심각한 영향을 미친다. 장내미생물 불균형과 전신 염증이 BPD 발생에 기여한다는 &#x27;장-폐 축(gut-lung axis)&#x27; 가설이 제기되어 왔으며, 프로바이오틱스가 장내환경 안정화를 통해 BPD 위험을 줄일 수 있는지에 대한 근거가 필요했다. C. butyricum은 낙산(butyrate) 생성을 통해 장벽 기능을 강화하고 염증을 억제하는 것으로 알려져 있어, 미숙아 BPD 예방에 대한 잠재적 후보 프로바이오틱스로 주목받았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">단일 기관 이중맹검 RCT로, 재태연령 32주 미만 및 출생체중 1,500g 미만의 미숙아 244명을 무작위 배정하였다. 프로바이오틱스군(n=122)은 출생 24시간 후부터 교정 연령 36주까지 C. butyricum과 B. infantis 복합 제제를 매일 경구 투여받았고, 대조군(n=122)은 위약을 투여받았다. 1차 평가변수는 BPD 발생률이었으며, 2차 평가변수로 중등도-중증 BPD 비율, 교정 12개월 시 산소 의존도, 폐동맥압, 교정 18~22개월 Bayley-III 신경발달 평가를 포함하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">프로바이오틱스군의 BPD 발생률은 대조군 대비 유의하게 낮았다(RR 0.59, 95% CI 0.42–0.83, p=0.003; 1차 평가변수 달성).<br/>
+중등도-중증 BPD 비율도 프로바이오틱스군에서 유의하게 감소하였다(p&lt;0.01).<br/>
+교정 12개월 시 산소 의존도가 프로바이오틱스군에서 낮았으며(p=0.02), 폐동맥압 역시 유의하게 감소하였다(p=0.03).<br/>
+교정 18~22개월 Bayley-III 평가에서 인지(p=0.01), 언어(p=0.03), 운동(p=0.02) 영역 점수가 프로바이오틱스군에서 유의하게 높았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">연구 기간 중 프로바이오틱스 투여와 관련된 심각한 이상반응(패혈증, 균혈증 등)은 보고되지 않았다. 프로바이오틱스의 미숙아 투여 안전성이 확인되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">C. butyricum + B. infantis 복합 프로바이오틱스는 극소 저체중 미숙아에서 BPD 발생률과 중증도를 유의하게 감소시키고, 장기 호흡기·신경발달 예후를 개선하였다. 장-폐 축을 통한 프로바이오틱스의 폐 보호 효과를 입증한 최초의 대규모 RCT로, 다기관 확대 연구가 필요하다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>244명 (미숙아 &lt;32주, &lt;1,500g) 대상</li>
+                            <li>출생 24h 후 ~ 교정 36주 투여기간</li>
+                            <li>BPD 발생률 유의 감소 1차 평가변수</li>
+                            <li>인지·언어·운동 점수 유의 향상 (18~22개월) Bayley-III</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 C.</div><div class="usage-head">🎯 butyricum의 장-폐 축(gut-lung axis) 보호 효과를 입증한 RCT. 낙산균이 장벽 강화→전신 염증 억제→폐 보호로 이어지는 기전적 근거를 제공하며, 바이오탑의 &#x27;낙산 생성 균주 기반 장벽 기능 개선&#x27; 포지셔닝을 강화한다.</div><div class="usage-head">🎯 미숙아라는 취약 인구에서의 안전성·유효성 확인은 C. butyricum 프로바이오틱스의 임상적 가치를 높인다.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #2 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">A probiotic bacterium modulates antitumour γδ T-cell responses in lung cancer</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Frontiers in Immunology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-03-24</div>
+                        <button class="bd-request-btn" data-title="A probiotic bacterium modulates antitumour γδ T-cell responses in lung cancer" data-session="장내미생물" data-num="2" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.3389/fimmu.2026.1750569" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">Translational + Clinical Cohort</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">장내미생물이 면역관문억제제(ICI)의 항암 효과에 영향을 미친다는 임상적 증거가 축적되어 왔다. CBM588(C. butyricum MIYAIRI 588)은 비소세포폐암(NSCLC) 및 전이성 신세포암(mRCC) 환자에서 ICI 병용 시 무진행 생존기간(PFS)과 전체 생존기간(OS)을 유의하게 연장하는 것으로 보고되었으나(PFS 250 vs 101일, p=0.009), 그 면역학적 기전은 불명확했다. 연구진은 CBM588이 비전통적 항암 T세포인 Vγ9Vδ2 T세포를 활성화하여 종양 인식 능력을 부여할 수 있다는 가설을 검증하고자 하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">건강 공여자(영국·일본, 총 28명)의 PBMC를 CBM588 정제 현탁액 또는 정제 포자로 12일간 자극하여 T세포 아형 변화를 유세포분석으로 평가하였다. CRISPR/Cas9로 BTN3A 녹아웃 폐암세포주(A549-BTN3A KO)를 제작하여 T세포의 종양 인식이 butyrophilin 3A 의존적인지 검증하였다. T107 분석(CD107a/TNF)으로 세포독성 기능을, 72시간 살해 분석으로 실제 암세포 살해 능력을 측정하였다. 임상 코호트는 구마모토대학 NSCLC 환자 38명(ICI 단독 vs ICI+CBM588)으로, 말초혈액 및 흉수 내 Vδ2 T세포의 CD69 활성화 마커와 생존 예후의 상관관계를 분석하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">CBM588 자극 후 건강 공여자 PBMC에서 Vγ9Vδ2 T세포가 중앙값 1.31%→50.7%로 대폭 증가(p&lt;0.0001).<br/>
+CBM588 프라이밍 T세포는 A549 폐암세포를 BTN3A 의존적으로 인식하고 살해(1:1 비율 72시간 후 중앙값 22.5% BTN3A 특이적 살해, p&lt;0.01).<br/>
+환자 코호트에서 ICI+CBM588군의 말초혈액 CD69⁺Vδ2 T세포 비율이 ICI 단독군 대비 유의하게 증가(p=0.043).<br/>
+CBM588 투여 전후 비교에서 CD69⁺Vδ2 T세포가 유의하게 상승(p=0.0041).<br/>
+치료 후 CD69 고발현군(n=16)은 저발현군(n=19) 대비 전체 생존이 유의하게 우수(log-rank p=0.026).<br/>
+완전관해 달성 3명 모두 CD69 고발현군이자 CBM588 복용군이었다.<br/>
+흉수에서도 ICI+CBM588군의 Vγ9Vδ2 T세포 비율이 유의하게 높았다(p=0.0276).</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">CBM588 투여와 관련된 유해사례는 보고되지 않았다. 시험관 내 실험에서도 정상 세포에 대한 비특이적 독성은 관찰되지 않았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">CBM588은 항암 활성을 가진 Vγ9Vδ2 T세포를 직접 확장시키고, BTN3A 의존적 종양 인식·살해 기능을 부여하며, 폐암 환자에서 말초혈액 및 종양 부위의 γδ T세포 활성화를 증가시킨다. Vδ2 CD69⁺ T세포는 생존 예측 바이오마커로서의 가능성을 보여준다. 이는 프로바이오틱스가 비전통적 면역세포를 통해 항암 면역을 직접 조절할 수 있다는 새로운 기전을 제시한다. 단, 후향적 관찰 연구로 인과관계 확립에는 전향적 대규모 연구가 필요하다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>1.31% → 50.7% (p&lt;0.0001) Vδ2 T세포 확장</li>
+                            <li>22.5% (BTN3A 특이적, 1:1 72h) 암세포 살해율</li>
+                            <li>p=0.0041 (CBM588 전후) CD69⁺Vδ2 증가</li>
+                            <li>CD69 고발현 vs 저발현 p=0.026 생존 예측</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 CBM588(C. butyricum 균종)의 항암 면역 조절 기전을 최초로 규명한 획기적 연구.</div><div class="usage-head">🎯 바이오탑 포지셔닝 중 &#x27;장내미생물 조절을 통한 전신 면역 효과&#x27;의 과학적 근거를 강화한다. C.</div><div class="usage-head">🎯 butyricum이 γδ T세포를 통해 면역관문억제제의 효과를 증강시킨다는 기전은, 바이오탑의 항암 보조 영역(수술·항암 보조) 확대 논의에 활용 가능하다. 단, CBM588 특이적 연구이므로 TO-A 균주와의 직접 동일시는 주의 필요.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #3 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Management of symptomatic uncomplicated diverticular disease (SUDD) of the colon with Clostridium butyricum CBM588 versus rifaximin: a retrospective cross-sectional study</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> International Journal of Colorectal Disease</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-10-18</div>
+                        <button class="bd-request-btn" data-title="Management of symptomatic uncomplicated diverticular disease (SUDD) of the colon with Clostridium butyricum CBM588 versus rifaximin: a retrospective cross-sectional study" data-session="장내미생물" data-num="3" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.1007/s00384-025-05005-6" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">Retrospective Cross-sectional</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">증상성 비복잡성 게실질환(SUDD)은 만성적인 복통, 복부팽만, 배변 습관 변화를 특징으로 하며, 삶의 질에 상당한 영향을 미친다. 기존에는 주기적 리팍시민(rifaximin) 요법이 증상 관리의 표준이었으나, 장기 항생제 사용의 우려가 있다. C. butyricum CBM588은 낙산(butyrate) 생성을 통해 대장 점막 항상성 유지, 장벽 강화, 염증 조절 등의 작용을 하는 프로바이오틱스로, SUDD에서의 효과가 주목받았다. 본 연구는 CBM588과 주기적 리팍시민의 12개월 증상 관리 효과를 비교하고자 하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">단일 기관 후향적 횡단면 연구로, 2023~2024년 SUDD 확진 환자 70명을 대상으로 하였다. CBM588군(Group A, n=35)은 CBM588을 12개월간 매일 복용, 리팍시민군(Group B, n=35)은 리팍시민 400mg 1일 2회를 매월 7일간 주기적으로 복용하였다. 최종 분석은 12개월 추적 완료한 56명(CBM588군 31명, 리팍시민군 25명)을 대상으로 하였다. 1차 평가변수는 SUDD 관련 증상 감소, 2차 평가변수는 급성 게실염 발생률이었다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">12개월 추적 후, 증상 악화(flare) 발생률은 두 군 간 유의한 차이가 없었다(CBM588 19.4% vs 리팍시민 20%, p=0.7).<br/>
+그러나 환자 주관적 증상 개선(&#x27;적절한 증상 경감&#x27;)은 CBM588군에서 유의하게 높았다(77.4% vs 44%, p=0.02).<br/>
+복통 빈도에서도 CBM588군이 우수(주 1회 미만 복통: 74.2% vs 36%), 통증 전무 비율 역시 CBM588군이 높았다(48.4% vs 20%).<br/>
+복부팽만과 배변급박감 개선은 CBM588군에서 더 빈번하였으나(19.3% vs 8%), 표본 크기 한계로 통계적 유의성에 도달하지 못했다.<br/>
+급성 게실염은 양 군 모두에서 발생하지 않았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">CBM588 및 리팍시민 모두 12개월 투여 중 치료 관련 이상반응은 보고되지 않았다. 우수한 내약성이 확인되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">SUDD 환자에서 CBM588은 주기적 리팍시민과 동등한 게실염 예방 효과를 보이면서, 주관적 증상 개선에서는 유의하게 우수하였다. CBM588의 낙산 생성을 통한 대장 점막 강화, 염증 조절, 장내환경 개선이 증상 호전의 기전으로 추정된다. 후향적 비무작위 설계이며 소규모 연구라는 한계가 있어, 전향적 대규모 RCT를 통한 검증이 필요하다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>56명 (CBM588 31, rifaximin 25) 대상</li>
+                            <li>77.4% vs 44% (p=0.02) 증상 경감</li>
+                            <li>74.2% vs 36% (p&lt;0.05) 주1회 미만 복통</li>
+                            <li>48.4% vs 20% 통증 전무</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: CBM588 vs Rifaximin 증상 개선율 비교</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart3"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart3"), {
+                            type: "bar",
+                            data: { labels: ["적절한 증상 경감 (CBM588)", "적절한 증상 경감 (Rifaximin)", "복통 전무 (CBM588)", "복통 전무 (Rifaximin)"], datasets: [
+                              { label: "값", data: [77.4, 44, 48.4, 20], backgroundColor: "#1A5276" },
+                              { label: "", data: [0, 0, 0, 0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 낙산균(C.</div><div class="usage-head">🎯 butyricum)이 기존 SUDD 표준치료인 리팍시민 대비 동등 이상의 증상 관리 효과를 보인 비교 연구.</div><div class="usage-head">🎯 바이오탑의 &#x27;낙산 생성 기반 장벽 강화·장내환경 개선&#x27; 기전이 임상적으로 의미 있는 증상 개선으로 이어짐을 보여준다. 특히 소화기내과 게실질환 영역에서 항생제 대안으로서의 프로바이오틱스 포지셔닝에 활용 가능하다.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #4 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">布拉氏酵母菌联合双歧杆菌四联活菌预防婴幼儿抗生素相关性腹泻的前瞻性随机对照研究</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> 中国当代儿科杂志 (Chinese Journal of Contemporary Pediatrics)</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-08-15</div>
+                        <button class="bd-request-btn" data-title="布拉氏酵母菌联合双歧杆菌四联活菌预防婴幼儿抗生素相关性腹泻的前瞻性随机对照研究" data-session="장내미생물" data-num="4" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.7499/j.issn.1008-8830.2506104" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">Prospective RCT</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">항생제 연관 설사(AAD)는 입원 영유아에서 빈번하게 발생하며, 항생제에 의한 장내미생물 교란이 주요 원인이다. 단일 프로바이오틱스(S. boulardii 또는 비피도박테리움 4종 복합제) 투여가 AAD 예방에 일부 효과를 보였으나, 진균과 세균 프로바이오틱스 병용의 시너지 효과에 대한 근거는 제한적이었다. 본 연구는 S. boulardii와 비피도박테리움 4종 복합균(BQP)의 병용이 단독 투여 대비 AAD 예방에 더 효과적인지를 전향적 RCT로 검증하고자 하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">전향적, 무작위, 병행 대조 임상시험으로, 2023년 10월~2025년 6월 항생제 치료가 필요한 1~36개월 입원 영유아 236명을 4군으로 무작위 배정하였다: 대조군(n=59, 프로바이오틱스 미투여), S. boulardii군(n=59), BQP군(n=58), 병용군(n=60, S. boulardii + BQP). 프로바이오틱스는 항생제 개시부터 중단 후 7일까지 투여하였다. 1차 평가변수는 AAD 발생률이었고, 2차 평가변수는 설사 지속 기간, 분변 미생물 구조(16S rRNA 시퀀싱), 염증 지표(분변 칼프로텍틴, 혈청 IL-6), 안전성이었다. 프로바이오틱스 중단 30일 후까지 추적하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">병용군의 AAD 발생률은 7%로, S. boulardii 단독군(15%), BQP 단독군(17%), 대조군(31%) 대비 유의하게 낮았다(p&lt;0.0083, Bonferroni 보정).<br/>
+프로바이오틱스 중단 30일 후 Shannon 다양성 지수는 병용군이 다른 3군 대비 유의하게 높았다(p&lt;0.05).<br/>
+병용군 분변에서 Bifidobacterium 및 Lactobacillus 상대 풍부도가 유의하게 증가하고, Enterococcus 풍부도는 유의하게 감소하였다(p&lt;0.05).<br/>
+항생제 중단 7일 후 염증 지표(칼프로텍틴, IL-6)는 병용군에서 다른 3군 대비 유의하게 낮았다(p&lt;0.05).</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">4군 간 이상반응 발생률에 통계적으로 유의한 차이는 없었다. S. boulardii와 BQP 병용의 안전성이 확인되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">S. boulardii와 비피도박테리움 4종 복합균의 병용은 단일 프로바이오틱스 대비 영유아 AAD를 더 효과적으로 예방하며, 장내 유익균 정착 촉진과 미생물 다양성 회복을 통해 작용하는 것으로 추정된다. 프로바이오틱스 병용의 시너지 효과를 입증한 질 높은 RCT로, 임상적 확대 적용의 근거를 제공한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>236명 (1~36개월 영유아, 4군) 대상</li>
+                            <li>7% AAD 발생률 (병용)</li>
+                            <li>15% AAD 발생률 (S.b.단독)</li>
+                            <li>17% AAD 발생률 (BQP단독)</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 군별 AAD 발생률 비교</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart4"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart4"), {
+                            type: "bar",
+                            data: { labels: ["대조군", "S. boulardii 단독", "BQP 단독", "병용군 (S.b.+BQP)"], datasets: [
+                              { label: "값", data: [31, 15, 17, 7], backgroundColor: "#1A5276" },
+                              { label: "", data: [0, 0, 0, 0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 S.</div><div class="usage-head">🎯 boulardii(바이오탑 성분 효모균)의 AAD 예방 효과를 전향적 RCT로 재확인하고, 다른 프로바이오틱스와의 병용 시너지를 입증한 연구.</div><div class="usage-head">🎯 바이오탑의 &#x27;항생제 연관 설사 예방&#x27; 핵심 처방명분(검증 완료 성공모델: 항생제 연관 설사 100억)을 강화한다. 장내미생물 다양성 회복 데이터는 바이오탑의 &#x27;장내미생물 균형 회복&#x27; 메시지에 직접 활용 가능하다.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #5 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Saccharomyces boulardii in patients with severe acute pancreatitis: a single center, open-label randomized controlled trial</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Burns &amp; Trauma</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-01-16</div>
+                        <button class="bd-request-btn" data-title="Saccharomyces boulardii in patients with severe acute pancreatitis: a single center, open-label randomized controlled trial" data-session="장내미생물" data-num="5" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.1093/burnst/tkag006" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">Open-label RCT</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">중증 급성 췌장염(SAP)은 장벽 기능 손상으로 세균 전위(translocation)가 발생하여 원내감염(nosocomial infection)이 빈번하며, 이는 사망률에 직접적으로 영향을 미친다. SAP에서 프로바이오틱스의 감염 예방 효과에 대해서는 상반된 결과가 보고되어 왔으며, 특히 세균 프로바이오틱스는 PROPATRIA 연구에서 사망률 증가 우려가 제기되었다. S. boulardii는 진균 프로바이오틱스로서 세균 프로바이오틱스와 다른 안전성 프로파일을 가지며, 장벽 기능 강화와 병원성 미생물 억제 작용이 알려져 있어, SAP에서의 효과를 검증할 필요가 있었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">단일 기관, 개방 표지 RCT로, 중국 소화기 ICU에 입원한 SAP 환자 54명을 무작위 배정(프로바이오틱스군 27명, 대조군 27명→최종 분석 23명)하였다. 프로바이오틱스군은 경장영양(EN) + S. boulardii(0.5g 1일 2회, 15일간 공장관 투여), 대조군은 EN 단독이었다. 1차 평가변수는 원내감염(호흡기, 장관, 혈류 감염), 2차 평가변수는 ICU 사망률, 28일 사망률, ICU·입원 기간이었다. 인후·직장 도말 및 분변을 0, 1, 3, 6, 9, 12, 15일에 수집하여 16S rRNA 및 ITS2 시퀀싱으로 세균·진균 미생물 변화를 분석하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">프로바이오틱스군에서 원내감염 0/27(0%) vs 대조군 5/23(21.7%), p=0.016. 호흡기 감염 역시 프로바이오틱스군 0% vs 대조군 17.4%(p=0.038).<br/>
+카테터 관련 혈류감염은 프로바이오틱스군 0% vs 대조군 13.04%(p=0.09).<br/>
+ICU·28일 사망률은 양 군 모두 0%로 동일.<br/>
+미생물 분석에서 프로바이오틱스군은 Firmicutes/Bacteroidetes 비율 감소(p=0.0116), Enterococcus 증식 억제, 장관 및 호흡기 Candida 증식 억제를 보였다.<br/>
+장관 진균(ITS2) 지수의 원내감염 예측력 AUC=0.950(p=0.0159)으로 우수한 바이오마커 가능성을 확인하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">프로바이오틱스군에서 S. boulardii 관련 균혈증(fungemia) 0건. 양 군 모두 ICU 및 28일 사망 0건. SAP 환자에서 S. boulardii의 안전성이 확인되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">S. boulardii는 SAP 환자에서 경장영양 병용 시 원내감염을 유의하게 감소시키며, 장내 세균 교란 방지 및 Candida 증식 억제를 통해 작용한다. 장관 진균 지수가 원내감염의 우수한 예측 바이오마커임을 제시하였다. 소규모 단일기관 연구이므로 대규모 다기관 RCT로의 확인이 필요하나, 진균 프로바이오틱스의 중증 환자 적용 가능성을 보여주는 의미 있는 결과이다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>50명 (SAP, 소화기 ICU) 대상</li>
+                            <li>0% vs 21.7% (p=0.016) 원내감염</li>
+                            <li>0% vs 17.4% (p=0.038) 호흡기감염</li>
+                            <li>0.950 (감염 예측, p=0.016) ITS2 AUC</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: SAP 원내감염 발생률 비교</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart5"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart5"), {
+                            type: "bar",
+                            data: { labels: ["원내감염 (S.b.+EN)", "원내감염 (EN단독)", "호흡기감염 (S.b.+EN)", "호흡기감염 (EN단독)"], datasets: [
+                              { label: "값", data: [0, 21.7, 0, 17.4], backgroundColor: "#1A5276" },
+                              { label: "", data: [0, 0, 0, 0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 S.</div><div class="usage-head">🎯 boulardii(바이오탑 성분 효모균)의 중증 급성 질환(SAP)에서의 감염 예방 효과를 입증한 RCT. 원내감염 0% vs 21.7%라는 극적인 결과는 바이오탑의 &#x27;감염성 합병증 감소&#x27; 포지셔닝을 강력히 뒷받침한다.</div><div class="usage-head">🎯 특히 수술·항암 보조 영역에서의 바이오탑 활용 근거 확장에 직접 활용 가능하다. Candida 억제 효과는 진균 프로바이오틱스의 독특한 장점을 부각한다.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #6 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Perioperative probiotics and synbiotics reduce postoperative infections following colorectal surgery: a systematic review and meta-analysis of randomized controlled trials</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Journal of Surgical Research</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-06-27</div>
+                        <button class="bd-request-btn" data-title="Perioperative probiotics and synbiotics reduce postoperative infections following colorectal surgery: a systematic review and meta-analysis of randomized controlled trials" data-session="장내미생물" data-num="6" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.1016/j.jss.2025.05.026" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">Systematic Review &amp;amp; Meta-analysis</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">대장직장 수술(CRS)은 수술 부위 감염(SSI), 폐렴, 요로감염 등 수술 후 감염 합병증의 위험이 높다. 프로바이오틱스 및 신바이오틱스의 주술기 투여가 장벽 기능 보호, 세균 전위 억제, 면역 조절을 통해 수술 후 감염을 줄일 수 있다는 가설이 제기되어 왔으나, 개별 RCT의 규모가 작아 종합적 근거 평가가 필요했다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">PRISMA 지침에 따른 체계적 문헌고찰 및 메타분석으로, CRS 환자에서 주술기 프로바이오틱스/신바이오틱스와 위약/무처치를 비교한 RCT를 포함하였다. 최종 28개 RCT, 총 2,686명을 분석하였다. 1차 평가변수는 총 수술 후 감염 발생률이었으며, 2차 평가변수로 SSI, 폐렴, 요로감염, 입원 기간, 장기능 회복 시간 등을 포함하였다. 이질성은 I² 통계량으로 평가하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">프로바이오틱스/신바이오틱스군은 대조군 대비 총 수술 후 감염을 유의하게 감소시켰다(RR 0.55, 95% CI 0.41-0.74, p&lt;0.001).<br/>
+SSI도 유의하게 감소(RR 0.61, p&lt;0.01).<br/>
+폐렴 및 요로감염도 감소 추세를 보였다.<br/>
+입원 기간이 프로바이오틱스군에서 유의하게 단축되었다.<br/>
+하위군 분석에서 프로바이오틱스와 신바이오틱스 모두 유사한 감염 감소 효과를 보였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">28개 RCT 전체에서 프로바이오틱스/신바이오틱스 투여와 관련된 심각한 이상반응은 보고되지 않았다. 주술기 프로바이오틱스 투여의 안전성이 확인되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">CRS에서 주술기 프로바이오틱스/신바이오틱스 투여는 수술 후 감염을 45% 감소시키며, 입원 기간 단축에도 기여한다. 28개 RCT에 기반한 견고한 메타분석 결과로, 주술기 프로바이오틱스의 감염 예방 효과에 대한 높은 수준의 근거를 제공한다. 최적 균주, 용량, 투여 기간에 대한 추가 연구가 필요하다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>28 RCTs, N=2,686 포함 연구</li>
+                            <li>RR 0.55 (95% CI 0.41-0.74, p&lt;0.001) 총 감염 감소</li>
+                            <li>RR 0.61 (p&lt;0.01) SSI 감소</li>
+                            <li>45% 감염 위험 감소율</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 주술기 프로바이오틱스의 감염 감소 효과 (RR)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart6"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart6"), {
+                            type: "bar",
+                            data: { labels: ["총 감염 (RR)", "SSI (RR)", "기준선 (대조군)"], datasets: [
+                              { label: "값", data: [0.55, 0.61, 1.0], backgroundColor: "#1A5276" },
+                              { label: "", data: [0, 0, 0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 대장직장 수술에서 프로바이오틱스의 감염 예방 효과를 28개 RCT 메타분석으로 확인한 고수준 근거.</div><div class="usage-head">🎯 바이오탑의 핵심 처방명분인 &#x27;수술 보조 - 감염성 합병증 감소&#x27; 영역의 핵심 레퍼런스로 활용 가능하다.</div><div class="usage-head">🎯 감염 위험 45% 감소(RR 0.55)라는 명확한 수치는 외과 영역에서의 바이오탑 처방 권유 시 강력한 근거가 된다.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #7 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Saccharomyces boulardii supplementation as an adjuvant to bismuth quadruple therapy for Helicobacter pylori eradication: a systematic review and meta-analysis of randomized controlled trials</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> International Journal of Antimicrobial Agents</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-08-25</div>
+                        <button class="bd-request-btn" data-title="Saccharomyces boulardii supplementation as an adjuvant to bismuth quadruple therapy for Helicobacter pylori eradication: a systematic review and meta-analysis of randomized controlled trials" data-session="장내미생물" data-num="7" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.1016/j.ijantimicag.2025.107600" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">Systematic Review &amp;amp; Meta-analysis</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">H. pylori 제균 치료에서 비스무트 4제 요법(BQT)은 표준 치료법이나, 부작용(설사, 오심, 복통)으로 인한 순응도 저하가 제균율 감소의 주요 원인이다. S. boulardii는 항생제 내성이 있는 진균 프로바이오틱스로서, 항생제 병용 시 장내미생물 보호와 부작용 경감에 효과적일 수 있다. 기존 개별 RCT 결과가 일관되지 않아, BQT에 S. boulardii를 보조적으로 추가할 때의 제균율 향상과 부작용 감소 효과에 대한 종합적 메타분석이 필요했다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">PRISMA 지침에 따른 체계적 문헌고찰 및 메타분석으로, BQT + S. boulardii와 BQT 단독을 비교한 RCT를 포함하였다. 최종 19개 RCT, 총 2,973명을 분석하였다. 1차 평가변수는 ITT 및 PP 제균율이었고, 2차 평가변수는 총 부작용 발생률, 설사, 오심, 구역, 복통 등 개별 부작용이었다. 하위군 분석으로 치료 기간(10일 vs 14일), S. boulardii 용량, BQT 구성 성분별 효과를 평가하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">S. boulardii 보조 투여군은 BQT 단독 대비 제균율이 유의하게 향상(OR 1.49, 95% CI 1.19-1.86, p=0.0004).<br/>
+총 부작용 발생률이 유의하게 감소(OR 0.44, 95% CI 0.28-0.69, p=0.0006).<br/>
+개별 부작용 분석에서 설사(OR 0.41, p&lt;0.001)와 오심(OR 0.58, p=0.02)이 특히 유의하게 감소하였다.<br/>
+하위군 분석에서 14일 치료군에서 S. boulardii의 효과가 더 두드러졌으며, 다양한 BQT 구성에서 일관된 효과를 보였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">S. boulardii 투여군에서 심각한 이상반응은 보고되지 않았다. 오히려 총 부작용 발생률을 56% 감소시켜(OR 0.44), S. boulardii가 BQT의 내약성을 개선함을 확인하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">BQT에 S. boulardii를 보조적으로 추가하면 H. pylori 제균율이 유의하게 향상되고 부작용이 유의하게 감소한다. 19개 RCT, 2,973명에 기반한 견고한 메타분석으로, S. boulardii의 H. pylori 제균 보조 요법으로서의 근거를 확립하였다. 14일 BQT에서 효과가 더 우수하며, 일상 진료에서의 적극적 활용을 지지한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>19 RCTs, N=2,973 포함 연구</li>
+                            <li>OR 1.49 (95% CI 1.19-1.86, p=0.0004) 제균율 향상</li>
+                            <li>OR 0.44 (95% CI 0.28-0.69, p=0.0006) 부작용 감소</li>
+                            <li>OR 0.41 (p&lt;0.001) 설사 감소</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: S. boulardii 보조 투여 효과 (Odds Ratio)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart7"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart7"), {
+                            type: "bar",
+                            data: { labels: ["제균율 향상 (OR)", "총 부작용 감소 (OR)", "설사 감소 (OR)", "기준선 (BQT 단독)"], datasets: [
+                              { label: "값", data: [1.49, 0.44, 0.41, 1.0], backgroundColor: "#1A5276" },
+                              { label: "", data: [0, 0, 0, 0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 S. boulardii(바이오탑 성분 효모균)의 H.</div><div class="usage-head">🎯 pylori 제균 보조 효과를 19개 RCT 메타분석으로 확인한 고수준 근거. 바이오탑의 소화기 영역 확대, 특히 H.</div><div class="usage-head">🎯 pylori 제균 치료 보조제로서의 처방 명분을 강화한다. 제균율 향상(OR 1.49)과 동시에 부작용 56% 감소(OR 0.44)라는 이중 효과는 환자 순응도 개선에 기여하며, 소화기내과 마케팅에서 강력한 메시지가 된다.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+    <h4>근거 분류 기준</h4>
+    <div class="legend-row">
+      <span class="tag-direct">직접근거</span>
+      <span>바이오탑과 동일 성분·균주를 사용한 연구 (C. butyricum TO-A, S. boulardii DBVPG 6763)</span>
+    </div>
+    <div class="legend-row">
+      <span class="tag-ref">참고근거</span>
+      <span>동일 종이나 다른 균주(CBM588) 사용 — 결과가 균주 특이적일 수 있어 직접 적용 시 주의 필요</span>
+    </div>
+    <h4 style="margin-top: 14px;">중요도 등급</h4>
+    <div class="legend-row">
+      <span class="stars-high">★★★</span>
+      <span>즉시 활용: RCT, 메타분석, Phase 3-4 수준. PM팀 디테일링에 바로 반영 가능</span>
+    </div>
+    <div class="legend-row">
+      <span class="stars-mid">★★☆</span>
+      <span>참고 활용: 전임상, 기전 연구, 소규모 임상. 학술강연 소재로 적합</span>
+    </div>
+    <div class="legend-row">
+      <span class="stars-low">★☆☆</span>
+      <span>모니터링: 동향 파악 수준. 후속 연구 결과 확인 필요</span>
+    </div>
+    <h4 style="margin-top: 14px;">접근성 표시</h4>
+    <div class="legend-row">
+      <span class="tag-open">🔓 오픈액세스</span>
+      <span>원문 전체 접근 가능 (PMC, Frontiers, MDPI, PLOS 등)</span>
+    </div>
+    <div class="legend-row">
+      <span class="tag-wall">🔒 페이월</span>
+      <span>원문 접근 제한 — 초록 및 인용 수치만 확인</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var h=decodeURIComponent(location.hash.slice(1)); if(!h) return;
+  var papers=document.querySelectorAll('.paper'),found=null;
+  for(var i=0;i<papers.length;i++){var t=papers[i].querySelector('.paper-title');var txt=t?t.textContent.trim().toLowerCase():'';if(txt.indexOf(h.toLowerCase())!==-1){found=papers[i];break;}}
+  if(!found) return;
+  for(var j=0;j<papers.length;j++){if(papers[j]!==found)papers[j].style.display='none';}
+  found.style.outline='3px solid #1A5276';found.style.borderRadius='10px';found.scrollIntoView({behavior:'smooth',block:'start'});
+  var btn=document.createElement('button');btn.textContent='📋 모든 논문 보기';
+  btn.style.cssText='position:fixed;bottom:24px;right:24px;z-index:999;padding:10px 20px;background:#003366;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3);';
+  btn.onclick=function(){for(var k=0;k<papers.length;k++)papers[k].style.display='';found.style.outline='';btn.remove();window.scrollTo(0,0);};
+  document.body.appendChild(btn);
+})();
+</script>
+
+<!-- BD_REQUEST_MODAL_v2 -->
+<style>
+  #bd-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;align-items:center;justify-content:center}
+  #bd-modal{background:#fff;border-radius:8px;padding:24px;min-width:420px;max-width:520px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-family:'Malgun Gothic',sans-serif}
+  #bd-modal h3{margin:0 0 16px;color:#003366;border-bottom:2px solid #1A5276;padding-bottom:8px}
+  #bd-modal .field{margin:12px 0}
+  #bd-modal label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:4px}
+  #bd-modal input,#bd-modal textarea{width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;font-size:13px;box-sizing:border-box;font-family:inherit}
+  #bd-modal textarea{min-height:60px;resize:vertical}
+  #bd-modal .radio-row label{display:inline-block;font-weight:400;margin-right:16px;cursor:pointer}
+  #bd-modal .actions{margin-top:20px;text-align:right}
+  #bd-modal button{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:13px;margin-left:8px}
+  #bd-modal .submit{background:#003366;color:#fff;font-weight:600}#bd-modal .cancel{background:#ddd;color:#333}
+  #bd-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#003366;color:#fff;padding:12px 24px;border-radius:6px;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:9999;opacity:0;transition:opacity .3s}
+  #bd-toast.show{opacity:1}#bd-toast.error{background:#c0392b}
+</style>
+<div id="bd-modal-overlay" onclick="if(event.target.id==='bd-modal-overlay') closeBDModal()">
+  <div id="bd-modal">
+    <h3>📌 BD 제작 요청</h3>
+    <div class="field"><label>논문</label><div id="bd-modal-title" style="font-size:13px;color:#555;line-height:1.4"></div></div>
+    <div class="field"><label>세션</label><div id="bd-modal-session" style="font-size:13px;color:#555"></div></div>
+    <div class="field"><label>BD 포맷</label><div class="radio-row">
+      <label><input type="radio" name="bd-format" value="CLB" checked> CLB (학술브리프)</label>
+      <label><input type="radio" name="bd-format" value="BT"> BT (바이오톡)</label></div></div>
+    <div class="field"><label>요청자 이메일 *</label><input type="email" id="bd-modal-requester" placeholder="example@hanall.co.kr" required></div>
+    <div class="field"><label>메모 (선택)</label><textarea id="bd-modal-memo" placeholder="특별 요청사항"></textarea></div>
+    <div class="actions"><button class="cancel" onclick="closeBDModal()">취소</button><button class="submit" onclick="submitBDRequest()">요청 제출</button></div>
+  </div>
+</div>
+<div id="bd-toast"></div>
+<script>
+const BD_WEBHOOK_URL='https://script.google.com/macros/s/AKfycbynF7P1576GbRlzdIjBaxrOvjTU4HDP8F9jY4flxduhSqYR15Hr4AmhImuaS0wPJoOC/exec';let bdCurrentBtn=null;
+function openBDModal(b){bdCurrentBtn=b;document.getElementById('bd-modal-title').textContent=b.dataset.title;document.getElementById('bd-modal-session').textContent=b.dataset.session;document.getElementById('bd-modal-requester').value=localStorage.getItem('bd-requester')||'';document.getElementById('bd-modal-memo').value='';document.querySelector('input[name=bd-format][value=CLB]').checked=true;document.getElementById('bd-modal-overlay').style.display='flex';}
+function closeBDModal(){document.getElementById('bd-modal-overlay').style.display='none';bdCurrentBtn=null;}
+function showToast(m,e){var t=document.getElementById('bd-toast');t.textContent=m;t.className=e?'show error':'show';setTimeout(function(){t.className='';},3500);}
+function submitBDRequest(){if(!bdCurrentBtn)return;var title=bdCurrentBtn.dataset.title,session=bdCurrentBtn.dataset.session,format=document.querySelector('input[name=bd-format]:checked').value,requester=document.getElementById('bd-modal-requester').value.trim(),memo=document.getElementById('bd-modal-memo').value.trim();if(!requester){showToast('요청자 이메일은 필수입니다',true);return;}localStorage.setItem('bd-requester',requester);var cb='bdcb_'+Date.now();window[cb]=function(data){delete window[cb];document.head.removeChild(s);if(data.status==='ok'){showToast('✅ BD 요청 접수: '+format+' / '+title.slice(0,40)+'…');bdCurrentBtn.disabled=true;bdCurrentBtn.textContent='✓ 요청됨';closeBDModal();}else if(data.status==='duplicate'){showToast('⚠️ 동일 요청이 이미 대기 중입니다',true);closeBDModal();}else{showToast('❌ 오류: '+(data.message||'알 수 없음'),true);}};var params=new URLSearchParams({action:'requestBDQueue',title:title,session:session,format:format,requester:requester,memo:memo,callback:cb});var s=document.createElement('script');s.src=BD_WEBHOOK_URL+'?'+params.toString();s.onerror=function(){delete window[cb];showToast('❌ 네트워크 오류 — 잠시 후 다시 시도',true);};document.head.appendChild(s);}
+</script>
+
+</body>
+</html>
