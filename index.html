@@ -351,6 +351,7 @@ body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var
   <button class="tab-btn" onclick="switchTab('t-all',this)">📊 전체 현황</button>
   <button class="tab-btn" onclick="switchTab('t-110',this)">🏥 110대 세부현황</button>
   <button class="tab-btn" onclick="switchTab('t-prenon',this)">💊 프레논 교차판매</button>
+  <button class="tab-btn" onclick="switchTab('t-process',this)">📋 매월 과정관리</button>
 </div>
 
 <!-- Google Sheets 실시간 연동 패널 -->
@@ -535,6 +536,19 @@ body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var
   </div>
 
   <!-- 4) 프레논 교차판매 탭 -->
+  <div class="tab-panel" id="t-process">
+    <div class="section-card">
+      <h3 style="margin-top:0">📋 매월 과정관리 <span id="msproc-meta" style="font-size:11px;color:var(--gray3);font-weight:400"></span></h3>
+      <div style="margin:6px 0 10px;font-size:12.5px">월 스냅샷:
+        <select id="msproc-sel" style="padding:4px 8px;border:1px solid #ccd3de;border-radius:6px"></select>
+        <span style="font-size:11px;color:var(--gray3)">매월 확정 스냅샷이 누적됩니다</span></div>
+      <div id="msproc-body" style="overflow-x:auto"><div class="no-data">과정관리 데이터(process_monthly.js)가 없습니다</div></div>
+      <div style="margin-top:8px;font-size:10.5px;color:var(--gray3);line-height:1.6">
+        정의 · 콜수=일일보고 한일(방문보고) 건수 · 업체수=한일 보고 업체(괄호=그중 우량 월 1.5천만↑ 매출 업체) · 갱신율=이달 진행사항 보고 건÷담당 전체 · 정체=처방 제외 진행 건 중 60일+ 미갱신 · 실적업체 커버=확정 최신월 매출 업체 중 이달 방문 비중 · 갭은 감점 아님(조기 보고 목적) · 신호등: 갱신율 40/20% · 정체율 20/50% · 신규 3/0건 · 커버리지 50/25% (잠정)
+      </div>
+    </div>
+  </div>
+
   <div class="tab-panel" id="t-prenon">
     <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px" id="pn-cards"></div>
     <div style="background:#fff;border:1px solid var(--gray2);border-radius:10px;margin-bottom:16px;overflow:hidden">
@@ -2973,7 +2987,7 @@ function renderCrmVendor(d){
   if(crmView.vendorIdx<0)return'';
   var c=(d.vendorChips||[])[crmView.vendorIdx];
   if(!c)return'';
-  var meta=crmMeta(), sales=(crmData&&crmData.sales)||{}, sv=(sales.vendors||{})[c.key]||null;
+  var meta=crmMeta(), sales=(crmData&&crmData.sales)||{}, sv=msResolveVendor(c.key||c.name,(sales.vendors||{}))||null;
   var months=sales.months||[];
   var h='<div class="vd-card">';
   h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">'
@@ -3044,6 +3058,67 @@ function renderCrmVendor(d){
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bootCrm);
   else bootCrm();
 })();
+</script>
+<script src="process_monthly.js"></script>
+<script>
+/* 매월 과정관리 (정적 스냅샷: process_monthly.js — 월 갱신 빌드가 재생성·푸시) */
+(function(){
+  var css=document.createElement('style');
+  css.textContent='#t-process table{width:100%;border-collapse:collapse;font-size:12.5px}#t-process th{background:#1f3864;color:#fff;font-size:11px;padding:6px 5px;font-weight:600;text-align:center}#t-process td{border-bottom:1px solid #e7ecf4;padding:6px 6px;text-align:center;vertical-align:top}#t-process td.l{text-align:left;padding-left:9px}#t-process td b{font-size:13px}#t-process .ps{font-size:10px;color:#8a94a4;margin-top:2px}#t-process .pm{color:#3d5a99;font-weight:600}#t-process tr.pref td{background:#f6f7fa;color:#98a1b0}#t-process tr.pref td b{color:#98a1b0}#t-process tr.ptot td{background:#eef2f9;font-weight:700;color:#1f3864;border-top:2px solid #1f3864}#t-process .pd{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}#t-process .pd.g{background:#16a34a}#t-process .pd.y{background:#d97706}#t-process .pd.r{background:#dc2626}';
+  document.head.appendChild(css);
+  var DP=window.MS_PROCESS;
+  if(!DP||!DP.snapshots){return;}
+  var sel=document.getElementById('msproc-sel'),body=document.getElementById('msproc-body'),meta=document.getElementById('msproc-meta');
+  var months=Object.keys(DP.snapshots).sort().reverse();
+  sel.innerHTML=months.map(function(m){return '<option>'+m+'</option>';}).join('');
+  meta.textContent='기준 '+DP.generated+' · 스냅샷 '+months.length+'개월';
+  function dt(k){return k?'<span class="pd '+k+'"></span>':'';}
+  function f1(v){return v==null?'-':Number(v).toFixed(1);}
+  function f2s(v){return (v>=0?'+':'')+Number(v).toFixed(2);}
+  function render(M){
+    var S=DP.snapshots[M],rows=S.rows,ev=DP.evalSet||[];
+    var ord=ev.concat(Object.keys(rows).filter(function(m){return ev.indexOf(m)<0;}));
+    var T={tgt:0,fc:0,pfc:0,total:0,upd:0,stale:0,prog:0,new:0,newmbo:0,calls:0,rpts:0};
+    var h='<table><tr><th style="text-align:left;padding-left:9px">지부장</th><th>① 수치 갭<br><span style="font-weight:400;font-size:9.5px;opacity:.8">목표→예측 · 전월예측比</span></th><th>② 신약 갱신</th><th>③ 정체(60일+)</th><th>④ 신규 발굴</th><th>⑤ 업체 콜</th><th>[보조] 개시율</th></tr>';
+    ord.forEach(function(m){
+      var d=rows[m],isEv=ev.indexOf(m)>=0;
+      Object.keys(T).forEach(function(k){T[k]+=(d[k]||0);});
+      var updr=d.total?d.upd/d.total*100:0,str=d.prog?d.stale/d.prog*100:0;
+      var mom=(d.fc!=null&&d.pfc!=null)?d.fc-d.pfc:null;
+      var o6=(S.open6||{})[m],covp=d.actv?d.cov/d.actv*100:0;
+      h+='<tr'+(isEv?'':' class="pref"')+'><td class="l"><b>'+m+'</b>'+(isEv?'':'<div class="ps">현황 참고 · 평가 제외</div>')+'</td>'
+        +'<td><b>'+f1(d.tgt)+' → '+f1(d.fc)+'억</b><div class="ps">갭 '+(d.fc!=null&&d.tgt!=null?f2s(d.fc-d.tgt):'-')+'억 · 전월예측比 '+(mom!=null?f2s(mom):'-')+'억</div></td>'
+        +'<td>'+(isEv?dt(updr>=40?'g':updr>=20?'y':'r'):'')+'<b>'+updr.toFixed(0)+'%</b><div class="ps">'+d.total+'건 중 '+d.upd+'건 · 보고 '+d.rpts+'회</div></td>'
+        +'<td>'+(isEv?dt(str<=20?'g':str<=50?'y':'r'):'')+'<b>'+d.stale+'건</b> ('+str.toFixed(0)+'%)<div class="ps">진행 '+d.prog+'건 중</div></td>'
+        +'<td>'+(isEv?dt(d.new>=3?'g':d.new>=1?'y':'r'):'')+'<b>'+d.new+'건</b><div class="ps">MBO '+Number(d.newmbo||0).toLocaleString()+'만</div></td>'
+        +'<td>'+(isEv?dt(covp>=50?'g':covp>=25?'y':'r'):'')+'<b>'+d.calls+'콜</b> · '+d.shops+'처(우량 '+d.shopsEx+')<div class="ps pm">실적업체 커버 '+d.cov+'/'+d.actv+'처 ('+covp.toFixed(0)+'%)</div><div class="ps">순항·관찰·부진 '+d.st.join('·')+'</div></td>'
+        +'<td>'+(o6?((isEv?dt(o6[0]/o6[1]>=.4?'g':o6[0]/o6[1]>=.2?'y':'r'):'')+'<b>'+(o6[0]/o6[1]*100).toFixed(0)+'%</b><div class="ps">'+o6[0]+'/'+o6[1]+'건'+(S.refM?'('+(S.refM.slice(4)*1)+'월 도래분)':'')+'</div>'):'-')+'</td></tr>';
+    });
+    var updr=T.total?T.upd/T.total*100:0,str=T.prog?T.stale/T.prog*100:0,ts=S.teamShops||[null,null],tc=S.teamCov||[null,null],ot=S.openTeam||null;
+    h+='<tr class="ptot"><td class="l">MS팀</td><td><b>'+f1(T.tgt)+' → '+f1(T.fc)+'억</b><div class="ps">갭 '+f2s(T.fc-T.tgt)+'억 · 전월예측比 '+f2s(T.fc-T.pfc)+'억</div></td>'
+      +'<td><b>'+updr.toFixed(0)+'%</b><div class="ps">'+T.total+'건 중 '+T.upd+'건 · 보고 '+T.rpts+'회</div></td>'
+      +'<td><b>'+T.stale+'건</b> ('+str.toFixed(0)+'%)</td><td><b>'+T.new+'건</b><div class="ps">MBO '+Number(T.newmbo||0).toLocaleString()+'만</div></td>'
+      +'<td><b>'+T.calls+'콜</b> · '+(ts[0]!=null?ts[0]+'처(우량 '+ts[1]+')':'-')+(tc[0]!=null?'<div class="ps pm">실적업체 커버 '+tc[0]+'/'+tc[1]+'처 ('+(tc[0]/tc[1]*100).toFixed(0)+'%)</div>':'')+'</td>'
+      +'<td>'+(ot?'<b>'+(ot[0]/ot[1]*100).toFixed(0)+'%</b><div class="ps">'+ot[0]+'/'+ot[1]+'건</div>':'-')+'</td></tr></table>';
+    body.innerHTML=h;
+  }
+  sel.onchange=function(){render(sel.value);};
+  render(months[0]);
+})();
+/* 업체 상세 실적 매칭 보정(별칭·정규화·괄호 모회사) — 에스투앰 등 이형 표기 */
+function msResolveVendor(name,vendors){
+  if(!name||!vendors)return null;
+  var t=String(name).trim();
+  var AL=(window.MS_PROCESS&&window.MS_PROCESS.alias)||{};
+  if(AL[t]&&vendors[AL[t]]!=null)return vendors[AL[t]];
+  if(vendors[t]!=null)return vendors[t];
+  function nn(s){return String(s).replace(/주식회사|\(주\)|\(유\)|㈜|\s/g,'').toLowerCase();}
+  var n=nn(t),keys=Object.keys(vendors),i;
+  for(i=0;i<keys.length;i++){if(nn(keys[i])===n)return vendors[keys[i]];}
+  var m=t.match(/\(([^)]+)/);
+  if(m){var n2=nn(m[1]);for(i=0;i<keys.length;i++){if(nn(keys[i])===n2)return vendors[keys[i]];}}
+  return null;
+}
 </script>
 </body>
 </html>
