@@ -2301,6 +2301,9 @@ function download110SumExcel(){
 <script>
 var forecastData=null, forecastLoaded=false, forecastLoading=false;
 function fcEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+/* [2026-09-02 박본님] 이철종 → 최인경 인수인계 중 — 화면 표기만 '이철종(최인경)'.
+   데이터 키(시트 지부장명·DIRECTORS·폼 rpm 값)는 '이철종' 유지 — 마감예측·업체활동·보고이력 매칭이 전부 이 키라 표기만 바꾼다. */
+function crmDirLabel(n){var s=String(n==null?'':n);return s==='이철종'?'이철종(최인경)':s;}
 /* 원 → 억원(소수1자리) */
 function fcEok(won,dp){var d=(dp==null?1:dp);return (Math.round((Number(won)||0)/1e8*Math.pow(10,d))/Math.pow(10,d)).toFixed(d);}
 /* 원 → 만원(정수, 천단위 콤마) */
@@ -2452,7 +2455,7 @@ function renderFcDirectors(dirs, meta){
   var body='', sumMon={}, sumT=0,sumF=0,sumE1=0,sumE2=0,sumG=0;
   dirs.forEach(function(dir){
     var mthly=dir.monthly||{};
-    var row='<tr><td style="text-align:left;font-weight:700">'+fcEsc(dir.name)+'</td>';
+    var row='<tr><td style="text-align:left;font-weight:700">'+fcEsc(crmDirLabel(dir.name))+'</td>';
     monCols.forEach(function(m){
       var v=mthly[m];
       row+='<td>'+(v!=null&&v!==''?fcEok(v):'-')+'</td>';
@@ -2493,7 +2496,7 @@ function renderFcNewDrug(nd, meta){
   var body='';
   dirs.forEach(function(dir){
     var mm=byDir[dir]||{}; var sub=0;
-    var row='<tr><td style="text-align:left;font-weight:700">'+fcEsc(dir)+'</td>';
+    var row='<tr><td style="text-align:left;font-weight:700">'+fcEsc(crmDirLabel(dir))+'</td>';
     rem.forEach(function(m){var v=mm[m]||0;sub+=Number(v)||0;row+='<td>'+(v?fcEok(v):'-')+'</td>';});
     row+='<td style="background:#eef2f9;font-weight:700">'+fcEok(sub)+'</td></tr>';
     body+=row;
@@ -2811,7 +2814,7 @@ function renderCrmDirectors(){
   dirs.forEach(function(d,i){
     var f=d.flow||{}, ac=d.actuals||{}, pl=(d.pipeline&&d.pipeline.total)||{};
     var snap=crmMonthSnap(d), vs=snap.st; /* [v44b] 업체 상태·이슈 = 이번달 분만(월 리셋). 이력은 구글시트 */
-    var row='<tr class="clickable" onclick="crmOpenDir('+i+')"><td style="text-align:left;font-weight:700">'+fcEsc(d.name)+'</td>';
+    var row='<tr class="clickable" onclick="crmOpenDir('+i+')"><td style="text-align:left;font-weight:700">'+fcEsc(crmDirLabel(d.name))+'</td>';
     cols.forEach(function(m){
       var v=ac[m];
       row+='<td>'+(v!=null&&v!==''?fcEok(v):'<span style="color:var(--gray3)">-</span>')+'</td>';
@@ -2873,7 +2876,7 @@ function renderCrmDirector(){
   /* 헤더 */
   h+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">'
     +'<button class="crm-back" onclick="crmBackAll()">‹ 전체</button>'
-    +'<div style="font-size:19px;font-weight:800;letter-spacing:-.02em">'+fcEsc(d.name)+' 지부장</div>'
+    +'<div style="font-size:19px;font-weight:800;letter-spacing:-.02em">'+fcEsc(crmDirLabel(d.name))+' 지부장</div>'
     +'<span class="crm-badge'+(meta.confirmedMonth?' on':'')+'">확정 실적 기준: '+fcEsc(crmMon(meta.confirmedMonth))+(meta.confirmedPartial?' (일부)':'')+'</span></div>';
 
   /* 1. 평가 실적 현황 */
@@ -3107,7 +3110,7 @@ function renderCrmVendor(d){
       var updr=d.total?d.upd/d.total*100:0,str=d.prog?d.stale/d.prog*100:0;
       var mom=(d.fc!=null&&d.pfc!=null)?d.fc-d.pfc:null;
       var o6=(S.open6||{})[m],covp=d.actv?d.cov/d.actv*100:0;
-      h+='<tr'+(isEv?'':' class="pref"')+'><td class="l"><b>'+m+'</b>'+(isEv?'':'<div class="ps">현황 참고 · 평가 제외</div>')+'</td>'
+      h+='<tr'+(isEv?'':' class="pref"')+'><td class="l"><b>'+(typeof crmDirLabel==='function'?crmDirLabel(m):m)+'</b>'+(isEv?'':'<div class="ps">현황 참고 · 평가 제외</div>')+'</td>'
         +'<td><b>'+f1(d.tgt)+' → '+f1(d.fc)+'억</b><div class="ps">갭 '+(d.fc!=null&&d.tgt!=null?f2s(d.fc-d.tgt):'-')+'억 · 전월예측比 '+(mom!=null?f2s(mom):'-')+'억</div></td>'
         +'<td>'+(isEv?dt(updr>=40?'g':updr>=20?'y':'r'):'')+'<b>'+updr.toFixed(0)+'%</b><div class="ps">'+d.total+'건 중 '+d.upd+'건 · 보고 '+d.rpts+'회</div></td>'
         +'<td>'+(isEv?dt(str<=20?'g':str<=50?'y':'r'):'')+'<b>'+d.stale+'건</b> ('+str.toFixed(0)+'%)<div class="ps">진행 '+d.prog+'건 중</div></td>'
