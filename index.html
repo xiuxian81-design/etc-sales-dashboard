@@ -2805,12 +2805,12 @@ function renderCrmDirectors(){
   head+='<th style="background:var(--gray1)">'+crmMon(meta.prevMonth)+' 예측</th>'
       +'<th style="background:var(--blue-lt);color:var(--blue-dk)">'+crmMon(meta.nowMonth)+' 목표</th>'
       +'<th style="background:var(--gray1)">파이프라인<br><span style="font-size:9px;color:var(--gray3)">건 · MBO</span></th>'
-      +'<th style="background:var(--gray1)">업체 상태<br><span style="font-size:9px;color:var(--gray3)">순항·관찰·부진 (최신 보고)</span></th>'
-      +'<th style="background:var(--gray1)">이슈<br><span style="font-size:9px;color:var(--gray3)">최신 보고</span></th><th></th></tr>';
+      +'<th style="background:var(--gray1)">업체 상태<br><span style="font-size:9px;color:var(--gray3)">순항·관찰·부진 (이번달)</span></th>'
+      +'<th style="background:var(--gray1)">이슈<br><span style="font-size:9px;color:var(--gray3)">이번달</span></th><th></th></tr>';
   var body='', sumM={}, sumPrev=0, sumGoal=0, sumCnt=0, sumMbo=0, sumIss=0;
   dirs.forEach(function(d,i){
     var f=d.flow||{}, ac=d.actuals||{}, pl=(d.pipeline&&d.pipeline.total)||{};
-    var snap=crmDailySnap(d), vs=snap.st; /* [v44] 업체 상태·이슈 = 최신 보고일 분만(리셋). 이력은 구글시트 */
+    var snap=crmMonthSnap(d), vs=snap.st; /* [v44b] 업체 상태·이슈 = 이번달 분만(월 리셋). 이력은 구글시트 */
     var row='<tr class="clickable" onclick="crmOpenDir('+i+')"><td style="text-align:left;font-weight:700">'+fcEsc(d.name)+'</td>';
     cols.forEach(function(m){
       var v=ac[m];
@@ -2839,29 +2839,29 @@ function crmOpenDir(i){ crmView={mode:'dir',dirIdx:i,vendorIdx:-1}; renderCrm();
 function crmBackAll(){ crmView={mode:'all',dirIdx:-1,vendorIdx:-1}; renderCrm(); }
 function crmToggleVendor(i){ crmView.vendorIdx=(crmView.vendorIdx===i?-1:i); renderCrmDirector(); }
 
-/* ── [v44 2026-09-01 박본님] 일일보고 업체 내용 '리셋' 표시 ──
-   대시보드는 지부장별 '최신 보고일' 분만 보여준다(새 보고가 오면 이전 표시분은 화면에서 사라짐).
+/* ── [v44 2026-09-01 박본님, v44b 월 단위로 교정] 일일보고 업체 내용 '월 리셋' 표시 ──
+   대시보드는 지부장별 '이번달' 분을 누적으로 보여주고, 달이 바뀌면 리셋된다(지난달 분은 화면에서 제외).
    전체 이력은 구글시트 '업체활동' 탭에 그대로 누적된다 — 매출(업체실적) 확정 후 활동↔실적 평가는 시트가 원장.
-   최신 보고일 = 한일·이슈 중 최대 일자(할일은 내일 날짜라 제외). 매출 추이는 일일보고가 아니므로 리셋 대상 아님. */
-function crmDailySnap(d){
+   매출 추이는 일일보고가 아니므로 리셋 대상 아님. */
+function crmMonthSnap(d){
+  var meta=crmMeta(), nowM=meta.nowMonth||'';
   var acts=((crmData&&crmData.activities)||{})[d.name]||[];
-  var latest=acts.filter(function(a){return a['구분']!=='할일';})
-    .reduce(function(m,a){var t=String(a['일자']||'');return t>m?t:m;},'');
   var chips=[],map={};
-  acts.forEach(function(a){
-    if(a['구분']!=='한일'||String(a['일자']||'')!==latest||!latest)return;
+  acts.forEach(function(a){   /* activities는 일자 내림차순 → 첫 비공란 상태 = 최신 상태 */
+    if(a['구분']!=='한일'||!nowM||String(a['일자']||'').slice(0,7)!==nowM)return;
     var k=a.vendorKey||a['업체명']||'';if(!k)return;
     var c=map[k];
     if(!c){c=map[k]={key:k,name:a['업체명']||k,status:'',count:0};chips.push(c);}
-    c.count++;if(a['상태'])c.status=a['상태'];
+    c.count++;if(a['상태']&&!c.status)c.status=a['상태'];
   });
   var st={'순항':0,'관찰':0,'부진':0};
   chips.forEach(function(c){if(st[c.status]!=null)st[c.status]++;});
   var issues=[];
-  (d.issues||[]).forEach(function(gp){(gp.items||[]).forEach(function(it){
-    if(latest&&String(it['일자']||'')===latest)issues.push(it);
-  });});
-  return {latest:latest,chips:chips,st:st,issues:issues};
+  (d.issues||[]).forEach(function(gp){
+    if(gp.month!==nowM)return;
+    (gp.items||[]).forEach(function(it){issues.push(it);});
+  });
+  return {month:nowM,chips:chips,st:st,issues:issues};
 }
 
 /* ── 지부장 상세 8블록 ── */
@@ -2988,25 +2988,25 @@ function renderCrmDirector(){
   h+='<div class="section-card"><h3>📈 6. 매출 볼륨업 <span style="font-size:11px;color:var(--gray3);font-weight:400">'+vrows.length+'건 · 총 증대MBO '+fcMan(vu.total)+'만원</span></h3>'
     +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead><tr><th style="text-align:left">병원명</th><th>품목</th><th style="text-align:left">내용</th><th>증대MBO</th><th>목표월</th><th>상태</th></tr></thead><tbody>'+vbody+'</tbody></table></div></div>';
 
-  /* 7. 미팅 업체 칩 (+ 업체 상세 카드) — [v44] 최신 보고일 분만 표시(리셋). 이력은 구글시트 '업체활동' 탭 */
-  var snap=crmDailySnap(d); d._dailySnap=snap;
+  /* 7. 미팅 업체 칩 (+ 업체 상세 카드) — [v44b] 이번달 누적 표시, 달이 바뀌면 리셋. 이력은 구글시트 '업체활동' 탭 */
+  var snap=crmMonthSnap(d); d._monthSnap=snap;
   var chips=snap.chips, vs=snap.st;
   var chipHtml=chips.length?chips.map(function(c,i){
     return '<button class="crm-chip '+fcEsc(c.status||'none')+(crmView.vendorIdx===i?' sel':'')+'" onclick="crmToggleVendor('+i+')">'
       +fcEsc(c.name||c.key||'-')+'<span class="n">'+(Number(c.count)||0)+'회</span></button>';
-  }).join(''):'<div class="no-data">최신 보고에 미팅 기록이 없습니다 (폼 ⑤ 오늘 한일)</div>';
-  h+='<div class="section-card"><h3>🏢 7. 미팅 업체 <span style="font-size:11px;color:var(--gray3);font-weight:400">'+(snap.latest?fcEsc(snap.latest)+' 보고 기준':'보고 없음')+' · '+chips.length+'처 · '
+  }).join(''):'<div class="no-data">이번달 미팅 기록이 없습니다 (폼 ⑤ 오늘 한일)</div>';
+  h+='<div class="section-card"><h3>🏢 7. 미팅 업체 <span style="font-size:11px;color:var(--gray3);font-weight:400">'+fcEsc(snap.month||'')+' 누적 · '+chips.length+'처 · '
     +'<span style="color:var(--ok)">순항 '+vs['순항']+'</span> · <span style="color:var(--watch)">관찰 '+vs['관찰']+'</span> · <span style="color:var(--bad)">부진 '+vs['부진']+'</span> · 칩을 클릭하면 업체 상세</span></h3>'
     +'<div class="crm-chips">'+chipHtml+'</div>'
-    +'<div style="font-size:10.5px;color:var(--gray3);margin-top:7px">새 일일보고가 오면 이 화면은 최신 보고일 기준으로 갱신(리셋)됩니다 — 이전 보고분은 구글시트 \'업체활동\' 탭에 전량 기록되어, 매출 확정 후 활동↔실적 평가에 사용합니다.</div>'
+    +'<div style="font-size:10.5px;color:var(--gray3);margin-top:7px">이번달 보고 누적입니다 — 달이 바뀌면 리셋되며, 지난달 기록은 구글시트 \'업체활동\' 탭에 전량 남아 매출 확정 후 활동↔실적 평가에 사용합니다.</div>'
     +renderCrmVendor(d)+'</div>';
 
-  /* 8. 이슈·고민 — [v44] 최신 보고일 분만 표시(리셋). 이전 이슈는 구글시트 기록 */
-  var issDay=snap.issues;
-  var ibody=issDay.length?issDay.map(function(it){
+  /* 8. 이슈·고민 — [v44b] 이번달 분만 표시(월 리셋). 지난달 이슈는 구글시트 기록 */
+  var issMon=snap.issues;
+  var ibody=issMon.length?issMon.map(function(it){
     return '<div class="it"><span class="d">'+fcEsc(it['일자']||'')+'</span><span>'+fcEsc(it['내용']||'').replace(/\n/g,'<br>')+'</span></div>';
-  }).join(''):'<div class="no-data">최신 보고에 등록된 이슈가 없습니다</div>';
-  h+='<div class="section-card"><h3>💬 8. 고민·이슈 <span style="font-size:11px;color:var(--gray3);font-weight:400">'+(snap.latest?fcEsc(snap.latest)+' 보고 기준':'')+' · 이전 이슈는 구글시트에 기록</span></h3><div class="vd-tl">'+ibody+'</div></div>';
+  }).join(''):'<div class="no-data">이번달 등록된 이슈가 없습니다</div>';
+  h+='<div class="section-card"><h3>💬 8. 고민·이슈 <span style="font-size:11px;color:var(--gray3);font-weight:400">'+fcEsc(snap.month||'')+' 누적 · 달이 바뀌면 리셋 · 지난달 이슈는 구글시트에 기록</span></h3><div class="vd-tl">'+ibody+'</div></div>';
 
   h+='<div style="margin-top:6px"><button class="crm-back" onclick="crmBackAll()">‹ 전체 지부장 보기</button></div>';
   el.innerHTML=h;
@@ -3015,8 +3015,8 @@ function renderCrmDirector(){
 /* ── 업체 상세 카드 (칩 클릭 토글) ── */
 function renderCrmVendor(d){
   if(crmView.vendorIdx<0)return'';
-  var snap=d._dailySnap||crmDailySnap(d);
-  var c=(snap.chips||[])[crmView.vendorIdx];   /* [v44] 칩 = 최신 보고일 한일 업체 */
+  var snap=d._monthSnap||crmMonthSnap(d);
+  var c=(snap.chips||[])[crmView.vendorIdx];   /* [v44b] 칩 = 이번달 한일 업체 */
   if(!c)return'';
   var meta=crmMeta(), sales=(crmData&&crmData.sales)||{}, sv=(sales.vendors||{})[c.key]||msResolveVendor(c.key||c.name,(sales.vendors||{}))||null;
   var months=sales.months||[];
@@ -3024,7 +3024,7 @@ function renderCrmVendor(d){
   h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">'
     +'<b style="font-size:15px">'+fcEsc(c.name||c.key||'-')+'</b>'
     +(c.status?'<span class="crm-chip '+fcEsc(c.status)+'" style="cursor:default;padding:3px 10px">'+fcEsc(c.status)+'</span>':'')
-    +'<span class="crm-badge">'+fcEsc(snap.latest||'')+' 보고</span>'
+    +'<span class="crm-badge">'+fcEsc(snap.month||'')+' 보고</span>'
     +'</div>';
   /* 월 매출 추이 미니 막대 */
   if(sv&&months.length){
@@ -3038,22 +3038,25 @@ function renderCrmVendor(d){
   }else{
     h+='<div class="no-data" style="padding:14px">업체실적 데이터가 없습니다 — 활동 이력만 표시합니다</div>';
   }
-  /* 매출 지표 — 매출은 일일보고가 아니므로 리셋 대상 아님(활동 누적 지표는 [v44] 제거 — 평가는 구글시트에서) */
+  /* 지표 — 매출은 일일보고가 아니므로 리셋 대상 아님. 미팅은 이번달 누적([v44b] 3개월 미팅 등 월 넘는 누적 지표는 제거 유지 — 평가는 구글시트에서) */
   h+='<div class="vd-kpi">'
+    +'<div class="k"><div class="l">이번달 미팅</div><div class="v">'+(Number(c.count)||0)+'회</div></div>'
     +'<div class="k"><div class="l">매출 전월比</div><div class="v" style="color:'+crmPctColor(sv&&sv.momPct)+'">'+crmPctTxt(sv&&sv.momPct)+'</div></div>'
     +'<div class="k"><div class="l">3개월 매출 추세</div><div class="v" style="color:'+crmPctColor(sv&&sv.trend3Pct)+'">'+crmPctTxt(sv&&sv.trend3Pct)+'</div></div>'
     +'</div>';
-  /* [v44] 이번 보고 활동만 표시(한일·이슈=최신 보고일, 할일=최신 보고일 이후 예정). 전체 이력은 구글시트 '업체활동' 탭 */
+  /* [v44b] 이번달 활동만 표시(한일·이슈=이번달, 할일=이번달 이후 예정 포함). 지난달 이력은 구글시트 '업체활동' 탭 */
   var acts=((crmData&&crmData.activities)||{})[d.name]||[];
   var mine=acts.filter(function(a){
     if((a.vendorKey||a['업체명'])!==c.key&&a['업체명']!==c.name)return false;
-    var dt=String(a['일자']||'');
-    return (a['구분']==='할일')?(dt>=snap.latest):(dt===snap.latest);
+    var m=String(a['일자']||'').slice(0,7);
+    return (a['구분']==='할일')?(m>=snap.month):(m===snap.month);
   });
   if(mine.length){
     var todo=mine.filter(function(a){return a['구분']==='할일';});
     var done=mine.filter(function(a){return a['구분']!=='할일';});
-    h+='<div class="vd-tl"><div style="font-size:11px;color:var(--gray3);margin-bottom:5px">이번 보고 활동 ('+fcEsc(snap.latest||'')+' · 예정 할일 → 한일) — 전체 이력은 구글시트 \'업체활동\' 탭</div>'
+    todo.sort(function(a,b){return String(b['일자']||'').localeCompare(String(a['일자']||''));});
+    done.sort(function(a,b){return String(b['일자']||'').localeCompare(String(a['일자']||''));});
+    h+='<div class="vd-tl"><div style="font-size:11px;color:var(--gray3);margin-bottom:5px">이번달 활동 ('+fcEsc(snap.month||'')+' · 예정 할일 → 한일 역순) — 지난달 이력은 구글시트 \'업체활동\' 탭</div>'
       +todo.concat(done).map(function(a){
         return '<div class="it"><span class="d">'+fcEsc(a['일자']||'')+'</span>'
           +'<span class="kb '+fcEsc(a['구분']||'')+'">'+fcEsc(a['구분']||'')+'</span>'
@@ -3061,7 +3064,7 @@ function renderCrmVendor(d){
           +'<span style="flex:1">'+fcEsc(a['내용']||'-').replace(/\n/g,'<br>')+'</span></div>';
       }).join('')+'</div>';
   }else{
-    h+='<div class="no-data" style="padding:12px">이번 보고에 이 업체 활동이 없습니다 — 이력은 구글시트 \'업체활동\' 탭</div>';
+    h+='<div class="no-data" style="padding:12px">이번달 이 업체 활동이 없습니다 — 이력은 구글시트 \'업체활동\' 탭</div>';
   }
   h+='</div>';
   return h;
