@@ -67,6 +67,9 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbyhk2el3kwGMStCvyUr-8B-
 
 /* ── 지부장(=RPM=작성자) 4인 고정 — 이철종=팀장 ── */
 const DIRECTORS = ['이철종','김종훈','유정현','정유창'];
+/* [2026-09-02 박본님] 이철종 → 최인경 인수인계 중 — 화면 표기만 '이철종(최인경)'.
+   payload rpm 값·서버 DIRECTORS 매칭은 '이철종' 유지(마감예측·업체활동·보고이력 키 보호). */
+function dirLabel(n){var s=String(n==null?'':n);return s==='이철종'?'이철종(최인경)':s;}
 
 // [🟡-9] HTML 이스케이핑 — XSS 방지 및 특수문자 UI 깨짐 방지
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -1301,7 +1304,7 @@ function buildRpm(){
   DIRECTORS.forEach((r,idx)=>{
     const b=document.createElement('button');
     b.className='rpm-btn';
-    b.innerHTML=esc(r)+(idx===0?'<span class="tag">팀장</span>':'');
+    b.innerHTML=esc(dirLabel(r))+(idx===0?'<span class="tag">팀장</span>':'');
     b.onclick=()=>selRpm(r,b);
     g.appendChild(b);
   });
@@ -1311,13 +1314,13 @@ function selRpm(r,btn){
   //   ① 동일인 재탭은 아무 것도 하지 않는다(최초 선택은 rpm='' 이라 통과)  ② 다른 사람으로 바꿀 땐 작성분이 있으면 되묻는다.
   if(rpm===r) return;
   const nd=dirtyItems().length, vu=volumeUp.length, ls=lastSentItems.length;
-  if(rpm && (nd||vu||ls) && !confirm('작성 중인 신약 '+nd+'건·볼륨업 '+vu+'건이 있습니다.\n작성자를 '+r+'(으)로 바꾸면 모두 지워집니다. 바꿀까요?')) return;
+  if(rpm && (nd||vu||ls) && !confirm('작성 중인 신약 '+nd+'건·볼륨업 '+vu+'건이 있습니다.\n작성자를 '+dirLabel(r)+'(으)로 바꾸면 모두 지워집니다. 바꿀까요?')) return;
   rpm=r; items=[]; volumeUp=[];
   lastSentItems=[]; lastSentDate='';       // [fix1-H1] 작성자 변경 시 전송 이력 초기화
   document.querySelectorAll('.rpm-btn').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   const badge=document.getElementById('rpm-badge');
-  badge.textContent='👤 '+r;badge.style.display='block';
+  badge.textContent='👤 '+dirLabel(r);badge.style.display='block';
   step(3);showEl('c-report');
   loadDaily();          // [v39] 서버 프리필(crm) + 오늘자 localStorage 임시저장 복원
   renderClosing();
