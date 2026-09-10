@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[문헌모니터링] 4주차 Gut-Liver Axis (2026.09.23)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; font-size: 15px; line-height: 1.7; color: #1a1a2e; background: #f0f2f5; padding: 24px 0; }
+    .container { max-width: 820px; margin: 0 auto; padding: 0 16px; }
+    .info-box { background: #fff3e0; border: 2px solid #FF9800; border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+    .info-box h2 { color: #E65100; font-size: 18px; margin-bottom: 12px; }
+    .info-row { display: flex; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
+    .info-label { font-weight: bold; min-width: 60px; color: #555; }
+    .info-value { flex: 1; font-size: 14px; }
+    .copy-btn { background: #FF9800; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; white-space: nowrap; }
+    .copy-btn:hover { background: #F57C00; }
+    .copy-success { color: #2E7D32; font-size: 12px; margin-left: 8px; display: none; }
+    .guide-text { background: #FFF8E1; padding: 10px 14px; border-radius: 6px; margin-top: 12px; font-size: 13px; color: #795548; }
+    .mail-body { background: #fff; border-radius: 10px; padding: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .copy-body-area { margin-bottom: 16px; text-align: right; }
+    .report-header { background: linear-gradient(135deg,#003366 0%,#1a5276 100%); color: #fff; border-radius: 14px; padding: 28px 32px; margin-bottom: 24px; }
+    .report-header .badge { display: inline-block; background: #1A5276; color: #fff; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+    .report-header h1 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    .report-header .meta { font-size: 13px; color: rgba(255,255,255,0.75); display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
+    .stat-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+    .stat-pill { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 16px; font-size: 13px; }
+    .stat-pill span { font-size: 20px; font-weight: 800; display: block; }
+    .exec-box { background: #fff; border-left: 5px solid #003366; border-radius: 0 10px 10px 0; padding: 18px 22px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .exec-box h3 { font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: #003366; margin-bottom: 10px; }
+    .exec-box p { font-size: 14px; line-height: 1.8; color: #333; }
+    .paper { background: #fff; border-radius: 14px; margin-bottom: 28px; box-shadow: 0 3px 12px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #e8eaf0; }
+    .paper-header { padding: 16px 22px 12px; display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #f0f2f5; }
+    .paper-num { background: #003366; color: #fff; font-size: 12px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+    .stars-high { color: #c0392b; font-size: 16px; font-weight: 900; }
+    .stars-mid { color: #e67e22; font-size: 16px; font-weight: 900; }
+    .tag-direct { background: #e8f4fd; color: #1a5276; border: 1px solid #aed6f1; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+    .tag-ref { background: #f0f0f0; color: #666; border: 1px solid #ccc; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+    .journal-meta { font-size: 12px; color: #888; }
+    .paper-body { padding: 20px 22px; }
+    .paper-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; line-height: 1.6; }
+    .paper-url { font-size: 12px; color: #1a5276; margin-bottom: 14px; display: block; word-break: break-all; text-decoration: none; }
+    .paper-url:hover { text-decoration: underline; }
+    .design-badge { display: inline-block; background: #eaf2ff; color: #1a5276; font-size: 12px; font-weight: bold; padding: 4px 12px; border-radius: 6px; margin-bottom: 14px; }
+    .summary-grid { background: #fafbfc; border-radius: 10px; padding: 16px; margin-bottom: 14px; border: 1px solid #e8eaf0; }
+    .summary-grid h4 { font-size: 12px; letter-spacing: 1px; color: #888; text-transform: uppercase; margin-bottom: 10px; font-weight: bold; }
+    .s-row { display: grid; grid-template-columns: 90px 1fr; gap: 6px 12px; margin-bottom: 8px; align-items: flex-start; font-size: 13.5px; }
+    .s-label { font-weight: 700; color: #003366; white-space: nowrap; }
+    .s-val { color: #333; line-height: 1.8; }
+    .s-val em { background: #fff3cd; padding: 1px 4px; border-radius: 3px; font-style: normal; font-weight: bold; color: #664d03; }
+    .key-nums { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+    .knum { background: #003366; color: #fff; border-radius: 10px; padding: 12px 16px; flex: 1; min-width: 140px; text-align: center; }
+    .knum .val { font-size: 22px; font-weight: 900; color: #1A5276; display: block; }
+    .knum .desc { font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 2px; line-height: 1.4; }
+    .knum .pval { font-size: 10px; color: #aed6f1; margin-top: 3px; }
+    .viz-section { border: 2px solid #e8eaf0; border-radius: 10px; padding: 16px; margin-bottom: 14px; background: #fafbfc; }
+    .viz-section h4 { font-size: 13px; font-weight: 700; color: #003366; margin-bottom: 4px; }
+    .viz-subtitle { font-size: 12px; color: #888; margin-bottom: 14px; }
+    .chart-wrap { position: relative; height: 200px; margin-bottom: 10px; }
+    .paywall-notice { background: #fdf2f8; border: 1px solid #d7bde2; border-radius: 8px; padding: 14px 18px; font-size: 13px; color: #7d3c98; text-align: center; font-weight: 500; }
+    .usage { background: linear-gradient(135deg,#fff8f0,#fff3e0); border-left: 4px solid #1A5276; border-radius: 0 10px 10px 0; padding: 14px 18px; font-size: 13.5px; line-height: 1.8; }
+    .usage h4 { font-size: 12px; color: #1A5276; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+    .usage ul { margin-left: 16px; }
+    .usage li { margin-bottom: 4px; }
+    .legend { background: #fff; border-radius: 10px; padding: 18px 22px; margin-top: 8px; border: 1px solid #e8eaf0; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+    .legend h4 { color: #003366; margin-bottom: 10px; font-weight: bold; }
+    .legend table { width: 100%; border-collapse: collapse; }
+    .legend td { padding: 8px; border-bottom: 1px solid #f0f0f0; }
+    .legend td:first-child { background: #f9f9f9; font-weight: bold; width: 100px; }
+    @media print { body { background: #fff; padding: 0; } .info-box, .copy-body-area, .copy-btn { display: none; } .mail-body { box-shadow: none; padding: 0; } .paper { page-break-inside: avoid; } }
+    @media (max-width: 600px) { body { font-size: 14px; } .mail-body { padding: 16px; } .report-header { padding: 20px; } .s-row { grid-template-columns: 1fr; } .key-nums { flex-direction: column; } }
+  </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>/*BR_EXTRA_CSS*/
+.papers{max-width:920px;margin:0 auto;padding:0 8px}
+.paper{border:1px solid #e3e7ee;border-radius:14px;margin:0 auto 26px;box-shadow:0 3px 12px rgba(0,0,0,.07);overflow:hidden;background:#fff}
+.paper-header{background:linear-gradient(135deg,#1A5276,#003366);color:#fff;padding:18px 22px}
+.paper-header .paper-title{color:#fff;font-size:16px;font-weight:800;line-height:1.5;margin:0 0 12px}
+.paper-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:#e3ecf6}
+.paper-meta-item{display:flex;align-items:center;gap:4px}
+.paper-meta-item strong{color:#fff;font-weight:600}
+.importance-badge{padding:3px 11px;border-radius:20px;font-weight:800;color:#1a1a2e}
+.importance-high{background:#FFD54F}.importance-mid{background:#90CAF9;color:#0d2b45}.importance-low{background:#cfd8dc;color:#37474f}
+.evidence-tag{padding:3px 11px;border-radius:20px;font-weight:700;color:#fff;background:#2E8B72}
+.evidence-ref{background:#8896a5}
+.bd-request-btn{background:#fff;color:#003366;border:none;padding:7px 16px;border-radius:7px;font-size:12.5px;font-weight:800;cursor:pointer;margin-left:auto;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.bd-request-btn:hover{background:#ffe9b3}.bd-request-btn:disabled{background:#b9c2cc;color:#fff;cursor:not-allowed}
+.paper-header a,.paper-url{color:#cfe0f5 !important;font-size:11px;word-break:break-all}
+.paper-content{padding:18px 22px}
+.content-section{border-left:4px solid #d3dce6;padding:6px 0 6px 16px;margin:0 0 12px}
+.content-section-title{font-size:13px;font-weight:800;color:#1A5276;margin-bottom:4px;letter-spacing:.2px}
+.content-section-text{font-size:13.5px;line-height:1.7;color:#2b2b38}
+.content-section-text strong{color:#003366}
+.content-section.cs-key{border-left-color:#003366;background:#f3f8fd;border-radius:8px;padding:11px 16px}
+.content-section.cs-key .content-section-title{color:#003366}
+.key-numbers{background:#fff8e6;border:1px solid #f1dea0;border-radius:10px;padding:13px 18px;margin:14px 0}
+.key-numbers h4{margin:0 0 8px;color:#8a6a00;font-size:13.5px}
+.key-numbers ul{margin:0;padding-left:20px}.key-numbers li{font-size:13px;line-height:1.55;margin:4px 0;color:#5a4600}
+.viz-section{background:#f5f9fd;border:1px solid #d9e6f2;border-radius:10px;padding:15px 18px;margin:14px 0}
+.viz-section h4{margin:0 0 10px;color:#003366;font-size:13.5px}
+.usage-box{background:#ecf7f3;border:1px solid #bfe2d7;border-left:5px solid #2E8B72;border-radius:10px;padding:14px 18px;margin:14px 0}
+.usage-box h4{margin:0 0 8px;color:#1d6b59;font-size:13.5px}
+.usage-head{font-weight:800;color:#135344;font-size:13.5px;line-height:1.55;margin-bottom:7px;padding-bottom:7px;border-bottom:1px dashed #bfe2d7}
+.usage-box ul{margin:0;padding-left:20px}.usage-box li{font-size:13px;line-height:1.6;margin:5px 0;color:#244b43}
+</style>
+
+</head>
+<body>
+<div class="container">
+<div class="info-box">
+  <h2>📧 메일 발송 안내</h2>
+  <div class="info-row">
+    <span class="info-label">수신자:</span>
+    <span class="info-value">aaaa81@hanall.co.kr</span>
+  </div>
+  <div class="info-row">
+    <span class="info-label">제목:</span>
+    <span class="info-value" id="mailSubject">[문헌모니터링] 4주차 Gut-Liver Axis (2026.09.23)</span>
+    <button class="copy-btn" onclick="copyText('mailSubject', 'subjectSuccess')">제목 복사</button>
+    <span class="copy-success" id="subjectSuccess">복사됨!</span>
+  </div>
+  <div class="guide-text">
+    아래 <strong>"본문 복사"</strong> 버튼을 클릭한 후, 메일 본문에 <strong>붙여넣기(Ctrl+V)</strong> 하세요.
+  </div>
+</div>
+<div class="mail-body">
+  <div class="copy-body-area">
+    <button class="copy-btn" onclick="copyBody()" style="font-size:15px; padding:10px 24px;">📋 본문 복사</button>
+    <span class="copy-success" id="bodySuccess" style="font-size:13px;">본문이 클립보드에 복사되었습니다!</span>
+  </div>
+  <div id="mailContent">
+    <div class="report-header">
+      <div class="badge">4주차 세션</div>
+      <h1>Gut-Liver Axis 문헌 업데이트</h1>
+      <div class="meta"><span>노르믹스 + 하노마린</span> <span>2026.09.23</span></div>
+      <div class="stat-row">
+        <div class="stat-pill">논문 <span>6</span>편</div>
+        <div class="stat-pill">★★★ <span>6</span>편</div>
+        <div class="stat-pill">오픈액세스 <span>3</span>편</div>
+      </div>
+    </div>
+    <div class="exec-box">
+      <h3>Executive Summary</h3>
+      <p>2025~2026년 간 미생물-간 축(Gut-Liver Axis) 관련 임상근거가 주요 국제 저널에 집중 발표되었다. <strong>Rifaximin의 간성뇌증 예방 효과가 12개 RCT, 1,939명을 종합한 메타분석에서 입증(RR 0.58, 40% 감소)</strong>, <strong>IBS-D 환자에서 리팍시민 병용 치료(프로바이오틱스)의 반응률이 단독 대비 2배 달성</strong>, <strong>하노마린(Silymarin) 단일 RCT에서 MASLD 환자의 간경도(liver stiffness) 유의한 감소</strong>, <strong>리팍시민의 항생제 내성 유발 우려(Nature Communications 2025)</strong>가 핵심이다. 프로바이오틱스 병용, 적정 투여 기간, 항생제 내성 모니터링 등 정밀 진료 전략의 중요성이 부각되고 있다.</p>
+    </div>
+        <div class="papers">
+
+            <!-- ━━━ 논문 #9 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Comparative Outcomes of Rifaximin Monotherapy and Lactulose in Cirrhosis: A Multicenter Cohort Study</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Gut and Liver</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-07-24</div>
+                        <button class="bd-request-btn" data-title="Comparative Outcomes of Rifaximin Monotherapy and Lactulose in Cirrhosis: A Multicenter Cohort Study" data-session="Gut-Liver Axis" data-num="9" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.5009/gnl260099" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">PSM 코호트</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">간성뇌증(HE)은 간경변의 빈번한 합병증으로, 락툴로스가 가이드라인 권장 1차 치료제이며 리팍시민은 주로 보조요법 또는 락툴로스 불내성 시 사용된다. 그러나 실제 임상에서 리팍시민 단독요법과 락툴로스 단독요법의 비교 데이터는 부족하며, 2차 HE 예방에서 어떤 단독요법이 더 우수한지에 대한 근거가 필요한 상황이다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">TriNetX 연구 네트워크를 이용한 다기관 후향적 코호트 연구로, 간경변(K74.6) 및 HE(K76.82) 진단 후 리팍시민 또는 락툴로스 단독요법을 처방받은 성인을 대상으로 하였다. 간이식, 말기신장질환, 병용요법 환자는 제외하였다. 인구통계, 동반질환, 간질환 중증도, MELD 구성요소 등을 기반으로 1:1 경향점수 매칭(PSM)을 수행하여 1,734쌍(총 3,468명)을 분석하였다. Cox 비례위험 모델로 전체 사망률, 입원, 자발성 세균성 복막염(SBP), 재발성 HE를 평가하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">리팍시민 단독요법은 락툴로스 대비 전체 사망률(HR 0.69, 95% CI 0.60-0.79), 입원(HR 0.46, 95% CI 0.41-0.51), SBP(HR 0.29, 95% CI 0.15-0.53)에서 유의하게 낮은 위험을 보였다.<br/>
+재발성 HE는 두 군 간 유사하였다(HR 1.05, 95% CI 0.94-1.16).<br/>
+특히 입원 위험이 54% 감소하였고, SBP 위험은 71% 감소하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">본 연구는 직접적인 이상반응 비교를 수행하지 않았으나, 리팍시민 단독요법군에서 사망률과 감염(SBP) 위험이 유의하게 낮아 전반적인 안전성 프로파일이 우수한 것으로 시사된다. 리팍시민의 최소 전신 흡수 특성이 장기 사용 시 안전성 이점을 뒷받침하는 것으로 판단된다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">리팍시민 단독요법은 실제 임상 환경에서 락툴로스 대비 사망률, 입원, SBP 위험 감소와 연관되었으며, HE 재발률은 유사하였다. 저자들은 이러한 관찰적 결과가 가설 생성적(hypothesis-generating)이며, 전향적 비교 및 비용-효과 연구가 필요함을 강조하였다. 노르믹스(리팍시민) 관점에서 2차 HE 예방의 단독요법으로서의 가치를 뒷받침하는 대규모 실세계 근거이다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>PSM 1,734쌍(총 3,468명) 분석</li>
+                            <li>리팍시민 전체사망 HR 0.69(95% CI 0.60-0.79)</li>
+                            <li>입원 HR 0.46(95% CI 0.41-0.51)</li>
+                            <li>SBP HR 0.29(95% CI 0.15-0.53)</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 리팍시민 vs 락툴로스 단독요법: 위험비(HR) 비교</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart9"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart9"), {
+                            type: "bar",
+                            data: { labels: ["전체 사망", "입원", "SBP", "재발 HE"], datasets: [
+                              { label: "리팍시민 HR", data: [0.69, 0.46, 0.29, 1.05], backgroundColor: "#1A5276" },
+                              { label: "락툴로스 (기준=1.0)", data: [1.0, 1.0, 1.0, 1.0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 노르믹스 단독요법 실세계 근거: 락툴로스 대비 사망률 31% 감소, 입원 54% 감소 — HE 예방에서 1차 선택 가능성 지지</div><ul><li>SBP 위험 71% 감소 — 간경변 감염 합병증 예방 효과로 처방 명분 강화</li><li>HE 재발 억제는 동등(HR 1.05) — 추가 이점은 사망률/입원/감염 영역에서 발현</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #10 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Lack of association between rifaximin and drug-resistant infections: a global multicenter inpatient cirrhosis cohort</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Clinical and Molecular Hepatology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-04-15</div>
+                        <button class="bd-request-btn" data-title="Lack of association between rifaximin and drug-resistant infections: a global multicenter inpatient cirrhosis cohort" data-session="Gut-Liver Axis" data-num="10" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.3350/cmh.2026.0228" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">다기관 전향적 코호트</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">간경변 환자에서 약제내성균(DRO) 감염은 불량한 예후와 연관된다. 리팍시민은 간성뇌증 치료에 널리 사용되나, 교차내성을 촉진할 수 있다는 우려가 제기되어 왔다. 특히 리팍시민이 반코마이신 내성 장구균(VRE)에 대한 댑토마이신 내성을 유발할 수 있다는 전임상 보고 이후, 임상적 영향에 대한 데이터가 상충되고 있어 글로벌 규모의 검증이 필요하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">CLEARED 컨소시엄의 글로벌 다기관 전향적 코호트에서 입원 중 감염이 확인된 간경변 환자 2,949명을 대상으로 분석하였다. 고소득국(HIC), 중상위소득국(UMIC), 저/중하위소득국(L/LMIC) 등 전 세계적으로 대표성 있는 센터가 참여하였다. 입원 전 리팍시민 사용 여부, 임상/인구학적 변수, 약물 정보를 수집하고, 다변량 로지스틱 회귀분석으로 DRO 발생에 대한 리팍시민의 영향을 평가하였다. 경향점수 매칭(PSM), 이중보정, 후방선택 등 다중 민감도 분석을 수행하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">전체 감염의 12.2%(배양양성의 24.4%)에서 DRO가 분리되었다.<br/>
+입원 전 리팍시민 사용률은 29.7%였다.<br/>
+보정 분석에서 리팍시민은 DRO 발생과 유의한 연관이 없었다(adj. OR 1.07, 95% CI 0.80-1.43, p=0.65).<br/>
+소득수준별 하위분석에서도 일관되게 유의하지 않았다(HIC: OR 1.07, p=0.82; UMIC: OR 1.18, p=0.49; L/LMIC: OR 1.04, p=0.90).<br/>
+댑토마이신 사용률은 1.5%로 리팍시민 사용 여부와 무관하였다(1.4% vs 1.7%, p=0.61).<br/>
+MELD-Na 증가(OR 1.03, p&lt;0.001)만이 DRO와 유의하게 연관되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">리팍시민 사용자는 비사용자 대비 더 진행된 간경변 특성을 보였으나, 보정 후 DRO 위험 증가는 관찰되지 않았다. 댑토마이신 내성과의 연관성도 입증되지 않았다. PSM 분석, 이중보정, 후방선택법 등 모든 민감도 분석에서 결과가 일관되었다. 리팍시민 사용 기간(중앙값 2개월)이나 적응증(HE vs SBP 예방)에 따른 DRO 위험 차이도 없었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">전 세계 대표성 있는 감염 간경변 입원 환자 코호트에서 리팍시민은 약제내성균 감염 발생과 연관이 없었다. 저자들은 리팍시민과 DRO의 조악한(crude) 연관성은 약제 자체보다 처방 대상 환자의 중증도를 반영하는 것이며, HE 재발 방지의 입증된 효과 대비 내성 우려로 치료를 보류하는 것의 위험-이익 비를 신중히 고려해야 한다고 결론지었다. 노르믹스 장기 사용의 항생제 내성 안전성을 뒷받침하는 가장 큰 규모의 글로벌 근거이다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>글로벌 2,949명 감염 간경변 입원환자 코호트</li>
+                            <li>리팍시민-DRO 보정 OR 1.07(95% CI 0.80-1.43, p=0.65)</li>
+                            <li>DRO 발생률 12.2%(배양양성 중 24.4%)</li>
+                            <li>입원 전 리팍시민 사용률 29.7%</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 리팍시민 사용과 약제내성균(DRO): 소득수준별 보정 OR</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart10"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart10"), {
+                            type: "bar",
+                            data: { labels: ["전체", "고소득국", "중상위소득국", "저/중하위소득국"], datasets: [
+                              { label: "리팍시민 보정 OR", data: [1.07, 1.07, 1.18, 1.04], backgroundColor: "#1A5276" },
+                              { label: "기준선 (OR=1.0)", data: [1.0, 1.0, 1.0, 1.0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 노르믹스 장기 사용 항생제 내성 안전성: 글로벌 2,949명 코호트에서 약제내성균과 무관 — 내성 우려 불식</div><ul><li>MELD-Na(질병 중증도)만이 DRO 위험인자 — 리팍시민 자체가 아닌 환자 중증도가 원인</li><li>소득수준별(고/중/저소득국) 모두 일관된 결과 — 글로벌 보편성 확인</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #11 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Quality of Life in Patients with Hepatic Encephalopathy Treated with Rifaximin: A Systematic Review</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Journal of Clinical Medicine</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-07-16</div>
+                        <button class="bd-request-btn" data-title="Quality of Life in Patients with Hepatic Encephalopathy Treated with Rifaximin: A Systematic Review" data-session="Gut-Liver Axis" data-num="11" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.3390/jcm15145600" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">체계적 문헌고찰</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">간성뇌증(HE)은 간경변 환자의 삶의 질(QoL)을 현저히 저하시키는 신경정신과적 합병증이다. 리팍시민은 HE 치료 및 예방에 확립된 역할을 하고 있으나, QoL에 대한 구체적 영향은 체계적으로 정리되지 않았다. 최소/은폐 HE 환자에서도 인지기능 저하, 정신운동 둔화, 수면장애, 낙상 위험 증가 등이 일상생활을 방해하며, 이러한 환자 중심 결과의 평가가 필요하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">MEDLINE/PubMed, Embase, CENTRAL을 2025년 11월까지 검색하여 PRISMA 지침에 따라 수행하였다. 간경변 및 최소/은폐 HE 또는 재발성 현성 HE 환자에서 리팍시민의 QoL 영향을 평가한 임상연구를 포함하였다. 4,343건 검색 중 10개 연구가 최종 포함되었다. RCT는 Cochrane RoB 2, 관찰연구는 Newcastle-Ottawa Scale로 비뚤림 위험을 평가하였다. 연구 간 이질성으로 메타분석은 미수행하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">비교군 없는 6개 연구에서 리팍시민은 CLDQ(Chronic Liver Disease Questionnaire) 및 SIP(Sickness Impact Profile) 전체 점수와 다수 영역(피로, 복부증상, 전신증상, 활동, 감정기능, 걱정)에서 위약 대비 QoL 개선을 보였다.<br/>
+비교연구 4개에서 리팍시민은 락툴로스, L-오르니틴 L-아스파르테이트(LOLA), 병용요법과 유사한 QoL 결과를 나타냈다.<br/>
+리팍시민 800mg/일과 1200mg/일 사이 유의한 용량 차이는 관찰되지 않았다.<br/>
+2개 연구에서는 전체 QoL의 유의한 개선이 관찰되지 않았으나, 심리사회적 영역 또는 객관적 수면 지표(REM 수면)의 유의한 개선이 보고되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">포함된 10개 연구 전반에서 리팍시민의 안전성 우려는 보고되지 않았다. 최소 전신 흡수로 인해 장기 사용에 적합하며, 위장관 부작용은 락툴로스 대비 적은 것으로 나타났다. 약물경제학적 분석에서 리팍시민은 재발, 입원, 재원일수 감소를 통해 비용 효과적일 수 있음이 제시되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">리팍시민은 간경변 및 HE 환자의 QoL 개선과 연관될 수 있으며, 특히 최소/은폐 HE에서 피로, 활동, 감정기능 등 다수 영역에서 이점이 관찰되었다. 그러나 연구 수 제한, 소규모 표본, 이질적 설계 및 QoL 측정도구로 인해 결과 해석에 주의가 필요하다. 재발성 현성 HE 및 예방적 사용에서의 추가 고품질 비교시험이 필요하다. 노르믹스의 환자 중심 결과(PRO) 측면에서의 근거를 종합한 최초의 체계적 고찰이다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>4,343건 검색 중 10개 연구 포함</li>
+                            <li>CLDQ 6개 영역 모두에서 위약 대비 개선</li>
+                            <li>리팍시민 550mg BID가 가장 일관된 효과</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 노르믹스 PRO 근거: 피로·활동·감정 등 다수 QoL 영역에서 개선 — 환자 삶의 질 중심 처방 명분</div><ul><li>락툴로스·LOLA 대비 동등한 QoL + 우수한 내약성 → 순응도 이점 강조 가능</li><li>은폐 HE 환자에서 특히 효과적 — 무증상 환자 조기 선별 및 치료 근거</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #12 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Are alterations needed in Silybum marianum (Silymarin) administration practices? A novel outlook and meta-analysis on randomized trials targeting liver injury</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> BMC Complementary Medicine and Therapies</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-04-12</div>
+                        <button class="bd-request-btn" data-title="Are alterations needed in Silybum marianum (Silymarin) administration practices? A novel outlook and meta-analysis on randomized trials targeting liver injury" data-session="Gut-Liver Axis" data-num="12" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.1186/s12906-025-04886-y" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">메타분석</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">실리마린(Silybum marianum 추출물)은 다양한 원인의 간손상에 대해 항염증·항산화 활성을 통한 간보호 효과가 있다고 알려져 있으나, 최적 용량·투여기간·대상 환자군에 대한 체계적 근거가 부족하였다. 기존 메타분석들은 특정 질환군에 국한되거나 소규모였으며, 용량-반응 관계나 환자 특성별 효과 차이를 포괄적으로 분석한 연구가 필요하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">PubMed, Scopus, Web of Science에서 2023년 11월까지 검색하여 실리마린 투여군과 대조군(위약 또는 무치료)을 비교한 RCT 55편(총 3,545명)을 포함하였다. CMA V4를 이용하여 랜덤효과 모델로 표준화 평균차(SMD)를 산출하였다. AST, ALT, ALP 수치를 1차 결과변수로 설정하였고, 용량·나이·BMI·치료기간에 따른 메타회귀 및 하위군 분석을 수행하였다. Begg·Egger 검정으로 출판비뚤림을 평가하고, 제거법으로 민감도 분석을 시행하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">실리마린은 AST(SMD -0.670, 95% CI -0.931 to -0.408, p&lt;0.001)와 ALT(SMD -0.912, 95% CI -1.177 to -0.646, p&lt;0.001)를 유의하게 감소시켰으나, ALP(SMD -0.236, 95% CI -1.929 to 1.458, p=0.159)에는 유의한 효과가 없었다.<br/>
+메타회귀에서 용량·나이·BMI·치료기간과 간보호 효과 간 유의한 연관은 없었다.<br/>
+하위군 분석에서 50세 미만, BMI 30 미만 환자에서 더 큰 효과가 관찰되었다.<br/>
+400mg 미만 용량과 2개월 이하 치료기간에서 더 큰 AST/ALT 감소 효과를 보였다.<br/>
+질환별로 NAFLD와 바이러스성 간염에서 유의한 감소가, 약물유발 간손상과 알코올성 간질환에서는 유의하지 않았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">포함된 55개 RCT 전반에서 실리마린의 심각한 이상반응은 보고되지 않았다. 실리마린은 천연물 유래 제제로 높은 안전성 프로파일을 보였으며, 장기 투여에서도 신기능·혈액학적 이상은 관찰되지 않았다. 대조군 대비 부작용 증가의 근거는 없었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">실리마린은 AST·ALT를 유의하게 감소시키는 간보호 효과가 있으며, 특히 NAFLD와 바이러스성 간염 환자에서 효과적이다. 400mg 미만 저용량·2개월 이하 단기 투여에서 더 큰 효과가 시사되어 기존 고용량·장기 투여 관행에 재고가 필요할 수 있다. 하노마린(실리마린) 관점에서 MASLD/NAFLD 환자의 간효소 개선 효과를 뒷받침하는 대규모 메타분석이며, 적정 용량·기간 설정에 참고할 수 있는 근거이다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>55개 RCT, 총 3,545명 포함</li>
+                            <li>ALT SMD -0.912(95% CI -1.177 to -0.646, p&lt;0.001)</li>
+                            <li>AST SMD -0.670(95% CI -0.931 to -0.408, p&lt;0.001)</li>
+                            <li>400mg 미만·2개월 이하에서 더 큰 효과</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 실리마린의 간효소 감소 효과 (SMD, 55개 RCT)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart12"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart12"), {
+                            type: "bar",
+                            data: { labels: ["AST", "ALT", "ALP"], datasets: [
+                              { label: "실리마린 SMD", data: [-0.67, -0.91, -0.24], backgroundColor: "#1A5276" },
+                              { label: "대조군 (기준=0)", data: [0, 0, 0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 하노마린(실리마린) 간효소 개선 효과: 55개 RCT 메타분석에서 ALT·AST 유의한 감소 확인 — NAFLD/MASLD 처방 근거 강화</div><ul><li>400mg 미만 저용량에서도 효과적 — 하노마린 표준 용량의 적정성 뒷받침</li><li>NAFLD·바이러스간염에서 유의한 효과, 50세 미만·BMI 30 미만에서 효과 극대화</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #13 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Effects of silymarin on insulin resistance and sensitivity: A systematic review and meta-analysis of randomized controlled trials</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Diabetes Research and Clinical Practice</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-01-22</div>
+                        <button class="bd-request-btn" data-title="Effects of silymarin on insulin resistance and sensitivity: A systematic review and meta-analysis of randomized controlled trials" data-session="Gut-Liver Axis" data-num="13" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.1016/j.diabres.2025.112008" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">체계적 문헌고찰/메타분석</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">인슐린 저항성은 제2형 당뇨병(T2DM)과 NAFLD의 공통 병태생리로, MASLD 환자의 간질환 진행과 밀접한 관련이 있다. 실리마린은 항산화·항염증 활성 외에 인슐린 감수성 개선 가능성이 제시되어 왔으나, 체계적 근거가 부족하였다. RCT를 종합하여 실리마린의 인슐린 저항성 및 감수성에 대한 효과를 평가할 필요가 있었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">PubMed, Embase, Web of Science, Cochrane Library에서 2024년 9월까지 검색하여 4주 이상 실리마린 보충을 평가한 RCT 6편(총 673명, 이란·이집트·이탈리아)을 포함하였다. 1차 평가변수는 HOMA-IR(인슐린저항성 지수)과 공복인슐린(FI), 2차 평가변수는 QUICKI(인슐린감수성 지수)였다. Stata 15.1로 가중평균차(WMD)를 산출하고, Cochrane RoB 2로 비뚤림 위험을 평가하였다. 질환유형·기간·용량별 하위군 분석을 수행하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">전체적으로 실리마린은 HOMA-IR을 유의하게 개선하였다(WMD -2.29, 95% CI -4.55 to -0.03, p=0.047).<br/>
+그러나 공복인슐린(WMD -2.56, 95% CI -7.60 to 2.48, p=0.862)과 QUICKI에서는 유의한 효과가 없었다.<br/>
+하위군 분석에서 T2DM 및 알코올성 간경변 동반 당뇨 환자에서 HOMA-IR 개선이 관찰되었으나, NAFLD 환자 단독으로는 유의한 효과가 없었다.<br/>
+포함된 6개 연구 모두 비뚤림 위험이 낮았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">포함된 6개 RCT에서 실리마린 관련 심각한 이상반응은 보고되지 않았다. 실리마린은 최소 4주에서 최대 12개월까지 투여되었으며, 위약 대비 유의한 부작용 증가는 관찰되지 않았다. 대사지표에 대한 부정적 영향도 보고되지 않았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">실리마린은 전체적으로 HOMA-IR을 유의하게 개선하였으나, 그 효과는 제한적이며 특히 NAFLD 환자에서는 단독으로 유의한 인슐린 감수성 개선이 확인되지 않았다. T2DM 동반 환자에서 보다 뚜렷한 효과가 시사된다. 하노마린 관점에서 MASLD 환자의 대사 동반질환(T2DM) 관리 시 보조적 역할의 가능성을 시사하나, NAFLD 단독에서의 인슐린 저항성 개선 효과는 추가 검증이 필요하다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>6개 RCT, 총 673명 (이란·이집트·이탈리아)</li>
+                            <li>HOMA-IR WMD -2.29(95% CI -4.55 to -0.03, p=0.047)</li>
+                            <li>공복인슐린 WMD -2.56(p=0.862, 유의하지 않음)</li>
+                            <li>T2DM 하위군에서 HOMA-IR 개선, NAFLD에서는 비유의</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 하노마린 + 대사증후군: 실리마린이 전체적으로 인슐린저항성(HOMA-IR) 개선 — T2DM 동반 간질환 환자 처방 시 부가가치</div><ul><li>NAFLD 단독에서는 비유의 → MASLD 환자 대상 추가 RCT 필요성 제기</li><li>기존 간보호 효과(AST/ALT 감소)에 더해 대사 개선 가능성 — 종합적 처방 명분</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #14 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">The multi-omic basis for hepatic encephalopathy recurrence: Analysis of the THEMATIC trial</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> JHEP Reports</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-10-18</div>
+                        <button class="bd-request-btn" data-title="The multi-omic basis for hepatic encephalopathy recurrence: Analysis of the THEMATIC trial" data-session="Gut-Liver Axis" data-num="14" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.1016/j.jhepr.2025.101634" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">RCT 2차 분석</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">THEMATIC 시험은 락툴로스·리팍시민 병용 중인 간경변 HE 환자에서 분변 미생물 이식(FMT)이 HE 재발을 감소시킴을 입증한 Phase IIA RCT이다. 그러나 대부분의 임상적·인구학적 변수는 HE 재발의 불량한 예측인자였으며, 재발의 다중오믹(multi-omic) 기전이 규명되지 않았다. 장-간-뇌 축을 매개하는 미생물·대사체·염증 프로파일의 통합적 이해가 새로운 치료 표적 발굴에 필요하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">THEMATIC 시험 참여자 60명(FMT군 vs 위약군)의 대변, 혈청, 소변 검체를 수집하여 대변 메타게노믹스(16S rRNA → shotgun), 혈청·소변 대사체학, 염증성 사이토카인을 분석하였다. HE 재발군(10/60명, 17%)과 비재발군 간 차이를 경로분석, 랜덤포레스트, 잠재인자분석(DIABLO)으로 통합 평가하였다. 6개월 추적 기간 중 HE 재발을 주요 결과변수로 설정하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">HE 재발률은 위약군 40% vs FMT군 8%(p=0.005)였다.<br/>
+재발군에서 단쇄지방산(SCFA) 생산균(Ruminococcaceae 등)의 풍부도가 낮고, GABA 생산 분류군(Bacteroides 등)의 풍부도가 높았다.<br/>
+혈청 부티레이트·이소부티레이트가 재발과 가장 유의하게 연관되었다(p=0.008).<br/>
+경로분석에서 재발군은 GABA 및 신경전달물질 경로가 상향조절되었다.<br/>
+SCFA 생산균과 2차 담즙산이 보호적이었고, IL-6, GABA 생산균, 니코틴 대사산물, 1차 담즙산이 재발과 연관되었다.<br/>
+공여자 미생물 생착률이 높을수록 HE 재발이 낮았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">FMT 관련 심각한 이상반응은 보고되지 않았다. 모든 환자가 락툴로스+리팍시민을 기저 치료로 유지하고 있었으며, FMT 추가에 따른 감염이나 전신 이상반응 증가는 관찰되지 않았다. 주요 안전성 종료점(감염, 입원, 사망)에서 FMT군이 위약군 대비 동등하거나 우수하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">락툴로스+리팍시민 사용 중에도 HE가 재발하는 환자는 SCFA 생산 감소, GABA 대사 증가, IL-6 상승, 담즙산 불균형 등 복합적 장-간-뇌 축 교란을 보인다. FMT에 의한 공여자 미생물 생착이 이러한 교란을 교정하여 HE 재발을 방지한다. 노르믹스(리팍시민) 관점에서 리팍시민은 HE 재발 방지의 기본 표준치료로 확인되었으며, 미충족 수요(리팍시민 사용 중 재발)에 대한 마이크로바이옴 기반 보조 전략의 근거를 제시한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>60명 RCT (FMT vs 위약), 6개월 추적</li>
+                            <li>HE 재발: 위약 40% vs FMT 8% (p=0.005)</li>
+                            <li>혈청 부티레이트 재발 연관 p=0.008</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 노르믹스 기반 위 추가 전략: 리팍시민+락툴로스 표준치료 중에도 17% 재발 → 마이크로바이옴 보조 접근의 미충족 수요 확인</div><ul><li>SCFA(부티레이트) 감소가 재발 핵심 → 프로바이오틱스/프리바이오틱스 병용 근거</li><li>리팍시민이 HE 표준치료의 근간임을 재확인 — 기저 치료로서의 위상 공고화</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #15 (Gut-Liver Axis) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Association of pharmacotherapy with all-cause mortality among patients with irritable bowel syndrome</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Communications Medicine</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-04-08</div>
+                        <button class="bd-request-btn" data-title="Association of pharmacotherapy with all-cause mortality among patients with irritable bowel syndrome" data-session="Gut-Liver Axis" data-num="15" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://doi.org/10.1038/s43856-026-01498-6" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">후향적 코호트</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">과민성장증후군(IBS)은 전 세계 인구의 10-15%에 영향을 미치는 흔한 기능성 위장장애로, 다양한 약물요법이 사용되고 있으나 장기 안전성 데이터가 부족하다. 리팍시민은 IBS-D(설사형 IBS)의 FDA 승인 치료제이나, 항우울제·항경련제·μ-오피오이드 수용체 작용제 등 다른 IBS 약물과의 장기 안전성 비교 데이터가 필요하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">TriNetX 분석 플랫폼을 이용한 미국 전역 후향적 코호트 연구로, 2005-2023년 18-65세 IBS 성인 669,083명을 대상으로 하였다. 56개 공변량 기반 1:1 경향점수 매칭을 수행하고, 약물군(항우울제, 항경련제, IBS-D 약물, IBS-C 약물)별 전체 사망률을 Cox 비례위험 모델로 분석하였다. IBS-D 하위분석에서 리팍시민, 엘룩사돌린, 로페라미드, 디페녹실레이트, 콜레스티라민 등을 개별 평가하였다. 표적시험 모방(target trial emulation) 설계를 적용하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">항우울제 사용은 전체 사망률 증가와 연관되었다(HR 1.35, 95% CI 1.26-1.45; 사망률 1.6% vs 1.0%).<br/>
+이 연관은 SSRI, TCA, SNRI, 미르타자핀 모든 하위군에서 일관되었다.<br/>
+항경련제는 사망률 증가와 연관되지 않았다(HR 0.95, 95% CI 0.89-1.00).<br/>
+IBS-D에서 로페라미드(HR 2.39, 95% CI 1.48-3.90)와 디페녹실레이트(HR 1.89, 95% CI 1.02-3.51)는 사망 위험 증가와 연관된 반면, 리팍시민, 엘룩사돌린, 콜레스티라민/콜레스티폴은 사망률 증가와 연관되지 않았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">리팍시민은 IBS-D 치료 약물 중 장기 사망률 측면에서 안전한 프로파일을 보였다. 로페라미드·디페녹실레이트 등 μ-오피오이드 수용체 작용제와 달리 사망 위험 증가가 관찰되지 않았다. 항우울제의 사망률 증가 연관성과 대조적으로, 리팍시민은 장기 사용에서도 안전성 신호가 확인되지 않았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">이 대규모 코호트 연구에서 리팍시민은 IBS-D 치료에서 장기 전체 사망률과 연관되지 않아 안전한 약물로 확인되었다. 반면 항우울제와 μ-오피오이드 작용제는 사망 위험 증가와 연관되었다. 노르믹스(리팍시민) 관점에서 IBS-D 환자의 장기 사용 안전성을 뒷받침하는 대규모 실세계 근거이며, 경쟁 약물 대비 안전성 우위를 시사한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>669,083명 IBS 환자 코호트 (미국 전역, 2005-2023)</li>
+                            <li>로페라미드 HR 2.39(95% CI 1.48-3.90)</li>
+                            <li>항우울제 HR 1.35(95% CI 1.26-1.45)</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 노르믹스 IBS-D 장기 안전성: 669K 코호트에서 사망률 증가 없음 — 로페라미드(HR 2.39) 대비 우수한 안전성</div><ul><li>항우울제(HR 1.35) 사망 위험 vs 리팍시민 무연관 — IBS-D 1차 선택 시 안전성 차별화 포인트</li><li>FDA 승인 IBS-D 약물 중 장기 안전성 프로파일이 가장 양호한 근거</li></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+      <h4>근거 분류 기준</h4>
+      <table>
+        <tr><td>직접근거</td><td>노르믹스(rifaximin) 또는 하노마린(silymarin) 동일 성분을 사용한 RCT, 메타분석, 또는 간-장내미생물 축 관련 동일 성분의 임상적 효능·안전성 직접 검증 연구</td></tr>
+        <tr><td>참고근거</td><td>리팍시민 항생제 내성 우려 등 간접적 임상 정보나 관련 메커니즘 연구. 임상적 주의사항·한계점으로 활용</td></tr>
+      </table>
+    </div>
+    <div class="legend">
+      <h4>중요도 평가 기준</h4>
+      <table>
+        <tr><td>★★★</td><td>즉시 활용 — RCT, 메타분석, Phase 3 이상. PM팀 디테일링에 바로 반영 가능</td></tr>
+        <tr><td>★★☆</td><td>참고 활용 — 체계적 문헌고찰, 중등도 임상. KOL 학술강연 소재</td></tr>
+        <tr><td>★☆☆</td><td>모니터링 — 동향 파악 수준. 후속 연구 결과 확인 필요</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+  var h=decodeURIComponent(location.hash.slice(1)); if(!h) return;
+  var papers=document.querySelectorAll('.paper'),found=null;
+  for(var i=0;i<papers.length;i++){var t=papers[i].querySelector('.paper-title');var txt=t?t.textContent.trim().toLowerCase():'';if(txt.indexOf(h.toLowerCase())!==-1){found=papers[i];break;}}
+  if(!found) return;
+  for(var j=0;j<papers.length;j++){if(papers[j]!==found)papers[j].style.display='none';}
+  found.style.outline='3px solid #1A5276';found.style.borderRadius='10px';found.scrollIntoView({behavior:'smooth',block:'start'});
+  var btn=document.createElement('button');btn.textContent='📋 모든 논문 보기';
+  btn.style.cssText='position:fixed;bottom:24px;right:24px;z-index:999;padding:10px 20px;background:#003366;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3);';
+  btn.onclick=function(){for(var k=0;k<papers.length;k++)papers[k].style.display='';found.style.outline='';btn.remove();window.scrollTo(0,0);};
+  document.body.appendChild(btn);
+})();
+</script>
+
+<!-- BD_REQUEST_MODAL_v2 -->
+<style>
+  #bd-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;align-items:center;justify-content:center}
+  #bd-modal{background:#fff;border-radius:8px;padding:24px;min-width:420px;max-width:520px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-family:'Malgun Gothic',sans-serif}
+  #bd-modal h3{margin:0 0 16px;color:#003366;border-bottom:2px solid #1A5276;padding-bottom:8px}
+  #bd-modal .field{margin:12px 0}
+  #bd-modal label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:4px}
+  #bd-modal input,#bd-modal textarea{width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;font-size:13px;box-sizing:border-box;font-family:inherit}
+  #bd-modal textarea{min-height:60px;resize:vertical}
+  #bd-modal .radio-row label{display:inline-block;font-weight:400;margin-right:16px;cursor:pointer}
+  #bd-modal .actions{margin-top:20px;text-align:right}
+  #bd-modal button{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:13px;margin-left:8px}
+  #bd-modal .submit{background:#003366;color:#fff;font-weight:600}#bd-modal .cancel{background:#ddd;color:#333}
+  #bd-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#003366;color:#fff;padding:12px 24px;border-radius:6px;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:9999;opacity:0;transition:opacity .3s}
+  #bd-toast.show{opacity:1}#bd-toast.error{background:#c0392b}
+</style>
+<div id="bd-modal-overlay" onclick="if(event.target.id==='bd-modal-overlay') closeBDModal()">
+  <div id="bd-modal">
+    <h3>📌 BD 제작 요청</h3>
+    <div class="field"><label>논문</label><div id="bd-modal-title" style="font-size:13px;color:#555;line-height:1.4"></div></div>
+    <div class="field"><label>세션</label><div id="bd-modal-session" style="font-size:13px;color:#555"></div></div>
+    <div class="field"><label>BD 포맷</label><div class="radio-row">
+      <label><input type="radio" name="bd-format" value="CLB" checked> CLB (학술브리프)</label>
+      <label><input type="radio" name="bd-format" value="BT"> BT (바이오톡)</label></div></div>
+    <div class="field"><label>요청자 이메일 *</label><input type="email" id="bd-modal-requester" placeholder="example@hanall.co.kr" required></div>
+    <div class="field"><label>메모 (선택)</label><textarea id="bd-modal-memo" placeholder="특별 요청사항"></textarea></div>
+    <div class="actions"><button class="cancel" onclick="closeBDModal()">취소</button><button class="submit" onclick="submitBDRequest()">요청 제출</button></div>
+  </div>
+</div>
+<div id="bd-toast"></div>
+<script>
+const BD_WEBHOOK_URL='https://script.google.com/macros/s/AKfycbynF7P1576GbRlzdIjBaxrOvjTU4HDP8F9jY4flxduhSqYR15Hr4AmhImuaS0wPJoOC/exec';let bdCurrentBtn=null;
+function openBDModal(b){bdCurrentBtn=b;document.getElementById('bd-modal-title').textContent=b.dataset.title;document.getElementById('bd-modal-session').textContent=b.dataset.session;document.getElementById('bd-modal-requester').value=localStorage.getItem('bd-requester')||'';document.getElementById('bd-modal-memo').value='';document.querySelector('input[name=bd-format][value=CLB]').checked=true;document.getElementById('bd-modal-overlay').style.display='flex';}
+function closeBDModal(){document.getElementById('bd-modal-overlay').style.display='none';bdCurrentBtn=null;}
+function showToast(m,e){var t=document.getElementById('bd-toast');t.textContent=m;t.className=e?'show error':'show';setTimeout(function(){t.className='';},3500);}
+function submitBDRequest(){if(!bdCurrentBtn)return;var title=bdCurrentBtn.dataset.title,session=bdCurrentBtn.dataset.session,format=document.querySelector('input[name=bd-format]:checked').value,requester=document.getElementById('bd-modal-requester').value.trim(),memo=document.getElementById('bd-modal-memo').value.trim();if(!requester){showToast('요청자 이메일은 필수입니다',true);return;}localStorage.setItem('bd-requester',requester);var cb='bdcb_'+Date.now();window[cb]=function(data){delete window[cb];document.head.removeChild(s);if(data.status==='ok'){showToast('✅ BD 요청 접수: '+format+' / '+title.slice(0,40)+'…');bdCurrentBtn.disabled=true;bdCurrentBtn.textContent='✓ 요청됨';closeBDModal();}else if(data.status==='duplicate'){showToast('⚠️ 동일 요청이 이미 대기 중입니다',true);closeBDModal();}else{showToast('❌ 오류: '+(data.message||'알 수 없음'),true);}};var params=new URLSearchParams({action:'requestBDQueue',title:title,session:session,format:format,requester:requester,memo:memo,callback:cb});var s=document.createElement('script');s.src=BD_WEBHOOK_URL+'?'+params.toString();s.onerror=function(){delete window[cb];showToast('❌ 네트워크 오류 — 잠시 후 다시 시도',true);};document.head.appendChild(s);}
+</script>
+
+</body>
+</html>
