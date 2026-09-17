@@ -78,11 +78,11 @@ if(!window.__gateTok())window.__gateGo("no_token");else if(DOC==="dash")window._
 /* ── GAS URL (고정) ── */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyhk2el3kwGMStCvyUr-8B-PWS-6aKwcf5EVfvpryqlj3jEeLw5pnttHMEokrpQXO33dQ/exec';
 
-/* ── 지부장(=RPM=작성자) 4인 고정 — 이철종=팀장 ── */
-const DIRECTORS = ['이철종','김종훈','유정현','정유창'];
-/* [2026-09-02 박본님] 이철종 → 최인경 인수인계 중 — 화면 표기만 '이철종(최인경)'.
-   payload rpm 값·서버 DIRECTORS 매칭은 '이철종' 유지(마감예측·업체활동·보고이력 키 보호). */
-function dirLabel(n){var s=String(n==null?'':n);return s==='이철종'?'이철종(최인경)':s;}
+/* ── 지부장(=RPM=작성자) 4인 고정 — 최인경=팀장(이철종 승계) ── */
+const DIRECTORS = ['최인경','김종훈','유정현','정유창'];
+/* [2026-09-18 박본님] 이철종 → 최인경 정식 전환 — 시트 데이터·서버 v49(구키 '이철종' 흡수)·대시보드와 동시 교체.
+   dirLabel은 9/2 임시 표기 함수의 호환용 항등 함수(호출부 무수정). */
+function dirLabel(n){return String(n==null?'':n);}
 
 // [🟡-9] HTML 이스케이핑 — XSS 방지 및 특수문자 UI 깨짐 방지
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}

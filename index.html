@@ -1833,7 +1833,7 @@ function renderAging(d){
     if(x.DC접수월 && x.DC접수월<=cym && PRE_DOC.indexOf(x.신약과정)>=0) why.push('계획월 미착수');
     if(why.length) rows.push({x:x, gv:gv, gd:(g===null?'-':String(g)), why:why.join(', ')});
   });
-  const RPM_ORDER=['이철종','정유창','유정현','김종훈'];
+  const RPM_ORDER=['최인경','정유창','유정현','김종훈'];   // [2026-09-18] 이철종→최인경 정식 전환
   const rpmRank=n=>{ const i=RPM_ORDER.indexOf(n); return i<0?99:i; };
   rows.sort((a,b)=>{ const ra=rpmRank(a.x.담당RPM), rb=rpmRank(b.x.담당RPM); if(ra!==rb)return ra-rb; const na=a.x.담당RPM||'', nb=b.x.담당RPM||''; if(na!==nb)return na<nb?-1:1; return b.gv-a.gv; });
   const el=document.getElementById('aging-body');
@@ -2316,9 +2316,8 @@ function download110SumExcel(){
 <script>
 var forecastData=null, forecastLoaded=false, forecastLoading=false;
 function fcEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-/* [2026-09-02 박본님] 이철종 → 최인경 인수인계 중 — 화면 표기만 '이철종(최인경)'.
-   데이터 키(시트 지부장명·DIRECTORS·폼 rpm 값)는 '이철종' 유지 — 마감예측·업체활동·보고이력 매칭이 전부 이 키라 표기만 바꾼다. */
-function crmDirLabel(n){var s=String(n==null?'':n);return s==='이철종'?'이철종(최인경)':s;}
+/* [2026-09-18 박본님] 이철종 → 최인경 정식 전환(시트 데이터·서버 v49·폼 동시). crmDirLabel은 호환용 항등 함수(호출부 무수정). */
+function crmDirLabel(n){return String(n==null?'':n);}
 /* 원 → 억원(소수1자리) */
 function fcEok(won,dp){var d=(dp==null?1:dp);return (Math.round((Number(won)||0)/1e8*Math.pow(10,d))/Math.pow(10,d)).toFixed(d);}
 /* 원 → 만원(정수, 천단위 콤마) */
