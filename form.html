@@ -78,7 +78,7 @@ if(!window.__gateTok())window.__gateGo("no_token");else if(DOC==="dash")window._
 /* ── GAS URL (고정) ── */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyhk2el3kwGMStCvyUr-8B-PWS-6aKwcf5EVfvpryqlj3jEeLw5pnttHMEokrpQXO33dQ/exec';
 
-/* ── 지부장(=RPM=작성자) 4인 고정 — 최인경=팀장(이철종 승계) ── */
+/* ── 지부장(=RPM=작성자) 4인 고정 — 팀장 표기 없음(2026-09-22 박본님: 최인경은 팀장 아님) ── */
 const DIRECTORS = ['최인경','김종훈','유정현','정유창'];
 /* [2026-09-18 박본님] 이철종 → 최인경 정식 전환 — 시트 데이터·서버 v49(구키 '이철종' 흡수)·대시보드와 동시 교체.
    dirLabel은 9/2 임시 표기 함수의 호환용 항등 함수(호출부 무수정). */
@@ -1318,7 +1318,7 @@ function buildRpm(){
   DIRECTORS.forEach((r,idx)=>{
     const b=document.createElement('button');
     b.className='rpm-btn';
-    b.innerHTML=esc(dirLabel(r))+(idx===0?'<span class="tag">팀장</span>':'');
+    b.innerHTML=esc(dirLabel(r));
     b.onclick=()=>selRpm(r,b);
     g.appendChild(b);
   });
