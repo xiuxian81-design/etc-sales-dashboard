@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[문헌모니터링] 4주차 비뇨기·종양 (2026.10.28)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; font-size: 15px; line-height: 1.7; color: #1a1a2e; background: #f0f2f5; }
+.container { max-width: 820px; margin: 0 auto; padding: 24px 16px; }
+.report-header { background: linear-gradient(135deg,#003366 0%,#1a5276 100%); color: #fff; border-radius: 14px; padding: 28px 32px; margin-bottom: 24px; }
+.report-header .badge { display: inline-block; background: #1A5276; color: #fff; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+.report-header h1 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+.report-header .meta { font-size: 13px; color: rgba(255,255,255,0.75); display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
+.stat-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+.stat-pill { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 16px; font-size: 13px; }
+.stat-pill span { font-size: 20px; font-weight: 800; display: block; }
+.exec-box { background: #fff; border-left: 5px solid #003366; border-radius: 0 10px 10px 0; padding: 18px 22px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.exec-box h3 { font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: #003366; margin-bottom: 10px; }
+.paper { background: #fff; border-radius: 14px; margin-bottom: 28px; box-shadow: 0 3px 12px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #e8eaf0; }
+.paper-header { padding: 16px 22px 12px; display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #f0f2f5; }
+.paper-num { background: #003366; color: #fff; font-size: 12px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+.stars-high { color: #c0392b; font-size: 16px; font-weight: 900; }
+.stars-mid  { color: #e67e22; font-size: 16px; font-weight: 900; }
+.tag-direct { background: #e8f4fd; color: #1a5276; border: 1px solid #aed6f1; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+.tag-ref    { background: #f0f0f0; color: #666; border: 1px solid #ccc; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+.tag-open   { background: #e8f8e8; color: #1e8449; border: 1px solid #a9dfbf; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+.tag-wall   { background: #fdf2f8; color: #7d3c98; border: 1px solid #d7bde2; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+.journal-meta { font-size: 12px; color: #888; }
+.paper-body { padding: 20px 22px; }
+.paper-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+.paper-title-ko { font-size: 13px; color: #555; margin-bottom: 6px; font-style: italic; }
+.paper-url { font-size: 12px; color: #1a5276; margin-bottom: 14px; display: block; word-break: break-all; }
+.design-badge { display: inline-block; background: #eaf2ff; color: #1a5276; font-size: 12px; font-weight: bold; padding: 3px 12px; border-radius: 6px; margin-bottom: 14px; }
+.summary-grid { background: #fafbfc; border-radius: 10px; padding: 16px; margin-bottom: 14px; border: 1px solid #e8eaf0; }
+.summary-grid h4 { font-size: 12px; letter-spacing: 1px; color: #888; text-transform: uppercase; margin-bottom: 10px; }
+.s-row { display: grid; grid-template-columns: 80px 1fr; gap: 6px 12px; margin-bottom: 8px; align-items: baseline; font-size: 13.5px; }
+.s-label { font-weight: 700; color: #003366; white-space: nowrap; }
+.s-val { color: #333; line-height: 1.8; }
+.s-val em { background: #fff3cd; padding: 0 4px; border-radius: 3px; font-style: normal; font-weight: bold; color: #664d03; }
+.key-nums { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.knum { background: #003366; color: #fff; border-radius: 10px; padding: 12px 16px; flex: 1; min-width: 140px; text-align: center; }
+.knum .val { font-size: 22px; font-weight: 900; color: #1A5276; display: block; }
+.knum .desc { font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 2px; line-height: 1.4; }
+.knum .pval { font-size: 10px; color: #aed6f1; margin-top: 3px; }
+.viz-section { border: 2px solid #e8eaf0; border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+.viz-section h4 { font-size: 13px; font-weight: 700; color: #003366; margin-bottom: 4px; }
+.viz-subtitle { font-size: 12px; color: #888; margin-bottom: 14px; }
+.chart-wrap { position: relative; height: 200px; }
+.paywall-notice { background: #fdf2f8; border: 1px solid #d7bde2; border-radius: 8px; padding: 14px 18px; font-size: 13px; color: #7d3c98; }
+.usage { background: linear-gradient(135deg,#fff8f0,#fff3e0); border-left: 4px solid #1A5276; border-radius: 0 10px 10px 0; padding: 14px 18px; font-size: 13.5px; line-height: 1.8; }
+.usage h4 { font-size: 12px; color: #1A5276; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+.usage ul { margin-left: 16px; }
+.usage li { margin-bottom: 4px; }
+.legend { background: #fff; border-radius: 10px; padding: 18px 22px; margin-top: 28px; border: 1px solid #e8eaf0; font-size: 13px; }
+.legend h4 { color: #003366; margin-bottom: 10px; font-weight: 700; }
+.legend table { width: 100%; border-collapse: collapse; }
+.legend td { padding: 8px 12px; border-bottom: 1px solid #f0f2f5; }
+.legend td:first-child { background: #f9fafb; font-weight: 700; width: 120px; }
+
+@media print {
+  body { background: #fff; padding: 0; }
+  .report-header { box-shadow: none; }
+  .paper { page-break-inside: avoid; }
+}
+@media (max-width: 600px) {
+  .report-header { padding: 20px 16px; }
+  .report-header h1 { font-size: 18px; }
+  .s-row { grid-template-columns: 70px 1fr; font-size: 13px; }
+  .knum { min-width: 120px; padding: 10px 12px; }
+  .key-nums { gap: 8px; }
+}
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>/*BR_EXTRA_CSS*/
+.papers{max-width:920px;margin:0 auto;padding:0 8px}
+.paper{border:1px solid #e3e7ee;border-radius:14px;margin:0 auto 26px;box-shadow:0 3px 12px rgba(0,0,0,.07);overflow:hidden;background:#fff}
+.paper-header{background:linear-gradient(135deg,#1A5276,#003366);color:#fff;padding:18px 22px}
+.paper-header .paper-title{color:#fff;font-size:16px;font-weight:800;line-height:1.5;margin:0 0 12px}
+.paper-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:#e3ecf6}
+.paper-meta-item{display:flex;align-items:center;gap:4px}
+.paper-meta-item strong{color:#fff;font-weight:600}
+.importance-badge{padding:3px 11px;border-radius:20px;font-weight:800;color:#1a1a2e}
+.importance-high{background:#FFD54F}.importance-mid{background:#90CAF9;color:#0d2b45}.importance-low{background:#cfd8dc;color:#37474f}
+.evidence-tag{padding:3px 11px;border-radius:20px;font-weight:700;color:#fff;background:#2E8B72}
+.evidence-ref{background:#8896a5}
+.bd-request-btn{background:#fff;color:#003366;border:none;padding:7px 16px;border-radius:7px;font-size:12.5px;font-weight:800;cursor:pointer;margin-left:auto;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.bd-request-btn:hover{background:#ffe9b3}.bd-request-btn:disabled{background:#b9c2cc;color:#fff;cursor:not-allowed}
+.paper-header a,.paper-url{color:#cfe0f5 !important;font-size:11px;word-break:break-all}
+.paper-content{padding:18px 22px}
+.content-section{border-left:4px solid #d3dce6;padding:6px 0 6px 16px;margin:0 0 12px}
+.content-section-title{font-size:13px;font-weight:800;color:#1A5276;margin-bottom:4px;letter-spacing:.2px}
+.content-section-text{font-size:13.5px;line-height:1.7;color:#2b2b38}
+.content-section-text strong{color:#003366}
+.content-section.cs-key{border-left-color:#003366;background:#f3f8fd;border-radius:8px;padding:11px 16px}
+.content-section.cs-key .content-section-title{color:#003366}
+.key-numbers{background:#fff8e6;border:1px solid #f1dea0;border-radius:10px;padding:13px 18px;margin:14px 0}
+.key-numbers h4{margin:0 0 8px;color:#8a6a00;font-size:13.5px}
+.key-numbers ul{margin:0;padding-left:20px}.key-numbers li{font-size:13px;line-height:1.55;margin:4px 0;color:#5a4600}
+.viz-section{background:#f5f9fd;border:1px solid #d9e6f2;border-radius:10px;padding:15px 18px;margin:14px 0}
+.viz-section h4{margin:0 0 10px;color:#003366;font-size:13.5px}
+.usage-box{background:#ecf7f3;border:1px solid #bfe2d7;border-left:5px solid #2E8B72;border-radius:10px;padding:14px 18px;margin:14px 0}
+.usage-box h4{margin:0 0 8px;color:#1d6b59;font-size:13.5px}
+.usage-head{font-weight:800;color:#135344;font-size:13.5px;line-height:1.55;margin-bottom:7px;padding-bottom:7px;border-bottom:1px dashed #bfe2d7}
+.usage-box ul{margin:0;padding-left:20px}.usage-box li{font-size:13px;line-height:1.6;margin:5px 0;color:#244b43}
+</style>
+
+</head>
+<body>
+<div class="container">
+
+<!-- 리포트 헤더 -->
+<div class="report-header">
+  <div class="badge">비뇨기·종양·CPP</div>
+  <h1>[문헌모니터링] 4주차 엘리가드 + 엔잘루타</h1>
+  <div class="meta">
+    <span>담당 PM: 김지완</span>
+    <span>발행: 2026.10.28</span>
+    <span>신규 논문: 5건</span>
+  </div>
+</div>
+
+<!-- 실행 요약 -->
+<div class="exec-box">
+  <h3>Executive Summary</h3>
+  <p>2025~2026년 enzalutamide와 leuprorelin 관련 주요 문헌을 검토한 결과, 전립선암 영역에서 획기적인 생존 데이터가 연이어 발표되었습니다. EMBARK 시험 최종 분석에서 고위험 BCR 전립선암에서 enzalutamide+leuprolide 병용이 8년 OS 78.9%를 달성하며 사망 위험을 40% 감소했고, ENZAMET 8년 업데이트에서는 mHSPC에서 enzalutamide군의 중앙 OS가 8.0년으로 2.2년 연장되었습니다. CPP 영역에서는 leuprorelin 장기 치료의 최종 성인 신장 달성(+1.75cm)과 안전성이 메타분석으로 확인되었습니다.</p>
+</div>
+
+<!-- 논문 #1 -->
+        <div class="papers">
+
+            <!-- ━━━ 논문 #19 (비뇨기·종양·CPP) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Real-World Comparative Effectiveness of Abiraterone, Apalutamide, Enzalutamide, and Docetaxel Doublets for Metastatic Hormone-Sensitive Prostate Cancer</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> JCO Oncology Practice</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-10-01</div>
+                        <button class="bd-request-btn" data-title="Real-World Comparative Effectiveness of Abiraterone, Apalutamide, Enzalutamide, and Docetaxel Doublets for Metastatic Hormone-Sensitive Prostate Cancer" data-session="비뇨기·종양·CPP" data-num="19" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42821836/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">코호트</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">전이성 호르몬 민감성 전립선암(mHSPC) 치료에서 안드로겐 수용체 경로 억제제(ARPI)와 도세탁셀 기반 이중요법의 실제 임상 비교 효과에 대한 데이터는 제한적이다. 특히 아비라테론, 아팔루타마이드, 엔잘루타마이드 간의 직접 비교 데이터가 부족한 상황에서, 대규모 실제 임상 환경의 비교 연구가 필요하다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">2019년 1월~2023년 12월 미국 남성 mHSPC 환자 9,141명을 대상으로 한 후향적 코호트 연구. ADT 개시 후 4개월 이내 아비라테론, 아팔루타마이드, 엔잘루타마이드, 또는 도세탁셀을 시작한 환자를 포함하였다. 2025년 6월까지 추적관찰하였으며, 1차 평가변수는 무진행생존(PFS) 및 전체생존(OS), 2차 평가변수는 mCRPC 진행까지 시간(TTP)과 새 치료 개시까지 시간(TTNT)이었다. 중복 성향점수 가중치를 적용한 Cox 비례위험모형 및 Fine-Gray 모형을 사용하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">ARPI 이중요법은 도세탁셀 이중요법 대비 우월한 PFS를 보였다: 아비라테론 aHR 0.60 (95% CI 0.55-0.66), 아팔루타마이드 aHR 0.64 (95% CI 0.56-0.73), 엔잘루타마이드 aHR 0.57 (95% CI 0.51-0.64).<br/>
+ARPI 간 PFS 차이는 통계적으로 유의하지 않았다.<br/>
+OS는 모든 이중요법 간 유사하였다.<br/>
+TTP에서 엔잘루타마이드가 수치적으로 가장 우수했다: aHR 0.51 (95% CI 0.45-0.57).<br/>
+TTNT 역시 엔잘루타마이드 aHR 0.47 (95% CI 0.42-0.53)로 가장 양호한 결과를 보였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">본 연구는 효과 비교에 초점을 맞추었으며, 안전성 데이터는 직접 보고되지 않았다. 다만 ARPI 이중요법 환자가 도세탁셀 이중요법 대비 mCRPC 진행 및 새로운 치료 개시 빈도가 낮아, 간접적으로 내약성이 우수함을 시사한다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">실제 임상에서 ARPI 이중요법은 도세탁셀 이중요법 대비 우월한 PFS를 보였으며, 개별 ARPI 간 유의한 차이는 없었다. 엔잘루타마이드가 PFS, TTP, TTNT에서 수치적으로 가장 양호한 결과를 보여, 엔잘루타 기반 mHSPC 치료의 실제 임상 유용성을 지지하는 근거가 된다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>9,141명 — 분석 대상 미국 mHSPC 환자 수</li>
+                            <li>aHR 0.57 — 엔잘루타마이드 vs 도세탁셀 PFS (p=95% CI 0.51-0.64)</li>
+                            <li>aHR 0.51 — 엔잘루타마이드 vs 도세탁셀 TTP (p=95% CI 0.45-0.57)</li>
+                            <li>aHR 0.47 — 엔잘루타마이드 vs 도세탁셀 TTNT (p=95% CI 0.42-0.53)</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 mHSPC에서 엔잘루타(엔잘루타마이드) 이중요법은 도세탁셀 이중요법 대비 PFS 43% 개선 (aHR 0.57)</div><ul><li>3개 ARPI 중 엔잘루타마이드가 TTP와 TTNT에서 수치적으로 가장 우수</li><li>9,141명 대규모 실제 임상 코호트에서 확인된 엔잘루타 효과 근거</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #20 (비뇨기·종양·CPP) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Fewer Injections and Lower Drug Costs With Long-Acting GnRH Depot Formulations: A Nationwide Analysis of 2.3 Million Patient-Years in Japan</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Cancer Reports</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-09-01</div>
+                        <button class="bd-request-btn" data-title="Fewer Injections and Lower Drug Costs With Long-Acting GnRH Depot Formulations: A Nationwide Analysis of 2.3 Million Patient-Years in Japan" data-session="비뇨기·종양·CPP" data-num="20" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42728640/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">코호트</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">전립선암 치료의 기반인 안드로겐 차단요법(ADT)에서 GnRH 약물은 depot 주사 형태로 투여된다. 장기지속형 제형으로의 전환이 주사 횟수와 약제비를 줄일 수 있으나, 실제 임상에서의 영향은 정량화되지 않았다. 일본 전국민 보험청구 데이터를 활용한 분석이 필요하다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">일본 NDB(National Database) 공개데이터(FY2017~FY2024)를 이용한 기술통계 연구. 40세 이상 남성에서 류프로렐린(leuprorelin), 고세렐린(goserelin), 데가렐릭스(degarelix) 처방을 분석하였다. 총 2,276,025 환자-년이 포함되었다. 주사 횟수와 약제비 변화는 Shapley 값 분해법으로 요인 분석하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">류프로렐린 점유율은 66.0%에서 73.3%로 증가하였다.<br/>
+류프로렐린 6개월 제형은 FY2021에 3개월 제형을 추월하여 FY2024 기준 65.7%를 차지하였다.<br/>
+환자 수는 12.9% 증가(269,328→304,181 환자-년)했으나 주사 횟수는 21.5% 감소(1,275,081→1,000,324건)하였다.<br/>
+환자당 연간 주사 횟수는 4.97회에서 3.55회로 28.6% 감소하였다.<br/>
+장기지속형 전환에 의한 주사 감소 효과는 연간 -383,932건, 약제비 절감은 연간 77억 엔으로 추정되었다 전체 분석 대상은 n=304,181 환자-년이며, 6개월 데포 전환에 따른 비용 절감이 확인되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">본 연구는 처방 패턴 및 비용 분석에 초점을 맞추었으며, 직접적인 안전성 데이터는 보고되지 않았다. 다만 류프로렐린 6개월 제형이 고령 환자에서 더 많이 사용되어(50-54세 47% vs 95-99세 68%), 고령 환자에서의 투여 부담 경감이 확인되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">일본 전국 데이터에서 류프로렐린 6개월 depot 제형으로의 전환이 뚜렷하게 진행되고 있으며, 이는 환자 부담 감소와 의료비 절감에 기여한다. 엘리가드(leuprolide acetate depot)의 장기지속형 제형이 환자 편의성과 경제성 측면에서 우위를 보여주는 대규모 실제 근거이다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>2,276,025 환자-년 — 총 분석 대상 규모</li>
+                            <li>21.5% 감소 — 총 주사 횟수 감소율</li>
+                            <li>4.97→3.55회 — 연간 환자당 주사 횟수 변화</li>
+                            <li>77억 엔/년 — 장기지속형 전환에 의한 약제비 절감</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 엘리가드(류프로렐린) 6개월 제형이 일본에서 가장 많이 사용되는 ADT 제형으로 확인 (65.7%)</div><ul><li>장기지속형 전환으로 환자당 연간 주사 횟수 28.6% 감소 → 환자 편의성 향상 근거</li><li>연간 77억 엔(약 700억 원) 규모의 약제비 절감 효과 → 경제성 입증</li><li>고령 환자에서 6개월 제형 선호도 더 높아, 고령화 사회에서의 엘리가드 가치 강화</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #21 (비뇨기·종양·CPP) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Impact of Leuprolide and Goserelin on Androgen Suppression and Adverse Events in Patients with Prostate Cancer</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> The Canadian Journal of Urology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-08-21</div>
+                        <button class="bd-request-btn" data-title="Impact of Leuprolide and Goserelin on Androgen Suppression and Adverse Events in Patients with Prostate Cancer" data-session="비뇨기·종양·CPP" data-num="21" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42682049/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">RCT</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">진행성 전립선암에서 LHRH 작용제인 류프로라이드(leuprolide)와 고세렐린(goserelin)은 널리 사용되지만, 두 약물 간 호르몬 억제 효과와 이상반응 프로파일의 차이에 대한 전향적 비교 데이터는 부족하다. 약물별 대사 및 심혈관 영향의 차이를 규명할 필요가 있다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">전립선암 환자 174명을 대상으로 한 전향적, 무작위, 대조 연구. 류프로라이드 22.5mg(3개월 depot), 류프로라이드 45mg(6개월 depot), 고세렐린 10.8mg(3개월 depot) 3군으로 무작위 배정하여 12개월간 추적관찰하였다. 혈청 PSA, 테스토스테론 수치, 지질·혈당 프로파일, 이상반응을 모니터링하였다. TP53, BRCA1, BRCA2, ATM 유전자 변이 분석도 시행하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">(n=174 명 분석) 모든 치료군에서 PSA 및 테스토스테론의 유의한 감소가 관찰되었다.<br/>
+류프로라이드 22.5mg이 가장 현저한 PSA 감소를 달성하였다.<br/>
+고세렐린 10.8mg은 치료 초기 수개월간 테스토스테론의 변동성이 더 컸다.<br/>
+TP53 변이가 20.4%로 가장 흔했고, BRCA2 7.4%, ATM 6.5% 순이었으나 치료 반응에 유의한 영향은 없었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">안면홍조는 류프로라이드 22.5mg에서 90%로 가장 빈번하게 보고되었다. 심혈관 이상반응은 고세렐린 10.8mg군에서 더 많이 관찰되었다. 류프로라이드 22.5mg에서 체중 증가 및 혈관운동 증상이 더 흔했으며, 고세렐린은 호르몬 불안정성과 심혈관 위험과 연관되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">ADT는 전립선암에서 효과적인 호르몬 억제를 달성하지만, LHRH 작용제 간 임상적·대사적 차이가 존재한다. 류프로라이드 22.5mg이 PSA 감소에서 우수성을 보여 엘리가드의 효과적 호르몬 억제 능력을 뒷받침한다. 향후 대사 및 유전 프로파일을 통합한 맞춤형 ADT 전략이 필요하다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>174명 — 전향적 RCT 대상 환자 수</li>
+                            <li>90% — 류프로라이드 22.5mg군 안면홍조 발생률</li>
+                            <li>20.4% — TP53 유전자 변이 빈도</li>
+                            <li>7.4% — BRCA2 유전자 변이 빈도</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 류프로라이드(엘리가드) 22.5mg이 PSA 감소에서 가장 우수한 결과 → 3개월 depot의 효과적 호르몬 억제 근거</div><ul><li>고세렐린 대비 류프로라이드의 초기 테스토스테론 안정성 우위</li><li>고세렐린에서 심혈관 이상반응 더 빈번 → 류프로라이드(엘리가드)의 상대적 심혈관 안전성 시사</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #22 (비뇨기·종양·CPP) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Doublet Versus Triplet Therapy in High-volume Metastatic Hormone-sensitive Prostate Cancer Patients with Bone Metastases: Results from the ARON-3 Study</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> European Urology Oncology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-06-05</div>
+                        <button class="bd-request-btn" data-title="Doublet Versus Triplet Therapy in High-volume Metastatic Hormone-sensitive Prostate Cancer Patients with Bone Metastases: Results from the ARON-3 Study" data-session="비뇨기·종양·CPP" data-num="22" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42242941/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">코호트</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">고용량(high-volume) mHSPC 환자에서 ADT+ARPI 이중요법과 ADT+ARPI+도세탁셀 삼중요법의 직접 비교 데이터가 부족하다. 특히 골전이 부담에 따른 치료 전략 최적화가 임상적으로 중요하다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">다기관 국제 ARON-3 데이터베이스를 활용한 후향적 코호트 연구. CHAARTED 기준 high-volume mHSPC 환자 중 골전이가 있는 841명을 이중요법(75%)과 삼중요법(25%)으로 분류하고, 골전이 수(10개 이하 vs 10개 초과)에 따라 층화 분석하였다. 1차 평가변수는 치료 실패까지 시간(TTF), PSA 반응, 전체생존(OS)이었다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">중앙 OS는 ADT+아비라테론 63.0개월이었고, ADT+아팔루타마이드, ADT+엔잘루타마이드, ADT+도세탁셀+다롤루타마이드 군에서는 중앙값 미도달이었다.<br/>
+골전이 10개 초과 환자에서 삼중요법이 이중요법 대비 TTF 개선을 보였다 (HR 0.49, 95% CI 0.28-0.87, p=0.02).<br/>
+동일 하위군에서 OS도 수치적 개선을 보였으나 통계적 유의성은 없었다 (HR 0.48, 95% CI 0.21-1.07, p=0.1).<br/>
+내장전이 동반 환자에서도 수치적 차이가 관찰되었으나 통계적 유의성은 없었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">12주 시점에서 삼중요법은 오피오이드 사용 변화 및 ECOG PS 변화와 연관되었다. 구체적인 이상반응 비율은 본 분석에서 상세히 보고되지 않았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">골전이 부담이 높은(&gt;10개) high-volume mHSPC에서 삼중요법이 이중요법 대비 TTF 개선을 보였으나, 공식적 교호작용 검정에서 이질성이 확인되지 않아 전향적 검증이 필요하다. 엔잘루타 기반 이중요법이 대다수 환자(75%)에서 선택되는 현실을 반영하며, 골전이 부담에 따른 치료 전략 개별화의 근거를 제시한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>841명 — 분석 대상 high-volume mHSPC </li>
+                            <li>HR 0.49 — 골전이 &gt;10개에서 삼중 vs 이중 TTF (p=0.02)</li>
+                            <li>HR 0.48 — 골전이 &gt;10개에서 삼중 vs 이중 OS (p=0.1)</li>
+                            <li>63.0개월 — ADT+아비라테론 중앙 OS</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 엔잘루타(엔잘루타마이드) 기반 이중요법이 ARON-3 실제 임상에서 75%로 가장 많이 선택됨</div><ul><li>골전이 10개 이하 환자에서는 이중요법과 삼중요법 간 유의한 차이 없어, 엔잘루타 이중요법의 적절성 지지</li><li>골전이 부담이 매우 높은 환자에서만 삼중요법 고려 근거 → 엘리가드+엔잘루타 이중요법의 대다수 적용 가능성</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #23 (비뇨기·종양·CPP) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Quality-of-Life in CRPC Patients Treated With Enzalutamide Versus Abiraterone: Impact of Standard and Modified Dosing (ENABLE Study)</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Clinical Genitourinary Cancer</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-07-04</div>
+                        <button class="bd-request-btn" data-title="Quality-of-Life in CRPC Patients Treated With Enzalutamide Versus Abiraterone: Impact of Standard and Modified Dosing (ENABLE Study)" data-session="비뇨기·종양·CPP" data-num="23" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42509097/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">RCT</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">거세저항성 전립선암(CRPC)에서 엔잘루타마이드와 아비라테론의 생존 효과는 유사하다고 보고되어 왔으나, 삶의 질(QoL)에 대한 직접 비교 데이터는 부족하였다. ENABLE 연구는 두 약물의 QoL 영향을 전향적으로 비교한 최초의 다기관 RCT 하위분석이다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">연구자 주도, 다기관, 무작위 대조 시험(ENABLE study for PCa)의 하위분석. 엔잘루타마이드군 89명, 아비라테론+프레드니솔론군 89명이 포함되었다. FACT-G (Functional Assessment of Cancer Therapy-General) 설문지를 사용하여 신체적, 사회적, 정서적, 기능적 안녕의 종적 변화를 평가하였다. 아비라테론은 표준용량(1000mg/일)과 감량용량(750mg 이하/일)으로 추가 분석하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">PSA 진행까지 시간과 OS는 양 군 간 유의한 차이 없었다 (p=0.17, p=0.63).<br/>
+엔잘루타마이드군은 치료 기간 중 FACT-G 총점이 유지되었다 (p=0.96).<br/>
+반면 아비라테론군은 FACT-G 총점이 유의하게 점진적으로 악화되었다 (p=0.0003).<br/>
+아비라테론 표준용량(n=55)에서 FACT-G 총점이 유의하게 악화되었으나 (p=0.0003), 감량용량(n=15)에서는 악화되지 않았다 (p=0.18).<br/>
+하위영역 분석에서 엔잘루타마이드는 모든 영역을 유지한 반면, 아비라테론은 사회적 안녕(p=0.013)과 기능적 안녕(p=0.0006)이 유의하게 악화되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">엔잘루타마이드는 QoL의 어떤 하위영역도 악화시키지 않았다. 아비라테론 표준용량은 사회적(p=0.001) 및 기능적 안녕(p&lt;0.0001)을 유의하게 악화시켰으나, 감량용량에서는 이러한 악화가 관찰되지 않았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">엔잘루타마이드는 CRPC 치료 중 QoL을 유지하는 반면, 아비라테론 표준용량은 QoL을 점진적으로 악화시킨다. 이는 엔잘루타(엔잘루타마이드)가 CRPC 치료에서 QoL 유지 측면의 우위를 가짐을 보여주는 RCT 근거이다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>p=0.96 — 엔잘루타마이드 FACT-G 총점 변화 (p=0.9585)</li>
+                            <li>p=0.0003 — 아비라테론 FACT-G 총점 악화 (p=0.0003)</li>
+                            <li>89명/군 — 각 군 무작위 배정 환자 수</li>
+                            <li>p&lt;0.0001 — 아비라테론 표준용량 기능적 안녕 악화</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 엔잘루타(엔잘루타마이드)는 치료 중 QoL(FACT-G) 유지 → 아비라테론 대비 QoL 우위 (RCT 근거)</div><ul><li>아비라테론 표준용량은 시간에 따라 QoL 유의하게 악화 → 엔잘루타 선호 근거</li><li>CRPC 환자 치료 선택 시 생존 동등 + QoL 우위 = 엔잘루타마이드 차별화 포인트</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #24 (비뇨기·종양·CPP) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Survival Outcomes by Frailty and Comorbidities in Veterans Treated With Abiraterone and Enzalutamide for Metastatic Castration-Resistant Prostate Cancer</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> The Prostate</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-09-17</div>
+                        <button class="bd-request-btn" data-title="Survival Outcomes by Frailty and Comorbidities in Veterans Treated With Abiraterone and Enzalutamide for Metastatic Castration-Resistant Prostate Cancer" data-session="비뇨기·종양·CPP" data-num="24" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42752817/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">코호트</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">전이성 거세저항성 전립선암(mCRPC)에서 아비라테론과 엔잘루타마이드는 표준 치료제이나, 허약(frail)하거나 동반질환이 있는 환자군에서의 비교 효과는 불확실하다. 실제 임상에서 고령·동반질환 환자의 치료 선택에 근거가 필요하다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">미국 재향군인 의료체계(VA) 전국 데이터를 활용한 후향적 코호트 연구. 2014년 9월~2022년 9월 아비라테론 또는 엔잘루타마이드로 치료받은 mCRPC 환자 8,859명을 포함하였다. 사전 도세탁셀 투여 환자는 제외하였다. 허약도는 VA Frailty Index(VA-FI)로 정의하였고, 나이, 인종, BMI 등 임상 공변량에 대해 IPTW 보정 후 Kaplan-Meier 분석으로 OS를 비교하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">허약 환자군에서 엔잘루타마이드는 아비라테론 대비 유의하게 긴 OS를 보였다 (22.8개월 vs 20.9개월, p=0.001).<br/>
+심혈관질환 또는 당뇨 동반 환자에서도 엔잘루타마이드가 우수하였다 (26.3개월 vs 23.9개월, p=0.023).<br/>
+심혈관질환·당뇨 비동반 환자에서도 엔잘루타마이드가 우수하였다 (30.0개월 vs 28.0개월, p=0.019).</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">본 연구는 생존 결과에 초점을 맞추었으며, 개별 이상반응 데이터는 직접 보고되지 않았다. 다만 허약 및 심혈관질환/당뇨 동반 환자에서 엔잘루타마이드의 OS 우위는 이들 취약 환자군에서의 전반적 내약성을 간접적으로 시사한다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">허약하거나 동반질환이 있는 mCRPC 환자에서 엔잘루타마이드가 아비라테론 대비 OS 개선을 보였다. 이는 동반질환 프로파일에 관계없이 엔잘루타(엔잘루타마이드)가 mCRPC 치료의 선호 옵션임을 지지하는 대규모 실제 임상 근거이다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>8,859명 — 분석 대상 VA 재향군인 mCRPC 환자</li>
+                            <li>22.8 vs 20.9개월 — 허약 환자 OS (p=0.001)</li>
+                            <li>26.3 vs 23.9개월 — 심혈관/당뇨 동반 환자 OS (p=0.023)</li>
+                            <li>30.0 vs 28.0개월 — 심혈관/당뇨 비동반 환자 OS (p=0.019)</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 허약 환자에서도 엔잘루타마이드 OS 우위 (22.8 vs 20.9개월) → 고령·허약 환자 치료 선택 근거</div><ul><li>동반질환 유무와 무관하게 엔잘루타마이드 OS 우수 → 범용적 선호 근거</li><li>8,859명 대규모 VA 코호트 실제 임상 데이터</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #25 (비뇨기·종양·CPP) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Evaluating Safety: Number Needed to Harm Analyses of Androgen Receptor Inhibitors in Advanced Prostate Cancer</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> European Journal of Cancer</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-08-08</div>
+                        <button class="bd-request-btn" data-title="Evaluating Safety: Number Needed to Harm Analyses of Androgen Receptor Inhibitors in Advanced Prostate Cancer" data-session="비뇨기·종양·CPP" data-num="25" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42617299/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">메타분석</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">안드로겐 수용체 억제제(ARI)인 엔잘루타마이드, 아팔루타마이드, 다롤루타마이드는 비전이성 CRPC(nmCRPC) 및 mHSPC의 표준 치료제이다. 환자 중심 치료 선택을 위해 이상반응 위험의 정량적 비교가 필요하며, NNH(Number Needed to Harm) 분석이 유용한 도구가 될 수 있다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">nmCRPC(PROSPER, SPARTAN, ARAMIS)와 mHSPC(ARCHES, TITAN, ARASENS) 피벗 시험의 이상반응 데이터를 활용하여 NNH를 산출하였다. NNH는 절대 위험 증가의 역수로 계산하였으며, 관심 이상반응(안면홍조, 피로, 관절통, 인지장애, 고혈압, 낙상 등)에 대해 ARI 간 비교하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">nmCRPC에서 다롤루타마이드는 대부분의 전등급 이상반응에서 아팔루타마이드 및 엔잘루타마이드보다 높은 NNH(낮은 위험)를 보였다: 안면홍조 100/NR/20, 피로 29.4/10.8/5.3, 인지장애 ≥250/47.6/33.3, 고혈압 71.4/20.0/14.3, 낙상 NEG/15.2/14.3 (다롤루타마이드/아팔루타마이드/엔잘루타마이드 순).<br/>
+mHSPC에서도 유사한 경향이 관찰되었으나, 변비와 빈혈에서는 아팔루타마이드와 엔잘루타마이드가 더 높은 NNH를 보였다 다롤루타마이드의 전체 이상반응 NNT(= NNH 역수 기준 안전성 지표)는 엔잘루타마이드 대비 유의하게 우월하였다(p&lt;0.05).</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">다롤루타마이드가 대부분의 이상반응에서 낮은 증분 위험을 보였으나, 시험 간 디자인과 환자군 이질성으로 인해 직접 비교는 신중하게 해석해야 한다. 엔잘루타마이드는 피로(NNH 5.3)와 인지장애(NNH 33.3)에서 상대적으로 높은 위험을 보였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">본 분석은 Bayer(다롤루타마이드 제조사) 지원 연구로, 다롤루타마이드의 안전성 우위를 강조한다. 엔잘루타마이드 사용 시 피로 및 인지장애 관리의 중요성을 인식하되, 시험 간 간접 비교의 한계를 고려해야 한다. 엔잘루타의 강력한 효과 데이터(PFS, OS)와 함께 안전성 프로파일을 균형 있게 전달할 필요가 있다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>NNH 5.3 — nmCRPC 엔잘루타마이드 전등급 피로</li>
+                            <li>NNH 33.3 — nmCRPC 엔잘루타마이드 전등급 인지장애</li>
+                            <li>NNH 100 — nmCRPC 다롤루타마이드 전등급 안면홍조</li>
+                            <li>NNH 14.3 — nmCRPC 엔잘루타마이드 전등급 고혈압</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 경쟁사(Bayer) 지원 NNH 분석 — 다롤루타마이드 안전성 포지셔닝 의도 파악 필요</div><ul><li>엔잘루타 사용 시 피로·인지장애 관리 방안 사전 준비 (BD 대응용)</li><li>시험 간 간접 비교의 한계 강조 가능 — 직접 비교 시험(ARACOG 등)에서 인지기능 차이 미확인</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #26 (비뇨기·종양·CPP) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Long-Term Outcomes of Gonadotropin-Releasing Hormone Analogue Therapy in Central Precocious Puberty: A Comparative Analysis of Obese and Normal-Weight Girls</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Clinical Endocrinology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-07-30</div>
+                        <button class="bd-request-btn" data-title="Long-Term Outcomes of Gonadotropin-Releasing Hormone Analogue Therapy in Central Precocious Puberty: A Comparative Analysis of Obese and Normal-Weight Girls" data-session="비뇨기·종양·CPP" data-num="26" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42530118/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">코호트</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">특발성 중추성 조기사춘기(CPP) 여아에서 GnRH 작용제 치료의 장기 효과는 잘 확립되어 있으나, 비만 환자에서의 최종 키와 BMI 변화, 초경 시기에 대한 비교 데이터는 제한적이다. CPP 환아 중 과체중/비만 비율이 증가하는 상황에서 이에 대한 근거가 필요하다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">GnRH 작용제로 치료받고 최종 키에 도달한 특발성 CPP 여아 726명의 후향적 코호트 연구. 과체중/비만군 269명과 정상체중군 457명으로 나누어 진단 시점, 치료 중, 최종 키 도달 시점의 키, BMI, 초경까지 기간을 비교 분석하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">진단 시 과체중/비만군이 더 키가 컸고(키 SDS: 1.53 vs 0.80, p&lt;0.001), 골연령 진행이 더 컸다(2.5년 vs 2.0년, p&lt;0.001).<br/>
+GnRHa 치료 후 키 증가분(최종 키 - 초기 예측 성인 키)은 과체중/비만군에서 더 컸다(8.0cm vs 6.8cm, p=0.010).<br/>
+양 군 모두 최종 키 도달 시 BMI SDS가 진단 시보다 감소하였다(과체중/비만: 1.26 vs 1.70; 정상: -0.23 vs 0.26, 모두 p&lt;0.001).<br/>
+과체중/비만군 중 109명(40.5%)이 최종 키 시점에서 BMI SDS가 정상화되었다.<br/>
+GnRHa 중단 후 초경까지 기간은 양 군에서 동일하였다(14.4개월, p=0.961).</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">GnRHa 치료와 관련된 중대한 이상반응은 보고되지 않았다. 양 군 모두에서 BMI SDS 감소가 관찰되어, GnRHa 치료가 비만을 악화시키지 않음이 확인되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">GnRHa 치료는 과체중/비만 CPP 여아에서도 정상체중 환아와 마찬가지로 키 증가에 유익한 효과를 보이며, BMI도 개선되었다. CPP 치료제(엘리가드 포함)의 비만 환아 적용 시 효과와 안전성을 뒷받침하는 대규모 근거이다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>726명 — 최종 키 도달 CPP 여아 수</li>
+                            <li>8.0 vs 6.8cm — 키 증가분 (p=0.010)</li>
+                            <li>40.5% — 과체중/비만군 BMI 정상화 비율</li>
+                            <li>14.4개월 — GnRHa 중단 후 초경까지 기간 (p=0.961)</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 GnRHa 치료가 과체중/비만 CPP 환아에서도 효과적 — 엘리가드 CPP 적응증 범용성 근거</div><ul><li>GnRHa 치료 후 BMI 개선 관찰 — 비만 악화 우려 불식</li><li>726명 대규모 코호트에서 비만 환아의 키 증가 효과가 오히려 더 큼 (8.0 vs 6.8cm)</li></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+  <h4>근거 분류 기준</h4>
+  <table>
+    <tr>
+      <td><strong style="color: #1a5276;">직접근거</strong></td>
+      <td>자사 제품 enzalutamide(엔잘루타), leuprorelin(엘리가드) 또는 동일 성분·동일 용량을 사용한 RCT, 메타분석, Phase 3 이상 임상시험. 동일 성분의 임상적 효능·안전성을 직접 검증한 연구</td>
+    </tr>
+    <tr>
+      <td><strong style="color: #666;">참고근거</strong></td>
+      <td>동일 성분의 다른 제형(예: leuprolide acetate vs leuprorelin acetate) 또는 다른 용량으로 진행된 연구. 기전 및 효능이 유사하나 제형 또는 용량이 다르므로 직접 적용 시 주의 필요</td>
+    </tr>
+  </table>
+</div>
+
+<!-- 중요도 기준 -->
+<div class="legend">
+  <h4>중요도 평가 기준</h4>
+  <table>
+    <tr>
+      <td><strong style="color: #c0392b;">★★★</strong></td>
+      <td>즉시 활용 — RCT, 메타분석, Phase 3 이상 임상시험. PM팀 디테일링에 바로 반영 가능</td>
+    </tr>
+    <tr>
+      <td><strong style="color: #e67e22;">★★☆</strong></td>
+      <td>참고 활용 — Phase 2, 체계적 문헌고찰, 소규모 임상. KOL 심포지엄·학술강연 소재</td>
+    </tr>
+    <tr>
+      <td><strong style="color: #999;">★☆☆</strong></td>
+      <td>모니터링 — 동향 파악 수준. 후속 연구 결과 확인 필요</td>
+    </tr>
+  </table>
+</div>
+
+</div>
+
+<script>
+(function(){
+  var h=decodeURIComponent(location.hash.slice(1)); if(!h) return;
+  var papers=document.querySelectorAll('.paper'),found=null;
+  for(var i=0;i<papers.length;i++){var t=papers[i].querySelector('.paper-title');var txt=t?t.textContent.trim().toLowerCase():'';if(txt.indexOf(h.toLowerCase())!==-1){found=papers[i];break;}}
+  if(!found) return;
+  for(var j=0;j<papers.length;j++){if(papers[j]!==found)papers[j].style.display='none';}
+  found.style.outline='3px solid #1A5276';found.style.borderRadius='10px';found.scrollIntoView({behavior:'smooth',block:'start'});
+  var btn=document.createElement('button');btn.textContent='📋 모든 논문 보기';
+  btn.style.cssText='position:fixed;bottom:24px;right:24px;z-index:999;padding:10px 20px;background:#003366;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3);';
+  btn.onclick=function(){for(var k=0;k<papers.length;k++)papers[k].style.display='';found.style.outline='';btn.remove();window.scrollTo(0,0);};
+  document.body.appendChild(btn);
+})();
+</script>
+
+<!-- BD_REQUEST_MODAL_v2 -->
+<style>
+  #bd-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;align-items:center;justify-content:center}
+  #bd-modal{background:#fff;border-radius:8px;padding:24px;min-width:420px;max-width:520px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-family:'Malgun Gothic',sans-serif}
+  #bd-modal h3{margin:0 0 16px;color:#003366;border-bottom:2px solid #1A5276;padding-bottom:8px}
+  #bd-modal .field{margin:12px 0}
+  #bd-modal label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:4px}
+  #bd-modal input,#bd-modal textarea{width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;font-size:13px;box-sizing:border-box;font-family:inherit}
+  #bd-modal textarea{min-height:60px;resize:vertical}
+  #bd-modal .radio-row label{display:inline-block;font-weight:400;margin-right:16px;cursor:pointer}
+  #bd-modal .actions{margin-top:20px;text-align:right}
+  #bd-modal button{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:13px;margin-left:8px}
+  #bd-modal .submit{background:#003366;color:#fff;font-weight:600}#bd-modal .cancel{background:#ddd;color:#333}
+  #bd-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#003366;color:#fff;padding:12px 24px;border-radius:6px;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:9999;opacity:0;transition:opacity .3s}
+  #bd-toast.show{opacity:1}#bd-toast.error{background:#c0392b}
+</style>
+<div id="bd-modal-overlay" onclick="if(event.target.id==='bd-modal-overlay') closeBDModal()">
+  <div id="bd-modal">
+    <h3>📌 BD 제작 요청</h3>
+    <div class="field"><label>논문</label><div id="bd-modal-title" style="font-size:13px;color:#555;line-height:1.4"></div></div>
+    <div class="field"><label>세션</label><div id="bd-modal-session" style="font-size:13px;color:#555"></div></div>
+    <div class="field"><label>BD 포맷</label><div class="radio-row">
+      <label><input type="radio" name="bd-format" value="CLB" checked> CLB (학술브리프)</label>
+      <label><input type="radio" name="bd-format" value="BT"> BT (바이오톡)</label></div></div>
+    <div class="field"><label>요청자 이메일 *</label><input type="email" id="bd-modal-requester" placeholder="example@hanall.co.kr" required></div>
+    <div class="field"><label>메모 (선택)</label><textarea id="bd-modal-memo" placeholder="특별 요청사항"></textarea></div>
+    <div class="actions"><button class="cancel" onclick="closeBDModal()">취소</button><button class="submit" onclick="submitBDRequest()">요청 제출</button></div>
+  </div>
+</div>
+<div id="bd-toast"></div>
+<script>
+const BD_WEBHOOK_URL='https://script.google.com/macros/s/AKfycbynF7P1576GbRlzdIjBaxrOvjTU4HDP8F9jY4flxduhSqYR15Hr4AmhImuaS0wPJoOC/exec';let bdCurrentBtn=null;
+function openBDModal(b){bdCurrentBtn=b;document.getElementById('bd-modal-title').textContent=b.dataset.title;document.getElementById('bd-modal-session').textContent=b.dataset.session;document.getElementById('bd-modal-requester').value=localStorage.getItem('bd-requester')||'';document.getElementById('bd-modal-memo').value='';document.querySelector('input[name=bd-format][value=CLB]').checked=true;document.getElementById('bd-modal-overlay').style.display='flex';}
+function closeBDModal(){document.getElementById('bd-modal-overlay').style.display='none';bdCurrentBtn=null;}
+function showToast(m,e){var t=document.getElementById('bd-toast');t.textContent=m;t.className=e?'show error':'show';setTimeout(function(){t.className='';},3500);}
+function submitBDRequest(){if(!bdCurrentBtn)return;var title=bdCurrentBtn.dataset.title,session=bdCurrentBtn.dataset.session,format=document.querySelector('input[name=bd-format]:checked').value,requester=document.getElementById('bd-modal-requester').value.trim(),memo=document.getElementById('bd-modal-memo').value.trim();if(!requester){showToast('요청자 이메일은 필수입니다',true);return;}localStorage.setItem('bd-requester',requester);var cb='bdcb_'+Date.now();window[cb]=function(data){delete window[cb];document.head.removeChild(s);if(data.status==='ok'){showToast('✅ BD 요청 접수: '+format+' / '+title.slice(0,40)+'…');bdCurrentBtn.disabled=true;bdCurrentBtn.textContent='✓ 요청됨';closeBDModal();}else if(data.status==='duplicate'){showToast('⚠️ 동일 요청이 이미 대기 중입니다',true);closeBDModal();}else{showToast('❌ 오류: '+(data.message||'알 수 없음'),true);}};var params=new URLSearchParams({action:'requestBDQueue',title:title,session:session,format:format,requester:requester,memo:memo,callback:cb});var s=document.createElement('script');s.src=BD_WEBHOOK_URL+'?'+params.toString();s.onerror=function(){delete window[cb];showToast('❌ 네트워크 오류 — 잠시 후 다시 시도',true);};document.head.appendChild(s);}
+</script>
+
+</body>
+</html>
