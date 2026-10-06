@@ -521,9 +521,9 @@ body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var
         <label class="ct on" data-c="stg"><input type="checkbox" checked>신약과정</label>
         <label class="ct on" data-c="land"><input type="checkbox" checked>랜딩예정</label>
         <label class="ct on" data-c="avg"><input type="checkbox" checked>25년 월평균</label>
-        <label class="ct on" data-c="m5"><input type="checkbox" checked>26.5월</label>
         <label class="ct on" data-c="m6"><input type="checkbox" checked>26.6월</label>
         <label class="ct on" data-c="m7"><input type="checkbox" checked>26.7월</label>
+        <label class="ct on" data-c="m8"><input type="checkbox" checked>26.8월</label>
         <span style="width:1px;height:18px;background:var(--gray2);margin:0 2px"></span>
         <label class="ct" id="ct-loc" onclick="toggleLoc()" title="지역·담당RPM 열 펼치기/접기">📍 지역/RPM</label>
       </div>
@@ -676,14 +676,14 @@ const MTHS25=[202501,202502,202503,202504,202505,202506,202507,202508,202509,202
 
 let allData=[], salesData={}, salesByHosp={}, salesLoaded=false, charts={};
 let h110ProdFilter='';
-let h110Cols={cso:1,mbo:1,stg:1,land:1,avg:1,m5:1,m6:1,m7:1};
+let h110Cols={cso:1,mbo:1,stg:1,land:1,avg:1,m6:1,m7:1,m8:1};
 let h110ShowLoc=0;   /* 지역/RPM 열 표시 여부 — 기본 접힘 */
-/* [2026-08-13] 컬럼 구성 변경 — 26.1·26.2월 삭제, 26.5~26.7월 추가(박본님 지시).
+/* [2026-08-13] 컬럼 구성 변경 — 26.1·26.2월 삭제, 26.6~26.8월 추가(박본님 지시).
    'loc'(지역/RPM)은 기존 고정 2번째 열이었으나 가시성 확보를 위해 토글 대상으로 옮기고 기본 꺼짐. */
-const COL_KEYS=['cso','mbo','stg','land','avg','m5','m6','m7'];
+const COL_KEYS=['cso','mbo','stg','land','avg','m6','m7','m8'];
 const COL_LABEL={cso:'CSO업체',mbo:'MBO',stg:'신약과정',land:'랜딩예정',avg:'25년 월평균',m1:'26.1월',m2:'26.2월'};
 function ctPreset(p){
-  const presets={all:['cso','mbo','stg','land','avg','m5','m6','m7'],sales:['avg','m5','m6','m7'],mbo:['cso','mbo','stg','land']};
+  const presets={all:['cso','mbo','stg','land','avg','m6','m7','m8'],sales:['avg','m6','m7','m8'],mbo:['cso','mbo','stg','land']};
   const on=presets[p]||presets.all;
   COL_KEYS.forEach(c=>h110Cols[c]=on.indexOf(c)>=0?1:0);
   document.querySelectorAll('.col-toggle label.ct').forEach(l=>{
@@ -752,8 +752,8 @@ function loadEmbeddedSales(){
     const obj={};
     PROD_KEYS.forEach(k=>{
       const p=rec.p&&rec.p[k];
-      /* [2026-08-13] 26.1·26.2월 → 26.5·26.6·26.7월. 값이 0인 키는 데이터에서 생략돼 있어 ||0 필요 */
-      obj[k]={sum25:p?(p.s25||0):0,m2605:p?(p.m5||0):0,m2606:p?(p.m6||0):0,m2607:p?(p.m7||0):0};
+      /* [2026-08-13] 26.1·26.2월 → 26.5·26.6·26.8월. 값이 0인 키는 데이터에서 생략돼 있어 ||0 필요 */
+      obj[k]={sum25:p?(p.s25||0):0,m2606:p?(p.m6||0):0,m2607:p?(p.m7||0):0,m2608:p?(p.m8||0):0};
     });
     salesData[biz]=obj;
     if(rec.n){
@@ -769,7 +769,7 @@ function loadEmbeddedSales(){
     const master=window.__H110__||[];
     const total=master.length;
     const matchedCnt=master.filter(h=>getSales(h.b,h.n)!=null).length;
-    el.innerHTML=`<span class="sales-ok">📦 평가실적 내장 데이터 (${cnt}개 거래처${total?` · 110대 매칭 ${matchedCnt}/${total}개`:''} · 25년 + 26.5~26.7월)</span>`;
+    el.innerHTML=`<span class="sales-ok">📦 평가실적 내장 데이터 (${cnt}개 거래처${total?` · 110대 매칭 ${matchedCnt}/${total}개`:''} · 25년 + 26.6~26.8월)</span>`;
   }
   return true;
 }
@@ -886,12 +886,12 @@ function loadSales(file){
         let pk=null;
         for(const k of PROD_KEYS){if(prod.includes(k)){pk=k;break;}}
         if(!pk)return;
-        if(!salesData[bizNo]){salesData[bizNo]={};PROD_KEYS.forEach(k=>salesData[bizNo][k]={sum25:0,m2605:0,m2606:0,m2607:0});}
+        if(!salesData[bizNo]){salesData[bizNo]={};PROD_KEYS.forEach(k=>salesData[bizNo][k]={sum25:0,m2606:0,m2607:0,m2608:0});}
         // 숫자·문자열 키 모두 시도
         MTHS25.forEach(m=>{salesData[bizNo][pk].sum25+=Number(r[m]||r[String(m)])||0;});
-        salesData[bizNo][pk].m2605+=Number(r[202605]||r['202605'])||0;
         salesData[bizNo][pk].m2606+=Number(r[202606]||r['202606'])||0;
         salesData[bizNo][pk].m2607+=Number(r[202607]||r['202607'])||0;
+        salesData[bizNo][pk].m2608+=Number(r[202608]||r['202608'])||0;
       });
 
     } else {
@@ -912,13 +912,13 @@ function loadSales(file){
       for(let i=0;i<sorted.length;i++){
         const [pk,sc]=sorted[i];
         const ec=i+1<sorted.length?sorted[i+1][1]:sc+20;
-        prodCols[pk]={avg25Col:null,m2605Col:null,m2606Col:null,m2607Col:null};
+        prodCols[pk]={avg25Col:null,m2606Col:null,m2607Col:null,m2608Col:null};
         for(let c=sc;c<ec;c++){
           const h=String(row4[c]||'').replace(/\\s/g,'');
           if(h.includes('25년')&&h.includes('평균'))prodCols[pk].avg25Col=c;
-          if((h.includes('26년')||h.includes('26.'))&&(h.includes('5월')))prodCols[pk].m2605Col=c;
           if((h.includes('26년')||h.includes('26.'))&&(h.includes('6월')))prodCols[pk].m2606Col=c;
-        if((h.includes('26년')||h.includes('26.'))&&(h.includes('7월')))prodCols[pk].m2607Col=c;
+          if((h.includes('26년')||h.includes('26.'))&&(h.includes('7월')))prodCols[pk].m2607Col=c;
+        if((h.includes('26년')||h.includes('26.'))&&(h.includes('8월')))prodCols[pk].m2608Col=c;
         }
       }
 
@@ -931,21 +931,21 @@ function loadSales(file){
         const bizNo=normBizNo(rawBiz);
         if(bizNo.length<5)continue;
         const hospName=String(row[2]||'').trim();  // col[2] = 거래처명
-        if(!salesData[bizNo]){salesData[bizNo]={};PROD_KEYS.forEach(k=>salesData[bizNo][k]={sum25:0,m2605:0,m2606:0,m2607:0});}
+        if(!salesData[bizNo]){salesData[bizNo]={};PROD_KEYS.forEach(k=>salesData[bizNo][k]={sum25:0,m2606:0,m2607:0,m2608:0});}
         for(const [pk,cols] of Object.entries(prodCols)){
           if(cols.avg25Col!=null){
             salesData[bizNo][pk].sum25+=(Number(row[cols.avg25Col])||0)*12;
           }
-          if(cols.m2605Col!=null){
-            salesData[bizNo][pk].m2605+=Number(row[cols.m2605Col])||0;
-          }
           if(cols.m2606Col!=null){
             salesData[bizNo][pk].m2606+=Number(row[cols.m2606Col])||0;
           }
-          /* [2026-09-07] 셋째 달 누적 블록 누락 보완 — 선언·헤더매칭은 3개월인데 파싱이 2개월뿐이라
-             엑셀 업로드 경로에서 마지막 달(현 26.7월)이 항상 0으로 나오던 결함 */
           if(cols.m2607Col!=null){
             salesData[bizNo][pk].m2607+=Number(row[cols.m2607Col])||0;
+          }
+          /* [2026-09-07] 셋째 달 누적 블록 누락 보완 — 선언·헤더매칭은 3개월인데 파싱이 2개월뿐이라
+             엑셀 업로드 경로에서 마지막 달(현 26.8월)이 항상 0으로 나오던 결함 */
+          if(cols.m2608Col!=null){
+            salesData[bizNo][pk].m2608+=Number(row[cols.m2608Col])||0;
           }
         }
         // 병원명 폴백 매칭용: salesByHosp에도 동일 데이터 저장
@@ -993,13 +993,13 @@ function parseEvaluationLong(wb,longSheets,SHEET_PRODUCT_MAP){
       const sales=Number(r['실매출']||r['실매출(원)']||r['매출']||0)||0;
       if(!salesData[bizNo]){
         salesData[bizNo]={};
-        PROD_KEYS.forEach(k=>salesData[bizNo][k]={sum25:0,m2605:0,m2606:0,m2607:0});
+        PROD_KEYS.forEach(k=>salesData[bizNo][k]={sum25:0,m2606:0,m2607:0,m2608:0});
       }
       const v=sales/1000; // 원 → 천원
       if(ym>=202501&&ym<=202512) salesData[bizNo][pk].sum25+=v;
-      else if(ym===202605) salesData[bizNo][pk].m2605+=v;
       else if(ym===202606) salesData[bizNo][pk].m2606+=v;
-        else if(ym===202607) salesData[bizNo][pk].m2607+=v;
+      else if(ym===202607) salesData[bizNo][pk].m2607+=v;
+        else if(ym===202608) salesData[bizNo][pk].m2608+=v;
       if(hospName){
         const nk=normHosp(hospName);
         if(!salesByHosp[nk]) salesByHosp[nk]=salesData[bizNo];
@@ -1060,7 +1060,7 @@ function download110Excel(){
   const hdr2=['','',''];
   PROD_KEYS.forEach(pk=>{
     hdr1.push(pk,'','','','','','','');
-    hdr2.push('CSO업체','MBO(만원)','신약과정','랜딩예정','25년 월평균(천원)','26년 4월(천원)','26년 5월(천원)','26년 6월(천원)');
+    hdr2.push('CSO업체','MBO(만원)','신약과정','랜딩예정','25년 월평균(천원)','26년 6월(천원)','26년 7월(천원)','26년 8월(천원)');
   });
 
   // 데이터 행 구성
@@ -1072,18 +1072,18 @@ function download110Excel(){
       const items=info.products[pk]||[];
       const pSales=sd?sd[pk]:null;
       const avg25=pSales?Math.round(pSales.sum25/12):null;
-      const m2605=pSales?Math.round(pSales.m2605):null;
       const m2606=pSales?Math.round(pSales.m2606):null;
       const m2607=pSales?Math.round(pSales.m2607):null;
+      const m2608=pSales?Math.round(pSales.m2608):null;
       if(!items.length){
-        row.push('','',' ','',(avg25!=null?avg25:''),(m2605!=null?m2605:''),(m2606!=null?m2606:''),(m2607!=null?m2607:''));
+        row.push('','',' ','',(avg25!=null?avg25:''),(m2606!=null?m2606:''),(m2607!=null?m2607:''),(m2608!=null?m2608:''));
       } else {
         const cso=[...new Set(items.map(x=>x.업체명).filter(Boolean))].join('/')||'';
         const mbo=items.reduce((s,x)=>s+x.MBO,0);
         const bestIdx=Math.max(0,...items.map(x=>STAGE_ORDER.indexOf(x.신약과정)).filter(i=>i>0));
         const bestStage=STAGE_ORDER[bestIdx]||'';
         const landing=items.map(x=>x.랜딩예정월).filter(Boolean).sort()[0]||'';
-        row.push(cso,Math.round(mbo/10000),bestStage,landing,(avg25!=null?avg25:''),(m2605!=null?m2605:''),(m2606!=null?m2606:''),(m2607!=null?m2607:''));
+        row.push(cso,Math.round(mbo/10000),bestStage,landing,(avg25!=null?avg25:''),(m2606!=null?m2606:''),(m2607!=null?m2607:''),(m2608!=null?m2608:''));
       }
     });
     return row;
@@ -1960,7 +1960,7 @@ function render110(){
   const colCnt=COL_KEYS.filter(c=>h110Cols[c]).length||1;
 
   // 서브헤더 (제품당 표시 컬럼만)
-  const SUBH={cso:'CSO업체',mbo:'MBO',stg:'신약과정',land:'랜딩예정',avg:'25년 월평균<br><span style="font-weight:400;opacity:.85">(단위:천원)</span>',m5:'26.5월',m6:'26.6월',m7:'26.7월'};
+  const SUBH={cso:'CSO업체',mbo:'MBO',stg:'신약과정',land:'랜딩예정',avg:'25년 월평균<br><span style="font-weight:400;opacity:.85">(단위:천원)</span>',m6:'26.6월',m7:'26.7월',m8:'26.8월'};
   const subHd=visibleProds.map(k=>{
     const c=`sub-${PROD_CLS[k]}`;
     return COL_KEYS.filter(ck=>h110Cols[ck]).map((ck,i)=>{
@@ -1971,7 +1971,7 @@ function render110(){
 
   // ── 품목별 매출 합계 (필터된 110대 병원 대상) ──
   const totals={};
-  visibleProds.forEach(k=>{ totals[k]={mboSum:0,sum25:0,m2605:0,m2606:0,m2607:0,hospCnt:0,salesHospCnt:0}; });
+  visibleProds.forEach(k=>{ totals[k]={mboSum:0,sum25:0,m2606:0,m2607:0,m2608:0,hospCnt:0,salesHospCnt:0}; });
   hospNames.forEach(hosp=>{
     const info=hospMap[hosp];
     const sd=getSales(info.bizNo,hosp);
@@ -1982,11 +1982,11 @@ function render110(){
         totals[k].mboSum+=items.reduce((s,x)=>s+x.MBO,0);
       }
       if(sd&&sd[k]){
-        if(sd[k].sum25>0||sd[k].m2605>0||sd[k].m2606>0||sd[k].m2607>0) totals[k].salesHospCnt++;
+        if(sd[k].sum25>0||sd[k].m2606>0||sd[k].m2607>0||sd[k].m2608>0) totals[k].salesHospCnt++;
         totals[k].sum25+=sd[k].sum25;
-        totals[k].m2605+=sd[k].m2605;
         totals[k].m2606+=sd[k].m2606;
         totals[k].m2607+=sd[k].m2607;
+        totals[k].m2608+=sd[k].m2608;
       }
     });
   });
@@ -1999,9 +1999,9 @@ function render110(){
       stg:`<td class="total-cell" style="text-align:center;color:var(--gray3);font-size:10px">—</td>`,
       land:`<td class="total-cell" style="text-align:center;color:var(--gray3);font-size:10px">—</td>`,
       avg:`<td class="total-cell sales-cell" style="font-weight:800;color:var(--green)">${t.sum25>0?fmtW(Math.round(t.sum25/12)):'·'}</td>`,
-      m5:`<td class="total-cell sales-cell" style="font-weight:800;color:var(--green)">${t.m2605>0?fmtW(Math.round(t.m2605)):'·'}</td>`,
       m6:`<td class="total-cell sales-cell" style="font-weight:800;color:var(--green)">${t.m2606>0?fmtW(Math.round(t.m2606)):'·'}</td>`,
       m7:`<td class="total-cell sales-cell" style="font-weight:800;color:var(--green)">${t.m2607>0?fmtW(Math.round(t.m2607)):'·'}</td>`,
+      m8:`<td class="total-cell sales-cell" style="font-weight:800;color:var(--green)">${t.m2608>0?fmtW(Math.round(t.m2608)):'·'}</td>`,
     };
     const visibleCells=COL_KEYS.filter(c=>h110Cols[c]).map((c,i)=>{
       let html=cellMap[c];
@@ -2052,9 +2052,9 @@ function render110(){
 
 function buildProdCells(items, pSales){
   const avg25=pSales?Math.round(pSales.sum25/12):null;
-  const m2605=pSales?Math.round(pSales.m2605):null;
   const m2606=pSales?Math.round(pSales.m2606):null;
   const m2607=pSales?Math.round(pSales.m2607):null;
+  const m2608=pSales?Math.round(pSales.m2608):null;
 
   const salesCell=(v,extra='')=>{
     if(v!=null&&v>0) return `<td class="sales-cell has-s ${extra}">${fmtW(v)}</td>`;
@@ -2085,9 +2085,9 @@ function buildProdCells(items, pSales){
     cells.land=`<td class="empty-c" style="color:var(--gray2);text-align:center">—</td>`;
   }
   cells.avg=salesCell(avg25);
-  cells.m5=salesCell(m2605);
   cells.m6=salesCell(m2606);
   cells.m7=salesCell(m2607);
+  cells.m8=salesCell(m2608);
 
   // 표시할 컬럼만, 첫 컬럼에 prod-divider 추가
   const visible=COL_KEYS.filter(c=>h110Cols[c]);
@@ -2138,7 +2138,7 @@ function render110sum(){
     const sd=getSales(info.bizNo,h);
     if(!sd) return 0;
     let s=0;
-    PROD_KEYS.forEach(k=>{ if(sd[k]) s+=(sd[k].sum25||0)+(sd[k].m2605||0)+(sd[k].m2606||0)+(sd[k].m2607||0); });
+    PROD_KEYS.forEach(k=>{ if(sd[k]) s+=(sd[k].sum25||0)+(sd[k].m2606||0)+(sd[k].m2607||0)+(sd[k].m2608||0); });
     return s;
   };
   hospNames.sort((a,b)=>{
@@ -2173,8 +2173,8 @@ function render110sum(){
     const totalMbo=allItems.reduce((s,x)=>s+x.MBO,0);
     // 매출 미니
     const avgMini=PROD_KEYS.filter(k=>sd&&sd[k]&&sd[k].sum25>0).map(k=>`${PROD_INI[k]} <b>${fmtW(Math.round(sd[k].sum25/12))}</b>`).join('<br>')||'<span style="color:#cbd5e1">·</span>';
-    const m1Mini=PROD_KEYS.filter(k=>sd&&sd[k]&&sd[k].m2605>0).map(k=>`${PROD_INI[k]} <b>${fmtW(Math.round(sd[k].m2605))}</b>`).join('<br>')||'<span style="color:#cbd5e1">·</span>';
-    const m2Mini=PROD_KEYS.filter(k=>sd&&sd[k]&&sd[k].m2607>0).map(k=>`${PROD_INI[k]} <b>${fmtW(Math.round(sd[k].m2607))}</b>`).join('<br>')||'<span style="color:#cbd5e1">·</span>';
+    const m1Mini=PROD_KEYS.filter(k=>sd&&sd[k]&&sd[k].m2606>0).map(k=>`${PROD_INI[k]} <b>${fmtW(Math.round(sd[k].m2606))}</b>`).join('<br>')||'<span style="color:#cbd5e1">·</span>';
+    const m2Mini=PROD_KEYS.filter(k=>sd&&sd[k]&&sd[k].m2608>0).map(k=>`${PROD_INI[k]} <b>${fmtW(Math.round(sd[k].m2608))}</b>`).join('<br>')||'<span style="color:#cbd5e1">·</span>';
     // 이슈 도트
     const evList=allItems.map(x=>x.이슈상태).filter(Boolean);
     const evWorst=evList.slice().sort((a,b)=>(ISSUE_ORDER_MAP[a]??5)-(ISSUE_ORDER_MAP[b]??5))[0]||'';
@@ -2184,7 +2184,7 @@ function render110sum(){
       const items=info.products[k]||[];
       const ps=sd?sd[k]:null;
       const cls={프레논:'pre',하노마린:'hano',바이오탑:'bio',알파본:'alpha'}[k];
-      if(!items.length && (!ps||(ps.sum25===0&&ps.m2605===0&&ps.m2606===0&&ps.m2607===0))){
+      if(!items.length && (!ps||(ps.sum25===0&&ps.m2606===0&&ps.m2607===0&&ps.m2608===0))){
         return `<div class="pcard ${cls}"><h4>${k}</h4><div class="empty">— 진행 없음 —</div></div>`;
       }
       const cso=[...new Set(items.map(x=>x.업체명).filter(Boolean))].join(' / ')||'-';
@@ -2193,8 +2193,8 @@ function render110sum(){
       const bs=STAGE_ORDER[bi]||'-';
       const land=items.map(x=>x.랜딩예정월).filter(Boolean).sort()[0]||'-';
       const a25=ps?Math.round(ps.sum25/12):0;
-      const m1=ps?Math.round(ps.m2605):0;
-      const m2=ps?Math.round(ps.m2607):0;
+      const m1=ps?Math.round(ps.m2606):0;
+      const m2=ps?Math.round(ps.m2608):0;
       return `<div class="pcard ${cls}"><h4>${k}</h4>
         <div class="pr"><span>CSO</span><b>${cso}</b></div>
         <div class="pr"><span>단계</span><b>${bs}</b></div>
@@ -2275,7 +2275,7 @@ function download110SumExcel(){
   // 매출합 내림차순 정렬
   const tsOf=h=>{
     const i=hospMap[h]; const sd=getSales(i.bizNo,h); if(!sd) return 0;
-    let s=0; PROD_KEYS.forEach(k=>{if(sd[k]) s+=(sd[k].sum25||0)+(sd[k].m2605||0)+(sd[k].m2606||0)+(sd[k].m2607||0);});
+    let s=0; PROD_KEYS.forEach(k=>{if(sd[k]) s+=(sd[k].sum25||0)+(sd[k].m2606||0)+(sd[k].m2607||0)+(sd[k].m2608||0);});
     return s;
   };
   hospNames.sort((a,b)=>{const sa=tsOf(a),sb=tsOf(b);return sb!==sa?sb-sa:a.localeCompare(b);});
@@ -2296,7 +2296,7 @@ function download110SumExcel(){
     const row=[hosp,info.시군구||'',info.담당RPM||'',prods,bs,Math.round(totalMbo/10000)];
     PROD_KEYS.forEach(k=>{
       const ps=sd?sd[k]:null;
-      row.push(ps?Math.round(ps.sum25/12):'',ps?Math.round(ps.m2605):'',ps?Math.round(ps.m2606):'',ps?Math.round(ps.m2607):'');
+      row.push(ps?Math.round(ps.sum25/12):'',ps?Math.round(ps.m2606):'',ps?Math.round(ps.m2607):'',ps?Math.round(ps.m2608):'');
     });
     return row;
   });
