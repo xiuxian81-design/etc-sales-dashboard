@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[문헌모니터링] 4주차 골대사·신경 (2026.10.28)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; font-size: 15px; line-height: 1.7; color: #1a1a2e; background: #f0f2f5; padding: 20px 0; }
+  .container { max-width: 820px; margin: 0 auto; padding: 0 16px; }
+  .info-box { background: #fff3e0; border: 2px solid #FF9800; border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+  .info-box h2 { color: #E65100; font-size: 18px; margin-bottom: 12px; }
+  .copy-btn { background: #FF9800; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; }
+  .mail-body { background: #fff; border-radius: 10px; padding: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px; }
+  .report-header { background: linear-gradient(135deg,#003366 0%,#1a5276 100%); color: #fff; border-radius: 14px; padding: 28px 32px; margin-bottom: 24px; }
+  .report-header h1 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+  .stat-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+  .stat-pill { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 16px; font-size: 13px; }
+  .stat-pill span { font-size: 20px; font-weight: 800; color: #1A5276; }
+  .exec-box { background: #fff; border-left: 5px solid #003366; border-radius: 0 10px 10px 0; padding: 18px 22px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .exec-box h3 { font-size: 13px; color: #003366; margin-bottom: 10px; font-weight: 700; }
+  .paper { background: #fff; border-radius: 14px; margin-bottom: 28px; box-shadow: 0 3px 12px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #e8eaf0; }
+  .paper-header { padding: 16px 22px; display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #f0f2f5; }
+  .paper-num { background: #003366; color: #fff; font-size: 12px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+  .stars-high { color: #c0392b; font-size: 16px; }
+  .stars-mid { color: #e67e22; font-size: 16px; }
+  .stars-low { color: #95a5a6; font-size: 16px; }
+  .tag-direct { background: #e8f4fd; color: #1a5276; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+  .tag-open { background: #e8f8e8; color: #1e8449; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+  .tag-wall { background: #fdf2f8; color: #7d3c98; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+  .paper-body { padding: 20px 22px; }
+  .paper-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; line-height: 1.5; }
+  .paper-url { font-size: 12px; color: #1a5276; margin-bottom: 14px; display: block; }
+  .design-badge { display: inline-block; background: #eaf2ff; color: #1a5276; font-size: 12px; font-weight: bold; padding: 3px 12px; border-radius: 6px; margin-bottom: 14px; }
+  .summary-grid { background: #fafbfc; border-radius: 10px; padding: 16px; margin-bottom: 14px; border: 1px solid #e8eaf0; }
+  .summary-grid h4 { font-size: 12px; color: #888; margin-bottom: 10px; }
+  .s-row { display: grid; grid-template-columns: 80px 1fr; gap: 6px 12px; margin-bottom: 8px; font-size: 13.5px; }
+  .s-label { font-weight: 700; color: #003366; }
+  .s-val { color: #333; line-height: 1.8; }
+  .s-val em { background: #fff3cd; padding: 0 4px; border-radius: 3px; font-style: normal; font-weight: bold; }
+  .key-nums { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+  .knum { background: #003366; color: #fff; border-radius: 10px; padding: 12px 16px; flex: 1; min-width: 140px; text-align: center; }
+  .knum .val { font-size: 22px; font-weight: 900; color: #1A5276; display: block; }
+  .knum .desc { font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 2px; }
+  .viz-section { border: 2px solid #e8eaf0; border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+  .viz-section h4 { font-size: 13px; font-weight: 700; color: #003366; margin-bottom: 4px; }
+  .chart-wrap { position: relative; height: 200px; }
+  .paywall-notice { background: #fdf2f8; border: 1px solid #d7bde2; border-radius: 8px; padding: 14px 18px; font-size: 13px; color: #7d3c98; }
+  .usage { background: linear-gradient(135deg,#fff8f0,#fff3e0); border-left: 4px solid #1A5276; border-radius: 0 10px 10px 0; padding: 14px 18px; font-size: 13.5px; line-height: 1.8; }
+  .usage h4 { font-size: 12px; color: #1A5276; font-weight: 700; margin-bottom: 6px; }
+  .usage li { margin-bottom: 4px; }
+  .legend { background: #fff; border-radius: 10px; padding: 18px 22px; margin-top: 8px; border: 1px solid #e8eaf0; font-size: 13px; }
+  .legend h4 { color: #003366; margin-bottom: 10px; }
+  .legend table { width: 100%; border-collapse: collapse; }
+  .legend td { padding: 6px 8px; border-bottom: 1px solid #f0f0f0; }
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>/*BR_EXTRA_CSS*/
+.papers{max-width:920px;margin:0 auto;padding:0 8px}
+.paper{border:1px solid #e3e7ee;border-radius:14px;margin:0 auto 26px;box-shadow:0 3px 12px rgba(0,0,0,.07);overflow:hidden;background:#fff}
+.paper-header{background:linear-gradient(135deg,#1A5276,#003366);color:#fff;padding:18px 22px}
+.paper-header .paper-title{color:#fff;font-size:16px;font-weight:800;line-height:1.5;margin:0 0 12px}
+.paper-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:#e3ecf6}
+.paper-meta-item{display:flex;align-items:center;gap:4px}
+.paper-meta-item strong{color:#fff;font-weight:600}
+.importance-badge{padding:3px 11px;border-radius:20px;font-weight:800;color:#1a1a2e}
+.importance-high{background:#FFD54F}.importance-mid{background:#90CAF9;color:#0d2b45}.importance-low{background:#cfd8dc;color:#37474f}
+.evidence-tag{padding:3px 11px;border-radius:20px;font-weight:700;color:#fff;background:#2E8B72}
+.evidence-ref{background:#8896a5}
+.bd-request-btn{background:#fff;color:#003366;border:none;padding:7px 16px;border-radius:7px;font-size:12.5px;font-weight:800;cursor:pointer;margin-left:auto;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.bd-request-btn:hover{background:#ffe9b3}.bd-request-btn:disabled{background:#b9c2cc;color:#fff;cursor:not-allowed}
+.paper-header a,.paper-url{color:#cfe0f5 !important;font-size:11px;word-break:break-all}
+.paper-content{padding:18px 22px}
+.content-section{border-left:4px solid #d3dce6;padding:6px 0 6px 16px;margin:0 0 12px}
+.content-section-title{font-size:13px;font-weight:800;color:#1A5276;margin-bottom:4px;letter-spacing:.2px}
+.content-section-text{font-size:13.5px;line-height:1.7;color:#2b2b38}
+.content-section-text strong{color:#003366}
+.content-section.cs-key{border-left-color:#003366;background:#f3f8fd;border-radius:8px;padding:11px 16px}
+.content-section.cs-key .content-section-title{color:#003366}
+.key-numbers{background:#fff8e6;border:1px solid #f1dea0;border-radius:10px;padding:13px 18px;margin:14px 0}
+.key-numbers h4{margin:0 0 8px;color:#8a6a00;font-size:13.5px}
+.key-numbers ul{margin:0;padding-left:20px}.key-numbers li{font-size:13px;line-height:1.55;margin:4px 0;color:#5a4600}
+.viz-section{background:#f5f9fd;border:1px solid #d9e6f2;border-radius:10px;padding:15px 18px;margin:14px 0}
+.viz-section h4{margin:0 0 10px;color:#003366;font-size:13.5px}
+.usage-box{background:#ecf7f3;border:1px solid #bfe2d7;border-left:5px solid #2E8B72;border-radius:10px;padding:14px 18px;margin:14px 0}
+.usage-box h4{margin:0 0 8px;color:#1d6b59;font-size:13.5px}
+.usage-head{font-weight:800;color:#135344;font-size:13.5px;line-height:1.55;margin-bottom:7px;padding-bottom:7px;border-bottom:1px dashed #bfe2d7}
+.usage-box ul{margin:0;padding-left:20px}.usage-box li{font-size:13px;line-height:1.6;margin:5px 0;color:#244b43}
+</style>
+
+</head>
+<body>
+<div class="container">
+<div class="info-box">
+  <h2>📧 메일 발송 안내</h2>
+  <div style="margin: 8px 0;"><strong>수신자:</strong> aaaa81@hanall.co.kr</div>
+  <div style="margin: 8px 0;"><strong>제목:</strong> <span id="mailSubject">[문헌모니터링] 4주차 골대사·신경 (2026.10.28)</span></div>
+  <button class="copy-btn" onclick="copyText()">본문 복사</button>
+</div>
+
+<div class="mail-body">
+  <div id="mailContent">
+    <div class="report-header">
+      <span style="display:inline-block; background: #1A5276; color: #fff; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px;">4주차 골대사·신경</span>
+      <h1>알파본D + 프레논OD 월간 업데이트</h1>
+      <div style="font-size: 13px; color: rgba(255,255,255,0.75); margin-top: 12px; display: flex; gap: 16px; flex-wrap: wrap;">
+        <span>📅 2026.10.28</span>
+        <span>🏥 신경병증성 통증·골대사</span>
+      </div>
+      <div class="stat-row">
+        <div class="stat-pill">논문 <span>8</span>건</div>
+        <div class="stat-pill">★★★ <span>3</span>건</div>
+        <div class="stat-pill">직접근거 <span>5</span>건</div>
+        <div class="stat-pill">오픈액세스 <span>4</span>건</div>
+      </div>
+    </div>
+
+    <div class="exec-box">
+      <h3>EXECUTIVE SUMMARY</h3>
+      <p>2025~2026년 alfacalcidol 및 pregabalin 관련 주요 문헌을 검토한 결과, <strong>pregabalin 영역에서 활발한 연구 성과</strong>가 발표되었다. Lancet Neurology에 게재된 NeuPSIG 가이드라인 업데이트(313개 RCT, 48,789명)에서 α2δ-리간드(pregabalin 포함)가 신경병증성 통증 1차 치료제로 강력 권고되었고, pregabalin이 gabapentin 대비 우월한 진통 효과를 보인 메타분석, 요통 및 당뇨병성 신경병증에서의 효능·안전성 데이터가 축적되고 있다.</p>
+    </div>
+        <div class="papers">
+
+            <!-- ━━━ 논문 #27 (골대사·신경) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Long-Term Efficacy and Safety of Treatments for Chronic Peripheral Neuropathic Pain: A Systematic Review</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Pain Ther</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-08</div>
+                        <button class="bd-request-btn" data-title="Long-Term Efficacy and Safety of Treatments for Chronic Peripheral Neuropathic Pain: A Systematic Review" data-session="골대사·신경" data-num="27" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42671707/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">체계적 문헌고찰</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">말초신경병증성 통증(PNP)은 만성 질환으로 장기 치료가 필요하나, NeuPSIG 2025 가이드라인은 24주 이하 단기 RCT만을 기반으로 권고하여 장기 유효성·안전성 근거가 부족하다. 본 체계적 문헌고찰은 NeuPSIG 권고 치료제의 13주 이상 장기 데이터를 종합 분석하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">PRISMA 방법론에 따라 Embase, PubMed에서 2024년 12월 및 2025년 5월 두 차례 검색을 수행하였다. NeuPSIG 2025 권고 치료제 중 13주 이상, 50명 이상 PNP 환자를 등록한 중재 및 관찰 연구를 포함하였다. 716편의 초록을 심사하여 최종 34편을 선정하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">(n=2025 권고 분석) 5건 이상의 장기 연구가 확인된 치료제는 HCCP(고농도 캡사이신 8% 패치, 13건), duloxetine(7건), gabapentin(6건), pregabalin(5건) 4개였다.<br/>
+Pregabalin은 6~15개월 추적에서 통증 감소 유지가 확인되었고, 치료 중단율 3~31%, AE 기인 중단율 12~15%였다.<br/>
+Gabapentin AE 기인 중단율 8~45%, duloxetine 6~18%, HCCP 약 5%로 보고되었다.<br/>
+대부분의 연구가 26~52주 기간이며 개방표지(open-label) 설계였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">Pregabalin의 AE 기인 중단율(12~15%)은 gabapentin(8~45%)보다 일관된 범위를 보였으나, HCCP(약 5%)보다는 높았다. 대부분의 NeuPSIG 1차 권고 치료제에서 장기 안전성 데이터가 제한적이었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">NeuPSIG 2025 권고 치료제 중 대다수는 장기 근거가 부족하며, 만성 PNP 치료 의사결정 시 장기 유효성·내약성 데이터의 확대가 필수적이다. Pregabalin은 5건의 장기 연구에서 지속적 진통 효과를 보였으나, 표준화된 장기 임상시험 설계가 요구된다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>8% — 주요 결과</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 체계적 문헌고찰/메타분석 수준 종합 근거</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #28 (골대사·신경) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Efficacy and Safety of Crisugabalin for Inadequately Controlled Diabetic Peripheral Neuropathic Pain: A Randomized, Double-blind, Placebo- and Active-Controlled Phase 2 Trial</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Diabetes Obes Metab</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-10</div>
+                        <button class="bd-request-btn" data-title="Efficacy and Safety of Crisugabalin for Inadequately Controlled Diabetic Peripheral Neuropathic Pain: A Randomized, Double-blind, Placebo- and Active-Controlled Phase 2 Trial" data-session="골대사·신경" data-num="28" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42823911/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">RCT</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">Crisugabalin은 α2δ-1 서브유닛에 선택적으로 결합하는 차세대 gabapentinoid로, 기존 pregabalin 대비 α2δ-2 결합을 줄여 중추신경계 부작용을 감소시킬 가능성이 제기되었다. 본 연구는 pregabalin 또는 gabapentin에 충분히 조절되지 않는 당뇨병성 말초신경병증성 통증(DPNP) 환자에서 crisugabalin의 유효성과 안전성을 평가하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">무작위, 이중맹검, 위약 및 활성대조(pregabalin 300mg/일) 4주 Phase 2 RCT. 총 93명의 DPNP 환자를 crisugabalin 40mg, pregabalin 300mg, 위약군에 무작위 배정하였다. 1차 평가변수는 SF-MPQ 변화량이었다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">Crisugabalin 40mg군의 SF-MPQ 점수 LSM 변화량은 pregabalin 300mg군 대비 -7.2 (95% CI: -12.4, -2.0; p=0.007)로 통계적으로 유의한 우월성을 보였다.<br/>
+통증 강도(NRS) 감소에서도 crisugabalin이 수치적 우위를 보였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">이상반응 발생률은 crisugabalin군 29.5%, pregabalin군 47.8%로 crisugabalin에서 현저히 낮았다. Pregabalin군에서 어지러움, 졸음 등 중추신경계 이상반응이 더 빈번하게 보고되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">Crisugabalin은 pregabalin에 충분히 반응하지 않는 DPNP 환자에서 유의한 통증 감소와 개선된 안전성 프로파일을 보여, pregabalin의 잠재적 차세대 대안으로서 Phase 3 확인 연구가 필요하다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>95% — 주요 결과</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 경쟁제품 비교/시장 동향 참고자료</div><ul><li>RCT 수준 근거로 학술 자료 활용</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #29 (골대사·신경) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Comparison of Efficacy and Safety of Denosumab with Eldecalcitol or Native Vitamin D in Postmenopausal Women with Osteoporosis: A Randomized Controlled Trial (ESCORT Study)</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> J Clin Med</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-07</div>
+                        <button class="bd-request-btn" data-title="Comparison of Efficacy and Safety of Denosumab with Eldecalcitol or Native Vitamin D in Postmenopausal Women with Osteoporosis: A Randomized Controlled Trial (ESCORT Study)" data-session="골대사·신경" data-num="29" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42513484/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">RCT</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">데노수맙 치료 시 병용하는 비타민 D 종류에 따라 골밀도 증가 효과가 다를 수 있다. 기존 일본 연구에서 데노수맙+alfacalcidol이 데노수맙+일반 비타민 D보다 대퇴골경부 BMD 상승폭이 더 컸으나, eldecalcitol과의 비교 데이터는 중국인 골다공증 환자에서 부족하였다. 본 ESCORT 연구는 데노수맙+eldecalcitol과 데노수맙+일반 비타민 D의 12개월 효과를 비교하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">단일기관, 무작위, 개방표지, 활성대조 RCT. 중국 폐경후 골다공증 여성 100명(FAS 91명)을 데노수맙(60mg SC q6mo)+eldecalcitol(0.75μg/일) 또는 데노수맙+일반 비타민 D(800IU/일)+칼슘(600mg/일)에 1:1 무작위 배정, 12개월 추적하였다. 1차 평가변수는 12개월 시 요추(L1-L4) BMD 변화율이었다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">12개월 시 요추 BMD 변화율은 ELD군 6.75% vs 대조군 4.99%로 유의한 차이를 보였다(LSM 차이 1.75%, 95% CI 0.10~3.41, p=0.038).<br/>
+대퇴골경부 BMD와 전체대퇴 BMD는 양군 모두 유의한 개선을 보였으나 군간 차이는 없었다.<br/>
+β-CTX는 양군 모두 3개월 시 91~94% 감소하였고, PINP도 현저히 억제되었다.<br/>
+12개월간 신규 골절은 양군 모두 없었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">이상반응 발생률은 ELD군 54.0%, 대조군 48.0%로 유의한 차이 없었다. 가장 흔한 AE는 이차성 부갑상선기능항진증이었다. 칼슘 관련 AE는 드물었으며(각 군 1건), 중대한 칼슘 이상은 없었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">데노수맙+eldecalcitol 병용은 데노수맙+일반 비타민 D 대비 요추 BMD를 더 효과적으로 증가시켰다. 활성형 비타민 D 유도체 병용이 데노수맙의 골격 효과를 강화할 수 있음을 시사하며, 대규모 다기관 확인 연구가 필요하다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>6.75% — 주요 결과</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 경쟁제품 비교/시장 동향 참고자료</div><ul><li>RCT 수준 근거로 학술 자료 활용</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #30 (골대사·신경) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Mechanistic Actions of Eldecalcitol and Alfacalcidol Across the Muscle-Metabolic Axis: A Selectivity-Based Review of Implications for Sarcopenia in Type 2 Diabetes Mellitus</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> iScience</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-04</div>
+                        <button class="bd-request-btn" data-title="Mechanistic Actions of Eldecalcitol and Alfacalcidol Across the Muscle-Metabolic Axis: A Selectivity-Based Review of Implications for Sarcopenia in Type 2 Diabetes Mellitus" data-session="골대사·신경" data-num="30" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42181249/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">종설</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">근감소증과 제2형 당뇨병(T2DM)은 상호 악화하는 양방향 병리 루프를 형성하며, 비타민 D 수용체(VDR) 신호는 이 교차점에서 핵심 조절 역할을 할 수 있다. 활성형 비타민 D 유도체인 eldecalcitol과 alfacalcidol은 구조적 차이로 인해 VDR 활성화 양상이 다를 수 있으나, 골격근-대사축에서의 기능적 선택성(functional selectivity)에 대한 체계적 비교는 부족하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">서사적 리뷰(narrative review)로, eldecalcitol과 alfacalcidol의 근육-대사축 관련 기전을 기능적 선택성 관점에서 체계적으로 비교 분석하였다. VDR 전사 조절, 항염증, 항산화, 동화작용(anabolic) 경로에서 각 약물의 전임상 및 임상 근거를 종합하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">Eldecalcitol은 비타민 D 결합단백질(DBP) 친화도가 높아 체내 반감기가 길고 지속적 VDR 활성화를 유도한다.<br/>
+Alfacalcidol은 간에서 25-수산화되어 calcitriol로 전환되는 전구약물로, 신기능 저하 환자나 고령자에서 광범위하게 사용된다.<br/>
+그러나 골격근 특이적 VDR 전사 편향(transcriptional bias)을 입증한 직접적 비교 임상 연구는 현재 없으며, 대부분의 근거가 전임상 단계에 머물러 있다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">본 리뷰에서 별도의 안전성 분석은 수행되지 않았으며, 기존 문헌 기반으로 양 약물 모두 고칼슘혈증 모니터링이 필요함을 언급하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">VDR 리간드 기능적 선택성 프레임워크는 근감소증-T2DM 교차 영역에서 구조화된 가설로 제안되며, 직접적 head-to-head 임상시험과 조직수준 트랜스크립토믹 프로파일링이 향후 필요하다. Alfacalcidol의 근대사 보호 기전 규명을 위한 추가 임상 연구가 요구된다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>- — 수치 데이터</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 알파본D(알파칼시돌) 직접 임상근거로 처방명분 강화</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #31 (골대사·신경) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Real World Treatment Patterns Among Patients with Painful Diabetic Peripheral Neuropathy in the United States</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Pain Med</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-09</div>
+                        <button class="bd-request-btn" data-title="Real World Treatment Patterns Among Patients with Painful Diabetic Peripheral Neuropathy in the United States" data-session="골대사·신경" data-num="31" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42015888/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">코호트</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">당뇨병성 말초신경병증(DPN)은 당뇨병 환자의 최대 50%에 영향을 미치며, 통증을 동반하는 painful DPN(pDPN)은 심각한 삶의 질 저하를 유발한다. FDA 승인 약물(pregabalin, duloxetine, tapentadol ER)이 있으나, 실제 진료 현장에서의 처방 패턴과 치료 순응도에 대한 최신 대규모 데이터가 필요하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">미국 IBM MarketScan 청구 데이터베이스(2017.1~2022.6)를 이용한 후향적 코호트 연구. DPN 진단 60일 이내 통증 약물을 처음 처방받은 18세 이상 성인 22,955명을 대상으로 최소 12개월 추적하였다. 처방약 종류, 용량, 순응도(PDC), 중단율, 순차적 치료 에피소드(TE)를 분석하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">Gabapentin이 최다 초기 처방(58.95%)이었고, pregabalin은 5.30%에 불과하였다.<br/>
+Pregabalin 초기 처방 비율은 이전 연구(21.6%) 대비 75% 이상 감소하였다.<br/>
+오피오이드 초기 처방 22.25%(tramadol 15.08%).<br/>
+Pregabalin 처방 환자의 80% 이상이 ≤150mg/일로, 유효 용량 미만이었다.<br/>
+순응도는 gabapentin, pregabalin, duloxetine 모두 평균 PDC ≤0.5로 불량하였다.<br/>
+약 75%가 1년 이내 치료를 중단하였으며(약 50%는 3개월 이내), 25% 미만이 다른 약제로 전환하였다.<br/>
+4번째 TE까지 약 65%의 환자가 모든 신경병증성 통증 약물을 중단하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">직접적 안전성 평가가 아닌 청구 데이터 분석이나, gabapentin의 부작용(어지러움, 졸음, 인지장애)이 용량 증량 제한과 낮은 순응도의 원인으로 논의되었다. 오피오이드(22.2~26.9%)의 지속적 처방은 남용 우려를 시사하였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">pDPN의 실제 진료에서 pregabalin 처방은 매우 제한적이며, 대부분 치료 미달 용량으로 사용되고 있다. 높은 치료 중단율과 낮은 순응도는 pDPN 치료의 심각한 unmet need를 반영한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>58.95% — 주요 결과</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 문헌 모니터링 — 최신 동향 파악</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #32 (골대사·신경) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Pregabalin-Associated Adverse Drug Reactions: A WHO-VigiAccess Pharmacovigilance Analysis</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Medicine (Baltimore)</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-08</div>
+                        <button class="bd-request-btn" data-title="Pregabalin-Associated Adverse Drug Reactions: A WHO-VigiAccess Pharmacovigilance Analysis" data-session="골대사·신경" data-num="32" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42675715/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">약물감시</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">Pregabalin은 전압 의존성 칼슘 채널 α2δ 서브유닛에 결합하여 흥분성 신경전달물질 방출을 억제하는 gabapentinoid로, 신경병증성 통증, 섬유근통, 범불안장애에 사용된다. 최근 pregabalin의 오남용 및 의존성 우려가 증가하였으나, 글로벌 규모의 약물감시 분석은 제한적이었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">WHO VigiAccess 데이터베이스(2025년 10월 기준)에서 pregabalin 관련 이상약물반응(ADR) 보고를 후향적으로 분석하였다. MedDRA SOC 분류체계에 따라 ADR을 범주화하고, 신경계, 정신과, 손상/중독, 사회적 상황 4개 도메인을 중점 분석하였다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">(n=4 개 분석) 총 164,223건의 pregabalin 관련 ADR이 확인되었다.<br/>
+신경계 장애가 18%(61,682건)로 가장 많았고, 정신과 장애 9%(30,684건), 손상/중독 8%(26,128건), 소화기 장애 7%, 근골격계 장애 6% 순이었다.<br/>
+신경계 ADR 중 어지러움, 졸음, 운동실조, 진전, 두통이 가장 빈번하였다.<br/>
+&#x27;사회적 상황&#x27; 범주에서 약 1%(3,835건)의 오남용/의존 신호가 확인되었으며, 일상생활 자립능력 상실(1,519건), 운전능력 장애(710건), 업무능력 장애(585건) 등 기능적 손상이 두드러졌다.<br/>
+약물남용자(42건), 약물전용(29건), 처방전 위조(36건) 등 비의료적 사용의 직접적 근거도 보고되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">Pregabalin ADR 프로파일은 중추신경계 및 행동 영역에 집중되어 있었다. 오피오이드 병용 시 호흡억제, 사망 위험이 37% 증가한다는 기존 근거와 일치하는 중독 및 과량복용 관련 보고가 다수 확인되었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">Pregabalin의 글로벌 안전성 프로파일은 신경정신과적, 행동적, 사회적 부작용이 교차하며 오남용 신호가 명확하다. 신중한 처방, 대중 인식 제고, 지속적 약물감시가 pregabalin의 치료적 가치와 남용 가능성 사이의 균형을 유지하는 데 필수적이다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>18% — 주요 결과</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 프레논OD(프레가발린) 직접 임상근거로 디테일링 활용</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #33 (골대사·신경) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Cobratide vs Pregabalin for Acute Herpes Zoster Neuralgia: A Randomized, Double-Blind, Double-Dummy Clinical Trial</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> J Am Acad Dermatol</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-06</div>
+                        <button class="bd-request-btn" data-title="Cobratide vs Pregabalin for Acute Herpes Zoster Neuralgia: A Randomized, Double-Blind, Double-Dummy Clinical Trial" data-session="골대사·신경" data-num="33" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42320855/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">RCT</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">급성 대상포진 신경통(acute HZ neuralgia)은 환자 삶의 질을 심각하게 저하시키며, pregabalin이 표준 치료제로 사용된다. Cobratide(코브라독 유래 진통 펩타이드)는 중국에서 통증 치료에 사용되어 왔으나, pregabalin과의 직접 비교 RCT는 수행된 바 없었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">무작위, 이중맹검, 이중위약(double-dummy) RCT. 급성 대상포진 신경통 환자 80명을 cobratide군(근육주사) 또는 pregabalin군(경구 투여)에 1:1 무작위 배정하여 28일간 치료하였다. 1차 평가변수는 NRS(Numerical Rating Scale) 통증 점수 변화량이었다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">28일 치료 후 NRS 감소는 cobratide군 6.00 vs pregabalin군 5.63으로, 군간 유의한 차이가 없었다(p=0.186).<br/>
+양군 모두 치료 전 대비 유의한 통증 감소를 보였다.<br/>
+통증 완화 시작 시점과 50% 통증 감소 도달까지의 기간에서도 유의한 차이가 관찰되지 않았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">이상반응 발생률은 cobratide군 35.9%, pregabalin군 51.2%로 cobratide에서 수치적으로 낮았다. Pregabalin군에서 어지러움과 졸음이 주요 이상반응이었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">Cobratide는 급성 대상포진 신경통에서 pregabalin과 유사한 진통 효과를 보였으며, 이상반응 발생률이 낮았다. 그러나 통계적으로 유의한 우월성은 입증되지 않았으며, 대규모 확인 연구가 필요하다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>50% — 주요 결과</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 프레논OD(프레가발린) 직접 임상근거로 디테일링 활용</div><ul><li>RCT 수준 근거로 학술 자료 활용</li></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+      <h4>근거 분류 기준</h4>
+      <table>
+        <tr><td><span class="tag-direct">직접근거</span></td><td>자사 제품과 동일 성분(alfacalcidol, pregabalin) 사용 연구</td></tr>
+        <tr><td>참고근거</td><td>동일 계열이나 다른 제품 사용 연구. 직접 적용 시 주의 필요</td></tr>
+      </table>
+    </div>
+
+    <div class="legend" style="margin-top: 12px;">
+      <h4>중요도 기준</h4>
+      <table>
+        <tr><td><span class="stars-high">★★★</span></td><td>즉시 활용 — RCT, 메타분석, Phase 3-4. PM팀 디테일링 반영 가능</td></tr>
+        <tr><td><span class="stars-mid">★★☆</span></td><td>참고 활용 — 전임상, 소규모 임상. KOL 심포지엄·학술강연 소재</td></tr>
+        <tr><td><span class="stars-low">★☆☆</span></td><td>모니터링 — 동향 파악. 후속 연구 결과 확인 필요</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+  var h=decodeURIComponent(location.hash.slice(1)); if(!h) return;
+  var papers=document.querySelectorAll('.paper'),found=null;
+  for(var i=0;i<papers.length;i++){var t=papers[i].querySelector('.paper-title');var txt=t?t.textContent.trim().toLowerCase():'';if(txt.indexOf(h.toLowerCase())!==-1){found=papers[i];break;}}
+  if(!found) return;
+  for(var j=0;j<papers.length;j++){if(papers[j]!==found)papers[j].style.display='none';}
+  found.style.outline='3px solid #1A5276';found.style.borderRadius='10px';found.scrollIntoView({behavior:'smooth',block:'start'});
+  var btn=document.createElement('button');btn.textContent='📋 모든 논문 보기';
+  btn.style.cssText='position:fixed;bottom:24px;right:24px;z-index:999;padding:10px 20px;background:#003366;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3);';
+  btn.onclick=function(){for(var k=0;k<papers.length;k++)papers[k].style.display='';found.style.outline='';btn.remove();window.scrollTo(0,0);};
+  document.body.appendChild(btn);
+})();
+</script>
+
+<!-- BD_REQUEST_MODAL_v2 -->
+<style>
+  #bd-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;align-items:center;justify-content:center}
+  #bd-modal{background:#fff;border-radius:8px;padding:24px;min-width:420px;max-width:520px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-family:'Malgun Gothic',sans-serif}
+  #bd-modal h3{margin:0 0 16px;color:#003366;border-bottom:2px solid #1A5276;padding-bottom:8px}
+  #bd-modal .field{margin:12px 0}
+  #bd-modal label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:4px}
+  #bd-modal input,#bd-modal textarea{width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;font-size:13px;box-sizing:border-box;font-family:inherit}
+  #bd-modal textarea{min-height:60px;resize:vertical}
+  #bd-modal .radio-row label{display:inline-block;font-weight:400;margin-right:16px;cursor:pointer}
+  #bd-modal .actions{margin-top:20px;text-align:right}
+  #bd-modal button{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:13px;margin-left:8px}
+  #bd-modal .submit{background:#003366;color:#fff;font-weight:600}#bd-modal .cancel{background:#ddd;color:#333}
+  #bd-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#003366;color:#fff;padding:12px 24px;border-radius:6px;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:9999;opacity:0;transition:opacity .3s}
+  #bd-toast.show{opacity:1}#bd-toast.error{background:#c0392b}
+</style>
+<div id="bd-modal-overlay" onclick="if(event.target.id==='bd-modal-overlay') closeBDModal()">
+  <div id="bd-modal">
+    <h3>📌 BD 제작 요청</h3>
+    <div class="field"><label>논문</label><div id="bd-modal-title" style="font-size:13px;color:#555;line-height:1.4"></div></div>
+    <div class="field"><label>세션</label><div id="bd-modal-session" style="font-size:13px;color:#555"></div></div>
+    <div class="field"><label>BD 포맷</label><div class="radio-row">
+      <label><input type="radio" name="bd-format" value="CLB" checked> CLB (학술브리프)</label>
+      <label><input type="radio" name="bd-format" value="BT"> BT (바이오톡)</label></div></div>
+    <div class="field"><label>요청자 이메일 *</label><input type="email" id="bd-modal-requester" placeholder="example@hanall.co.kr" required></div>
+    <div class="field"><label>메모 (선택)</label><textarea id="bd-modal-memo" placeholder="특별 요청사항"></textarea></div>
+    <div class="actions"><button class="cancel" onclick="closeBDModal()">취소</button><button class="submit" onclick="submitBDRequest()">요청 제출</button></div>
+  </div>
+</div>
+<div id="bd-toast"></div>
+<script>
+const BD_WEBHOOK_URL='https://script.google.com/macros/s/AKfycbynF7P1576GbRlzdIjBaxrOvjTU4HDP8F9jY4flxduhSqYR15Hr4AmhImuaS0wPJoOC/exec';let bdCurrentBtn=null;
+function openBDModal(b){bdCurrentBtn=b;document.getElementById('bd-modal-title').textContent=b.dataset.title;document.getElementById('bd-modal-session').textContent=b.dataset.session;document.getElementById('bd-modal-requester').value=localStorage.getItem('bd-requester')||'';document.getElementById('bd-modal-memo').value='';document.querySelector('input[name=bd-format][value=CLB]').checked=true;document.getElementById('bd-modal-overlay').style.display='flex';}
+function closeBDModal(){document.getElementById('bd-modal-overlay').style.display='none';bdCurrentBtn=null;}
+function showToast(m,e){var t=document.getElementById('bd-toast');t.textContent=m;t.className=e?'show error':'show';setTimeout(function(){t.className='';},3500);}
+function submitBDRequest(){if(!bdCurrentBtn)return;var title=bdCurrentBtn.dataset.title,session=bdCurrentBtn.dataset.session,format=document.querySelector('input[name=bd-format]:checked').value,requester=document.getElementById('bd-modal-requester').value.trim(),memo=document.getElementById('bd-modal-memo').value.trim();if(!requester){showToast('요청자 이메일은 필수입니다',true);return;}localStorage.setItem('bd-requester',requester);var cb='bdcb_'+Date.now();window[cb]=function(data){delete window[cb];document.head.removeChild(s);if(data.status==='ok'){showToast('✅ BD 요청 접수: '+format+' / '+title.slice(0,40)+'…');bdCurrentBtn.disabled=true;bdCurrentBtn.textContent='✓ 요청됨';closeBDModal();}else if(data.status==='duplicate'){showToast('⚠️ 동일 요청이 이미 대기 중입니다',true);closeBDModal();}else{showToast('❌ 오류: '+(data.message||'알 수 없음'),true);}};var params=new URLSearchParams({action:'requestBDQueue',title:title,session:session,format:format,requester:requester,memo:memo,callback:cb});var s=document.createElement('script');s.src=BD_WEBHOOK_URL+'?'+params.toString();s.onerror=function(){delete window[cb];showToast('❌ 네트워크 오류 — 잠시 후 다시 시도',true);};document.head.appendChild(s);}
+</script>
+
+</body>
+</html>
