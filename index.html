@@ -678,7 +678,7 @@ let allData=[], salesData={}, salesByHosp={}, salesLoaded=false, charts={};
 let h110ProdFilter='';
 let h110Cols={cso:1,mbo:1,stg:1,land:1,avg:1,m6:1,m7:1,m8:1};
 let h110ShowLoc=0;   /* 지역/RPM 열 표시 여부 — 기본 접힘 */
-/* [2026-08-13] 컬럼 구성 변경 — 26.1·26.2월 삭제, 26.6~26.8월 추가(박본님 지시).
+/* [2026-10-06] 3개월 롤링 26.6·7·8월(8월 실적 반영, 박본님 확정). [2026-08-13] 컬럼 구성 변경 — 26.1·26.2월 삭제, 26.5~26.7월 추가(박본님 지시).
    'loc'(지역/RPM)은 기존 고정 2번째 열이었으나 가시성 확보를 위해 토글 대상으로 옮기고 기본 꺼짐. */
 const COL_KEYS=['cso','mbo','stg','land','avg','m6','m7','m8'];
 const COL_LABEL={cso:'CSO업체',mbo:'MBO',stg:'신약과정',land:'랜딩예정',avg:'25년 월평균',m1:'26.1월',m2:'26.2월'};
