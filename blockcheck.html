@@ -454,12 +454,14 @@ function itemIdx(req){
 }
 function judgeRow(cell){
   const bz=String(cell.biz||'').replace(/\D/g,'');
+  const item=String(cell.item||'').trim(),want=item?itemIdx(item):null,miss=want?want.filter(w=>!w.idx.length).map(w=>w.q):[];
+  const cw=(want&&!miss.length)?want:null;   // 후보 거래처(같은 이름·비슷한 이름)에도 요청 품목으로 판정 — '후보 병원(품목 입력 필요)'만 보이던 것 개선(박본님 10-25)
   let b=null,note='';
   if(bz.length===10){
     b=bz;
     if(!known(b)&&String(cell.name||'').trim()){   // 원천에 없는 번호인데 같은 이름 거래처가 있으면 '비거래처 가능'으로 두지 않는다(양수도·번호 오타·열 밀림)
       const c=D.idx.get(nname(cell.name))||[];
-      if(c.length)return {v:'확인필요',cls:'chk',kind:'',reason:'사업자번호가 원천에 없음 — 같은 이름 거래처: '+c.slice(0,3).map(x=>`${fmtBiz(x)}(${judge(x).v})`).join(', '),match:fmtBiz(b)};
+      if(c.length)return {v:'확인필요',cls:'chk',kind:'',reason:'사업자번호가 원천에 없음 — 같은 이름 거래처: '+c.slice(0,3).map(x=>`${fmtBiz(x)}(${judge(x,cw).v})`).join(', '),match:fmtBiz(b)};
     }else if(known(b)&&String(cell.name||'').trim()){
       const a=nname(cell.name),o=nname(nameOf(b));
       if(a&&o&&!a.includes(o)&&!o.includes(a))note=`(요청 거래처명과 다름 — 원천: ${nameOf(b)}) `;
@@ -468,16 +470,15 @@ function judgeRow(cell){
   else if(String(cell.name||'').trim()){
     const k=nname(cell.name),c=D.idx.get(k)||[];
     if(c.length===1){b=c[0];note='(이름으로 매칭) '}
-    else if(c.length>1){b=addrPick(c,cell.addr);if(!b)return {v:'확인필요',cls:'chk',kind:'',reason:`같은 이름 ${c.length}곳 — 사업자번호로 확인: `+c.slice(0,3).map(x=>`${fmtBiz(x)}(${judge(x).v})`).join(', '),match:''};note='(주소로 구분) '}
+    else if(c.length>1){b=addrPick(c,cell.addr);if(!b)return {v:'확인필요',cls:'chk',kind:'',reason:`같은 이름 ${c.length}곳 — 사업자번호로 확인: `+c.slice(0,3).map(x=>`${fmtBiz(x)}(${judge(x,cw).v})`).join(', '),match:''};note='(주소로 구분) '}
     else{
       const part=[];   // 부분일치 후보 — 7.8만 건 순회라 4건 찾으면 멈추고, 큰 파일(100행 초과)에서는 생략(폰 멈춤 방지)
       if(k.length>=3&&!cell.big)for(const e of D.nn){const m=e[2];if(m.length>=3&&(m.includes(k)||k.includes(m))){part.push(e);if(part.length>=4)break}}
-      return {v:'확인필요',cls:'chk',kind:'',reason:part.length?'이름이 정확히 일치하지 않음 — 후보: '+part.slice(0,3).map(([x,n])=>`${n} ${fmtBiz(x)}(${judge(x).v})`).join(', '):'원천에서 이름을 찾지 못함 — 사업자번호로 확인',match:''};
+      return {v:'확인필요',cls:'chk',kind:'',reason:part.length?'이름이 정확히 일치하지 않음 — 후보: '+part.slice(0,3).map(([x,n])=>`${n} ${fmtBiz(x)}(${judge(x,cw).v})`).join(', '):'원천에서 이름을 찾지 못함 — 사업자번호로 확인',match:''};
     }
   }else if(bz.length)return {v:'확인필요',cls:'chk',kind:'',reason:'사업자번호 자릿수 오류',match:''};
   else return null;
   if(!known(b)&&!bizOk(b))return {v:'확인필요',cls:'chk',kind:'',reason:'원천에 없고 사업자번호 형식 오류 — 번호 확인',match:fmtBiz(b)};
-  const item=String(cell.item||'').trim(),want=item?itemIdx(item):null,miss=want?want.filter(w=>!w.idx.length).map(w=>w.q):[];
   const bad=isHosp(b)&&item&&(!want||miss.length);   // 병원인데 적은 품목을 못 찾음 → 품목 없이 판정하지 않는다
   const r=judge(b,bad?null:want),l=r.l||D.L[b],cm=l?l[4]:[];
   const out={kind:r.kind,v:r.v,cls:r.cls,reason:note+r.reason,match:`${nameOf(b)} (${fmtBiz(b)})`,
