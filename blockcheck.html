@@ -53,6 +53,10 @@ dt{color:var(--gray4);font-size:13px}dd{margin:0;min-width:0;overflow-wrap:anywh
 .grp h3{margin:0 0 5px;font-size:14px}
 .grp ul{margin:0;padding-left:18px;font-size:13px}
 .grp .flat{font-size:13px;color:var(--gray4);margin:4px 0 0}
+details.grp>summary{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:center}
+details.grp>summary::-webkit-details-marker{display:none}
+.grp.cf{background:var(--blue-lt)}
+.grp.cf h3{font-size:13px;color:var(--blue)}
 .ft{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:9px 14px;border-top:1px solid var(--gray2);background:var(--gray1);flex-wrap:wrap}
 .ft span{font-size:13px;color:var(--gray4);flex:1;min-width:0}
 .pick{display:flex;flex-direction:column}
@@ -126,7 +130,7 @@ details.rules ul{padding-left:18px;margin:6px 0 0}
     <summary>판정 기준</summary>
     <ul>
       <li><b>로컬</b> — 다른 CSO 코드가 이미 생성(마스터·채널매핑 CSO업체) → 불가 / 담당 최두현(오픈블록 이관처) → 가능 / 그 외 현 담당자 있음 → 불가 / 담당 없음(비거래처) → 가능</li>
-      <li><b>병원</b> — 품목별 판정. 기 코드생성 품목 → 불가 / 네트워크 오픈(O) → 가능 / 협의필요(한올·CSO) → 협의필요 / 네트워크 미오픈 → 불가</li>
+      <li><b>병원</b> — 품목별 판정. 기 코드생성 품목 → 불가 / 네트워크 오픈(O) → 가능 / 협의필요(한올·CSO) → 협의필요 / 네트워크 미오픈 → 불가. 단 <b>네트워크 오픈 목록이 비었거나 몇 개뿐인 병원</b>(조사가 안 된 병원)은 목록에 없는 품목을 '불가'가 아니라 <b>'확인필요'</b>로 표시하고 영업관리 컨펌 이력(CSO컨펌(병원) 최근 기록)을 함께 보여 줍니다.</li>
       <li>병원 여부: 네트워크 오픈 목록에 있거나, 채널에 '병원'이 있거나, 병원 품목 매출이 있으면 병원으로 봅니다. 카드에서 로컬/병원 판정을 바꿔볼 수 있습니다.</li>
       <li><b>확인필요</b> — 원천에 없는 번호 중 사업자번호 형식 오류이거나 같은 이름 거래처가 따로 있는 경우, 거래처명이 여러 곳과 같거나 정확히 일치하지 않는 경우, 요청 품목명을 찾지 못했거나 요청 품목 중 일부만 가능한 경우(엑셀 일괄). 사유 칸을 보고 사업자번호·품목으로 다시 확인해 주세요.</li>
       <li>원 판정 규칙: 최인경 지부장 'CSO 거래가능 조회'. 기준 데이터: 영업관리 CSO거래처관리데이터(2주 갱신).</li>
@@ -188,8 +192,8 @@ function ready(){
 /* ── 판정(원 규칙 그대로) ── */
 const W=[1,3,7,1,3,7,1,3,5];
 function bizOk(b){const d=[...b].map(Number);let s=0;for(let i=0;i<9;i++)s+=d[i]*W[i];s+=Math.floor(d[8]*5/10);return (10-s%10)%10===d[9]}
-function known(b){return !!(D.L[b]||D.H[b])}
-function isHosp(b){const h=D.H[b],l=D.L[b];if(h&&(Object.keys(h.o).length||Object.keys(h.w).length||Object.keys(h.h).length))return true;if(l&&l[4].some(r=>r[2].includes('병원')))return true;return false}
+function known(b){return !!(D.L[b]||D.H[b]||(D.C&&D.C[b]))}
+function isHosp(b){const h=D.H[b],l=D.L[b];if(h&&(Object.keys(h.o).length||Object.keys(h.w).length||Object.keys(h.h).length))return true;if(l&&l[4].some(r=>r[2].includes('병원')))return true;if(D.C&&D.C[b])return true;return false}   // 영업관리 병원 컨펌 이력이 있으면 병원
 function nameOf(b){const l=D.L[b],h=D.H[b];return (l&&l[0])||(h&&h.n)||'(이름 정보 없음)'}
 function judgeLocal(b){
   const l=D.L[b]||['','','',0,[],[]];const cm=l[4],ms=l[5];
@@ -201,21 +205,28 @@ function judgeLocal(b){
   else{const who=[...new Set(cm.filter(r=>r[1]!=='최두현').map(r=>r[0]+' '+r[1]))];v='불가';cls='no';reason='현 담당자가 관리 중 ('+who.join(', ')+')'}
   return {kind:'로컬',b,v,cls,reason,l,cso};
 }
+/* 네트워크 오픈 목록이 FULL개 이상 채워진 병원(10.15판 798곳)만 '목록에 없음 = 미오픈 = 불가'로 본다.
+   목록이 비었거나 몇 개뿐인 병원(1,075곳)은 조사가 안 된 것 — 불가 대신 '확인필요' + 영업관리 컨펌 이력 표시(10-24 박본님 1안) */
+const FULL=30;
 function judgeHosp(b){
-  const h=D.H[b]||{n:'',b:'',o:{},d:{},w:{},h:{}};
-  const g={가능:[],협의필요:[],불가:[]},nx=[],per={};
+  const h=D.H[b]||{n:'',b:'',o:{},d:{},w:{},h:{}},l=D.L[b];
+  // 목록이 빈 병원이라도 다른 CSO 코드(마스터·채널매핑)가 있으면 로컬 규칙처럼 불가 — 코드도 없을 때만 확인필요
+  const cso=l?[...new Set([...l[5].map(m=>m[0]),...l[4].map(r=>r[5])].filter(Boolean))]:[];
+  const thin=Object.keys(h.o).length<FULL,sparse=thin&&!cso.length;
+  const g={가능:[],협의필요:[],확인필요:[],불가:[]},nx=[],per={};
   D.items.forEach((nm,i)=>{
     const sales=`DW ${won(h.w[i])} / HA ${won(h.h[i])}`,f=h.o[i];
     if(h.d[i]){g.불가.push(`${nm} — 기 코드생성: ${h.d[i][0]} (${ymd(h.d[i][1])})`);per[i]='불가'}
     else if(f==='O'){g.가능.push(`${nm} — 네트워크 오픈 · ${sales}`);per[i]='가능'}
     else if(f==='H'||f==='C'){g.협의필요.push(`${nm} — 협의필요(${f==='H'?'한올':'CSO'}) · ${sales}`);per[i]='협의필요'}
-    else if(h.w[i]||h.h[i]){g.불가.push(`${nm} — 네트워크 미오픈, 현 매출 有 · ${sales}`);per[i]='불가'}
-    else{nx.push(nm);per[i]='불가'}
+    else if(h.w[i]||h.h[i]){if(sparse){g.확인필요.push(`${nm} — 네트워크 목록 없음, 현 매출 有 · ${sales}`);per[i]='확인필요'}else{g.불가.push(`${nm} — ${thin?'다른 CSO 코드 보유':'네트워크 미오픈'}, 현 매출 有 · ${sales}`);per[i]='불가'}}
+    else{nx.push(nm);per[i]=sparse?'확인필요':'불가'}
   });
   let v,cls;
-  if(g.가능.length){v=`가능 ${g.가능.length}품목`;cls='ok'}else if(g.협의필요.length){v='협의필요';cls='warn'}else{v='전 품목 불가';cls='no'}
-  return {kind:'병원',b,v,cls,h,g,nx,per,l:D.L[b]};
+  if(g.가능.length){v=`가능 ${g.가능.length}품목`;cls='ok'}else if(g.협의필요.length){v='협의필요';cls='warn'}else if(sparse){v='확인필요';cls='chk'}else{v='전 품목 불가';cls='no'}
+  return {kind:'병원',b,v,cls,h,g,nx,per,sparse,thin,cso,cf:(D.C&&D.C[b])||[],l};
 }
+const cfText=c=>`${ymd(c[0])} · ${c[3]||'품목 미기재'} · ${c[4]||'-'}${c[5]?' (코드생성 '+c[5]+')':''} · ${c[1]}${c[2]?'/'+c[2]:''}${c[6]?' · '+c[6]:''}`;   // 영업관리 컨펌 1건 요약
 function judge(b){return isHosp(b)?judgeHosp(b):judgeLocal(b)}
 function replyText(r){
   const nm=nameOf(r.b),id=nm.startsWith('(')?`거래처(${fmtBiz(r.b)})`:`${nm}(${fmtBiz(r.b)})`;
@@ -224,8 +235,9 @@ function replyText(r){
     if(r.cso.length)return `문의주신 ${id}은(는) 타 CSO 업체 코드가 이미 생성되어 있어 거래가 어렵습니다.`;
     return `문의주신 ${id}은(는) 현재 한올바이오파마 담당자가 관리 중인 거래처로 거래가 어렵습니다.`;
   }
-  if(r.g.가능.length)return `문의주신 ${id}은(는) ${r.g.가능.map(x=>x.split(' — ')[0]).join(', ')} 품목 거래 진행 가능합니다.`;
+  if(r.g.가능.length)return `문의주신 ${id}은(는) ${r.g.가능.map(x=>x.split(' — ')[0]).join(', ')} 품목 거래 진행 가능합니다.`+(r.sparse?' 그 외 품목은 확인 후 안내드리겠습니다.':'');
   if(r.g.협의필요.length)return `문의주신 ${id}은(는) 일부 품목 협의가 필요합니다. 확인 후 다시 안내드리겠습니다.`;
+  if(r.sparse)return `문의주신 ${id}은(는) 품목별 거래 가능 여부를 확인 후 다시 안내드리겠습니다.`;
   return `문의주신 ${id}은(는) 현재 거래 가능한 품목이 없습니다.`;
 }
 
@@ -244,15 +256,21 @@ function card(r){
     </dl>`;
   }else{
     const cm=l?l[4]:[];
-    const grp=(k,cls,arr)=>`<div class="grp"><h3><span class="pill ${cls}">${k} ${arr.length}</span></h3>${arr.length?'<ul>'+arr.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':''}</div>`;
+    // 품목 그룹 — 8개 넘으면 접어서 숫자만(불가 169개를 한 덩어리로 늘어놓지 않게)
+    const grp=(k,cls,arr,flatLabel,flat,note)=>{
+      flat=flat||[];const n=arr.length+flat.length;if(!n&&k!=='가능')return '';
+      const inner=(note?`<p class="flat">${note}</p>`:'')+(arr.length?'<ul>'+arr.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':'')+(flat.length?`<p class="flat">${flatLabel} ${flat.length}품목: ${flat.map(esc).join(', ')}</p>`:'');
+      return n>8?`<details class="grp"><summary><span class="pill ${cls}">${k} ${n}</span><span class="hint">펼쳐 보기</span></summary>${inner}</details>`:`<div class="grp"><h3><span class="pill ${cls}">${k} ${n}</span></h3>${inner}</div>`;
+    };
+    const cf=r.cf.length?`<div class="grp cf"><h3>영업관리 컨펌 이력 <span class="hint">최근 ${Math.min(3,r.cf.length)}건 · CSO컨펌(병원)</span></h3><ul>${r.cf.slice(0,3).map(c=>`<li>${esc(cfText(c))}</li>`).join('')}</ul></div>`:'';
     body=`<dl>
       <dt>블록</dt><dd>${esc((l&&l[2])||'-')}</dd>
       <dt>현 담당</dt><dd>${cm.length?[...new Set(cm.map(c=>c[0]+' '+c[1]))].map(esc).join(', '):'없음'}</dd>
       ${l&&l[5].length?`<dt>CSO 코드 보유</dt><dd>${l[5].map(m=>esc(m[0])+' — '+esc(m[1]||'-')).join('<br>')}</dd>`:''}
-    </dl>${grp('가능','ok',r.g.가능)}${grp('협의필요','warn',r.g.협의필요)}
-      <div class="grp"><h3><span class="pill no">불가 ${r.g.불가.length+r.nx.length}</span></h3>
-        ${r.g.불가.length?'<ul>'+r.g.불가.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':''}
-        ${r.nx.length?`<p class="flat">네트워크 미오픈 ${r.nx.length}품목: ${r.nx.map(esc).join(', ')}</p>`:''}</div>`;
+    </dl>${r.sparse?`<div class="reason chk">이 병원은 네트워크 오픈 품목 목록이 ${Object.keys(r.h.o).length?`${Object.keys(r.h.o).length}개뿐이라`:'없어'} 목록에 없는 품목은 '확인필요'로 표시합니다 — 영업관리 컨펌 이력을 참고해 확인해 주세요.</div>`:''}${cf}
+      ${grp('가능','ok',r.g.가능)}${grp('협의필요','warn',r.g.협의필요)}
+      ${r.sparse?grp('확인필요','chk',r.g.확인필요,'네트워크 목록 없음',r.nx):''}
+      ${grp('불가','no',r.g.불가,r.thin?`다른 CSO 코드 보유(${r.cso.join(', ')})로 불가 — 품목 범위는 마스터 확인`:'네트워크 미오픈',r.sparse?[]:r.nx)}`;
   }
   const rt=replyText(r);
   el.innerHTML=`<div class="ch"><div><h2>${esc(nm)}</h2><div class="sub">${fmtBiz(r.b)} · ${r.kind}</div></div>
@@ -315,7 +333,7 @@ const LIB_X='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js
 const LIB_E='https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';
 const HK={biz:['사업자번호','사업자등록번호','사업자','등록번호'],name:['거래처명','거래처','병원명','요양기관명','기관명','상호명','상호','실납처명','처방처','의원명','병의원','약국명'],addr:['주소','소재지'],item:['품목','제품']};
 const HX=/업체|대표|코드|담당/;   // 업체(CSO 자신)·대표자·코드 열은 거래처 열로 잡지 않는다
-const OUTCOLS=['블럭판정','구분','사유','가능 품목','협의 품목','현 담당','코드생성 CSO','매칭 거래처','회신 문구'];
+const OUTCOLS=['블럭판정','구분','사유','가능 품목','협의 품목','현 담당','코드생성 CSO','매칭 거래처','회신 문구','영업관리 컨펌(최근)'];
 async function onFile(f){
   if(!f)return;
   $('#st2').textContent='';$('#xres').hidden=true;$('#xmap').hidden=true;
@@ -407,7 +425,7 @@ function judgeRow(cell){
   const r=judge(b),l=r.l||D.L[b],cm=l?l[4]:[];
   const who=[...new Set(cm.map(c=>c[0]+' '+c[1]))].join(', ');
   const cso=[...new Set([...(l?l[5].map(m=>m[0]):[]),...cm.map(c=>c[5])].filter(Boolean))].join(', ');
-  const out={kind:r.kind,match:`${nameOf(b)} (${fmtBiz(b)})`,who,cso,reply:replyText(r),can:'',hyo:''};
+  const out={kind:r.kind,match:`${nameOf(b)} (${fmtBiz(b)})`,who,cso,reply:replyText(r),can:'',hyo:'',cf:(D.C&&D.C[b]&&D.C[b][0])?cfText(D.C[b][0]):''};
   if(r.kind==='로컬'){Object.assign(out,{v:r.v,cls:r.cls,reason:note+r.reason})}
   else{
     const nm=s=>s.split(' — ')[0];
@@ -419,12 +437,13 @@ function judgeRow(cell){
     }else if(want){   // 요청 품목에 걸린 제품이 전부 같은 판정일 때만 그 판정, 섞이면 확인필요(품목별 내역 표시)
       const idx=[...new Set(want.flatMap(w=>w.idx))],vs=[...new Set(idx.map(i=>r.per[i]))];
       const v=vs.length===1?vs[0]:(!vs.includes('가능')&&vs.includes('협의필요'))?'협의필요':'확인필요';
-      Object.assign(out,{v,cls:v==='가능'?'ok':v==='협의필요'?'warn':v==='불가'?'no':'chk',reason:note+(v==='확인필요'?'요청 품목 중 일부만 가능 — ':'요청 품목 ')+idx.map(i=>D.items[i]+'='+r.per[i]).join(', ')});
+      const pre=v!=='확인필요'?'요청 품목 ':vs.includes('확인필요')?'네트워크 목록에 없는 품목 포함 — 영업관리 컨펌 확인 · ':'요청 품목 중 일부만 가능 — ';
+      Object.assign(out,{v,cls:v==='가능'?'ok':v==='협의필요'?'warn':v==='불가'?'no':'chk',reason:note+pre+idx.map(i=>D.items[i]+'='+r.per[i]).join(', ')});
       const nmb=nameOf(b),id=nmb.startsWith('(')?`거래처(${fmtBiz(b)})`:`${nmb}(${fmtBiz(b)})`,its=idx.map(i=>D.items[i]).join(', ');   // 회신 문구도 요청 품목 기준
       out.reply=v==='가능'?`문의주신 ${id}은(는) ${its} 품목 거래 진행 가능합니다.`:v==='불가'?`문의주신 ${id}의 요청 품목(${its})은 현재 거래가 어렵습니다.`:v==='협의필요'?`문의주신 ${id}의 요청 품목은 협의가 필요합니다. 확인 후 다시 안내드리겠습니다.`:'';
     }else{
-      const v=r.cls==='ok'?'가능':r.cls==='warn'?'협의필요':'불가';
-      Object.assign(out,{v,cls:r.cls,reason:note+`병원 품목별: 가능 ${r.g.가능.length} · 협의 ${r.g.협의필요.length} · 불가 ${r.g.불가.length+r.nx.length}`});
+      const v=r.cls==='ok'?'가능':r.cls==='warn'?'협의필요':r.cls==='chk'?'확인필요':'불가';
+      Object.assign(out,{v,cls:r.cls,reason:note+`병원 품목별: 가능 ${r.g.가능.length} · 협의 ${r.g.협의필요.length} · `+(r.sparse?`확인필요 ${r.g.확인필요.length+r.nx.length}(네트워크 목록 없음 — 영업관리 컨펌 확인) · 불가 ${r.g.불가.length}`:`불가 ${r.g.불가.length+r.nx.length}`)});
     }
   }
   return out;
@@ -456,7 +475,7 @@ function draw2(){
   $('#xmore').hidden=rows.length<=XN;$('#xmore').textContent=`더 보기 (${rows.length-XN}건 남음)`;
 }
 const FILL={ok:'FFDFF3E4',no:'FFFDE8E8',warn:'FFFDF1DF',chk:'FFECECF0'},FONT={ok:'FF248A3D',no:'FFD70015',warn:'FFC76B00',chk:'FF6E6E73'};
-function outVals(r){return [r.v,r.kind,r.reason,r.can||'',r.hyo||'',r.who||'',r.cso||'',r.match||'',r.reply||'']}
+function outVals(r){return [r.v,r.kind,r.reason,r.can||'',r.hyo||'',r.who||'',r.cso||'',r.match||'',r.reply||'',r.cf||'']}
 async function download(){
   const btn=$('#xdl');btn.disabled=true;$('#st2').textContent='만드는 중…';
   try{
@@ -477,7 +496,7 @@ async function download(){
       const rr=r.i+base;
       outVals(r).forEach((v,j)=>{const c=ws.getCell(rr,c1+j);c.value=v;if(j===0){c.fill={type:'pattern',pattern:'solid',fgColor:{argb:FILL[r.cls]}};c.font={bold:true,color:{argb:FONT[r.cls]}}}if(j===2||j===8)c.alignment={wrapText:false}});
     });
-    [10,7,48,30,22,22,22,30,60].forEach((w,j)=>ws.getColumn(c1+j).width=w);
+    [10,7,48,30,22,22,22,30,60,48].forEach((w,j)=>ws.getColumn(c1+j).width=w);
     const sm=wb.addWorksheet('조회요약');
     const cnt=k=>XROWS.filter(r=>r.v===k).length;
     [['CSO 블럭 조회 결과'],['원본 파일',XL.file.name],['원본 시트',sh.n],['조회 일시',new Date().toLocaleString('ko-KR')],['기준 데이터',`CSO거래처관리데이터 ${D.meta['기준일']}`],['병원 판정',D.meta['병원판정']||''],[],['구분','건수'],['전체',XROWS.length],['가능',cnt('가능')],['불가',cnt('불가')],['협의필요',cnt('협의필요')],['확인필요',cnt('확인필요')],[],['※ 확인필요 = 사업자번호 오류이거나 거래처명이 여러 곳과 같거나 정확히 일치하지 않는 건 — 사업자번호로 다시 확인'],['※ 판정 기준 = 최인경 지부장 CSO 거래가능 조회 규칙(로컬: 타 CSO 코드·현 담당 / 병원: 품목별 네트워크 오픈)']].forEach(r=>sm.addRow(r));
