@@ -240,11 +240,13 @@ async function sendToSheets() {
         .withSuccessHandler(function(result) {
           if (result && result.success) {
             toast(`✅ 전송 완료! ${result.message || ''}`);
+            showSendResult(result.message || '', true);   // [v53]
             btn.textContent = '✅ 전송 완료';
             // 마감예측 성공 시: 목표를 보냈으면 목표 확정(읽기전용) 전환 — 백엔드 목표확정일·잠금 기록과 동기
             finalizeSend();
           } else {
             toast(`⚠️ 서버 응답: ${result ? result.message : '알 수 없는 오류'}`);
+            showSendResult(result ? result.message : '', false);   // [v53]
             btn.textContent = '⚠️ 확인 필요';
           }
           btn.disabled = false;
@@ -285,9 +287,11 @@ async function sendToSheets() {
       } else if (serverOk === true) {
         finalizeSend();
         toast('✅ ' + (serverMsg || '전송 완료'));
+        showSendResult(serverMsg, true);   // [v53]
         btn.textContent = '✅ 전송 완료';
       } else if (serverOk === false) {
         toast('⚠️ ' + (serverMsg || '서버가 저장을 거부했습니다 — 내용 확인 후 다시 전송하세요'));
+        showSendResult(serverMsg, false);   // [v53]
         btn.textContent = '⚠️ 확인 필요';
       } else {
         // 서버 upsert(지부장+일자+키)라 다시 보내도 행이 중복되지 않는다 → 재전송을 권장한다
@@ -728,6 +732,7 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
   <button class="btn-grn" onclick="saveExcel()">💾 Excel 백업</button>
   <button class="btn-main" onclick="openEmail()">📧 이메일 보고</button>
 </div>
+<div id="send-result" style="display:none;margin:8px 0 0;padding:8px 12px;border-radius:8px;font-size:13px;line-height:1.5;white-space:pre-wrap"></div>
 
 <!-- 이메일 모달 -->
 <div class="mbg" id="email-modal">
@@ -761,7 +766,7 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
       <div class="row2">
         <div class="ig full ac-wrap">
           <label>병원명 * <span style="font-size:10px;color:var(--gray3);font-weight:400">마스터 자동완성</span></label>
-          <input type="text" id="nb-h" placeholder="예) 서울아산병원" autocomplete="off" oninput="acSearch('nb',this.value)" onkeydown="acKey('nb',event)">
+          <input type="text" id="nb-h" placeholder="예) 서울아산병원" autocomplete="off" oninput="acSearch('nb',this.value);nbMultiHint()" onkeydown="acKey('nb',event)">
           <div class="ac-list" id="ac-nb"></div>
           <div id="nb-matchinfo" style="font-size:11px;margin-top:4px"></div>
         </div>
@@ -771,10 +776,12 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
             <span>🏥 <b>110대 병원</b> 해당 <span style="font-size:11px;color:var(--gray3);font-weight:400">(자동채움/수동)</span></span>
           </label>
         </div>
-        <div class="ig"><label>사업자번호 <span style="font-size:10px;color:var(--gray3);font-weight:400">자동채움</span></label><input type="text" id="nb-biz" placeholder="자동 또는 직접입력"></div>
+        <div class="ig"><label>사업자번호 <span style="font-size:10px;color:var(--gray3);font-weight:400">자동채움</span></label><input type="text" id="nb-biz" placeholder="자동 또는 직접입력" oninput="nbMultiHint()"></div>
         <div class="ig"><label>시군구 <span style="font-size:10px;color:var(--gray3);font-weight:400">자동채움</span></label><input type="text" id="nb-sgg" placeholder="자동 또는 직접입력"></div>
-        <div class="ig full"><label>기준품명 *</label><input type="text" id="nb-p" placeholder="예) 프레논OD정"></div>
-        <div class="ig"><label>CSO 업체명</label><input type="text" id="nb-c" placeholder="업체명 검색 또는 직접 입력" list="vendor-list" autocomplete="off"></div>
+        <div class="ig full"><label>기준품명 *</label><input type="text" id="nb-p" placeholder="예) 프레논OD정" oninput="nbMultiHint()"></div>
+        <!-- [v53] 복수오픈 사전 안내 — 같은 병원·품목이 이미 진행 중이면 업체·단계와 등록 가능 여부를 전송 전에 보여 준다 -->
+        <div class="ig full" id="nb-multi" style="display:none;margin-top:-6px;padding:8px 12px;background:#eff5fe;border:1.5px solid #93c5fd;border-radius:8px;font-size:12px;line-height:1.55"></div>
+        <div class="ig"><label>CSO 업체명</label><input type="text" id="nb-c" placeholder="업체명 검색 또는 직접 입력" list="vendor-list" autocomplete="off" oninput="nbMultiHint()"></div>
         <div class="ig"><label>업체 사업자번호 <span style="font-size:10px;color:var(--gray3);font-weight:400">CSO 사업자(J열)</span></label><input type="text" id="nb-cbiz" placeholder="000-00-00000"></div>
         <div class="ig"><label>CSO 연락처</label><input type="text" id="nb-ct" placeholder="010-0000-0000"></div>
         <div class="ig"><label>MBO (만원)</label><input type="number" inputmode="numeric" id="nb-m" placeholder="예) 500" oninput="nbMboHint(this.value)">
@@ -783,7 +790,7 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
         <div class="ig"><label>코딩예측월</label><input type="month" id="nb-cd"></div>
         <div class="ig full"><label>상정과/KOL <span style="font-size:10px;color:var(--gray3);font-weight:400">상정과 및 담당 DR</span></label><input type="text" id="nb-kol" placeholder="예) 내과 / 홍길동 DR"></div>
         <div class="ig"><label>신약과정</label>
-          <select id="nb-st"><option value="">-- 선택 --</option><option>미시작</option><option>업체확인(DC진행여부)</option><option>서류준비</option><option>DC신청</option><option>DC통과</option><option>코딩</option><option>처방</option></select>
+          <select id="nb-st" onchange="nbMultiHint()"><option value="">-- 선택 --</option><option>미시작</option><option>업체확인(DC진행여부)</option><option>서류준비</option><option>DC신청</option><option>DC통과</option><option>코딩</option><option>처방</option></select>
         </div>
         <div class="ig"><label>이슈상태</label>
           <select id="nb-iss" onchange="paintIssueSelect(this)"><option value="">-- 선택 --</option><option>정상</option><option>DC지연</option><option>오픈블럭</option><option>DC실패(재도전)</option><option>DC실패(종결)</option><option>업체변경</option></select>
@@ -1130,6 +1137,7 @@ function migrateIssue(v){if(v==='🟢')return'정상';if(v==='🟡')return'DC지
 function paintIssueSelect(sel){sel.className='iss-sel '+(sel.value?sel.value.replace(/[()]/g,''):'');}
 
 let data=[],rpm='',items=[];              // items = 신약진행 보고 대상(자동표시+검색추가)
+let multiOpen=[];                          // [v53] 복수오픈 진행 행(서버 getMboData.multiOpen, 종료 제외) — 신규 블럭 모달 사전 안내용
 /* [fix1-H1] 이번 세션에 실제로 전송된 신약 건 — 전송 후 이메일·엑셀에서 신약이 사라지지 않게 한다 */
 let lastSentItems=[], lastSentDate='';
 let volumeUp=[];                           // ④ 볼륨업 행
@@ -1199,6 +1207,7 @@ function loadFromGAS(){
         업체_이전값:   r['업체_이전값']||'',
         업체_변경일:   r['업체_변경일']||''
       }));
+      multiOpen=((res.multiOpen)||(res.data&&res.data.multiOpen)||[]).filter(r=>String(r['상태']||'').trim()!=='종료');   // [v53]
 
       buildHospitalMaster();
       hd.textContent='✅ 데이터 연결 완료';
@@ -1399,6 +1408,39 @@ function normVendorKey(v){
   s=s.replace(/㈜|\(\s*주\s*\)|주\s*\)|주식회사|유한회사/g,'');
   s=s.replace(/[\s​()（）.·,\-]/g,'');
   return s.toLowerCase();
+}
+/* ── [v53] 복수오픈 사전 안내 — 서버 normProd_와 같은 규칙(제형·용량·괄호 제거)으로 같은 병원·품목의 진행 업체를 찾아 보여 준다 ── */
+const PFORM=/(연질캡슐|경질캡슐|서방정|장용정|나정|산제|건조시럽|시럽|주사|캡슐|정|환|산|액|겔|크림|패치|ODT|OD장|OD정|OD)$/i;
+function normProdC(v){let s=String(v==null?'':v).replace(/\([^)]*\)/g,'').replace(/（[^）]*）/g,'').replace(/[\s​]/g,'');
+  s=s.replace(PFORM,'');s=s.replace(/\d+(\.\d+)?\s*(㎍|mcg|mg|g|iu|ml|㎎|㎖|㎕|㎏|kg|%)?/gi,'');s=s.replace(PFORM,'');s=s.replace(PFORM,'');s=s.replace(/[,\/].*$/,'');return s.replace(/[\s​]/g,'').toLowerCase();}
+function nbMultiHint(){
+  const el=document.getElementById('nb-multi'); if(!el) return;
+  const h=V('nb-h'), p=V('nb-p'), biz=normBiz(V('nb-biz')), v=V('nb-c');
+  if(!p||(!h&&!biz)){el.style.display='none';return;}
+  const np=normProdC(p), nh=normHosp(h);
+  const same=(pr,bz,hs)=>normProdC(pr)===np && ((biz&&normBiz(bz))?normBiz(bz)===biz:(!!nh&&normHosp(hs)===nh));
+  const rep=data.filter(d=>same(d.기준품명,d.사업자번호,d.실납처명))[0];
+  if(!rep){el.style.display='none';return;}
+  const subs=multiOpen.filter(r=>same(r['기준품명'],r['사업자번호'],r['실납처명']));
+  const vendors=[{v:rep.업체명,s:rep.신약과정,r:rep.담당RPM,rep:true}].concat(subs.map(r=>({v:r['업체명'],s:r['신약과정'],r:r['담당RPM']})));
+  const si=s=>STAGES.indexOf(String(s||'').trim());
+  const list=vendors.map(x=>`${esc(x.v||'(업체 미기재)')} <span style="color:var(--gray3)">${esc(x.s||'단계 미입력')}${x.r?' · '+esc(x.r):''}</span>${x.rep?' <b style="color:#1a4fa0">대표</b>':''}`).join(' / ');
+  const mine=v?vendors.filter(x=>normVendorKey(x.v)===normVendorKey(v))[0]:null;
+  let verdict;
+  if(!v) verdict='<span style="color:#92400e">업체명을 적으면 등록 가능 여부를 보여 줍니다</span>';
+  else if(mine) verdict=`<span style="color:#166534">✔ ${esc(v)}는 이미 이 블럭의 ${mine.rep?'대표':'복수오픈'} 업체 — 전송하면 진행 갱신으로 저장됩니다</span>`;
+  else if(vendors.some(x=>si(x.s)>=5)) verdict='<span style="color:#b91c1c">⛔ 이미 코딩·처방 단계 — 다른 업체는 추가할 수 없습니다(업체 교체면 이슈상태 "업체변경")</span>';
+  else if(vendors.some(x=>si(x.s)>=3)) verdict='<span style="color:#b91c1c">⛔ DC접수 완료 — 다른 업체는 추가할 수 없습니다</span>';
+  else if(vendors.length>=3) verdict='<span style="color:#b91c1c">⛔ 이미 3곳 진행 중 — 추가할 수 없습니다</span>';
+  else verdict=`<span style="color:#92400e">↳ 전송하면 <b>복수오픈 ${vendors.length+1}/3</b>으로 등록됩니다 — DC접수한 업체가 대표가 되고, 먼저 코딩한 업체를 인정합니다(나머지 자동 종료)</span>`;
+  el.innerHTML=`<b>이 병원·품목 진행 중:</b> ${list}<br>${verdict}`; el.style.display='block';
+}
+/* [v53] 전송 결과를 토스트(2.4초)와 별도로 남겨 둔다 — 복수오픈 등록·추가 불가 안내를 놓치지 않게 */
+function showSendResult(msg,ok){
+  const el=document.getElementById('send-result'); if(!el) return;
+  if(!msg){el.style.display='none';return;}
+  el.textContent=msg; el.style.display='block';
+  el.style.background=ok?'#f0fdf4':'#fff7ed'; el.style.border='1.5px solid '+(ok?'#86efac':'#fdba74'); el.style.color=ok?'#166534':'#9a3412';
 }
 function myDir(){ if(!crm||!Array.isArray(crm.directors))return null; return crm.directors.filter(d=>d&&d.name===rpm)[0]||null; }
 function crmMeta(){ return (crm&&crm.meta)||{}; }
@@ -2225,6 +2267,7 @@ function acPick(ctx,idx){
     document.getElementById('nb-sgg').value=h.시군구||'';
     document.getElementById('nb-is110').checked=!!h.is110;
     document.getElementById('nb-matchinfo').innerHTML='<span style="color:#166534">✅ 마스터 매칭 — 사업자번호·110대·지역 자동채움</span>';
+    nbMultiHint();   // [v53]
   }
   // [fix1-M8] 볼륨업(ctx='vu0','vu1'…)은 아래 래퍼가 처리한다. 여기선 존재하는 박스만 닫는다.
   const _box=document.getElementById('ac-'+ctx); if(_box) _box.style.display='none';
@@ -2263,6 +2306,7 @@ function addNB(){
   nbMboHint('');   // [fix6] MBO 환산 힌트·경고 초기화
   document.getElementById('nb-st').value='';
   document.getElementById('nb-matchinfo').innerHTML='';
+  {const _nm=document.getElementById('nb-multi');if(_nm)_nm.style.display='none';}   // [v53]
   const iss=document.getElementById('nb-iss');if(iss){iss.value='';paintIssueSelect(iss);}
   closeMd('nb-modal');renderList();toast(`✅ ${h} 신규 블럭 추가됨${m.미등록==='미등록'?' (미등록)':''}`);
 }

@@ -8,7 +8,7 @@ try{var m=location.hash.match(/[#&]tok=([^&]+)/);if(m){window.__gateT=m[1];try{s
 window.__gateTok=function(){if(window.__gateT)return window.__gateT;try{return sessionStorage.getItem("gate_tok")||"";}catch(e){return "";}};
 window.__gateQ=function(){var t=window.__gateTok();return t?("&tok="+encodeURIComponent(t)):"";};
 /* [v52] 🔎 CSO 블럭 조회 — 누르는 순간에만 토큰을 붙이고 곧바로 뗀다(우클릭 '링크 복사'·끌어다 놓기로 8시간 토큰이 새지 않게). 만료(5분 전 포함)면 이 탭부터 다시 로그인 */
-window.__bcOpen=function(a){var t=window.__gateTok(),x=0;try{x=+atob(t.split(".")[0].replace(/-/g,"+").replace(/_/g,"/")).split("|")[2];}catch(e){}if(!t||x*1000<Date.now()+300000){window.__gateGo("expired");return false;}a.href="blockcheck.html?v=20261024f#tok="+t;setTimeout(function(){a.href="blockcheck.html";},0);return true;};
+window.__bcOpen=function(a){var t=window.__gateTok(),x=0;try{x=+atob(t.split(".")[0].replace(/-/g,"+").replace(/_/g,"/")).split("|")[2];}catch(e){}if(!t||x*1000<Date.now()+300000){window.__gateGo("expired");return false;}a.href="blockcheck.html?v=20261024g#tok="+t;setTimeout(function(){a.href="blockcheck.html";},0);return true;};
 window.__gateGo=function(reason){var n=0;try{n=Number(sessionStorage.getItem("gate_redir")||0);if(Date.now()-Number(sessionStorage.getItem("gate_redir_t")||0)>120000)n=0;sessionStorage.setItem("gate_redir",String(n+1));sessionStorage.setItem("gate_redir_t",String(Date.now()));}catch(e){}if(n>=3){alert("계정 확인 페이지로 이동이 반복되고 있습니다("+(reason||"")+"). 잠시 후 다시 열거나 담당자에게 알려 주세요.");return;}try{sessionStorage.removeItem("gate_tok");}catch(e){}window.__gateT="";location.replace(GATE+"?doc="+DOC);};
 window.__gateGuard=function(res){if(!res||res.auth!=="required")return false;if(res.reason==="not_allowed"){alert("이 계정은 열람 권한이 없습니다. 담당자에게 요청해 주세요.");return true;}window.__gateGo(res.reason);return true;};
 /* [v46] 대시보드 내장데이터(110대 실적·마스터·과정관리)는 공개 파일이 아니라 D ?doc=dashdata 로 받는다(dash 토큰). 수신 전엔 crm 자동로드·과정관리 초기화를 기다린다 */
@@ -63,6 +63,7 @@ function loadFromSheets() {
     const rows = (data.data && Array.isArray(data.data)) ? data.data : (data.data && data.data.data) || data.data;
     // 빈블럭 데이터 저장 (이중래핑 또는 단일래핑 모두 처리)
     emptyBlockData = (data.data && data.data.emptyBlock) || data.emptyBlock || [];
+    multiOpenData = (data.data && data.data.multiOpen) || data.multiOpen || [];   // [v53] 복수오픈 행(진행·종료)
     if (!Array.isArray(rows)) {
       info.textContent = "❌ 응답 형식 오류 (rows is not array): " + typeof rows;
       btn.classList.remove("loading");
@@ -121,6 +122,7 @@ function loadFromSheets() {
 
 // 빈블럭 시트 데이터 저장 (실패/오픈블럭 카운트용)
 let emptyBlockData = [];
+let multiOpenData = [];   // [v53] 복수오픈 시트(2·3번째 업체) — 전체현황 '복수오픈' 카드
 function parseGsData(rows) {
   allData = rows.map((r, i) => {
     // Google Sheets에서 날짜는 Date 객체 또는 문자열로 올 수 있음
@@ -425,6 +427,11 @@ body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var
     <div class="section-card" id="aging-card">
       <h3>⏳ 정체 블럭 <span style="font-size:11px;color:var(--gray3);font-weight:400">①DC접수·코딩월 도래·30일↑ 미갱신 ②코딩예측월 미등록·60일↑ 미갱신 ③계획월 도래·서류준비前 · 처방 제외</span></h3>
       <div id="aging-body"></div>
+    </div>
+    <!-- [v53] 복수오픈 — 같은 병원·품목에 DC접수 전 업체 2~3곳, 먼저 코딩한 업체 인정 -->
+    <div class="section-card" id="multi-card">
+      <h3>🔀 복수오픈 <span style="font-size:11px;color:var(--gray3);font-weight:400">같은 병원·품목에 DC접수 전까지 업체 최대 3곳 · DC접수한 업체가 대표 · 먼저 코딩한 업체 인정(나머지 자동 종료)</span></h3>
+      <div id="multi-body"></div>
     </div>
     <div class="section-card" id="monthrep-card">
       <h3>🗓️ 월별 RPM 보고 · 신규등록 <span style="font-size:11px;color:var(--gray3);font-weight:400">보고=작성일 기준 · 신규=신청월 기준</span></h3>
@@ -1193,6 +1200,43 @@ function getFiltered(){
 function renderAll(){
   const d=getFiltered();
   renderStats(d);renderIssues(d);renderCharts(d);renderMonthlyHosp(d);renderRpmTable(d);renderMonthlyDC(d);renderWeeklySummary(d);renderTimeline(d);renderTable(d);renderPipeline(d);renderMboStage(d);renderAging(d);renderMonthlyReport();
+  try{renderMultiOpen();}catch(e){console.warn('복수오픈 카드',e);}   // [v53] 실패해도 다른 카드 렌더 무영향
+}
+/* ── [v53] 복수오픈 카드 — 복수오픈 시트(2·3번째 업체) + MBO 대표 행을 병원·품목으로 묶어 표시. 최근 30일 자동 종료도 함께 ── */
+const MB_FORM=/(연질캡슐|경질캡슐|서방정|장용정|나정|산제|건조시럽|시럽|주사|캡슐|정|환|산|액|겔|크림|패치|ODT|OD장|OD정|OD)$/i;
+function mbProd(v){let s=String(v==null?'':v).replace(/\([^)]*\)/g,'').replace(/（[^）]*）/g,'').replace(/[\s​]/g,'');   // GAS normProd_와 같은 규칙
+  s=s.replace(MB_FORM,'');s=s.replace(/\d+(\.\d+)?\s*(㎍|mcg|mg|g|iu|ml|㎎|㎖|㎕|㎏|kg|%)?/gi,'');s=s.replace(MB_FORM,'');s=s.replace(MB_FORM,'');s=s.replace(/[,\/].*$/,'');return s.replace(/[\s​]/g,'').toLowerCase();}
+function mbBiz(v){return String(v==null?'':v).replace(/[^0-9]/g,'');}
+function renderMultiOpen(){
+  const el=document.getElementById('multi-body'); if(!el) return;
+  const rows=(multiOpenData||[]).filter(r=>r&&String(r['기준품명']||'').trim());
+  if(!rows.length){el.innerHTML='<div style="color:var(--gray3);font-size:12px;padding:6px">복수오픈 블럭 없음 — 일일보고 폼에서 같은 병원·품목에 다른 업체를 등록하면 여기에 보입니다</div>';return;}
+  const key=(b,h,p)=>(mbBiz(b)||('@'+normHosp(h)))+'|'+mbProd(p);
+  const rep={};(allData||[]).forEach(d=>{const k=key(d.사업자번호,d.실납처명,d.기준품명);if(!rep[k])rep[k]=d;});
+  const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const stg=s=>s?`<span class="sb" style="background:${SC[s]||'#e2e8f0'};color:${STC[s]||'#475569'}">${esc(s)}</span>`:'<span style="color:var(--gray3)">-</span>';
+  const act={},closed=[];const cut=new Date();cut.setDate(cut.getDate()-30);const cutS=cut.toISOString().slice(0,10);
+  rows.forEach(r=>{const k=key(r['사업자번호'],r['실납처명'],r['기준품명']);
+    if(String(r['상태']||'').trim()==='종료'){if(String(r['종료일']||'').slice(0,10)>=cutS)closed.push(r);return;}
+    (act[k]||(act[k]={hosp:r['실납처명'],prod:r['기준품명'],subs:[]})).subs.push(r);});
+  const ks=Object.keys(act);
+  let h=`<div style="font-size:12px;color:var(--gray4);margin-bottom:6px">진행 중 ${ks.length}블럭 <span style="color:var(--gray3)">(복수오픈 업체 ${ks.reduce((n,k)=>n+act[k].subs.length,0)}곳 · 최근 30일 자동 종료 ${closed.length}건)</span></div>`;
+  if(ks.length){
+    h+='<div class="tbl-wrap"><table class="btbl"><thead><tr><th>병원</th><th>품목</th><th>대표 업체(단계·RPM)</th><th>복수오픈 업체(단계·RPM·등록일)</th><th>진행</th></tr></thead><tbody>';
+    ks.forEach(k=>{const a=act[k],r=rep[k];const n=1+a.subs.length;
+      const dc=[r&&r.신약과정].concat(a.subs.map(s=>s['신약과정'])).some(s=>STAGES.indexOf(String(s||'').trim())>=3);
+      h+=`<tr><td>${esc((r&&r.실납처명)||a.hosp)}${r&&r.is110?'<span class="badge-110">110대</span>':''}</td><td>${esc((r&&r.기준품명)||a.prod)}</td>
+        <td>${r?esc(r.업체명||'(업체 미기재)')+' '+stg(r.신약과정)+(r.담당RPM?' <span style="color:var(--gray3)">'+esc(r.담당RPM)+'</span>':''):'<span style="color:#b91c1c">대표 행 없음(MBO에서 삭제·이동됨)</span>'}</td>
+        <td>${a.subs.map(s=>esc(s['업체명']||'(업체 미기재)')+' '+stg(s['신약과정'])+' <span style="color:var(--gray3)">'+esc(s['담당RPM']||'')+' · '+esc(String(s['등록일']||'').slice(0,10))+'</span>').join('<br>')}</td>
+        <td style="white-space:nowrap">${n}/3${dc?' <span style="color:#b91c1c;font-weight:700">DC접수 후 — 추가 불가</span>':n>=3?' <span style="color:#b91c1c">마감</span>':''}</td></tr>`;});
+    h+='</tbody></table></div>';
+  }
+  if(closed.length){
+    h+='<details style="margin-top:8px;font-size:12px"><summary style="cursor:pointer;color:var(--gray4)">최근 30일 종료 '+closed.length+'건 보기</summary><div class="tbl-wrap"><table class="btbl"><thead><tr><th>종료일</th><th>병원</th><th>품목</th><th>업체</th><th>마지막 단계</th><th>사유</th></tr></thead><tbody>';
+    closed.sort((a,b)=>String(b['종료일']||'').localeCompare(String(a['종료일']||''))).forEach(r=>{h+=`<tr><td>${esc(String(r['종료일']||'').slice(0,10))}</td><td>${esc(r['실납처명'])}</td><td>${esc(r['기준품명'])}</td><td>${esc(r['업체명'])}</td><td>${stg(r['신약과정'])}</td><td>${esc(r['종료사유'])}</td></tr>`;});
+    h+='</tbody></table></div></details>';
+  }
+  el.innerHTML=h;
 }
 function renderStats(d){
   const total=d.length;
