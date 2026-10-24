@@ -4,8 +4,10 @@
 <meta charset="UTF-8">
 <script>/* [열람게이트] 성과보드가 #tok= 로 넘겨준 대시보드 토큰을 보관 — 데이터는 D ?doc=blockdata(JSONP)로만 받는다(공개 저장소에 데이터 없음) */
 (function(){window.__GATE="https://script.google.com/macros/s/AKfycbwTXL5bRBDXXoEN06x2OSMLq1Wqh1CFJWjYAPSWjhYAZZFxJqx30bwwgdpSFT2SndDL/exec";window.__DATA="https://script.google.com/macros/s/AKfycbyhk2el3kwGMStCvyUr-8B-PWS-6aKwcf5EVfvpryqlj3jEeLw5pnttHMEokrpQXO33dQ/exec";window.__gateT="";
-try{var m=location.hash.match(/[#&]tok=([^&]+)/);if(m){var t=m[1];try{t=decodeURIComponent(t);}catch(e){}window.__gateT=t;try{sessionStorage.setItem("gate_tok",t);}catch(e){}   /* 성과보드 버튼이 encodeURIComponent로 넘김(토큰 끝 '=' → %3D) — 풀어서 보관해야 서버 서명이 맞는다 */history.replaceState(null,"",location.pathname+location.search);}}catch(e){}
-window.__gateTok=function(){if(window.__gateT)return window.__gateT;try{return sessionStorage.getItem("gate_tok")||"";}catch(e){return "";}};
+/* 토큰(base64url·'.'·'=')에는 '%'가 없다 — '%XX'가 보이면 인코딩된 것이므로 풀어서 쓴다(구 버튼의 encodeURIComponent·구 페이지가 sessionStorage에 남긴 값 모두 흡수) */
+var norm=function(t){t=String(t||"");if(/%[0-9A-Fa-f]{2}/.test(t)){try{t=decodeURIComponent(t);}catch(e){}}return t;};
+try{var m=location.hash.match(/[#&]tok=([^&]+)/);if(m){var t=norm(m[1]);window.__gateT=t;try{sessionStorage.setItem("gate_tok",t);}catch(e){}history.replaceState(null,"",location.pathname+location.search);}}catch(e){}
+window.__gateTok=function(){if(window.__gateT)return window.__gateT;try{return norm(sessionStorage.getItem("gate_tok"));}catch(e){return "";}};
 })();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CSO 블럭 조회</title>
