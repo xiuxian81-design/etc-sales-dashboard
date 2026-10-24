@@ -7,6 +7,8 @@
 try{var m=location.hash.match(/[#&]tok=([^&]+)/);if(m){window.__gateT=m[1];try{sessionStorage.setItem("gate_tok",m[1]);}catch(e){}history.replaceState(null,"",location.pathname+location.search);}}catch(e){}
 window.__gateTok=function(){if(window.__gateT)return window.__gateT;try{return sessionStorage.getItem("gate_tok")||"";}catch(e){return "";}};
 window.__gateQ=function(){var t=window.__gateTok();return t?("&tok="+encodeURIComponent(t)):"";};
+/* [v52] 🔎 CSO 블럭 조회 — 누르는 순간에만 토큰을 붙이고 곧바로 뗀다(우클릭 '링크 복사'·끌어다 놓기로 8시간 토큰이 새지 않게). 만료(5분 전 포함)면 이 탭부터 다시 로그인 */
+window.__bcOpen=function(a){var t=window.__gateTok(),x=0;try{x=+atob(t.split(".")[0].replace(/-/g,"+").replace(/_/g,"/")).split("|")[2];}catch(e){}if(!t||x*1000<Date.now()+300000){window.__gateGo("expired");return false;}a.href="blockcheck.html?v=20261024c#tok="+t;setTimeout(function(){a.href="blockcheck.html";},0);return true;};
 window.__gateGo=function(reason){var n=0;try{n=Number(sessionStorage.getItem("gate_redir")||0);if(Date.now()-Number(sessionStorage.getItem("gate_redir_t")||0)>120000)n=0;sessionStorage.setItem("gate_redir",String(n+1));sessionStorage.setItem("gate_redir_t",String(Date.now()));}catch(e){}if(n>=3){alert("계정 확인 페이지로 이동이 반복되고 있습니다("+(reason||"")+"). 잠시 후 다시 열거나 담당자에게 알려 주세요.");return;}try{sessionStorage.removeItem("gate_tok");}catch(e){}window.__gateT="";location.replace(GATE+"?doc="+DOC);};
 window.__gateGuard=function(res){if(!res||res.auth!=="required")return false;if(res.reason==="not_allowed"){alert("이 계정은 열람 권한이 없습니다. 담당자에게 요청해 주세요.");return true;}window.__gateGo(res.reason);return true;};
 /* [v46] 대시보드 내장데이터(110대 실적·마스터·과정관리)는 공개 파일이 아니라 D ?doc=dashdata 로 받는다(dash 토큰). 수신 전엔 crm 자동로드·과정관리 초기화를 기다린다 */
@@ -352,7 +354,7 @@ body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var
     <a class="upbtn" id="btn-open-form" href="https://script.google.com/macros/s/AKfycbwTXL5bRBDXXoEN06x2OSMLq1Wqh1CFJWjYAPSWjhYAZZFxJqx30bwwgdpSFT2SndDL/exec?doc=form" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block">📝 일일보고폼 열기</a>
     <a class="upbtn" href="https://script.google.com/macros/s/AKfycbwTXL5bRBDXXoEN06x2OSMLq1Wqh1CFJWjYAPSWjhYAZZFxJqx30bwwgdpSFT2SndDL/exec?doc=ms" target="_blank" rel="noopener" title="대외비 · 허용 계정만">📊 MS팀 현황 대시보드</a>
     <a class="upbtn" href="https://script.google.com/macros/s/AKfycbwTXL5bRBDXXoEN06x2OSMLq1Wqh1CFJWjYAPSWjhYAZZFxJqx30bwwgdpSFT2SndDL/exec?doc=cso" target="_blank" rel="noopener" title="대외비 · 허용 계정만">📑 CSO 업체 리포트</a>
-    <a class="upbtn" href="blockcheck.html" target="_blank" rel="noopener" onmousedown="this.href='blockcheck.html?v=20261024b#tok='+window.__gateTok()" onclick="this.href='blockcheck.html?v=20261024b#tok='+window.__gateTok()" title="대외비 · 허용 계정만 — CSO 요청 거래처의 블럭 가능 여부(직접 입력·엑셀 일괄)" style="text-decoration:none;display:inline-block">🔎 CSO 블럭 조회</a>
+    <a class="upbtn" href="blockcheck.html" target="_blank" rel="noopener" onclick="return window.__bcOpen(this)" onauxclick="return window.__bcOpen(this)" title="대외비 · 허용 계정만 — CSO 요청 거래처의 블럭 가능 여부(직접 입력·엑셀 일괄)" style="text-decoration:none;display:inline-block">🔎 CSO 블럭 조회</a>
     <button class="upbtn">📂 MBO Excel 불러오기<input type="file" id="file-in" accept=".xlsx,.xls"></button>
   </div>
 </div>

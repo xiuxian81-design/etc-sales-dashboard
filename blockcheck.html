@@ -128,7 +128,7 @@ details.rules ul{padding-left:18px;margin:6px 0 0}
       <li><b>로컬</b> — 다른 CSO 코드가 이미 생성(마스터·채널매핑 CSO업체) → 불가 / 담당 최두현(오픈블록 이관처) → 가능 / 그 외 현 담당자 있음 → 불가 / 담당 없음(비거래처) → 가능</li>
       <li><b>병원</b> — 품목별 판정. 기 코드생성 품목 → 불가 / 네트워크 오픈(O) → 가능 / 협의필요(한올·CSO) → 협의필요 / 네트워크 미오픈 → 불가</li>
       <li>병원 여부: 네트워크 오픈 목록에 있거나, 채널에 '병원'이 있거나, 병원 품목 매출이 있으면 병원으로 봅니다. 카드에서 로컬/병원 판정을 바꿔볼 수 있습니다.</li>
-      <li><b>확인필요</b> — 원천에 없는 번호 중 사업자번호 형식 오류, 거래처명이 여러 곳과 같거나 이름이 정확히 일치하지 않는 경우(엑셀 일괄). 사업자번호로 다시 확인해 주세요.</li>
+      <li><b>확인필요</b> — 원천에 없는 번호 중 사업자번호 형식 오류이거나 같은 이름 거래처가 따로 있는 경우, 거래처명이 여러 곳과 같거나 정확히 일치하지 않는 경우, 요청 품목명을 찾지 못했거나 요청 품목 중 일부만 가능한 경우(엑셀 일괄). 사유 칸을 보고 사업자번호·품목으로 다시 확인해 주세요.</li>
       <li>원 판정 규칙: 최인경 지부장 'CSO 거래가능 조회'. 기준 데이터: 영업관리 CSO거래처관리데이터(2주 갱신).</li>
     </ul>
   </details>
@@ -150,7 +150,7 @@ function fatal(html){const e=$('#fatal');e.innerHTML=html;e.hidden=false;$('#aso
 function loadData(){
   const tok=window.__gateTok();
   const again=`<a href="${window.__GATE}?doc=dash">성과보드 다시 열기</a>`;
-  if(!tok){fatal(`열람 확인이 필요합니다. 성과보드의 <b>🔎 CSO 블럭 조회</b> 버튼으로 열어 주세요. → ${again}`);return}
+  if(!tok){fatal(`열람 확인이 필요합니다. 성과보드에서 <b>🔎 CSO 블럭 조회</b> 버튼을 한 번 눌러 열어 주세요(길게 눌러 새 탭·북마크로 열면 확인 정보가 넘어오지 않습니다). → ${again}`);return}
   const to=setTimeout(()=>fatal(`응답이 없습니다. 네트워크를 확인하고 새로고침해 주세요. → ${again}`),90000);
   window.__bcData=async r=>{
     clearTimeout(to);
@@ -159,7 +159,7 @@ function loadData(){
       fatal(why+(r&&r.reason==='not_allowed'?'':' → '+again));return;
     }
     try{
-      const bin=Uint8Array.from(atob(r),c=>c.charCodeAt(0));
+      const s=atob(r),bin=new Uint8Array(s.length);for(let i=0;i<s.length;i++)bin[i]=s.charCodeAt(i);   // Uint8Array.from(…,fn)은 저사양 폰에서 순간 힙을 크게 씀
       let txt;
       if(window.DecompressionStream){txt=await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream('gzip'))).text()}
       else{await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js');txt=pako.ungzip(bin,{to:'string'})}
@@ -173,6 +173,7 @@ function loadData(){
 }
 function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('라이브러리 로드 실패: '+src));document.head.appendChild(s)})}
 function ready(){
+  $('#fatal').hidden=true;   // 90초 타임아웃 안내 뒤 늦게 도착한 경우
   NAMES=[];const idx=new Map();
   for(const [b,v] of Object.entries(D.L)) if(v[0]) NAMES.push([b,v[0]]);
   for(const [b,v] of Object.entries(D.H)) if(v.n && !(D.L[b]&&D.L[b][0])) NAMES.push([b,v.n]);
@@ -269,7 +270,11 @@ function badCard(b){
 }
 function copy(t,btn){
   const done=()=>{const o=btn.textContent;btn.textContent='복사됨';setTimeout(()=>btn.textContent=o,1400)};
-  const fb=()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done()}catch(e){}ta.remove()};
+  const fb=()=>{   // 클립보드 API가 막힌 인앱 브라우저용 — 키보드가 뜨지 않게 readOnly·고정 위치, 실패하면 실패라고 알린다
+    const ta=document.createElement('textarea');ta.value=t;ta.readOnly=true;ta.style.cssText='position:fixed;top:0;left:0;opacity:0;font-size:16px';
+    document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,t.length);let ok=false;try{ok=document.execCommand('copy')}catch(e){}ta.remove();
+    if(ok)done();else{btn.textContent='복사 안 됨 — 문구를 길게 눌러 복사';setTimeout(()=>btn.textContent='회신 문구 복사',3000)}
+  };
   try{navigator.clipboard.writeText(t).then(done,fb)}catch(e){fb()}
 }
 function run1(){
@@ -318,11 +323,20 @@ async function onFile(f){
   try{
     await loadScript(LIB_X);
     const buf=await f.arrayBuffer();
-    const wb=XLSX.read(buf,{type:'array'});
-    const sheets=wb.SheetNames.map(n=>{const ws=wb.Sheets[n];const aoa=ws['!ref']?XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:'',blankrows:true}):[];const rg=ws['!ref']?XLSX.utils.decode_range(ws['!ref']):{s:{r:0,c:0},e:{r:0,c:0}};return {n,aoa,rg}});
-    const best=sheets.reduce((a,s,i)=>s.aoa.filter(r=>r.some(v=>String(v).trim())).length>sheets[a].aoa.filter(r=>r.some(v=>String(v).trim())).length?i:a,0);
+    let wb;
+    if(/\.csv$/i.test(f.name)){   // 한국어 엑셀 'CSV(쉼표로 분리)'는 CP949 — UTF-8이 아니면 EUC-KR로 읽는다
+      let t;try{t=new TextDecoder('utf-8',{fatal:true}).decode(buf)}catch(e){t=new TextDecoder('euc-kr').decode(buf)}
+      wb=XLSX.read(t.replace(/^﻿/,''),{type:'string'});
+    }else wb=XLSX.read(buf,{type:'array'});
+    wb.SheetNames.forEach(n=>{   // 병합 셀(한 거래처를 여러 품목 행에 걸쳐 병합) → 각 행에 왼쪽 위 값을 채워 행마다 판정
+      const ws=wb.Sheets[n];
+      (ws['!merges']||[]).forEach(m=>{const v=ws[XLSX.utils.encode_cell(m.s)];if(!v)return;for(let r=m.s.r;r<=m.e.r;r++)for(let c=m.s.c;c<=m.e.c;c++)if(r!==m.s.r||c!==m.s.c)ws[XLSX.utils.encode_cell({r,c})]={...v}});
+    });
+    const sheets=wb.SheetNames.map((n,i)=>{const ws=wb.Sheets[n];const aoa=ws['!ref']?XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:'',blankrows:true}):[];const rg=ws['!ref']?XLSX.utils.decode_range(ws['!ref']):{s:{r:0,c:0},e:{r:0,c:0}};const hidden=!!(wb.Workbook&&wb.Workbook.Sheets&&wb.Workbook.Sheets[i]&&wb.Workbook.Sheets[i].Hidden);return {n,aoa,rg,hidden,rows:aoa.filter(r=>r.some(v=>String(v).trim())).length}});
+    const vis=sheets.some(s=>!s.hidden);
+    const best=sheets.reduce((a,s,i)=>((vis&&s.hidden)?false:(a<0||s.rows>sheets[a].rows))?i:a,-1);
     XL={file:f,buf,sheets,si:best};
-    $('#xs').innerHTML=sheets.map((s,i)=>`<option value="${i}">${esc(s.n)}</option>`).join('');$('#xs').value=best;
+    $('#xs').innerHTML=sheets.map((s,i)=>`<option value="${i}">${esc(s.n)}${s.hidden?' (숨김)':''}</option>`).join('');$('#xs').value=best;
     detect();run2();
   }catch(e){$('#xmeta').textContent='파일을 열지 못했습니다: '+e.message}
 }
@@ -350,20 +364,41 @@ function addrPick(cands,addr){
   const hit=cands.filter(b=>{const a=((D.L[b]&&D.L[b][1])||'').replace(/\s/g,'');return keys.every(k=>a.includes(k))});
   return hit.length===1?hit[0]:null;
 }
+/* 요청 품목 → [{q:요청 조각, idx:[매칭 품목]}]. '10/10mg'처럼 숫자 사이 '/'는 함량이라 쪼개지 않고, 함량만 남은 조각('10mg')은 버린다
+   (lookbehind 정규식은 iOS 16.3 이하에서 문법 오류라 쓰지 않는다) */
+const STRENGTH=/^[\d.∕]+(mg|ml|g|㎍|iu|tb|t|bx|정|캡슐)*$/i;
+const nkey=s=>nitem(String(s||'').replace(/(\d)\s*\/\s*(\d)/g,'$1∕$2').replace(/mcg|µg|μg/gi,'㎍'));   // 함량 '/'·단위 표기 통일
 function itemIdx(req){
-  const parts=String(req||'').split(/[,\/·\n]+/).map(nitem).filter(s=>s.length>=2);if(!parts.length)return null;
-  const set=new Set();D.items.forEach((nm,i)=>{const k=nitem(nm);if(parts.some(p=>k.includes(p)||p.includes(k)))set.add(i)});return [...set];
+  const parts=String(req||'').replace(/(\d)\s*\/\s*(\d)/g,'$1∕$2').split(/[,\/·\n]+/).map(s=>s.trim()).filter(s=>{const p=nkey(s);return p.length>=2&&!STRENGTH.test(p)});
+  if(!parts.length)return null;
+  const keys=D.__ik||(D.__ik=D.items.map(nkey));
+  return parts.map(s=>{
+    const p=nkey(s),toks=s.split(/\s+/).map(nkey).filter(Boolean);   // '프레논 50mg' → 프레논·50mg가 모두 들어 있는 품목
+    const multi=toks.length>1&&toks.some(t=>t.length>=2&&!STRENGTH.test(t));
+    const has=(k,t)=>{if(!STRENGTH.test(t))return k.includes(t);let j=k.indexOf(t);while(j>=0){if(j===0||!/[\d.]/.test(k[j-1]))return true;j=k.indexOf(t,j+1)}return false};   // '50mg'가 '150mg'에 걸리지 않게
+    return {q:s,idx:keys.map((k,i)=>(k.includes(p)||p.includes(k)||(multi&&toks.every(t=>has(k,t))))?i:-1).filter(i=>i>=0)};
+  });
 }
 function judgeRow(cell){
   const bz=String(cell.biz||'').replace(/\D/g,'');
   let b=null,note='';
-  if(bz.length===10)b=bz;
+  if(bz.length===10){
+    b=bz;
+    if(!known(b)&&String(cell.name||'').trim()){   // 원천에 없는 번호인데 같은 이름 거래처가 있으면 '비거래처 가능'으로 두지 않는다(양수도·번호 오타·열 밀림)
+      const c=D.idx.get(nname(cell.name))||[];
+      if(c.length)return {v:'확인필요',cls:'chk',kind:'',reason:'사업자번호가 원천에 없음 — 같은 이름 거래처: '+c.slice(0,3).map(x=>`${fmtBiz(x)}(${judge(x).v})`).join(', '),match:fmtBiz(b)};
+    }else if(known(b)&&String(cell.name||'').trim()){
+      const a=nname(cell.name),o=nname(nameOf(b));
+      if(a&&o&&!a.includes(o)&&!o.includes(a))note=`(요청 거래처명과 다름 — 원천: ${nameOf(b)}) `;
+    }
+  }
   else if(String(cell.name||'').trim()){
     const k=nname(cell.name),c=D.idx.get(k)||[];
-    if(c.length===1)b=c[0];
+    if(c.length===1){b=c[0];note='(이름으로 매칭) '}
     else if(c.length>1){b=addrPick(c,cell.addr);if(!b)return {v:'확인필요',cls:'chk',kind:'',reason:`같은 이름 ${c.length}곳 — 사업자번호로 확인: `+c.slice(0,3).map(x=>`${fmtBiz(x)}(${judge(x).v})`).join(', '),match:''};note='(주소로 구분) '}
     else{
-      const part=k.length<3?[]:D.nn.filter(([,,m])=>m.length>=3&&(m.includes(k)||k.includes(m))).slice(0,4);
+      const part=[];   // 부분일치 후보 — 7.8만 건 순회라 4건 찾으면 멈추고, 큰 파일(100행 초과)에서는 생략(폰 멈춤 방지)
+      if(k.length>=3&&!cell.big)for(const e of D.nn){const m=e[2];if(m.length>=3&&(m.includes(k)||k.includes(m))){part.push(e);if(part.length>=4)break}}
       return {v:'확인필요',cls:'chk',kind:'',reason:part.length?'이름이 정확히 일치하지 않음 — 후보: '+part.slice(0,3).map(([x,n])=>`${n} ${fmtBiz(x)}(${judge(x).v})`).join(', '):'원천에서 이름을 찾지 못함 — 사업자번호로 확인',match:''};
     }
   }else if(bz.length)return {v:'확인필요',cls:'chk',kind:'',reason:'사업자번호 자릿수 오류',match:''};
@@ -377,14 +412,19 @@ function judgeRow(cell){
   else{
     const nm=s=>s.split(' — ')[0];
     out.can=r.g.가능.map(nm).join(', ');out.hyo=r.g.협의필요.map(nm).join(', ');
-    const want=cell.item?itemIdx(cell.item):null;
-    if(want&&want.length){
-      const vs=want.map(i=>r.per[i]);
-      const v=vs.includes('가능')?'가능':vs.includes('협의필요')?'협의필요':'불가';
-      Object.assign(out,{v,cls:v==='가능'?'ok':v==='협의필요'?'warn':'no',reason:note+`요청 품목 ${want.map(i=>D.items[i]+'='+r.per[i]).join(', ')}`});
+    const want=String(cell.item||'').trim()?itemIdx(cell.item):null;
+    const miss=want?want.filter(w=>!w.idx.length).map(w=>w.q):[];
+    if(String(cell.item||'').trim()&&(!want||miss.length)){   // 품목을 적었는데 못 찾으면 병원 전체 기준 '가능'으로 두지 않는다
+      Object.assign(out,{v:'확인필요',cls:'chk',reason:note+`요청 품목명 매칭 실패(${miss.length?miss.join(', '):String(cell.item).trim()}) — 품목 확인 · 이 병원 가능 품목 ${r.g.가능.length}개`});
+    }else if(want){   // 요청 품목에 걸린 제품이 전부 같은 판정일 때만 그 판정, 섞이면 확인필요(품목별 내역 표시)
+      const idx=[...new Set(want.flatMap(w=>w.idx))],vs=[...new Set(idx.map(i=>r.per[i]))];
+      const v=vs.length===1?vs[0]:(!vs.includes('가능')&&vs.includes('협의필요'))?'협의필요':'확인필요';
+      Object.assign(out,{v,cls:v==='가능'?'ok':v==='협의필요'?'warn':v==='불가'?'no':'chk',reason:note+(v==='확인필요'?'요청 품목 중 일부만 가능 — ':'요청 품목 ')+idx.map(i=>D.items[i]+'='+r.per[i]).join(', ')});
+      const nmb=nameOf(b),id=nmb.startsWith('(')?`거래처(${fmtBiz(b)})`:`${nmb}(${fmtBiz(b)})`,its=idx.map(i=>D.items[i]).join(', ');   // 회신 문구도 요청 품목 기준
+      out.reply=v==='가능'?`문의주신 ${id}은(는) ${its} 품목 거래 진행 가능합니다.`:v==='불가'?`문의주신 ${id}의 요청 품목(${its})은 현재 거래가 어렵습니다.`:v==='협의필요'?`문의주신 ${id}의 요청 품목은 협의가 필요합니다. 확인 후 다시 안내드리겠습니다.`:'';
     }else{
       const v=r.cls==='ok'?'가능':r.cls==='warn'?'협의필요':'불가';
-      Object.assign(out,{v,cls:r.cls,reason:note+`병원 품목별: 가능 ${r.g.가능.length} · 협의 ${r.g.협의필요.length} · 불가 ${r.g.불가.length+r.nx.length}`+(cell.item?' (요청 품목명 불일치 — 전체 품목 기준)':'')});
+      Object.assign(out,{v,cls:r.cls,reason:note+`병원 품목별: 가능 ${r.g.가능.length} · 협의 ${r.g.협의필요.length} · 불가 ${r.g.불가.length+r.nx.length}`});
     }
   }
   return out;
@@ -395,11 +435,14 @@ function run2(){
   $('#xmeta').textContent=`${XL.file.name} · 시트 '${sh.n}' · 열 지정이 틀리면 아래에서 바꾸면 바로 다시 판정합니다`;
   if(cb<0&&cn<0){$('#xres').hidden=true;$('#st2').textContent='';$('#xmeta').textContent='사업자번호 열이나 거래처명 열을 지정해 주세요';return}
   XROWS=[];
+  const big=aoa.length-h-1>100;   // 이름 부분일치 후보는 100행 이하 파일에서만(폰에서 행당 수십 ms)
   for(let i=h+1;i<aoa.length;i++){
     const r=aoa[i],g=c=>c>=0?String(r[c]??'').trim():'';
-    const res=judgeRow({biz:g(cb),name:g(cn),addr:g(ca),item:g(ci)});
+    const res=judgeRow({biz:g(cb),name:g(cn),addr:g(ca),item:g(ci),big});
     if(res)XROWS.push({i,req:[g(cn),g(cb)].filter(Boolean).join(' · ')||'-',...res});
   }
+  const diff=XROWS.filter(r=>/^\(요청 거래처명과 다름/.test(r.reason)).length;   // 번호·이름 열이 한 칸씩 밀린 파일 경고
+  if(diff&&diff>=Math.max(5,XROWS.length*0.3))$('#xmeta').textContent+=` · ⚠ 사업자번호와 거래처명이 서로 다른 행이 ${diff}건 — 열이 밀렸는지 확인해 주세요`;
   const cnt=k=>XROWS.filter(r=>r.v===k).length;
   const c={가능:cnt('가능'),불가:cnt('불가'),협의필요:cnt('협의필요'),확인필요:cnt('확인필요')};
   XF='all';XN=200;
