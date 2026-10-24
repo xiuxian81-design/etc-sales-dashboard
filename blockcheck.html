@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<script>/* [열람게이트] 성과보드가 #tok= 로 넘겨준 대시보드 토큰을 보관 — 데이터는 D ?doc=blockdata(JSONP)로만 받는다(공개 저장소에 데이터 없음) */
+(function(){window.__GATE="https://script.google.com/macros/s/AKfycbwTXL5bRBDXXoEN06x2OSMLq1Wqh1CFJWjYAPSWjhYAZZFxJqx30bwwgdpSFT2SndDL/exec";window.__DATA="https://script.google.com/macros/s/AKfycbyhk2el3kwGMStCvyUr-8B-PWS-6aKwcf5EVfvpryqlj3jEeLw5pnttHMEokrpQXO33dQ/exec";window.__gateT="";
+try{var m=location.hash.match(/[#&]tok=([^&]+)/);if(m){window.__gateT=m[1];try{sessionStorage.setItem("gate_tok",m[1]);}catch(e){}history.replaceState(null,"",location.pathname+location.search);}}catch(e){}
+window.__gateTok=function(){if(window.__gateT)return window.__gateT;try{return sessionStorage.getItem("gate_tok")||"";}catch(e){return "";}};
+})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSO 블럭 조회</title>
+<style>
+@font-face{font-family:'MaruBuri';src:url('fonts/MaruBuri-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'MaruBuri';src:url('fonts/MaruBuri-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
+:root{--blue:#0071e3;--blue-lt:#eff5fe;--green:#248a3d;--green-lt:#dff3e4;--yellow:#c76b00;--yellow-lt:#fdf1df;--red:#d70015;--red-lt:#fde8e8;--gray1:#f5f5f7;--gray2:#d2d2d7;--gray3:#86868b;--gray4:#6e6e73;--gray5:#1d1d1f;--bg:#f5f5f7;--card:#fff}
+*{box-sizing:border-box}
+body{margin:0;font-family:'MaruBuri','Malgun Gothic','Apple SD Gothic Neo',serif;background:var(--bg);color:var(--gray5);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.hd{background:var(--blue);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.hd h1{margin:0;font-size:19px}
+.hd p{margin:2px 0 0;font-size:12px;opacity:.85}
+.hd a{color:#fff;text-decoration:none;border:1.5px solid rgba(255,255,255,.5);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:700;white-space:nowrap}
+.wrap{max-width:960px;margin:0 auto;padding:14px 16px 60px;display:flex;flex-direction:column;gap:14px}
+.tabs{display:flex;gap:6px;background:#e8e8ed;border-radius:10px;padding:4px}
+.tabs button{flex:1;border:0;background:transparent;border-radius:8px;padding:10px 8px;font:inherit;font-size:15px;font-weight:700;color:var(--gray4);cursor:pointer}
+.tabs button.on{background:#fff;color:var(--blue);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.box{background:var(--card);border:1px solid var(--gray2);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px}
+textarea{width:100%;min-height:84px;resize:vertical;font:inherit;font-size:16px;border:1px solid var(--gray2);border-radius:8px;padding:10px 12px;background:var(--gray1)}
+textarea:focus,select:focus,button:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button{font:inherit;font-size:14px;font-weight:700;border-radius:8px;padding:9px 16px;cursor:pointer;border:1px solid var(--gray2);background:#fff;color:var(--gray5)}
+button.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+button.sm{font-size:12px;padding:5px 10px;font-weight:600}
+button:disabled{opacity:.5;cursor:default}
+.status{font-size:13px;color:var(--gray4)}
+.hint{font-size:12px;color:var(--gray3)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{font-size:13px;font-weight:700;padding:4px 11px;border-radius:999px;border:1.5px solid transparent;background:var(--gray1);color:var(--gray4);cursor:default}
+button.chip{cursor:pointer}
+button.chip.on{border-color:currentColor}
+.ok{background:var(--green-lt);color:var(--green)}.no{background:var(--red-lt);color:var(--red)}.warn{background:var(--yellow-lt);color:var(--yellow)}.chk{background:#ececf0;color:var(--gray4)}
+.card{background:var(--card);border:1px solid var(--gray2);border-radius:12px;overflow:hidden}
+.ch{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--gray2);flex-wrap:wrap}
+.ch h2{margin:0;font-size:17px}
+.ch .sub{font-size:13px;color:var(--gray4)}
+.pill{font-size:14px;font-weight:700;padding:4px 12px;border-radius:6px;white-space:nowrap}
+.reason{padding:9px 14px;font-weight:700;border-bottom:1px solid var(--gray2)}
+dl{display:grid;grid-template-columns:max-content 1fr;gap:5px 14px;margin:0;padding:10px 14px}
+dt{color:var(--gray4);font-size:13px}dd{margin:0;min-width:0;overflow-wrap:anywhere;font-size:14px}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;border-radius:4px;background:var(--blue-lt);color:var(--blue);margin-right:6px}
+.grp{padding:9px 14px;border-top:1px solid var(--gray2)}
+.grp h3{margin:0 0 5px;font-size:14px}
+.grp ul{margin:0;padding-left:18px;font-size:13px}
+.grp .flat{font-size:13px;color:var(--gray4);margin:4px 0 0}
+.ft{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:9px 14px;border-top:1px solid var(--gray2);background:var(--gray1);flex-wrap:wrap}
+.ft span{font-size:13px;color:var(--gray4);flex:1;min-width:0}
+.pick{display:flex;flex-direction:column}
+.pick button{text-align:left;border:0;border-bottom:1px solid var(--gray2);border-radius:0;font-weight:500;padding:10px 14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.drop{border:2px dashed var(--gray2);border-radius:12px;padding:22px 14px;text-align:center;background:var(--gray1);display:flex;flex-direction:column;gap:8px;align-items:center}
+.drop.over{border-color:var(--blue);background:var(--blue-lt)}
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.map label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--gray4);font-weight:700}
+select{font:inherit;font-size:14px;border:1px solid var(--gray2);border-radius:8px;padding:7px 8px;background:#fff;min-width:0;width:100%}
+.tw{overflow-x:auto;border:1px solid var(--gray2);border-radius:10px;background:#fff}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:7px 9px;border-bottom:1px solid #ececf0;text-align:left;vertical-align:top}
+th{background:var(--gray1);font-size:12px;color:var(--gray4);position:sticky;top:0;white-space:nowrap}
+td.v{white-space:nowrap;font-weight:700}
+td.n{min-width:130px}td.r{min-width:220px}
+.err{background:var(--red-lt);color:var(--red);border-radius:10px;padding:12px 14px;font-weight:700}
+.err a{color:var(--red)}
+details.rules{font-size:13px;color:var(--gray4)}
+details.rules summary{cursor:pointer;font-weight:700;color:var(--gray5)}
+details.rules ul{padding-left:18px;margin:6px 0 0}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="hd">
+  <div><h1>CSO 블럭 조회</h1><p id="asof">데이터 불러오는 중…</p></div>
+  <a href="index.html">← 성과보드</a>
+</div>
+<div class="wrap">
+  <div id="fatal" class="err" hidden></div>
+  <div class="tabs" role="tablist">
+    <button id="tb-one" class="on" role="tab" aria-selected="true">🔎 직접 조회</button>
+    <button id="tb-xl" role="tab" aria-selected="false">📂 엑셀 일괄 조회</button>
+  </div>
+
+  <section id="pn-one" class="box">
+    <textarea id="q" placeholder="사업자번호 또는 거래처명 (예: 135-95-27413)&#10;CSO 문의 메일·카톡을 통째로 붙여넣어도 사업자번호를 모두 찾아 조회합니다."></textarea>
+    <div class="row"><button class="pri" id="go" disabled>조회</button><button id="clear">지우기</button><span class="status" id="st1"></span></div>
+  </section>
+  <div id="out1" class="chips" hidden></div>
+  <div id="cards" style="display:flex;flex-direction:column;gap:12px"></div>
+
+  <section id="pn-xl" class="box" hidden>
+    <div class="drop" id="drop">
+      <b>업체가 보낸 엑셀을 여기에 끌어다 놓거나</b>
+      <button class="pri" id="pickf" disabled>엑셀 파일 선택</button>
+      <input type="file" id="fin" accept=".xlsx,.xls,.csv" hidden>
+      <span class="hint">xlsx·xls·csv · 파일은 이 기기 안에서만 처리되고 서버로 올라가지 않습니다</span>
+    </div>
+    <div id="xmap" hidden>
+      <div class="hint" id="xmeta" style="margin-bottom:6px"></div>
+      <div class="map">
+        <label>시트<select id="xs"></select></label>
+        <label>머리글 행<select id="xh"></select></label>
+        <label>사업자번호 열<select id="xb"></select></label>
+        <label>거래처명 열<select id="xn"></select></label>
+        <label>주소 열(동명 구분용)<select id="xa"></select></label>
+        <label>품목 열(병원 품목별)<select id="xi"></select></label>
+      </div>
+    </div>
+  </section>
+  <section id="xres" class="box" hidden>
+    <div class="chips" id="xchips"></div>
+    <div class="row"><button class="pri" id="xdl">⬇ 결과 엑셀 받기</button><span class="status" id="st2"></span></div>
+    <div class="hint">결과 엑셀 = 원본 그대로 + 오른쪽에 블럭판정·사유·담당·회신 문구 열 추가(판정 칸 색 표시) + '조회요약' 시트</div>
+    <div class="tw"><table><thead><tr><th>#</th><th>판정</th><th>요청 거래처</th><th>사유</th><th>매칭 거래처</th></tr></thead><tbody id="xbody"></tbody></table></div>
+    <div class="row"><button id="xmore" class="sm" hidden>더 보기</button></div>
+  </section>
+
+  <details class="rules">
+    <summary>판정 기준</summary>
+    <ul>
+      <li><b>로컬</b> — 다른 CSO 코드가 이미 생성(마스터·채널매핑 CSO업체) → 불가 / 담당 최두현(오픈블록 이관처) → 가능 / 그 외 현 담당자 있음 → 불가 / 담당 없음(비거래처) → 가능</li>
+      <li><b>병원</b> — 품목별 판정. 기 코드생성 품목 → 불가 / 네트워크 오픈(O) → 가능 / 협의필요(한올·CSO) → 협의필요 / 네트워크 미오픈 → 불가</li>
+      <li>병원 여부: 네트워크 오픈 목록에 있거나, 채널에 '병원'이 있거나, 병원 품목 매출이 있으면 병원으로 봅니다. 카드에서 로컬/병원 판정을 바꿔볼 수 있습니다.</li>
+      <li><b>확인필요</b> — 원천에 없는 번호 중 사업자번호 형식 오류, 거래처명이 여러 곳과 같거나 이름이 정확히 일치하지 않는 경우(엑셀 일괄). 사업자번호로 다시 확인해 주세요.</li>
+      <li>원 판정 규칙: 최인경 지부장 'CSO 거래가능 조회'. 기준 데이터: 영업관리 CSO거래처관리데이터(2주 갱신).</li>
+    </ul>
+  </details>
+</div>
+
+<script>
+let D=null, NAMES=null, XL=null;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const won=v=>v?Math.round(v).toLocaleString('ko-KR'):'0';
+const fmtBiz=b=>b.slice(0,3)+'-'+b.slice(3,5)+'-'+b.slice(5);
+const xd=n=>{if(!n)return'-';return new Date(Date.UTC(1899,11,30)+n*864e5).toISOString().slice(0,10)};
+const ymd=s=>{s=String(s||'');return s.length===8?s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6):s.length===6?s.slice(0,4)+'-'+s.slice(4):s};
+const nname=s=>String(s||'').replace(/\s+/g,'').replace(/\(주\)|㈜|주식회사|\(유\)|\(재\)|\(의\)|\(사\)|\(복\)/g,'').replace(/-폐업$/,'').toLowerCase();
+const nitem=s=>String(s||'').replace(/\s+/g,'').replace(/\([^)]*\)/g,'').toLowerCase();
+function fatal(html){const e=$('#fatal');e.innerHTML=html;e.hidden=false;$('#asof').textContent='데이터를 불러오지 못했습니다'}
+
+/* ── 데이터 수신: D ?doc=blockdata → base64(gzip(JSON)) 문자열 1개 ── */
+function loadData(){
+  const tok=window.__gateTok();
+  const again=`<a href="${window.__GATE}?doc=dash">성과보드 다시 열기</a>`;
+  if(!tok){fatal(`열람 확인이 필요합니다. 성과보드의 <b>🔎 CSO 블럭 조회</b> 버튼으로 열어 주세요. → ${again}`);return}
+  const to=setTimeout(()=>fatal(`응답이 없습니다. 네트워크를 확인하고 새로고침해 주세요. → ${again}`),90000);
+  window.__bcData=async r=>{
+    clearTimeout(to);
+    if(!r||typeof r!=='string'){
+      const why=r&&r.reason==='expired'?'열람 시간이 지났습니다(8시간).':r&&r.reason==='not_allowed'?'이 계정은 열람 권한이 없습니다. 담당자에게 요청해 주세요.':'열람 확인이 필요합니다'+(r&&r.reason?' ('+esc(r.reason)+')':'')+'.';
+      fatal(why+(r&&r.reason==='not_allowed'?'':' → '+again));return;
+    }
+    try{
+      const bin=Uint8Array.from(atob(r),c=>c.charCodeAt(0));
+      let txt;
+      if(window.DecompressionStream){txt=await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream('gzip'))).text()}
+      else{await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js');txt=pako.ungzip(bin,{to:'string'})}
+      D=JSON.parse(txt); ready();
+    }catch(e){fatal('데이터를 여는 중 오류가 났습니다. 새로고침해 주세요. ('+esc(e.message)+')')}
+  };
+  const s=document.createElement('script');
+  s.src=window.__DATA+'?doc=blockdata&callback=__bcData&_='+Date.now()+'&tok='+encodeURIComponent(tok);
+  s.onerror=()=>{clearTimeout(to);fatal(`서버에 연결하지 못했습니다. 새로고침해 주세요. → ${again}`)};
+  document.head.appendChild(s);
+}
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('라이브러리 로드 실패: '+src));document.head.appendChild(s)})}
+function ready(){
+  NAMES=[];const idx=new Map();
+  for(const [b,v] of Object.entries(D.L)) if(v[0]) NAMES.push([b,v[0]]);
+  for(const [b,v] of Object.entries(D.H)) if(v.n && !(D.L[b]&&D.L[b][0])) NAMES.push([b,v.n]);
+  D.nn=[];
+  for(const [b,n] of NAMES){const k=nname(n);if(!k)continue;D.nn.push([b,n,k]);if(!idx.has(k))idx.set(k,[]);idx.get(k).push(b)}
+  D.idx=idx;
+  $('#asof').textContent=`기준 ${D.meta['기준일']} · 로컬 ${Object.keys(D.L).length.toLocaleString()}곳 · 병원 ${Object.keys(D.H).length.toLocaleString()}곳`;
+  $('#go').disabled=false;$('#pickf').disabled=false;$('#st1').textContent='준비됨';
+  if($('#q').value.trim()) run1();
+}
+
+/* ── 판정(원 규칙 그대로) ── */
+const W=[1,3,7,1,3,7,1,3,5];
+function bizOk(b){const d=[...b].map(Number);let s=0;for(let i=0;i<9;i++)s+=d[i]*W[i];s+=Math.floor(d[8]*5/10);return (10-s%10)%10===d[9]}
+function known(b){return !!(D.L[b]||D.H[b])}
+function isHosp(b){const h=D.H[b],l=D.L[b];if(h&&(Object.keys(h.o).length||Object.keys(h.w).length||Object.keys(h.h).length))return true;if(l&&l[4].some(r=>r[2].includes('병원')))return true;return false}
+function nameOf(b){const l=D.L[b],h=D.H[b];return (l&&l[0])||(h&&h.n)||'(이름 정보 없음)'}
+function judgeLocal(b){
+  const l=D.L[b]||['','','',0,[],[]];const cm=l[4],ms=l[5];
+  const cso=[...new Set([...ms.map(m=>m[0]),...cm.map(r=>r[5])].filter(Boolean))];
+  let v,cls,reason;
+  if(cso.length){v='불가';cls='no';reason='다른 CSO가 이미 코드 생성 (MS팀 보유): '+cso.join(', ')}
+  else if(!cm.length){v='가능';cls='ok';reason=known(b)?'비거래처':'비거래처 (원천 데이터에 없는 번호 — 번호 확인 권장)'}
+  else if(cm.every(r=>r[1]==='최두현')){v='가능';cls='ok';reason='오픈블록 이관처 (최두현)'}
+  else{const who=[...new Set(cm.filter(r=>r[1]!=='최두현').map(r=>r[0]+' '+r[1]))];v='불가';cls='no';reason='현 담당자가 관리 중 ('+who.join(', ')+')'}
+  return {kind:'로컬',b,v,cls,reason,l,cso};
+}
+function judgeHosp(b){
+  const h=D.H[b]||{n:'',b:'',o:{},d:{},w:{},h:{}};
+  const g={가능:[],협의필요:[],불가:[]},nx=[],per={};
+  D.items.forEach((nm,i)=>{
+    const sales=`DW ${won(h.w[i])} / HA ${won(h.h[i])}`,f=h.o[i];
+    if(h.d[i]){g.불가.push(`${nm} — 기 코드생성: ${h.d[i][0]} (${ymd(h.d[i][1])})`);per[i]='불가'}
+    else if(f==='O'){g.가능.push(`${nm} — 네트워크 오픈 · ${sales}`);per[i]='가능'}
+    else if(f==='H'||f==='C'){g.협의필요.push(`${nm} — 협의필요(${f==='H'?'한올':'CSO'}) · ${sales}`);per[i]='협의필요'}
+    else if(h.w[i]||h.h[i]){g.불가.push(`${nm} — 네트워크 미오픈, 현 매출 有 · ${sales}`);per[i]='불가'}
+    else{nx.push(nm);per[i]='불가'}
+  });
+  let v,cls;
+  if(g.가능.length){v=`가능 ${g.가능.length}품목`;cls='ok'}else if(g.협의필요.length){v='협의필요';cls='warn'}else{v='전 품목 불가';cls='no'}
+  return {kind:'병원',b,v,cls,h,g,nx,per,l:D.L[b]};
+}
+function judge(b){return isHosp(b)?judgeHosp(b):judgeLocal(b)}
+function replyText(r){
+  const nm=nameOf(r.b),id=nm.startsWith('(')?`거래처(${fmtBiz(r.b)})`:`${nm}(${fmtBiz(r.b)})`;
+  if(r.kind==='로컬'){
+    if(r.cls==='ok')return `문의주신 ${id}은(는) 한올바이오파마 ${r.reason.startsWith('비거래처')?'비거래처':'오픈블록 이관처'}로 확인되어 거래 진행 가능합니다.`;
+    if(r.cso.length)return `문의주신 ${id}은(는) 타 CSO 업체 코드가 이미 생성되어 있어 거래가 어렵습니다.`;
+    return `문의주신 ${id}은(는) 현재 한올바이오파마 담당자가 관리 중인 거래처로 거래가 어렵습니다.`;
+  }
+  if(r.g.가능.length)return `문의주신 ${id}은(는) ${r.g.가능.map(x=>x.split(' — ')[0]).join(', ')} 품목 거래 진행 가능합니다.`;
+  if(r.g.협의필요.length)return `문의주신 ${id}은(는) 일부 품목 협의가 필요합니다. 확인 후 다시 안내드리겠습니다.`;
+  return `문의주신 ${id}은(는) 현재 거래 가능한 품목이 없습니다.`;
+}
+
+/* ── 직접 조회 ── */
+function card(r){
+  const el=document.createElement('article');el.className='card';
+  const nm=nameOf(r.b),l=r.l;let body='';
+  if(r.kind==='로컬'){
+    const cm=l?l[4]:[];
+    body=`<div class="reason ${r.cls}">${esc(r.reason)}</div><dl>
+      <dt>주소</dt><dd>${esc((l&&l[1])||'-')}</dd>
+      <dt>블록</dt><dd>${esc((l&&l[2])||'-')}</dd>
+      <dt>매출(6개월 평균)</dt><dd>${won(l&&l[3])}</dd>
+      <dt>현 담당</dt><dd>${cm.length?cm.map(c=>`<div><span class="tag">${esc(c[2])}</span>${esc(c[0])} ${esc(c[1])} · 코드생성 ${xd(c[3])}${c[5]?' · CSO '+esc(c[5]):''}${c[4]?' · '+esc(c[4]):''}</div>`).join(''):'없음'}</dd>
+      ${l&&l[5].length?`<dt>CSO 마스터</dt><dd>${l[5].map(m=>esc(m[0])+' — '+esc(m[1]||'-')).join('<br>')}</dd>`:''}
+    </dl>`;
+  }else{
+    const cm=l?l[4]:[];
+    const grp=(k,cls,arr)=>`<div class="grp"><h3><span class="pill ${cls}">${k} ${arr.length}</span></h3>${arr.length?'<ul>'+arr.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':''}</div>`;
+    body=`<dl>
+      <dt>블록</dt><dd>${esc((l&&l[2])||'-')}</dd>
+      <dt>현 담당</dt><dd>${cm.length?[...new Set(cm.map(c=>c[0]+' '+c[1]))].map(esc).join(', '):'없음'}</dd>
+      ${l&&l[5].length?`<dt>CSO 코드 보유</dt><dd>${l[5].map(m=>esc(m[0])+' — '+esc(m[1]||'-')).join('<br>')}</dd>`:''}
+    </dl>${grp('가능','ok',r.g.가능)}${grp('협의필요','warn',r.g.협의필요)}
+      <div class="grp"><h3><span class="pill no">불가 ${r.g.불가.length+r.nx.length}</span></h3>
+        ${r.g.불가.length?'<ul>'+r.g.불가.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':''}
+        ${r.nx.length?`<p class="flat">네트워크 미오픈 ${r.nx.length}품목: ${r.nx.map(esc).join(', ')}</p>`:''}</div>`;
+  }
+  const rt=replyText(r);
+  el.innerHTML=`<div class="ch"><div><h2>${esc(nm)}</h2><div class="sub">${fmtBiz(r.b)} · ${r.kind}</div></div>
+    <div class="row"><span class="pill ${r.cls}">${esc(r.v)}</span><button class="sm" data-flip>${r.kind==='로컬'?'병원으로 보기':'로컬로 보기'}</button></div></div>
+    ${body}<div class="ft"><span>${esc(rt)}</span><button class="sm" data-copy>회신 문구 복사</button></div>`;
+  el.querySelector('[data-flip]').onclick=()=>el.replaceWith(card(r.kind==='로컬'?judgeHosp(r.b):judgeLocal(r.b)));
+  el.querySelector('[data-copy]').onclick=e=>copy(rt,e.target);
+  return el;
+}
+function badCard(b){
+  const el=document.createElement('article');el.className='card';
+  el.innerHTML=`<div class="ch"><div><h2>사업자번호 확인 필요</h2><div class="sub">${fmtBiz(b)}</div></div><span class="pill chk">확인필요</span></div>
+    <div class="reason chk">원천 데이터에 없고 사업자번호 형식(검증번호)이 맞지 않습니다. 번호를 다시 확인해 주세요.</div>`;
+  return el;
+}
+function copy(t,btn){
+  const done=()=>{const o=btn.textContent;btn.textContent='복사됨';setTimeout(()=>btn.textContent=o,1400)};
+  const fb=()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done()}catch(e){}ta.remove()};
+  try{navigator.clipboard.writeText(t).then(done,fb)}catch(e){fb()}
+}
+function run1(){
+  if(!D)return;
+  const q=$('#q').value.trim(),out=$('#cards'),sum=$('#out1');
+  out.innerHTML='';sum.innerHTML='';sum.hidden=true;
+  if(!q){$('#st1').textContent='';return}
+  const nums=[...new Set((q.match(/\d{3}-?\d{2}-?\d{5}/g)||[]).map(s=>s.replace(/-/g,'')))];
+  let res=[],seq=[];
+  if(nums.length){
+    nums.forEach(b=>{if(!known(b)&&!bizOk(b))seq.push(badCard(b));else{const r=judge(b);res.push(r);seq.push(r)}});
+  }else{
+    const key=q.replace(/\s+/g,'');
+    const hits=NAMES.filter(([,n])=>n.replace(/\s+/g,'').includes(key));
+    if(!hits.length){$('#st1').textContent=`'${q}' 일치 없음 — 이름이 다를 수 있으니 사업자번호로 조회해 주세요.`;return}
+    if(hits.length===1){res=[judge(hits[0][0])];seq=res}
+    else{
+      $('#st1').textContent=`${hits.length}곳 일치 — 선택하세요`+(hits.length>80?' (앞 80곳만 표시, 이름을 더 길게 넣어 주세요)':'');
+      const box=document.createElement('div');box.className='card pick';
+      hits.slice(0,80).forEach(([b,n])=>{
+        const l=D.L[b],bt=document.createElement('button'),who=l&&l[4][0]?l[4][0][0]+' '+l[4][0][1]:'담당 없음';
+        bt.innerHTML=`<span>${esc(n)} <span class="hint">${esc((l&&l[1])||'')}</span></span><span class="hint">${fmtBiz(b)} · ${esc(who)}</span>`;
+        bt.onclick=()=>{$('#q').value=b;run1()};box.appendChild(bt);
+      });
+      out.appendChild(box);return;
+    }
+  }
+  $('#st1').textContent=`${seq.length}건 조회`;
+  const ok=res.filter(r=>r.cls==='ok').length,no=res.filter(r=>r.cls==='no').length,wa=res.length-ok-no,bad=seq.length-res.length;
+  sum.innerHTML=`<span class="chip ok">가능 ${ok}</span><span class="chip no">불가 ${no}</span>${wa?`<span class="chip warn">협의필요 ${wa}</span>`:''}${bad?`<span class="chip chk">확인필요 ${bad}</span>`:''}`;
+  if(res.length>1){const all=res.map(replyText).join('\n'),b=document.createElement('button');b.className='sm';b.textContent='전체 회신 문구 복사';b.onclick=()=>copy('안녕하세요.\n'+all,b);sum.appendChild(b)}
+  sum.hidden=false;
+  seq.forEach(r=>out.appendChild(r instanceof Element?r:card(r)));
+}
+
+/* ── 엑셀 일괄 조회 ── */
+const LIB_X='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+const LIB_E='https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';
+const HK={biz:['사업자번호','사업자등록번호','사업자','등록번호'],name:['거래처명','거래처','병원명','요양기관명','기관명','상호명','상호','실납처명','처방처','의원명','병의원','약국명'],addr:['주소','소재지'],item:['품목','제품']};
+const HX=/업체|대표|코드|담당/;   // 업체(CSO 자신)·대표자·코드 열은 거래처 열로 잡지 않는다
+const OUTCOLS=['블럭판정','구분','사유','가능 품목','협의 품목','현 담당','코드생성 CSO','매칭 거래처','회신 문구'];
+async function onFile(f){
+  if(!f)return;
+  $('#st2').textContent='';$('#xres').hidden=true;$('#xmap').hidden=true;
+  $('#xmeta').textContent='여는 중… (처음 한 번은 엑셀 도구를 내려받아 몇 초 걸립니다)';$('#xmap').hidden=false;
+  try{
+    await loadScript(LIB_X);
+    const buf=await f.arrayBuffer();
+    const wb=XLSX.read(buf,{type:'array'});
+    const sheets=wb.SheetNames.map(n=>{const ws=wb.Sheets[n];const aoa=ws['!ref']?XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:'',blankrows:true}):[];const rg=ws['!ref']?XLSX.utils.decode_range(ws['!ref']):{s:{r:0,c:0},e:{r:0,c:0}};return {n,aoa,rg}});
+    const best=sheets.reduce((a,s,i)=>s.aoa.filter(r=>r.some(v=>String(v).trim())).length>sheets[a].aoa.filter(r=>r.some(v=>String(v).trim())).length?i:a,0);
+    XL={file:f,buf,sheets,si:best};
+    $('#xs').innerHTML=sheets.map((s,i)=>`<option value="${i}">${esc(s.n)}</option>`).join('');$('#xs').value=best;
+    detect();run2();
+  }catch(e){$('#xmeta').textContent='파일을 열지 못했습니다: '+e.message}
+}
+function hdrScore(row){let s=0;for(const v of row){const t=String(v).replace(/\s+/g,'');if(!t||/\d/.test(t)||t.length>12)continue;for(const ks of Object.values(HK))if(ks.some(k=>t.includes(k))){s++;break}}return s}
+function detect(){
+  const sh=XL.sheets[XL.si],aoa=sh.aoa;
+  let h=-1,bs=0;for(let i=0;i<Math.min(15,aoa.length);i++){const s=hdrScore(aoa[i]);if(s>bs){bs=s;h=i}}
+  const ncol=aoa.reduce((m,r)=>Math.max(m,r.length),1);
+  const lab=c=>{const t=h>=0?String(aoa[h][c]||'').trim():'';return XLSX.utils.encode_col(sh.rg.s.c+c)+'열'+(t?' · '+t:'')};
+  const opts='<option value="-1">(없음)</option>'+[...Array(ncol).keys()].map(c=>`<option value="${c}">${esc(lab(c))}</option>`).join('');
+  ['#xb','#xn','#xa','#xi'].forEach(s=>$(s).innerHTML=opts);
+  $('#xh').innerHTML='<option value="-1">(머리글 없음)</option>'+[...Array(Math.min(15,aoa.length)).keys()].map(i=>`<option value="${i}">${sh.rg.s.r+i+1}행</option>`).join('');
+  $('#xh').value=h;
+  const hdr=c=>h>=0?String(aoa[h][c]||'').replace(/\s+/g,''):'';
+  const find=(ks,skip)=>{for(const k of ks)for(let c=0;c<ncol;c++)if(c!==skip&&hdr(c).includes(k)&&!HX.test(hdr(c)))return c;return -1};
+  let b=find(HK.biz);
+  const data=aoa.slice(h+1);
+  if(b<0){let mx=0;for(let c=0;c<ncol;c++){if(HX.test(hdr(c)))continue;const n=data.filter(r=>/^\s*\d{3}-?\d{2}-?\d{5}\s*$/.test(String(r[c]||''))).length;if(n>mx){mx=n;b=c}}}
+  let n=find(HK.name,b);if(n>=0&&HK.biz.some(x=>hdr(n).includes(x)))n=-1;
+  $('#xb').value=b;$('#xn').value=n;$('#xa').value=find(HK.addr);$('#xi').value=find(HK.item);
+}
+function addrPick(cands,addr){
+  const t=String(addr||'').split(/\s+/).filter(Boolean);if(t.length<2)return null;
+  const keys=t.slice(1,3).map(x=>x.replace(/\s/g,''));
+  const hit=cands.filter(b=>{const a=((D.L[b]&&D.L[b][1])||'').replace(/\s/g,'');return keys.every(k=>a.includes(k))});
+  return hit.length===1?hit[0]:null;
+}
+function itemIdx(req){
+  const parts=String(req||'').split(/[,\/·\n]+/).map(nitem).filter(s=>s.length>=2);if(!parts.length)return null;
+  const set=new Set();D.items.forEach((nm,i)=>{const k=nitem(nm);if(parts.some(p=>k.includes(p)||p.includes(k)))set.add(i)});return [...set];
+}
+function judgeRow(cell){
+  const bz=String(cell.biz||'').replace(/\D/g,'');
+  let b=null,note='';
+  if(bz.length===10)b=bz;
+  else if(String(cell.name||'').trim()){
+    const k=nname(cell.name),c=D.idx.get(k)||[];
+    if(c.length===1)b=c[0];
+    else if(c.length>1){b=addrPick(c,cell.addr);if(!b)return {v:'확인필요',cls:'chk',kind:'',reason:`같은 이름 ${c.length}곳 — 사업자번호로 확인: `+c.slice(0,3).map(x=>`${fmtBiz(x)}(${judge(x).v})`).join(', '),match:''};note='(주소로 구분) '}
+    else{
+      const part=k.length<3?[]:D.nn.filter(([,,m])=>m.length>=3&&(m.includes(k)||k.includes(m))).slice(0,4);
+      return {v:'확인필요',cls:'chk',kind:'',reason:part.length?'이름이 정확히 일치하지 않음 — 후보: '+part.slice(0,3).map(([x,n])=>`${n} ${fmtBiz(x)}(${judge(x).v})`).join(', '):'원천에서 이름을 찾지 못함 — 사업자번호로 확인',match:''};
+    }
+  }else if(bz.length)return {v:'확인필요',cls:'chk',kind:'',reason:'사업자번호 자릿수 오류',match:''};
+  else return null;
+  if(!known(b)&&!bizOk(b))return {v:'확인필요',cls:'chk',kind:'',reason:'원천에 없고 사업자번호 형식 오류 — 번호 확인',match:fmtBiz(b)};
+  const r=judge(b),l=r.l||D.L[b],cm=l?l[4]:[];
+  const who=[...new Set(cm.map(c=>c[0]+' '+c[1]))].join(', ');
+  const cso=[...new Set([...(l?l[5].map(m=>m[0]):[]),...cm.map(c=>c[5])].filter(Boolean))].join(', ');
+  const out={kind:r.kind,match:`${nameOf(b)} (${fmtBiz(b)})`,who,cso,reply:replyText(r),can:'',hyo:''};
+  if(r.kind==='로컬'){Object.assign(out,{v:r.v,cls:r.cls,reason:note+r.reason})}
+  else{
+    const nm=s=>s.split(' — ')[0];
+    out.can=r.g.가능.map(nm).join(', ');out.hyo=r.g.협의필요.map(nm).join(', ');
+    const want=cell.item?itemIdx(cell.item):null;
+    if(want&&want.length){
+      const vs=want.map(i=>r.per[i]);
+      const v=vs.includes('가능')?'가능':vs.includes('협의필요')?'협의필요':'불가';
+      Object.assign(out,{v,cls:v==='가능'?'ok':v==='협의필요'?'warn':'no',reason:note+`요청 품목 ${want.map(i=>D.items[i]+'='+r.per[i]).join(', ')}`});
+    }else{
+      const v=r.cls==='ok'?'가능':r.cls==='warn'?'협의필요':'불가';
+      Object.assign(out,{v,cls:r.cls,reason:note+`병원 품목별: 가능 ${r.g.가능.length} · 협의 ${r.g.협의필요.length} · 불가 ${r.g.불가.length+r.nx.length}`+(cell.item?' (요청 품목명 불일치 — 전체 품목 기준)':'')});
+    }
+  }
+  return out;
+}
+let XROWS=[],XF='all',XN=200;
+function run2(){
+  const sh=XL.sheets[XL.si],aoa=sh.aoa,h=+$('#xh').value,cb=+$('#xb').value,cn=+$('#xn').value,ca=+$('#xa').value,ci=+$('#xi').value;
+  $('#xmeta').textContent=`${XL.file.name} · 시트 '${sh.n}' · 열 지정이 틀리면 아래에서 바꾸면 바로 다시 판정합니다`;
+  if(cb<0&&cn<0){$('#xres').hidden=true;$('#st2').textContent='';$('#xmeta').textContent='사업자번호 열이나 거래처명 열을 지정해 주세요';return}
+  XROWS=[];
+  for(let i=h+1;i<aoa.length;i++){
+    const r=aoa[i],g=c=>c>=0?String(r[c]??'').trim():'';
+    const res=judgeRow({biz:g(cb),name:g(cn),addr:g(ca),item:g(ci)});
+    if(res)XROWS.push({i,req:[g(cn),g(cb)].filter(Boolean).join(' · ')||'-',...res});
+  }
+  const cnt=k=>XROWS.filter(r=>r.v===k).length;
+  const c={가능:cnt('가능'),불가:cnt('불가'),협의필요:cnt('협의필요'),확인필요:cnt('확인필요')};
+  XF='all';XN=200;
+  $('#xchips').innerHTML=`<button class="chip on" data-f="all">전체 ${XROWS.length}</button><button class="chip ok" data-f="가능">가능 ${c.가능}</button><button class="chip no" data-f="불가">불가 ${c.불가}</button>`+(c.협의필요?`<button class="chip warn" data-f="협의필요">협의필요 ${c.협의필요}</button>`:'')+(c.확인필요?`<button class="chip chk" data-f="확인필요">확인필요 ${c.확인필요}</button>`:'');
+  $('#xchips').querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{XF=b.dataset.f;XN=200;$('#xchips').querySelectorAll('[data-f]').forEach(x=>x.classList.toggle('on',x===b));draw2()});
+  $('#xres').hidden=false;draw2();
+}
+function draw2(){
+  const rows=XROWS.filter(r=>XF==='all'||r.v===XF),sh=XL.sheets[XL.si];
+  $('#xbody').innerHTML=rows.slice(0,XN).map(r=>`<tr><td>${sh.rg.s.r+r.i+1}</td><td class="v"><span class="pill ${r.cls}">${esc(r.v)}</span></td><td class="n">${esc(r.req)}</td><td class="r">${esc(r.reason)}</td><td class="n">${esc(r.match)}</td></tr>`).join('');
+  $('#xmore').hidden=rows.length<=XN;$('#xmore').textContent=`더 보기 (${rows.length-XN}건 남음)`;
+}
+const FILL={ok:'FFDFF3E4',no:'FFFDE8E8',warn:'FFFDF1DF',chk:'FFECECF0'},FONT={ok:'FF248A3D',no:'FFD70015',warn:'FFC76B00',chk:'FF6E6E73'};
+function outVals(r){return [r.v,r.kind,r.reason,r.can||'',r.hyo||'',r.who||'',r.cso||'',r.match||'',r.reply||'']}
+async function download(){
+  const btn=$('#xdl');btn.disabled=true;$('#st2').textContent='만드는 중…';
+  try{
+    await loadScript(LIB_E);
+    const sh=XL.sheets[XL.si],h=+$('#xh').value,isX=/\.xlsx$/i.test(XL.file.name);
+    // aoa 행 i → 엑셀 행 i+base, 추가 열은 c1부터(1부터 센 번호). 원본 xlsx면 원본 서식 그대로 오른쪽에 붙인다
+    let wb=null,ws=null,base,c1,hr,kept=false;
+    if(isX&&h>=0){try{wb=new ExcelJS.Workbook();await wb.xlsx.load(XL.buf);ws=wb.getWorksheet(sh.n);kept=!!ws}catch(e){ws=null}}
+    if(kept){base=sh.rg.s.r+1;c1=sh.rg.e.c+2;hr=h+base}
+    else{   // xls·csv·머리글 없음·원본을 못 읽은 경우 → 값만 옮긴 새 시트(머리글 1행 보장)
+      wb=new ExcelJS.Workbook();ws=wb.addWorksheet('조회결과');
+      const ncol=sh.aoa.reduce((m,r)=>Math.max(m,r.length),1);c1=ncol+1;
+      if(h<0){ws.addRow([...Array(ncol)].map((_,c)=>XLSX.utils.encode_col(c)+'열'));base=2;hr=1}else{base=1;hr=h+1}
+      sh.aoa.forEach(r=>ws.addRow(r));
+    }
+    OUTCOLS.forEach((t,j)=>{const c=ws.getCell(hr,c1+j);c.value=t;c.font={bold:true,color:{argb:'FFFFFFFF'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF0071E3'}};c.alignment={vertical:'middle',wrapText:true}});
+    XROWS.forEach(r=>{
+      const rr=r.i+base;
+      outVals(r).forEach((v,j)=>{const c=ws.getCell(rr,c1+j);c.value=v;if(j===0){c.fill={type:'pattern',pattern:'solid',fgColor:{argb:FILL[r.cls]}};c.font={bold:true,color:{argb:FONT[r.cls]}}}if(j===2||j===8)c.alignment={wrapText:false}});
+    });
+    [10,7,48,30,22,22,22,30,60].forEach((w,j)=>ws.getColumn(c1+j).width=w);
+    const sm=wb.addWorksheet('조회요약');
+    const cnt=k=>XROWS.filter(r=>r.v===k).length;
+    [['CSO 블럭 조회 결과'],['원본 파일',XL.file.name],['원본 시트',sh.n],['조회 일시',new Date().toLocaleString('ko-KR')],['기준 데이터',`CSO거래처관리데이터 ${D.meta['기준일']}`],['병원 판정',D.meta['병원판정']||''],[],['구분','건수'],['전체',XROWS.length],['가능',cnt('가능')],['불가',cnt('불가')],['협의필요',cnt('협의필요')],['확인필요',cnt('확인필요')],[],['※ 확인필요 = 사업자번호 오류이거나 거래처명이 여러 곳과 같거나 정확히 일치하지 않는 건 — 사업자번호로 다시 확인'],['※ 판정 기준 = 최인경 지부장 CSO 거래가능 조회 규칙(로컬: 타 CSO 코드·현 담당 / 병원: 품목별 네트워크 오픈)']].forEach(r=>sm.addRow(r));
+    sm.getCell('A1').font={bold:true,size:14};sm.getColumn(1).width=16;sm.getColumn(2).width=60;
+    const out=await wb.xlsx.writeBuffer();
+    const d=new Date(),ymd6=String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+    const name=XL.file.name.replace(/\.(xlsx|xls|csv)$/i,'')+'_블럭조회결과_'+ymd6+'.xlsx';
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));a.download=name;document.body.appendChild(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000);
+    $('#st2').textContent=`받음: ${name}`+(kept?' (원본 서식 유지)':' (값만 옮긴 새 파일)');
+  }catch(e){$('#st2').textContent='엑셀을 만들지 못했습니다: '+e.message}
+  btn.disabled=false;
+}
+
+/* ── 화면 연결 ── */
+function tab(x){const one=x==='one';$('#tb-one').classList.toggle('on',one);$('#tb-xl').classList.toggle('on',!one);$('#tb-one').setAttribute('aria-selected',one);$('#tb-xl').setAttribute('aria-selected',!one);
+  $('#pn-one').hidden=!one;$('#out1').hidden=!one||!$('#out1').innerHTML;$('#cards').hidden=!one;$('#pn-xl').hidden=one;$('#xres').hidden=one||!XROWS.length}
+$('#tb-one').onclick=()=>tab('one');$('#tb-xl').onclick=()=>tab('xl');
+$('#go').onclick=run1;
+$('#clear').onclick=()=>{$('#q').value='';run1();$('#q').focus()};
+$('#q').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();run1()}});
+$('#pickf').onclick=()=>$('#fin').click();
+$('#fin').onchange=e=>{onFile(e.target.files[0]);e.target.value=''};
+const dz=$('#drop');
+['dragenter','dragover'].forEach(t=>dz.addEventListener(t,e=>{e.preventDefault();dz.classList.add('over')}));
+['dragleave','drop'].forEach(t=>dz.addEventListener(t,e=>{e.preventDefault();dz.classList.remove('over')}));
+dz.addEventListener('drop',e=>{if(D&&e.dataTransfer.files[0])onFile(e.dataTransfer.files[0])});
+$('#xs').onchange=()=>{XL.si=+$('#xs').value;detect();run2()};
+['#xh','#xb','#xn','#xa','#xi'].forEach(s=>$(s).onchange=run2);
+$('#xmore').onclick=()=>{XN+=300;draw2()};
+$('#xdl').onclick=download;
+loadData();
+</script>
+</body>
+</html>
