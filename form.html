@@ -1426,9 +1426,11 @@ function nbMultiHint(){
   const si=s=>STAGES.indexOf(String(s||'').trim());
   const list=vendors.map(x=>`${esc(x.v||'(업체 미기재)')} <span style="color:var(--gray3)">${esc(x.s||'단계 미입력')}${x.r?' · '+esc(x.r):''}</span>${x.rep?' <b style="color:#1a4fa0">대표</b>':''}`).join(' / ');
   const mine=v?vendors.filter(x=>normVendorKey(x.v)===normVendorKey(v))[0]:null;
+  const is110=!!rep.is110||!!(document.getElementById('nb-is110')||{}).checked;   // 복수오픈은 110대 병원만(박본님 10-25)
   let verdict;
   if(!v) verdict='<span style="color:#92400e">업체명을 적으면 등록 가능 여부를 보여 줍니다</span>';
   else if(mine) verdict=`<span style="color:#166534">✔ ${esc(v)}는 이미 이 블럭의 ${mine.rep?'대표':'복수오픈'} 업체 — 전송하면 진행 갱신으로 저장됩니다</span>`;
+  else if(!is110) verdict=`<span style="color:#b91c1c">⚠ 110대 병원이 아니라 복수오픈이 없습니다 — 전송하면 업체가 ${esc(rep.업체명||'(미기재)')}에서 ${esc(v)}(으)로 교체됩니다(교체가 맞으면 이슈상태를 "업체변경"으로)</span>`;
   else if(vendors.some(x=>si(x.s)>=5)) verdict='<span style="color:#b91c1c">⛔ 이미 코딩·처방 단계 — 다른 업체는 추가할 수 없습니다(업체 교체면 이슈상태 "업체변경")</span>';
   else if(vendors.some(x=>si(x.s)>=3)) verdict='<span style="color:#b91c1c">⛔ DC접수 완료 — 다른 업체는 추가할 수 없습니다</span>';
   else if(vendors.length>=3) verdict='<span style="color:#b91c1c">⛔ 이미 3곳 진행 중 — 추가할 수 없습니다</span>';

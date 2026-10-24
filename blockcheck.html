@@ -134,7 +134,7 @@ details.rules ul{padding-left:18px;margin:6px 0 0}
     <summary>판정 기준</summary>
     <ul>
       <li><b>로컬</b> (채널매핑 담당 부서 기준) — 다른 CSO 코드 있음 → 불가 / 한올 담당자(영업부·MS팀 등) 있음 → 불가 / 대웅 담당자(DW·DA·DB·폴라리스)만 → <b>협의필요</b> / 영업기획팀·영업관리팀만 담당(비활성처) → 가능 / 담당 없음(비거래처) → 가능</li>
-      <li><b>병원</b> (품목을 함께 입력) — 그 품목의 최근 6개월 매출(DW·HA병원) 있음 → 불가 / <b>PRM 블럭신청 후 6개월 이내(신규 블럭 유예)</b> → 매출이 안 보여도 불가(OCS 2개월 지연) / <b>CRM(일일보고) 진행 중</b>: DC접수 이상 업체가 있으면 불가, DC접수 전 복수오픈 3곳 미만이면 가능(협의필요)·3곳이면 불가 / 그 외 매출 없음 → 가능. 단 MS팀·한올영업부·대웅영업부가 담당하거나 다른 CSO 코드·6개월 지난 PRM 신청이 있으면 <b>가능(협의필요)</b>. 품목을 안 적으면 '품목 입력 필요'와 품목별 목록을 보여 줍니다.</li>
+      <li><b>병원</b> (품목을 함께 입력) — 그 품목의 최근 6개월 매출(DW·HA병원) 있음 → 불가 / <b>PRM 블럭신청 후 6개월 이내(신규 블럭 유예)</b> → 매출이 안 보여도 불가(OCS 2개월 지연) / <b>CRM(일일보고) 진행 중</b>: DC접수 이상 업체가 있으면 불가 / <b>110대 병원</b>은 DC접수 전 복수오픈 3곳 미만이면 가능(협의필요)·3곳이면 불가 / 110대가 아닌 병원은 진행 중 업체가 있으면 불가(복수오픈 없음) / 그 외 매출 없음 → 가능. 단 MS팀·한올영업부·대웅영업부가 담당하거나 다른 CSO 코드·6개월 지난 PRM 신청이 있으면 <b>가능(협의필요)</b>. 품목을 안 적으면 '품목 입력 필요'와 품목별 목록을 보여 줍니다.</li>
       <li><b>프레논</b>은 제형·용량이 달라도('프레논', '프레논OD', '프레논 50mg') 한 품목으로 봅니다 — 계열 안에 하나라도 불가면 불가.</li>
       <li>병원 여부: 병원 품목 매출·영업관리 병원 컨펌 이력이 있거나, 이름·담당 부서·채널에 '병원'이 있으면 병원으로 봅니다. 카드에서 로컬/병원 판정을 바꿔볼 수 있습니다.</li>
       <li><b>확인필요</b> — 원천에 없는 번호 중 사업자번호 형식 오류이거나 같은 이름 거래처가 따로 있는 경우, 거래처명이 여러 곳과 같거나 정확히 일치하지 않는 경우, 요청 품목명을 찾지 못했거나 요청 품목별 판정이 다른 경우. 사유 칸을 보고 다시 확인해 주세요.</li>
@@ -192,7 +192,7 @@ function ready(){
   D.idx=idx;
   // 품목 키(제형·용량 뺀 핵심 토큰, 프레논은 계열 하나) + CRM 진행 블럭 색인 {사업자번호:[{keys,v:업체,s:단계,si,rpm,src}]}
   D.ik=D.items.map(([,n])=>famOf(n)||pkey(n));D.ikSet=new Set(D.ik);
-  D.M={};D.MN={};(Array.isArray(D.m)?D.m:[]).forEach(([b,p,v,s,rpm,src,h])=>{const e={keys:prodKeys(p),p,v,s,si:STG.indexOf(s),rpm,src,h};if(b)(D.M[b]||(D.M[b]=[])).push(e);else{const k=nname(h);if(k)(D.MN[k]||(D.MN[k]=[])).push(e)}});   // 사업자번호 없는 CRM 행은 병원명으로
+  D.M={};D.MN={};(Array.isArray(D.m)?D.m:[]).forEach(([b,p,v,s,rpm,src,h,t])=>{const e={keys:prodKeys(p),p,v,s,si:STG.indexOf(s),rpm,src,h,is110:t===undefined?1:(t?1:0)};if(b)(D.M[b]||(D.M[b]=[])).push(e);else{const k=nname(h);if(k)(D.MN[k]||(D.MN[k]=[])).push(e)}});   // 사업자번호 없는 CRM 행은 병원명으로 · t(110대)는 v54부터, 없으면 110대로 간주
   const crm=Array.isArray(D.m)?` · CRM 진행 ${D.m.length}건(실시간)`:' · ⚠ CRM 진행 정보 없음(판정에 미반영)';
   $('#asof').textContent=`기준 ${D.meta['기준일']} · 로컬 ${Object.keys(D.L).length.toLocaleString()}곳 · 병원 ${Object.keys(D.H).length.toLocaleString()}곳`+crm;
   $('#go').disabled=false;$('#pickf').disabled=false;$('#st1').textContent='준비됨';
@@ -251,6 +251,7 @@ function judgeHosp(b,want){   // want = itemIdx 결과(요청 품목) 또는 nul
     if(s&&(s[0]||s[1])){per[i]='불가';det[i]=`최근 6개월 매출 有 (DW ${won(s[0])} / HA ${won(s[1])})`}
     else if(p&&ge>today){per[i]='불가';det[i]=`PRM 블럭신청 ${p[0]} (${p[1]}) — 신규 블럭 유예 중(~${dstr(ge)}), 매출 반영 전`}
     else if(dc.length){per[i]='불가';det[i]=`CRM 진행 중 ${dc.map(vtxt).join(', ')} — ${dc[0].si>=5?'이미 코딩·처방':'DC접수 완료'}, 다른 업체 추가 불가`}
+    else if(mb.some(e=>!e.is110)){per[i]='불가';det[i]=`CRM 진행 중 ${mb.map(vtxt).join(', ')} — 110대 아님(복수오픈 없음), 다른 업체 추가 불가`}   // 복수오픈은 110대 병원만(박본님 10-25)
     else if(mb.length>=3){per[i]='불가';det[i]=`복수오픈 3곳 진행 중 (${mb.map(vtxt).join(', ')}) — 추가 불가`}
     else if(mb.length){per[i]='가능(협의필요)';det[i]=`복수오픈 ${mb.length}/3 진행 중 (${mb.map(vtxt).join(', ')}) — 지부장 확인`}
     else if(p||hy.length){per[i]='가능(협의필요)';det[i]='매출 없음 · '+[p?`PRM 신청 ${p[0]}(${p[1]}) 6개월 경과`:'',...hy].filter(Boolean).join(' · ')}
@@ -541,7 +542,7 @@ async function download(){
     [10,7,48,30,22,22,22,30,60,48].forEach((w,j)=>ws.getColumn(c1+j).width=w);
     const sm=wb.addWorksheet('조회요약');
     const cnt=k=>XROWS.filter(r=>r.v===k).length;
-    [['CSO 블럭 조회 결과'],['원본 파일',XL.file.name],['원본 시트',sh.n],['조회 일시',new Date().toLocaleString('ko-KR')],['기준 데이터',`CSO거래처관리데이터 ${D.meta['기준일']}`],['병원 판정',D.meta['병원판정']||''],[],['구분','건수'],['전체',XROWS.length],...ORDER.map(([k])=>[k,cnt(k)]),[],['※ 로컬: 다른 CSO 코드·한올 담당 → 불가 / 대웅 담당만 → 협의필요 / 영업기획·영업관리팀만(비활성처)·담당 없음 → 가능'],['※ 병원: 요청 품목의 최근 6개월 매출 있음·PRM 블럭신청 후 6개월 이내(신규 유예)·CRM 진행 블럭에 DC접수 이상 업체 있음·복수오픈 3곳 → 불가 / 복수오픈 3곳 미만 → 가능(협의필요) / 그 외 매출 없음 → 가능, MS팀·한올·대웅 영업 담당이나 다른 CSO 코드가 있으면 가능(협의필요) / 품목을 안 적으면 품목 입력 필요 / 프레논은 제형이 달라도 한 품목'],['CRM 진행 블럭',Array.isArray(D.m)?D.m.length+'건(조회 시점 실시간)':'못 받음 — 판정에 미반영'],['※ 확인필요 = 사업자번호 오류·같은 이름 여러 곳·품목명 불일치·요청 품목별 판정이 다른 건 — 사유 칸 확인']].forEach(r=>sm.addRow(r));
+    [['CSO 블럭 조회 결과'],['원본 파일',XL.file.name],['원본 시트',sh.n],['조회 일시',new Date().toLocaleString('ko-KR')],['기준 데이터',`CSO거래처관리데이터 ${D.meta['기준일']}`],['병원 판정',D.meta['병원판정']||''],[],['구분','건수'],['전체',XROWS.length],...ORDER.map(([k])=>[k,cnt(k)]),[],['※ 로컬: 다른 CSO 코드·한올 담당 → 불가 / 대웅 담당만 → 협의필요 / 영업기획·영업관리팀만(비활성처)·담당 없음 → 가능'],['※ 병원: 요청 품목의 최근 6개월 매출 있음·PRM 블럭신청 후 6개월 이내(신규 유예)·CRM 진행 블럭에 DC접수 이상 업체 있음·110대 복수오픈 3곳·110대 아닌 병원에 진행 업체 있음 → 불가 / 110대 복수오픈 3곳 미만 → 가능(협의필요) / 그 외 매출 없음 → 가능, MS팀·한올·대웅 영업 담당이나 다른 CSO 코드가 있으면 가능(협의필요) / 품목을 안 적으면 품목 입력 필요 / 프레논은 제형이 달라도 한 품목'],['CRM 진행 블럭',Array.isArray(D.m)?D.m.length+'건(조회 시점 실시간)':'못 받음 — 판정에 미반영'],['※ 확인필요 = 사업자번호 오류·같은 이름 여러 곳·품목명 불일치·요청 품목별 판정이 다른 건 — 사유 칸 확인']].forEach(r=>sm.addRow(r));
     sm.getCell('A1').font={bold:true,size:14};sm.getColumn(1).width=16;sm.getColumn(2).width=60;
     const out=await wb.xlsx.writeBuffer();
     const d=new Date(),ymd6=String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
