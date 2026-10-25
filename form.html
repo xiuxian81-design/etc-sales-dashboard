@@ -1145,6 +1145,7 @@ function paintIssueSelect(sel){sel.className='iss-sel '+(sel.value?sel.value.rep
 let data=[],rpm='',items=[];              // items = 신약진행 보고 대상(자동표시+검색추가)
 let multiOpen=[];                          // [v53] 복수오픈 진행 행(서버 getMboData.multiOpen, 종료 제외) — 신규 블럭 모달 사전 안내용
 let itemMaster=[], vendorMasterNames=[];   // [v55] 품목마스터 탭(표준명·별칭) · 업체실적 탭 업체명 — 고르기 + 없으면 직접 입력(점검 대상 표시)
+let vendorAliasRows=[];                    // [v56] 업체별칭 탭 [{std, aliases}] — 별칭을 적으면 저장 시 표준 표기로
 /* [fix1-H1] 이번 세션에 실제로 전송된 신약 건 — 전송 후 이메일·엑셀에서 신약이 사라지지 않게 한다 */
 let lastSentItems=[], lastSentDate='';
 let volumeUp=[];                           // ④ 볼륨업 행
@@ -1217,6 +1218,7 @@ function loadFromGAS(){
       multiOpen=((res.multiOpen)||(res.data&&res.data.multiOpen)||[]).filter(r=>String(r['상태']||'').trim()!=='종료');   // [v53]
       itemMaster=((res.itemMaster)||(res.data&&res.data.itemMaster)||[]).filter(m=>m&&m.std);   // [v55]
       vendorMasterNames=((res.vendorMaster)||(res.data&&res.data.vendorMaster)||[]);
+      vendorAliasRows=((res.vendorAliases)||(res.data&&res.data.vendorAliases)||[]).filter(r=>r&&r.std);   // [v56]
       fillItemSelect(); fillVendorList();
 
       buildHospitalMaster();
@@ -1450,7 +1452,9 @@ function nbMultiHint(){
 /* ── [v55] 품목·업체 마스터 — 고르기 + 없으면 직접 입력. 마스터에 없는 값은 바로 표시하고(저장은 그대로) 서버가 매주 월요일 '마스터점검' 탭에 모은다 ── */
 const FLAG_OK='<span style="color:#166534">✔ 마스터 항목</span>';
 function itemStdOf(p){const k=normProdC(p);if(!k)return '';for(const m of itemMaster){if(normProdC(m.std)===k)return m.std;for(const a of (m.aliases||[]))if(normProdC(a)===k)return m.std;}return '';}   // 표기 흔들림 흡수 → 표준명, 없으면 ''
-function vendorInMaster(v){const k=normVendorKey(v);return !!k&&vendorMasterNames.some(n=>normVendorKey(n)===k);}
+function vendorStdOf(v){const k=normVendorKey(v);if(!k)return '';for(const r of vendorAliasRows){if(normVendorKey(r.std)===k)return r.std;for(const a of (r.aliases||[]))if(normVendorKey(a)===k)return r.std;}return '';}   // [v56] 별칭 → 표준 업체명, 없으면 ''
+function vendorInMaster(v){const k=normVendorKey(v);return !!k&&(vendorMasterNames.some(n=>normVendorKey(n)===k)||!!vendorStdOf(v));}
+function vendorFix(v){const s=vendorStdOf(v);return (s&&normVendorKey(s)!==normVendorKey(v))?s:v;}   // 저장용 — 별칭이면 표준 표기
 function fillItemSelect(){
   const sel=document.getElementById('nb-p-sel'); if(!sel) return;
   const cur=sel.value;
@@ -1474,11 +1478,13 @@ function nbItemFlag(){   // 직접 입력 중 — 마스터 표기와 같으면 
   const std=itemStdOf(v);
   flag.innerHTML=std?`<span style="color:#166534">✔ 마스터 '${esc(std)}'와 같은 품목 — 저장 시 그 표기로 통일됩니다</span>`:'<span style="color:#92400e">⚠ 마스터에 없는 품목 — 직접 입력(매주 월요일 점검 대상)</span>';
 }
-function nbVendorFlag(){
-  const v=V('nb-c'), flag=document.getElementById('nb-c-flag'); if(!flag) return;
-  flag.innerHTML=!v?'':vendorInMaster(v)?FLAG_OK:'<span style="color:#92400e">⚠ 업체실적(업체 마스터)에 없는 업체 — 직접 입력(매주 월요일 점검 대상)</span>';
+function vendorFlagHtml(v){
+  if(!v) return '';
+  const s=vendorStdOf(v);
+  if(s&&normVendorKey(s)!==normVendorKey(v)) return `<span style="color:#166534">✔ 마스터 '${esc(s)}'의 별칭 — 저장 시 그 표기로 통일됩니다</span>`;   // [v56]
+  return vendorInMaster(v)?FLAG_OK:'<span style="color:#92400e">⚠ 업체실적(업체 마스터)에 없는 업체 — 직접 입력(매주 월요일 점검 대상)</span>';
 }
-function vendorFlagHtml(v){return !v?'':vendorInMaster(v)?FLAG_OK:'<span style="color:#92400e">⚠ 업체 마스터에 없음(점검 대상)</span>';}
+function nbVendorFlag(){const flag=document.getElementById('nb-c-flag'); if(flag) flag.innerHTML=vendorFlagHtml(V('nb-c'));}
 function nbResetMaster(){
   const sel=document.getElementById('nb-p-sel'), inp=document.getElementById('nb-p'); if(sel) sel.value=''; if(inp){inp.style.display='none';inp.value='';}
   ['nb-p-flag','nb-c-flag'].forEach(id=>{const e=document.getElementById(id); if(e) e.innerHTML='';});
@@ -2182,7 +2188,7 @@ function buildRI(it,i){
     <div class="ri-bd">
       <div class="row2">
         ${!it._new?`<div class="ig"><label>🏢 CSO 업체명 <span style="font-size:10px;color:var(--gray3);font-weight:400">변경 시 수정</span>${vendorHistIcon}</label>
-          <input type="text" value="${esc(it.업체명||'')}" placeholder="업체명 검색 또는 직접 입력" list="vendor-list" autocomplete="off" onchange="setF(${i},'업체명',this.value);this.nextElementSibling.innerHTML=vendorFlagHtml(this.value)">
+          <input type="text" value="${esc(it.업체명||'')}" placeholder="업체명 검색 또는 직접 입력" list="vendor-list" autocomplete="off" onchange="this.value=vendorFix(this.value);setF(${i},'업체명',this.value);this.nextElementSibling.innerHTML=vendorFlagHtml(this.value)">
           <div style="font-size:11px;margin-top:3px">${vendorFlagHtml(it.업체명)}</div>
         </div>
         <div class="ig"><label>💰 MBO (만원) <span style="font-size:10px;color:var(--gray3);font-weight:400">변경 시 수정</span>${mboHistIcon}</label>
@@ -2349,7 +2355,7 @@ function addNB(){
   const rpmTel=(data.find(x=>x.담당RPM===rpm&&x.RPM연락처)||{}).RPM연락처||'';
   items.push({_id:Date.now(),_new:true,_open:true,_미등록:(m.미등록==='미등록'),담당RPM:rpm,신청월:today().slice(0,4)+'년',
     RPM연락처:rpmTel,사업자번호:biz,실납처명:h,is110:is110,시군구:V('nb-sgg'),제품명:p,기준품명:p,
-    업체사업자번호:V('nb-cbiz'),업체명:V('nb-c'),업체연락처:V('nb-ct'),MBO:manToWon(V('nb-m'))||0,   // [fix6] 입력=만원 → 저장=원
+    업체사업자번호:V('nb-cbiz'),업체명:vendorFix(V('nb-c')),업체연락처:V('nb-ct'),MBO:manToWon(V('nb-m'))||0,   // [fix6] 입력=만원 → 저장=원 · [v56] 업체 별칭 → 표준 표기
     DC접수월:V('nb-ld'),코딩예측월:V('nb-cd'),상정과KOL:V('nb-kol'),신약과정:document.getElementById('nb-st').value,
     이슈상태:issVal,진행사항:V('nb-n'),작성일:today(),비고:V('nb-e')});
   ['nb-h','nb-p','nb-c','nb-cbiz','nb-ct','nb-m','nb-ld','nb-cd','nb-kol','nb-n','nb-e','nb-biz','nb-sgg'].forEach(id=>document.getElementById(id).value='');
