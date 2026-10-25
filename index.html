@@ -2495,23 +2495,40 @@ function renderFcYearly(y, meta){
     if(curYear&&yr===curYear&&Array.isArray(y.targets)){
       var tg={}, ts={}; months.forEach(function(m,i){ if(fcYearOf(m)===yr){ var mo=parseInt(m.slice(5,7),10); tg[mo]=(y.targets[i]!=null&&y.targets[i]!=='')?Number(y.targets[i]):null; ts[mo]=(y.targetSrc||[])[i]||''; } });
       var hasT=Object.keys(tg).some(function(k){return tg[k]!=null;});
+      /* [v60 2026-10-25 박본님] 잔여 목표 — 사업계획 12개월이 다 있으면 현재월부터 연말까지의 목표를 '연간 목표 − 그 전 달까지 실적 누계(실적 없는 달은 계획값 대입)'를 계획 비중으로 나눈 값으로 바꾼다(사업기 누계 100% 달성에 필요한 금액). 실적이 들어오면 자동 재계산 */
+      var resid=null;
+      (function(){
+        var nowMo=(meta&&meta.nowMonth&&fcYearOf(meta.nowMonth)===yr)?parseInt(meta.nowMonth.slice(5,7),10):0;
+        var full=true; for(var i=1;i<=12;i++){ if(!(ts[i]==='plan'&&tg[i]!=null)) full=false; }
+        if(!full||nowMo<2||nowMo>12) return;
+        var annual=0; for(var i=1;i<=12;i++) annual+=tg[i];
+        var before=0, filled=[];
+        for(var i=1;i<nowMo;i++){ var c=byYear[yr][i]; var a=(c&&c.k==='actual'&&Number(c.v)>0)?Number(c.v):null; if(a!=null) before+=a; else { before+=tg[i]; filled.push(i); } }
+        var wsum=0; for(var i=nowMo;i<=12;i++) wsum+=tg[i];
+        var rem=annual-before; if(wsum<=0) return;
+        resid={annual:annual,before:before,rem:rem,from:nowMo,filled:filled,plan:{}};
+        for(var i=nowMo;i<=12;i++){ resid.plan[i]=tg[i]; tg[i]=rem*tg[i]/wsum; ts[i]='residual'; }
+      })();
       if(hasT){
         var rT='<tr style="background:#f8fafc"><td style="text-align:left;font-weight:700;color:var(--blue-dk)">'+yr+' 목표</td>', rA='<tr style="background:#f8fafc"><td style="text-align:left;font-weight:700">달성율</td>', rC='<tr style="background:#f8fafc"><td style="text-align:left;font-weight:700">누계 달성율</td>';
         var tSum=0,tCnt=0,cumA=0,cumT=0,lastCum=null, srcSet={};
         for(var mo=1;mo<=12;mo++){
           var cell=byYear[yr][mo], t=tg[mo], a=(cell&&cell.v!=null&&cell.v!==''&&cell.k!=='forecast')?Number(cell.v):null;
           if(t!=null){ tSum+=t; tCnt++; if(ts[mo]) srcSet[ts[mo]]=1; }
-          rT+='<td style="color:var(--blue-dk)'+(cell&&cell.k==='current'?';font-weight:700':'')+'">'+(t!=null?fcEok(t):'<span style="color:var(--gray3)">-</span>')+'</td>';
+          rT+='<td style="color:var(--blue-dk)'+(cell&&cell.k==='current'?';font-weight:700':'')+(ts[mo]==='residual'?';background:#eef2ff':'')+'" title="'+(ts[mo]==='residual'?('잔여 목표 — 사업계획 '+fcEok(resid.plan[mo])+'억을 연간 잔여분으로 환산'):'')+'">'+(t!=null?fcEok(t)+(ts[mo]==='residual'?'<span style="font-size:9px;color:#6366f1"> 잔여</span>':''):'<span style="color:var(--gray3)">-</span>')+'</td>';
           if(t!=null&&t>0&&a!=null&&a>0){ var p=a/t*100; cumA+=a; cumT+=t; lastCum=cumA/cumT*100;
             rA+='<td style="font-weight:700;color:'+(p>=100?'var(--ok)':(p>=90?'var(--watch)':'var(--bad)'))+'">'+Math.round(p)+'%'+(cell.k==='current'?'<span style="font-size:9px;color:var(--gray3)">예측</span>':'')+'</td>';
             rC+='<td style="font-weight:700;color:'+(lastCum>=100?'var(--ok)':(lastCum>=90?'var(--watch)':'var(--bad)'))+'">'+Math.round(lastCum)+'%</td>';
           } else { rA+='<td style="color:var(--gray3)">-</td>'; rC+='<td style="color:var(--gray3)">-</td>'; }
         }
-        rT+='<td style="background:#eef2f9;font-weight:700;color:var(--blue-dk)">'+fcEok(tSum)+'<span style="font-size:9px;color:var(--gray3)"> ('+tCnt+'개월)</span></td><td style="background:#eef2f9;color:var(--blue-dk)">'+(tCnt?fcEok(tSum/tCnt):'-')+'</td></tr>';
+        if(resid){ tSum=resid.annual; tCnt=12; }   /* 잔여 모드: 연누계 = 사업계획 연간(월별 합은 보전분이 더해져 커진다) */
+        rT+='<td style="background:#eef2f9;font-weight:700;color:var(--blue-dk)" title="'+(resid?'사업계획 연간 목표':'')+'">'+fcEok(tSum)+'<span style="font-size:9px;color:var(--gray3)"> ('+tCnt+'개월'+(resid?' 계획':'')+')</span></td><td style="background:#eef2f9;color:var(--blue-dk)">'+(tCnt?fcEok(tSum/tCnt):'-')+'</td></tr>';
         rA+='<td style="background:#eef2f9;font-weight:700">'+(cumT?Math.round(cumA/cumT*100)+'%':'-')+'</td><td style="background:#eef2f9"></td></tr>';
         rC+='<td style="background:#eef2f9;font-weight:700">'+(lastCum!=null?Math.round(lastCum)+'%':'-')+'</td><td style="background:#eef2f9"></td></tr>';
         body+=rT+rA+rC;
-        y._targetNote='목표 = '+(srcSet.plan?'연도별실적 탭 목표(억원) 열':'')+(srcSet.plan&&srcSet.closing?' + ':'')+(srcSet.closing?'마감예측 탭 지부장 목표 합(목표 없는 달은 -)':'')+' · 달성율 = 실적÷목표(현재월은 마감예측합 기준, 미래월 -) · 누계 달성율 = 연초부터 그 달까지 실적 합÷목표 합(목표·실적이 둘 다 있는 달만) · 🟢100%↑ 🟡90%↑ 🔴';
+        y._targetNote='목표 = '+(srcSet.plan?'연도별실적 탭 목표(억원) 열(26년 사업계획)':'')+(srcSet.plan&&srcSet.closing?' + ':'')+(srcSet.closing?'마감예측 탭 지부장 목표 합(목표 없는 달은 -)':'')
+          +(resid?' · <b style="color:#4f46e5">'+resid.from+'~12월 = 잔여 목표</b>: 연간 '+fcEok(resid.annual)+'억 − '+(resid.from-1)+'월까지 누계 '+fcEok(resid.before)+'억'+(resid.filled.length?'('+resid.filled.map(function(i){return i+'월';}).join('·')+'은 실적 전이라 계획값 대입)':'')+' = '+fcEok(resid.rem)+'억을 계획 비중(사업계획 '+Object.keys(resid.plan).map(function(i){return fcEok(resid.plan[i]);}).join('/')+'억)으로 배분 — 실적이 들어오면 자동 재계산':'')
+          +' · 달성율 = 실적÷목표(현재월은 마감예측합 기준, 미래월 -) · 누계 달성율 = 연초부터 그 달까지 실적 합÷목표 합(목표·실적이 둘 다 있는 달만) · 🟢100%↑ 🟡90%↑ 🔴';
       }
     }
   });
