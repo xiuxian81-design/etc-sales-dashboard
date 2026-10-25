@@ -369,6 +369,7 @@ body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var
   <button class="tab-btn" onclick="switchTab('t-110',this)">🏥 110대 세부현황</button>
   <button class="tab-btn" onclick="switchTab('t-prenon',this)">💊 프레논 교차판매</button>
   <button class="tab-btn" onclick="switchTab('t-process',this)">📋 매월 과정관리</button>
+  <button class="tab-btn" onclick="switchTab('t-vendors',this)">🏢 업체 현황</button>
 </div>
 
 <!-- Google Sheets 실시간 연동 패널 -->
@@ -573,6 +574,11 @@ body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var
         정의 · 콜수=일일보고 한일(방문보고) 건수 · 업체수=한일 보고 업체(괄호=그중 우량 월 1.5천만↑ 매출 업체) · 갱신율=이달 진행사항 보고 건÷담당 전체 · 정체=처방 제외 진행 건 중 60일+ 미갱신 · 실적업체 커버=확정 최신월 매출 업체 중 이달 방문 비중 · 갭은 감점 아님(조기 보고 목적) · 신호등: 갱신율 40/20% · 정체율 20/50% · 신규 3/0건 · 커버리지 50/25% (잠정)
       </div>
     </div>
+  </div>
+
+  <!-- [v58 2026-10-25 박본님] 업체 현황 탭 — mode=crm vendorBoard(업체 단위 분기 트렌드·진행·활동). 품목별 매출·수수료·혜택은 2단계(월 임베드) -->
+  <div class="tab-panel" id="t-vendors">
+    <div id="vb-root"><div class="no-data">성과관리 데이터를 불러오면 업체 현황이 표시됩니다 (매출예측/고객관리 탭과 같은 호출)</div></div>
   </div>
 
   <!-- 4) 프레논 교차판매 탭 -->
@@ -1151,6 +1157,7 @@ function switchTab(panelId,btn){
   if(panelId==='t-110sum' && typeof render110sum==='function') render110sum();
   if(panelId==='t-prenon') loadPrenonDash();
   if(panelId==='t-forecast') loadCrm();   // [v38] 매출예측/고객관리 = mode=crm 단일 호출
+  if(panelId==='t-vendors'){ if(crmLoaded) renderVendorBoard(); else loadCrm(); }   // [v58] 업체 현황 = 같은 mode=crm 페이로드
 }
 
 /* ── 필터 초기화 ── */
@@ -2659,7 +2666,7 @@ function renderFcVolumeUp(vu, meta){
 
 <!-- ══════════════════════════════════════════
      📈 매출예측/고객관리 (MS팀 성과관리 CRM · v38)
-     mode=crm JSONP 단일 호출 → 본부지표·2배경로·연도별표·지부장 통합표 → 행 클릭 시 지부장 상세 9블록([v57] 7 할일 이행·상태 경보) → 업체 칩 클릭·검색 시 업체 히스토리(최근 12개월)
+     mode=crm JSONP 단일 호출 → 본부지표·2배경로·연도별표·지부장 통합표 → 행 클릭 시 지부장 상세 9블록([v57] 7 할일 이행·상태 경보) → 업체 칩 클릭·검색 시 업체 히스토리(최근 12개월) · [v58] 같은 페이로드의 vendorBoard로 '업체 현황' 탭(renderVendorBoard)
      응답 계약 = _workspace\01_architect_datamodel.md §11-4 (meta·team·yearly·directors·activities·monthlyPlans·sales·vendors)
      ══════════════════════════════════════════ -->
 <style>
@@ -2741,6 +2748,7 @@ function renderFcVolumeUp(vu, meta){
 .vd-hist-strip{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:6px}
 .vd-mark{font-size:10px;font-weight:800;padding:1px 7px;border-radius:5px;white-space:nowrap;margin-left:auto}
 .vd-mark.ok{background:var(--ok-lt);color:var(--ok)}.vd-mark.bad{background:var(--bad-lt);color:var(--bad)}.vd-mark.wait{background:var(--gray1);color:var(--gray3)}
+tr.clickable.sel td{background:var(--blue-lt)}   /* [v58] 업체 현황 선택 행 */
 .tb{font-size:9.5px;font-weight:800;padding:1px 6px;border-radius:5px}
 .tb.신약{background:var(--blue-lt);color:var(--blue-dk)}
 .tb.볼륨업{background:var(--ok-lt);color:var(--ok)}
@@ -2842,6 +2850,7 @@ function renderCrm(){
   renderCrmDouble((crmData.team||{}).doublePath||null);
   renderFcYearly(crmData.yearly||{}, meta);
   renderCrmDirectors();
+  try{ var vp=document.getElementById('t-vendors'); if(vp&&vp.classList.contains('active')) renderVendorBoard(); }catch(e){}   // [v58]
   if(crmView.mode==='dir'&&crmView.dirIdx>=0){
     document.getElementById('crm-overview').style.display='none';
     document.getElementById('crm-detail').style.display='block';
@@ -2946,7 +2955,7 @@ function crmMonthSnap(d){
   var chips=[],map={};
   acts.forEach(function(a){   /* activities는 일자 내림차순 → 첫 비공란 상태 = 최신 상태 */
     if(a['구분']!=='한일'||!nowM||String(a['일자']||'').slice(0,7)!==nowM)return;
-    var k=a.vendorKey||a['업체명']||'';if(!k)return;
+    var k=a.vendorKey||a['업체명']||'';if(!k||a['비업체'])return;   /* [v58] 비업체(내부 일정 등)는 칩에서 제외 */
     var c=map[k];
     if(!c){c=map[k]={key:k,name:a['업체명']||k,status:'',count:0};chips.push(c);}
     c.count++;if(a['상태']&&!c.status)c.status=a['상태'];
@@ -3151,7 +3160,7 @@ function crmRateColor(r){return (r==null||isNaN(r))?'var(--gray3)':(r>=80?'var(-
 function crmVendorList(d){ /* 이 지부장 activities(최근 12개월)의 업체 목록 — 키별 최신 표기(activities는 일자 내림차순), 이름순. 칩·경보표·미이행표·검색이 같은 번호를 쓴다 */
   if(d._vlist)return d._vlist;
   var acts=((crmData&&crmData.activities)||{})[d.name]||[], map={}, list=[];
-  acts.forEach(function(a){var k=a.vendorKey||a['업체명']||'';if(!k)return;if(!map[k]){map[k]={key:k,name:a['업체명']||k,n:0};list.push(map[k]);}map[k].n++;});
+  acts.forEach(function(a){var k=a.vendorKey||a['업체명']||'';if(!k||a['비업체'])return;if(!map[k]){map[k]={key:k,name:a['업체명']||k,n:0};list.push(map[k]);}map[k].n++;});
   list.sort(function(x,y){return String(x.name).localeCompare(String(y.name),'ko');});
   d._vlist=list;return list;
 }
@@ -3163,29 +3172,67 @@ function crmTodoMark(a,mine,today){ /* 할일 1건 판정: 같은 업체 한일�
   return {cls:'bad',txt:'✗ 미이행'};
 }
 
-/* ── 업체 히스토리 카드 [v57] — 칩 클릭·검색·경보표에서 열림. 이 지부장의 해당 업체 활동 전부(activities 범위 = 최근 12개월) · 상태 추이 · 할일 이행 · 월 매출.
-   (v44b '이번달만 표시'는 칩에만 남기고, 카드는 히스토리로 전환 — 박본님 2026-10-25 "업체 히스토리가 쌓이고 확인할 수 있게") ── */
+/* ── [v58] 공용: 업체 활동 히스토리 HTML (지부장 상세 카드 · 업체 현황 탭) ──
+   mine = 그 업체 활동(일자 내림차순, 업체 현황 탭은 지부장 전체·재위탁 포함) · extraKpi = KPI 행 앞에 붙일 추가 타일 · showDir = 행에 지부장 표시(할일 판정은 같은 지부장 한일만) */
+function crmVendorHistoryHtml(mine, today, nowM, showDir, extraKpi){
+  var seq=mine.filter(function(a){return a['구분']==='한일'&&CRM_ST_RANK[a['상태']]!=null;}).slice().reverse();   /* 오래된→최신 */
+  var latest=seq.length?seq[seq.length-1]['상태']:'', lastDrop=null, mSeen=[], mStat={};
+  seq.forEach(function(a,i){var m=String(a['일자']).slice(0,7);if(!mStat[m])mSeen.push(m);mStat[m]=a['상태'];
+    if(i>0&&CRM_ST_RANK[a['상태']]>CRM_ST_RANK[seq[i-1]['상태']])lastDrop={from:seq[i-1]['상태'],to:a['상태'],date:String(a['일자']).slice(0,10)};});
+  var poolOf=function(a){return showDir?mine.filter(function(b){return b['지부장']===a['지부장'];}):mine;};
+  var todos=mine.filter(function(a){return a['구분']==='할일';}), tDone=0,tBad=0,tWait=0;
+  todos.forEach(function(a){var mk=crmTodoMark(a,poolOf(a),today);if(mk.cls==='ok')tDone++;else if(mk.cls==='bad')tBad++;else tWait++;});
+  var cntAll=mine.filter(function(a){return a['구분']==='한일';}).length, cntMon=mine.filter(function(a){return a['구분']==='한일'&&String(a['일자']||'').slice(0,7)===nowM;}).length;
+  var tTot=tDone+tBad, tRate=tTot?Math.round(tDone/tTot*100):null;
+  var h='<div class="vd-kpi">'+(extraKpi||'')
+    +'<div class="k"><div class="l">미팅(한일) · 전체 / 이번달</div><div class="v">'+cntAll+'<span style="font-size:12px;color:var(--gray3)">회</span> / '+cntMon+'<span style="font-size:12px;color:var(--gray3)">회</span></div></div>'
+    +'<div class="k"><div class="l">할일 이행 (30일 경과분)</div><div class="v" style="color:'+crmRateColor(tRate)+'">'+(tRate==null?'-':tRate+'%')+'</div><div style="font-size:10.5px;color:var(--gray3)">'+tDone+'/'+tTot+'건'+(tWait?' · 판정 전 '+tWait:'')+'</div></div>'
+    +'<div class="k"><div class="l">최근 상태 하락</div><div class="v" style="font-size:14px;color:'+(lastDrop?'var(--bad)':'var(--ok)')+'">'+(lastDrop?(fcEsc(lastDrop.from)+' → '+fcEsc(lastDrop.to)+' <span style="font-weight:400;color:var(--gray3)">'+fcEsc(lastDrop.date.slice(5))+'</span>'):'없음')+'</div></div>'
+    +'</div>';
+  if(mSeen.length){
+    h+='<div style="font-size:11px;color:var(--gray3);margin-top:12px">상태 추이 (월별 마지막 보고 상태'+(latest?' · 최근 '+fcEsc(latest):'')+')</div><div class="vd-hist-strip">'
+      +mSeen.map(function(m,i){var st=mStat[m], prev=i>0?mStat[mSeen[i-1]]:null, down=prev&&CRM_ST_RANK[st]>CRM_ST_RANK[prev];
+        return (i>0?'<span style="color:var(--gray3)">→</span>':'')+'<span class="crm-chip '+fcEsc(st)+'" style="cursor:default;padding:2px 9px;font-size:10.5px">'+fcEsc(crmMon(m))+' '+fcEsc(st)+(down?' ↓':'')+'</span>';}).join('')
+      +'</div>';
+  }
+  if(mine.length){
+    var groups=[], gmap={};
+    mine.forEach(function(a){var m=String(a['일자']||'').slice(0,7)||'-';if(!gmap[m]){gmap[m]={m:m,items:[],n:{'한일':0,'할일':0,'이슈':0}};groups.push(gmap[m]);}gmap[m].items.push(a);gmap[m].n[a['구분']]=(gmap[m].n[a['구분']]||0)+1;});
+    h+='<div class="vd-tl"><div style="font-size:11px;color:var(--gray3);margin-bottom:5px">활동 히스토리 — 최근 12개월 · '+mine.length+'건 (한일 '+cntAll+' · 할일 '+todos.length+' · 이슈 '+mine.filter(function(a){return a['구분']==='이슈';}).length+') · 월별 접기, 최신 달 펼침</div>'
+      +groups.map(function(g,gi){
+        return '<details'+(gi===0?' open':'')+'><summary>'+fcEsc(g.m)+' <span style="color:var(--gray3);font-weight:400;font-size:11px">한일 '+g.n['한일']+' · 할일 '+g.n['할일']+' · 이슈 '+g.n['이슈']+'</span></summary>'
+          +g.items.map(function(a){
+            return '<div class="it"><span class="d">'+fcEsc(String(a['일자']||'').slice(0,10))+'</span>'
+              +(showDir?'<span class="kb" style="background:var(--gray1);color:var(--gray4)">'+fcEsc(a['지부장']||'')+'</span>':'')
+              +'<span class="kb '+fcEsc(a['구분']||'')+'">'+fcEsc(a['구분']||'')+'</span>'
+              +(a['소속CSO']?'<span class="kb" style="background:var(--watch-lt);color:var(--watch)" title="재위탁 활동 — 소속 '+fcEsc(a['소속CSO'])+'">'+fcEsc(a['업체명']||'')+'</span>':'')
+              +(a['상태']?'<span class="crm-chip '+fcEsc(a['상태'])+'" style="cursor:default;padding:1px 8px;font-size:10px">'+fcEsc(a['상태'])+'</span>':'')
+              +'<span style="flex:1">'+fcEsc(a['내용']||'-').replace(/\n/g,'<br>')+'</span>'
+              +(a['구분']==='할일'?(function(){var m2=crmTodoMark(a,poolOf(a),today);return '<span class="vd-mark '+m2.cls+'">'+m2.txt+'</span>';})():'')
+              +'</div>';}).join('')
+          +'</details>';
+      }).join('')+'</div>';
+  }else{
+    h+='<div class="no-data" style="padding:12px">최근 12개월 이 업체 활동이 없습니다 — 그 이전 이력은 구글시트 \'업체활동\' 탭</div>';
+  }
+  return h;
+}
+
+/* ── 업체 히스토리 카드 [v57·v58] — 지부장 상세에서 칩 클릭·검색·경보표로 열림. 이 지부장의 해당 업체 활동(activities 범위 = 최근 12개월) · 월 매출 · 상태 추이 · 할일 이행 ── */
 function renderCrmVendor(d){
   var key=crmView.vendorKey; if(!key)return'';
   var mine=(((crmData&&crmData.activities)||{})[d.name]||[]).filter(function(a){return (a.vendorKey||a['업체명']||'')===key;});   /* 일자 내림차순 유지 */
   var name=crmView.vendorName||(mine[0]&&mine[0]['업체명'])||key, today=crmTodayYmd(), nowM=crmMeta().nowMonth||today.slice(0,7);
   var sales=(crmData&&crmData.sales)||{}, sv=(sales.vendors||{})[key]||msResolveVendor(name,(sales.vendors||{}))||null, months=sales.months||[];
-  var seq=mine.filter(function(a){return a['구분']==='한일'&&CRM_ST_RANK[a['상태']]!=null;}).slice().reverse();   /* 오래된→최신 */
-  var latest=seq.length?seq[seq.length-1]['상태']:'', lastDrop=null, mSeen=[], mStat={};
-  seq.forEach(function(a,i){var m=String(a['일자']).slice(0,7);if(!mStat[m])mSeen.push(m);mStat[m]=a['상태'];
-    if(i>0&&CRM_ST_RANK[a['상태']]>CRM_ST_RANK[seq[i-1]['상태']])lastDrop={from:seq[i-1]['상태'],to:a['상태'],date:String(a['일자']).slice(0,10)};});
-  var todos=mine.filter(function(a){return a['구분']==='할일';}), tDone=0,tBad=0,tWait=0;
-  todos.forEach(function(a){var mk=crmTodoMark(a,mine,today);if(mk.cls==='ok')tDone++;else if(mk.cls==='bad')tBad++;else tWait++;});
-  var cntAll=mine.filter(function(a){return a['구분']==='한일';}).length, cntMon=mine.filter(function(a){return a['구분']==='한일'&&String(a['일자']||'').slice(0,7)===nowM;}).length;
+  var seqLatest=''; mine.forEach(function(a){ if(!seqLatest&&a['구분']==='한일'&&a['상태']) seqLatest=a['상태']; });
   var first=mine.length?String(mine[mine.length-1]['일자']||'').slice(0,10):'', last=mine.length?String(mine[0]['일자']||'').slice(0,10):'';
   var h='<div class="vd-card" id="crm-vendor-card">';
   h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">'
     +'<b style="font-size:15px">'+fcEsc(name)+'</b>'
-    +(latest?'<span class="crm-chip '+fcEsc(latest)+'" style="cursor:default;padding:3px 10px">최근 상태 '+fcEsc(latest)+'</span>':'<span class="crm-chip none" style="cursor:default;padding:3px 10px">상태 기록 없음</span>')
+    +(seqLatest?'<span class="crm-chip '+fcEsc(seqLatest)+'" style="cursor:default;padding:3px 10px">최근 상태 '+fcEsc(seqLatest)+'</span>':'<span class="crm-chip none" style="cursor:default;padding:3px 10px">상태 기록 없음</span>')
     +'<span class="crm-badge">히스토리 '+(first?fcEsc(first)+' ~ '+fcEsc(last):'활동 없음')+' · '+mine.length+'건</span>'
     +'<button class="crm-back" style="margin-left:auto" onclick="crmView.vendorKey=\'\';crmView.vendorName=\'\';renderCrmDirector()">✕ 닫기</button>'
     +'</div>';
-  /* 월 매출 추이 미니 막대 (업체실적 — 일일보고가 아니라 리셋 대상 아님) */
   if(sv&&months.length){
     var vals=months.map(function(m){return Number((sv.monthly||{})[m])||0;});
     var mx=Math.max.apply(null,vals.concat([1]));
@@ -3197,40 +3244,9 @@ function renderCrmVendor(d){
   }else{
     h+='<div class="no-data" style="padding:14px">업체실적 데이터가 없습니다 — 활동 이력만 표시합니다</div>';
   }
-  var tTot=tDone+tBad, tRate=tTot?Math.round(tDone/tTot*100):null;
-  h+='<div class="vd-kpi">'
-    +'<div class="k"><div class="l">미팅(한일) · 전체 / 이번달</div><div class="v">'+cntAll+'<span style="font-size:12px;color:var(--gray3)">회</span> / '+cntMon+'<span style="font-size:12px;color:var(--gray3)">회</span></div></div>'
-    +'<div class="k"><div class="l">할일 이행 (30일 경과분)</div><div class="v" style="color:'+crmRateColor(tRate)+'">'+(tRate==null?'-':tRate+'%')+'</div><div style="font-size:10.5px;color:var(--gray3)">'+tDone+'/'+tTot+'건'+(tWait?' · 판정 전 '+tWait:'')+'</div></div>'
-    +'<div class="k"><div class="l">최근 상태 하락</div><div class="v" style="font-size:14px;color:'+(lastDrop?'var(--bad)':'var(--ok)')+'">'+(lastDrop?(fcEsc(lastDrop.from)+' → '+fcEsc(lastDrop.to)+' <span style="font-weight:400;color:var(--gray3)">'+fcEsc(lastDrop.date.slice(5))+'</span>'):'없음')+'</div></div>'
-    +'<div class="k"><div class="l">매출 전월比</div><div class="v" style="color:'+crmPctColor(sv&&sv.momPct)+'">'+crmPctTxt(sv&&sv.momPct)+'</div></div>'
-    +'<div class="k"><div class="l">3개월 매출 추세</div><div class="v" style="color:'+crmPctColor(sv&&sv.trend3Pct)+'">'+crmPctTxt(sv&&sv.trend3Pct)+'</div></div>'
-    +'</div>';
-  /* 상태 추이 — 월별 마지막 보고 상태(오래된→최신), 나빠진 달에 ↓ */
-  if(mSeen.length){
-    h+='<div style="font-size:11px;color:var(--gray3);margin-top:12px">상태 추이 (월별 마지막 보고 상태)</div><div class="vd-hist-strip">'
-      +mSeen.map(function(m,i){var st=mStat[m], prev=i>0?mStat[mSeen[i-1]]:null, down=prev&&CRM_ST_RANK[st]>CRM_ST_RANK[prev];
-        return (i>0?'<span style="color:var(--gray3)">→</span>':'')+'<span class="crm-chip '+fcEsc(st)+'" style="cursor:default;padding:2px 9px;font-size:10.5px">'+fcEsc(crmMon(m))+' '+fcEsc(st)+(down?' ↓':'')+'</span>';}).join('')
-      +'</div>';
-  }
-  /* 활동 히스토리 — 월별 접기(최신 달 펼침), 할일엔 이행 판정 */
-  if(mine.length){
-    var groups=[], gmap={};
-    mine.forEach(function(a){var m=String(a['일자']||'').slice(0,7)||'-';if(!gmap[m]){gmap[m]={m:m,items:[],n:{'한일':0,'할일':0,'이슈':0}};groups.push(gmap[m]);}gmap[m].items.push(a);gmap[m].n[a['구분']]=(gmap[m].n[a['구분']]||0)+1;});
-    h+='<div class="vd-tl"><div style="font-size:11px;color:var(--gray3);margin-bottom:5px">활동 히스토리 — 최근 12개월 · '+mine.length+'건 (한일 '+cntAll+' · 할일 '+todos.length+' · 이슈 '+mine.filter(function(a){return a['구분']==='이슈';}).length+') · 월별 접기, 최신 달 펼침</div>'
-      +groups.map(function(g,gi){
-        return '<details'+(gi===0?' open':'')+'><summary>'+fcEsc(g.m)+' <span style="color:var(--gray3);font-weight:400;font-size:11px">한일 '+g.n['한일']+' · 할일 '+g.n['할일']+' · 이슈 '+g.n['이슈']+'</span></summary>'
-          +g.items.map(function(a){
-            return '<div class="it"><span class="d">'+fcEsc(String(a['일자']||'').slice(0,10))+'</span>'
-              +'<span class="kb '+fcEsc(a['구분']||'')+'">'+fcEsc(a['구분']||'')+'</span>'
-              +(a['상태']?'<span class="crm-chip '+fcEsc(a['상태'])+'" style="cursor:default;padding:1px 8px;font-size:10px">'+fcEsc(a['상태'])+'</span>':'')
-              +'<span style="flex:1">'+fcEsc(a['내용']||'-').replace(/\n/g,'<br>')+'</span>'
-              +(a['구분']==='할일'?(function(){var m2=crmTodoMark(a,mine,today);return '<span class="vd-mark '+m2.cls+'">'+m2.txt+'</span>';})():'')
-              +'</div>';}).join('')
-          +'</details>';
-      }).join('')+'</div>';
-  }else{
-    h+='<div class="no-data" style="padding:12px">최근 12개월 이 업체 활동이 없습니다 — 그 이전 이력은 구글시트 \'업체활동\' 탭</div>';
-  }
+  var extra='<div class="k"><div class="l">매출 전월比</div><div class="v" style="color:'+crmPctColor(sv&&sv.momPct)+'">'+crmPctTxt(sv&&sv.momPct)+'</div></div>'
+    +'<div class="k"><div class="l">3개월 매출 추세</div><div class="v" style="color:'+crmPctColor(sv&&sv.trend3Pct)+'">'+crmPctTxt(sv&&sv.trend3Pct)+'</div></div>';
+  h+=crmVendorHistoryHtml(mine, today, nowM, false, extra);
   h+='</div>';
   return h;
 }
@@ -3245,6 +3261,99 @@ function renderCrmVendor(d){
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bootCrmReady);
   else bootCrmReady();
 })();
+</script>
+<script>
+/* ═══ [v58 2026-10-25 박본님] 업체 현황 탭 — mode=crm vendorBoard ═══
+   표: 업체(소속·재위탁 2단계) × 최근 2분기 매출(실매출·VAT 제외) + 전분기比(월평균 기준) + 전년 동분기比(같은 개월) + 최근 상태·경보 + 신약·PRM 블럭 + 활동.
+   행 클릭 → 상세: ① 분기 트렌드(8분기)·월별 20개월 ② 품목별 매출(2단계 예정) ③ 수수료·혜택(2단계 예정) ④ 진행사항(MBO 블럭·PRM) ⑤ 활동 히스토리(지부장 전체·재위탁 포함) */
+var vbView={dir:'',kind:'',q:'',sort:'amt',sel:''};
+function vbRows(){ return (crmData&&Array.isArray(crmData.vendorBoard))?crmData.vendorBoard:[]; }
+function vbMeta(){ return (crmData&&crmData.vendorBoardMeta)||{quarters:[]}; }
+function vbQ(q){ return q?(q.slice(2,4)+'년 '+q.slice(5)+'Q'):'-'; }
+function vbPct(p){ return (p==null||isNaN(p))?'<span style="color:var(--gray3)">-</span>':'<span style="font-weight:700;color:'+crmPctColor(p)+'">'+crmPctTxt(p)+'</span>'; }
+function vbSet(k,v){ vbView[k]=v; renderVendorBoard(); }
+function vbSel(){ var r=document.createElement('select'); return r; }
+function renderVendorBoard(){
+  var root=document.getElementById('vb-root'); if(!root) return;
+  var rows=vbRows(), meta=vbMeta(), qs=meta.quarters||[];
+  if(!rows.length){ root.innerHTML='<div class="section-card"><h3>🏢 업체 현황</h3><div class="no-data">'+(crmData?'백엔드 v58 배포 전이거나 업체 데이터가 없습니다':'성과관리 데이터를 불러오는 중…')+'</div></div>'; return; }
+  var qCur=qs[qs.length-1]||'', qPrev=qs[qs.length-2]||'';
+  var dirs=[]; rows.forEach(function(r){ if(r.dir&&dirs.indexOf(r.dir)<0) dirs.push(r.dir); }); dirs.sort();
+  var f=rows.filter(function(r){ if(vbView.dir&&r.dir!==vbView.dir) return false; if(vbView.kind&&r.kind!==vbView.kind) return false; if(vbView.q){ var q=vbView.q.toLowerCase(); if(String(r.name).toLowerCase().indexOf(q)<0&&String(r.parentName||'').toLowerCase().indexOf(q)<0) return false; } return true; });
+  var amtOf=function(r){ var x=r.q[r.q.length-1]; return x?x.amt:0; };
+  var sorters={amt:function(a,b){return amtOf(b)-amtOf(a);}, qoq:function(a,b){return (a.qoqPct==null?1e9:a.qoqPct)-(b.qoqPct==null?1e9:b.qoqPct);}, yoy:function(a,b){return (a.yoyPct==null?1e9:a.yoyPct)-(b.yoyPct==null?1e9:b.yoyPct);}, alert:function(a,b){return ((b.alert?1:0)-(a.alert?1:0))||(amtOf(b)-amtOf(a));}, act:function(a,b){return String(b.lastAct||'').localeCompare(String(a.lastAct||''));}, name:function(a,b){return String(a.name).localeCompare(String(b.name),'ko');}};
+  f.sort(sorters[vbView.sort]||sorters.amt);
+  var up=rows.filter(function(r){return r.qoqPct!=null&&r.qoqPct>0;}).length, down=rows.filter(function(r){return r.qoqPct!=null&&r.qoqPct<0;}).length, al=rows.filter(function(r){return r.alert;}).length, act30=rows.filter(function(r){return r.meet30>0;}).length;
+  var c=meta.counts||{};
+  var h='<div class="section-card"><h3>🏢 업체 현황 <span style="font-size:11px;color:var(--gray3);font-weight:400">업체 '+rows.length+'처(계약 '+(c['계약']||0)+' · 재위탁 '+(c['재위탁']||0)+' · 미확인 '+(c['미확인']||0)+') · 실적 '+fcEsc(crmMon(meta.latestMonth))+'까지 · 매출 = 업체실적(실매출·VAT 제외) · 행을 클릭하면 상세</span></h3>';
+  h+='<div class="crm-stat" style="margin-bottom:12px">'
+    +'<div class="b"><div class="l">전분기比 상승 / 하락 업체</div><div class="v"><span style="color:var(--ok)">'+up+'</span> / <span style="color:var(--bad)">'+down+'</span></div><div class="s">'+fcEsc(vbQ(qCur))+' vs '+fcEsc(vbQ(qPrev))+' · 월평균 기준</div></div>'
+    +'<div class="b"><div class="l">상태 전이 경보 업체</div><div class="v" style="color:'+(al?'var(--bad)':'var(--ok)')+'">'+al+'</div><div class="s">최근 60일 하락·부진지속(미회복)</div></div>'
+    +'<div class="b"><div class="l">최근 30일 미팅 업체</div><div class="v">'+act30+'</div><div class="s">한일 보고 1회 이상</div></div>'
+    +'</div>';
+  var selSt='padding:6px 9px;border:1px solid var(--hair);border-radius:8px;font-size:12px';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">'
+    +'<select onchange="vbSet(\'dir\',this.value)" style="'+selSt+'"><option value="">지부장 전체</option>'+dirs.map(function(d){return '<option value="'+fcEsc(d)+'"'+(vbView.dir===d?' selected':'')+'>'+fcEsc(d)+'</option>';}).join('')+'</select>'
+    +'<select onchange="vbSet(\'kind\',this.value)" style="'+selSt+'"><option value="">구분 전체</option>'+['계약','재위탁','미확인'].map(function(k){return '<option value="'+k+'"'+(vbView.kind===k?' selected':'')+'>'+k+'</option>';}).join('')+'</select>'
+    +'<select onchange="vbSet(\'sort\',this.value)" style="'+selSt+'">'+[['amt','최근 분기 매출순'],['qoq','전분기比 낮은 순'],['yoy','전년比 낮은 순'],['alert','경보 먼저'],['act','최근 활동순'],['name','가나다']].map(function(o){return '<option value="'+o[0]+'"'+(vbView.sort===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>'
+    +'<input id="vb-q" value="'+fcEsc(vbView.q)+'" placeholder="🔍 업체명 검색" style="flex:1;min-width:200px;padding:6px 10px;border:1px solid var(--hair);border-radius:8px;font-size:12px" onkeydown="if(event.key===\'Enter\')vbSet(\'q\',this.value)" onchange="vbSet(\'q\',this.value)">'
+    +'<span style="font-size:11px;color:var(--gray3)">'+f.length+'처 표시</span></div>';
+  var mx=1; f.forEach(function(r){ r.q.slice(-2).forEach(function(x){ if(x.amt>mx) mx=x.amt; }); });
+  h+='<div class="tbl-wrap"><table class="btbl fc-tbl"><thead><tr><th style="text-align:left">업체</th><th>지부장</th><th>'+fcEsc(vbQ(qPrev))+'</th><th>'+fcEsc(vbQ(qCur))+'</th><th>전분기比<br><span style="font-size:9px;color:var(--gray3)">월평균</span></th><th>전년 동분기比<br><span style="font-size:9px;color:var(--gray3)">같은 개월</span></th><th>최근 상태</th><th>신약 진행<br><span style="font-size:9px;color:var(--gray3)">진행/처방/전체</span></th><th>PRM 블럭<br><span style="font-size:9px;color:var(--gray3)">건 · 최근 계획월</span></th><th>활동<br><span style="font-size:9px;color:var(--gray3)">30일 · 마지막</span></th></tr></thead><tbody>';
+  f.slice(0,400).forEach(function(r){
+    var qp=r.q[r.q.length-2]||{amt:0,n:0}, qc=r.q[r.q.length-1]||{amt:0,n:0};
+    var bar=function(x){ var w=mx?Math.max(2,Math.round(x.amt/mx*100)):2; return '<div style="display:flex;align-items:center;gap:6px;justify-content:flex-end"><div style="width:56px;height:8px;background:var(--gray1);border-radius:4px;overflow:hidden"><div style="width:'+w+'%;height:100%;background:var(--blue)"></div></div><span style="min-width:58px;text-align:right">'+(x.amt?crmMoney(x.amt):'-')+'</span>'+(x.n&&x.n<3?'<span style="font-size:9px;color:var(--gray3)">'+x.n+'개월</span>':'')+'</div>'; };
+    var st=r.lastStatus?'<span class="crm-chip '+fcEsc(r.lastStatus)+'" style="cursor:default;padding:1px 8px;font-size:10px">'+fcEsc(r.lastStatus)+'</span>':'<span style="color:var(--gray3)">-</span>';
+    if(r.alert) st+=' <span style="color:var(--bad);font-weight:800" title="'+fcEsc(r.alert)+'">↓</span>';
+    var nm='<b>'+fcEsc(r.name)+'</b>'+(r.kind==='재위탁'?' <span class="crm-badge wait" style="font-size:10px">재위탁 · '+fcEsc(r.parentName||'')+'</span>':'')+(r.kind==='미확인'?' <span class="crm-badge" style="font-size:10px">미확인</span>':'')+(r.subs&&r.subs.length?' <span style="font-size:10px;color:var(--gray3)">재위탁 '+r.subs.length+'</span>':'');
+    h+='<tr class="clickable'+(vbView.sel===r.key?' sel':'')+'" onclick="vbOpen(this.dataset.k)" data-k="'+fcEsc(r.key)+'"><td style="text-align:left">'+nm+'</td><td>'+fcEsc(r.dir||'-')+'</td><td>'+bar(qp)+'</td><td>'+bar(qc)+'</td><td>'+vbPct(r.qoqPct)+'</td><td>'+vbPct(r.yoyPct)+'</td><td style="white-space:nowrap">'+st+'</td>'
+      +'<td>'+(r.mbo&&r.mbo.n?('<b>'+r.mbo.active+'</b> / '+r.mbo.rx+' / '+r.mbo.n):'<span style="color:var(--gray3)">-</span>')+'</td><td>'+(r.prm?(r.prm.n+'<span style="font-size:9px;color:var(--gray3)"> · '+fcEsc(r.prm.last||'')+'</span>'):'<span style="color:var(--gray3)">-</span>')+'</td>'
+      +'<td style="white-space:nowrap">'+(r.meet30?('<b>'+r.meet30+'회</b>'):'<span style="color:var(--gray3)">0</span>')+' <span style="font-size:10px;color:var(--gray3)">'+fcEsc(String(r.lastAct||'').slice(5))+'</span></td></tr>';
+  });
+  h+='</tbody></table></div>'+(f.length>400?'<div style="font-size:11px;color:var(--gray3);margin-top:6px">상위 400처만 표시 — 검색·필터로 좁히세요</div>':'')
+    +'<div style="font-size:10.5px;color:var(--gray3);margin-top:8px;line-height:1.6">전분기比 = 최근 분기 월평균 ÷ 전분기 월평균 − 1(진행 중 분기도 같은 기준, "n개월" = 실적 있는 달 수) · 전년 동분기比 = 최근 분기에 실적이 있는 달과 전년 같은 달의 합 비교 · 신약 진행 = MBO 블럭(진행 = DC신청~코딩 정상 건 / 처방 / 전체) · PRM 블럭 = PRM블럭신청현황 CSO명 기준 신청 건 · 재위탁 업체의 매출·수수료는 소속 CSO에 잡힙니다(활동은 소속에도 합산) · 품목별 매출·수수료·혜택은 2단계(월 임베드)에서 추가</div></div>';
+  h+='<div id="vb-detail">'+renderVendorDetail()+'</div>';
+  root.innerHTML=h;
+}
+function vbOpen(key){ vbView.sel=(vbView.sel===key?'':key); renderVendorBoard(); if(vbView.sel){ var el=document.getElementById('vb-card'); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); } }
+function vbActs(key,withSubs){ /* 지부장 전체 activities에서 이 업체(+재위탁) 활동 — 일자 내림차순 */
+  var out=[], A=(crmData&&crmData.activities)||{};
+  Object.keys(A).forEach(function(d){ (A[d]||[]).forEach(function(a){ if(!a.vendorKey) return; if(a.vendorKey===key||(withSubs&&a.parentKey===key)) out.push(Object.assign({지부장:d},a)); }); });
+  out.sort(function(x,y){ return String(y['일자']||'').localeCompare(String(x['일자']||'')); });
+  return out;
+}
+function renderVendorDetail(){
+  var key=vbView.sel; if(!key) return '';
+  var r=vbRows().filter(function(x){return x.key===key;})[0]; if(!r) return '';
+  var meta=vbMeta(), today=meta.today||crmTodayYmd(), nowM=crmMeta().nowMonth||today.slice(0,7);
+  var h='<div class="vd-card" id="vb-card" style="margin-top:14px">';
+  h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px"><b style="font-size:16px">'+fcEsc(r.name)+'</b>'
+    +'<span class="crm-badge">'+fcEsc(r.kind)+(r.kind==='재위탁'?' · 소속 '+fcEsc(r.parentName||''):'')+'</span>'+(r.dir?'<span class="crm-badge">'+fcEsc(r.dir)+' 지부장</span>':'')+(r.biz?'<span style="font-size:11px;color:var(--gray3)">사업자 '+fcEsc(r.biz)+'</span>':'')
+    +(r.lastStatus?'<span class="crm-chip '+fcEsc(r.lastStatus)+'" style="cursor:default;padding:3px 10px">최근 상태 '+fcEsc(r.lastStatus)+'</span>':'')+(r.alert?'<span class="crm-badge bad">경보 '+fcEsc(r.alert)+'</span>':'')
+    +'<button class="crm-back" style="margin-left:auto" onclick="vbOpen(this.dataset.k)" data-k="'+fcEsc(key)+'">✕ 닫기</button></div>';
+  var qs=r.q||[], qmx=Math.max.apply(null,qs.map(function(x){return x.amt;}).concat([1]));
+  h+='<div style="font-size:12px;font-weight:700;margin-top:6px">① 매출 트렌드 <span style="font-size:10.5px;color:var(--gray3);font-weight:400">분기 합(실매출·VAT 제외) · 전분기比 '+crmPctTxt(r.qoqPct)+' · 전년 동분기比 '+crmPctTxt(r.yoyPct)+(r.yoyBase?' (전년 같은 달 합 '+crmMoney(r.yoyBase)+')':'')+'</span></div>';
+  if(r.kind==='재위탁') h+='<div class="no-data" style="padding:10px">재위탁 업체 — 매출·수수료는 소속 CSO <b>'+fcEsc(r.parentName||'')+'</b>에 잡힙니다</div>';
+  else if(!qs.some(function(x){return x.amt;})) h+='<div class="no-data" style="padding:10px">업체실적에 매출이 없습니다(신규·비거래 업체)</div>';
+  else h+='<div class="vd-bars" style="height:120px">'+qs.map(function(x){ var hp=Math.max(2,Math.round(x.amt/qmx*100)); return '<div class="vd-bar"><div class="bv">'+(x.amt?crmMoney(x.amt):'-')+'</div><div class="bar" style="height:'+hp+'%'+(x.n&&x.n<3?';opacity:.55':'')+'"></div><div class="bl">'+fcEsc(vbQ(x.q))+(x.n&&x.n<3?'<br><span style="font-size:9px">'+x.n+'개월</span>':'')+'</div></div>'; }).join('')+'</div>';
+  var mons=Object.keys(r.monthly||{}).sort();
+  if(mons.length) h+='<details style="margin-top:6px"><summary style="font-size:11px;color:var(--gray3);cursor:pointer">월별 '+mons.length+'개월 펼치기</summary><div class="tbl-wrap"><table class="btbl fc-tbl" style="margin-top:6px"><thead><tr>'+mons.map(function(m){return '<th>'+fcEsc(m.slice(2))+'</th>';}).join('')+'</tr></thead><tbody><tr>'+mons.map(function(m){return '<td>'+crmMoney(r.monthly[m])+'</td>';}).join('')+'</tr></tbody></table></div></details>';
+  h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:12px">'
+    +'<div style="border:1px dashed var(--hair);border-radius:12px;padding:10px;font-size:11.5px;color:var(--gray3)"><b style="color:var(--gray4)">② 품목별 매출</b> — 2단계: 평가실적(업체×품목×월) 월 임베드 후 표시</div>'
+    +'<div style="border:1px dashed var(--hair);border-radius:12px;padding:10px;font-size:11.5px;color:var(--gray3)"><b style="color:var(--gray4)">③ 수수료·혜택</b> — 2단계: 정산(VAT 포함 기준) 구간율·품목수수료·구간 인센·품목 인센·혜택률, CSO 리포트 링크</div></div>';
+  var ml=(r.mbo&&r.mbo.list)||[];
+  h+='<div style="font-size:12px;font-weight:700;margin-top:14px">④ 진행사항 <span style="font-size:10.5px;color:var(--gray3);font-weight:400">신약 MBO 블럭 '+(r.mbo?r.mbo.n:0)+'건(진행 '+(r.mbo?r.mbo.active:0)+' · 처방 '+(r.mbo?r.mbo.rx:0)+')'+(r.prm?' · PRM 신청 블럭 '+r.prm.n+'건 · 거래처 '+r.prm.hosp+'처 · 최근 계획월 '+fcEsc(r.prm.last||'-'):' · PRM 신청 없음')+'</span></div>';
+  if(ml.length){
+    h+='<div class="tbl-wrap"><table class="btbl fc-tbl" style="margin-top:6px"><thead><tr><th style="text-align:left">병원</th><th style="text-align:left">품목</th><th>단계</th><th>이슈</th><th>MBO</th><th>DC접수</th><th>코딩예측</th><th>마지막 보고</th><th>지부장</th><th style="text-align:left">진행사항</th></tr></thead><tbody>'
+      +ml.map(function(m){ return '<tr><td style="text-align:left;font-weight:600">'+fcEsc(m['병원']||'-')+'</td><td style="text-align:left">'+fcEsc(m['품목']||'-')+'</td><td><span class="crm-badge">'+fcEsc(m['단계']||'-')+'</span></td><td>'+(m['이슈']&&m['이슈']!=='정상'?'<span class="crm-badge bad">'+fcEsc(m['이슈'])+'</span>':'-')+'</td><td>'+fcMan(m.MBO)+'만</td><td>'+fcEsc(m['DC접수월']||'-')+'</td><td>'+fcEsc(m['코딩예측월']||'-')+'</td><td>'+fcEsc(m['보고']||'-')+'</td><td>'+fcEsc(m['지부장']||'')+'</td><td style="text-align:left;color:var(--gray4)">'+fcEsc(m['진행사항']||'-')+'</td></tr>'; }).join('')
+      +'</tbody></table></div>';
+  } else h+='<div class="no-data" style="padding:10px">MBO에 등록된 신약 블럭이 없습니다</div>';
+  var mine=vbActs(key, r.kind!=='재위탁');
+  h+='<div style="font-size:12px;font-weight:700;margin-top:14px">⑤ 활동 히스토리 <span style="font-size:10.5px;color:var(--gray3);font-weight:400">최근 12개월 · '+mine.length+'건 · 지부장 전체'+(r.subs&&r.subs.length?' · 재위탁('+fcEsc(r.subs.join(', '))+') 활동 포함':'')+'</span></div>';
+  h+=crmVendorHistoryHtml(mine, today, nowM, true, '');
+  h+='</div>';
+  return h;
+}
 </script>
 <script>
 /* 매월 과정관리 (스냅샷 = dash_data.json msProcess — D ?doc=dashdata 로 수신) [v46] */

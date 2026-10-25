@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <!-- form.html v30 — 2026-06-28 재설계: 작성자=지부장4명 / ①마감예측(월1회·잠금) / ②신약진행 자동표시3종+검색 / ③볼륨업 / 마스터 병원명 자동완성.
      기존 신약진행 보고·프레논 조회·JSONP 로딩·payload(items[]) 회귀 0. payload 키는 02_backend_notes 스펙과 일치.
+     v58 (2026-10-25): ⑤⑥ 한일/할일 행에 '재위탁 CSO'(소속 CSO 아래 실제 만난 업체)·'업체 없음(내부 일정)' 추가 — 저장 업체명 = 재위탁 || 소속, 소속CSO 키 동봉, 내부는 서버가 '(내부)'로 저장(집계 제외).
+       소속/재위탁 자동완성 = getMboData.vendorRoster(업체마스터 탭) ∪ 기존 vendors. 박본님 10-25 결정(2단계 업체).
      v38 (2026-07-24): ①신규블럭 모달에 '업체 사업자번호'(nb-cbiz) 입력칸 추가 + addNB에서 RPM연락처 자동채움 → C·J열 공란 해소.
      ②외부호스팅 제출을 no-cors→cors 읽기로 전환해 서버 {success,message}(중복병합·재등록차단 안내) 표시, 읽기 실패 시 기존 '전송됨'으로 폴백(재전송 없음). GAS 서버 코드 변경 없음.
      v39 (2026-08-03) — MS팀 성과관리 CRM 일일보고 (계약: 01_architect_datamodel §11):
@@ -483,6 +485,9 @@ body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var
 .row-add:hover{background:var(--blue-lt);border-color:var(--blue)}
 .rowbox{border:1px solid var(--hair);border-radius:12px;padding:11px 12px;background:#fff;position:relative;display:flex;flex-direction:column;gap:8px}
 .rowbox + .rowbox{margin-top:8px}
+.rowbox.internal{background:var(--gray1)}   /* [v58] 업체 없음(내부 일정) 행 */
+.chk-internal{font-size:11px;color:var(--gray3);display:flex;gap:5px;align-items:center;cursor:pointer}
+.sub-hint{font-size:10px;color:var(--gray3);margin-top:-4px}
 .row-del{position:absolute;top:0;right:0;width:44px;height:44px;min-width:44px;min-height:44px;padding:0;background:none;border:none;color:var(--gray3);font-size:19px;line-height:1;cursor:pointer;border-radius:0 12px 0 12px;display:flex;align-items:center;justify-content:center}
 .row-del:hover{color:var(--bad);background:var(--bad-lt)}
 .row-empty{padding:16px 8px;text-align:center;color:var(--gray3);font-size:12px}
@@ -682,7 +687,7 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
 
     <!-- ⑤ 오늘 한일 -->
     <div class="card" id="c-done">
-      <div class="card-hd"><span>⑤ 오늘 한일 <span class="cnt" id="done-cnt">0</span></span> <span class="sec-help">업체별로 한 줄씩</span></div>
+      <div class="card-hd"><span>⑤ 오늘 한일 <span class="cnt" id="done-cnt">0</span></span> <span class="sec-help">업체별로 한 줄씩 · 소속 CSO → 재위탁 CSO(있을 때) · 내부 일정은 '업체 없음'</span></div>
       <div class="card-bd" style="padding-top:10px">
         <div class="sec-note">만난 업체를 적고 <b>상태</b>를 눌러주세요. 상태는 대시보드 업체 칩 색으로 그대로 반영됩니다.<br><b>순항</b> 날짜·병원·품목이 붙은 다음 행동을 합의했거나, 지난 약속이 이행됨<br><b>관찰</b> 안내·홍보만 하고 합의한 행동이 없거나, 지난 약속이 4주 넘게 진척 없음<br><b>부진</b> 약속 불이행 2회 이상, 업체 매출·블럭 감소, 또는 이탈·경쟁사 이동 징후</div>
         <div id="done-list"></div>
@@ -1144,7 +1149,7 @@ function paintIssueSelect(sel){sel.className='iss-sel '+(sel.value?sel.value.rep
 
 let data=[],rpm='',items=[];              // items = 신약진행 보고 대상(자동표시+검색추가)
 let multiOpen=[];                          // [v53] 복수오픈 진행 행(서버 getMboData.multiOpen, 종료 제외) — 신규 블럭 모달 사전 안내용
-let itemMaster=[], vendorMasterNames=[];   // [v55] 품목마스터 탭(표준명·별칭) · 업체실적 탭 업체명 — 고르기 + 없으면 직접 입력(점검 대상 표시)
+let itemMaster=[], vendorMasterNames=[], vendorRoster=[];   // [v58] vendorRoster = 업체마스터(계약·재위탁·미확인 — 소속 CSO·재위탁 CSO 자동완성)   // [v55] 품목마스터 탭(표준명·별칭) · 업체실적 탭 업체명 — 고르기 + 없으면 직접 입력(점검 대상 표시)
 let vendorAliasRows=[];                    // [v56] 업체별칭 탭 [{std, aliases}] — 별칭을 적으면 저장 시 표준 표기로
 /* [fix1-H1] 이번 세션에 실제로 전송된 신약 건 — 전송 후 이메일·엑셀에서 신약이 사라지지 않게 한다 */
 let lastSentItems=[], lastSentDate='';
@@ -1219,6 +1224,7 @@ function loadFromGAS(){
       itemMaster=((res.itemMaster)||(res.data&&res.data.itemMaster)||[]).filter(m=>m&&m.std);   // [v55]
       vendorMasterNames=((res.vendorMaster)||(res.data&&res.data.vendorMaster)||[]);
       vendorAliasRows=((res.vendorAliases)||(res.data&&res.data.vendorAliases)||[]).filter(r=>r&&r.std);   // [v56]
+      vendorRoster=((res.vendorRoster)||(res.data&&res.data.vendorRoster)||[]).filter(r=>r&&r.name);   // [v58]
       fillItemSelect(); fillVendorList();
 
       buildHospitalMaster();
@@ -1403,6 +1409,7 @@ function loadCrm(){
 function buildVendorMaster(){
   const seen={}, out=[];
   ((crm&&crm.vendors)||[]).forEach(v=>{const k=normVendorKey(v); if(!v||seen[k])return; seen[k]=1; out.push({name:v,recent:false});});
+  (vendorRoster||[]).forEach(r=>{ if(r.kind==='재위탁') return; const k=normVendorKey(r.name); if(!r.name||seen[k])return; seen[k]=1; out.push({name:r.name,recent:false,sub:r.kind==='미확인'?'미확인(마스터 정리 전)':''}); });   // [v58] 업체마스터 계약·미확인 = 소속 CSO 후보
   const me=myDir();
   const rec={};
   ((me&&me.vendorChips)||[]).forEach(c=>{ if(c&&c.name) rec[normVendorKey(c.name)]=1; });
@@ -1891,17 +1898,23 @@ function addDone(){ daily.한일.push({업체명:'',상태:'',내용:''}); rende
 function delDone(i){ daily.한일.splice(i,1); if(!daily.한일.length) daily.한일=[{업체명:'',상태:'',내용:''}]; renderDone(); saveDaily(); }
 function doneField(i,f,v){ daily.한일[i][f]=v; doneCount(); saveDaily(); }
 function doneState(i,s){ daily.한일[i].상태=(daily.한일[i].상태===s?'':s); renderDone(); saveDaily(); }
-function doneCount(){ const n=(daily.한일||[]).filter(r=>String(r.업체명||'').trim()).length; const el=document.getElementById('done-cnt'); if(el) el.textContent=n; }
+function doneCount(){ const n=(daily.한일||[]).filter(r=>r.내부?String(r.내용||'').trim():String(r.업체명||'').trim()).length; /* [v58] 내부 일정은 내용이 있으면 셈 */ const el=document.getElementById('done-cnt'); if(el) el.textContent=n; }
 function renderDone(){
   const cont=document.getElementById('done-list'); if(!cont) return;
-  cont.innerHTML=daily.한일.map((r,i)=>`<div class="rowbox">
+  cont.innerHTML=daily.한일.map((r,i)=>`<div class="rowbox${r.내부?' internal':''}">
       <button class="row-del" onclick="delDone(${i})">×</button>
       <div class="vac" style="padding-right:34px">
-        <input class="fi" type="text" id="vin-done-${i}" value="${esc(r.업체명||'')}" placeholder="업체명 (자동완성)" autocomplete="off"
+        <input class="fi" type="text" id="vin-done-${i}" value="${esc(r.업체명||'')}" placeholder="소속 CSO (업체명 자동완성)" autocomplete="off" ${r.내부?'disabled':''}
           oninput="doneField(${i},'업체명',this.value);vacSearch('done',${i},this.value)" onkeydown="vacKey('done',${i},event)" onblur="vacClose('done',${i})">
         <div class="vac-list" id="vac-done-${i}"></div>
       </div>
-      <div class="seg st${(!r.상태&&String(r.업체명||'').trim())?' need':''}">
+      <div class="vac" style="padding-right:34px">
+        <input class="fi" type="text" id="vin-donesub-${i}" value="${esc(r.재위탁||'')}" placeholder="재위탁 CSO (있을 때만 — 소속 아래 실제 만난 업체)" autocomplete="off" ${r.내부?'disabled':''}
+          oninput="doneField(${i},'재위탁',this.value);vacSearch('donesub',${i},this.value)" onkeydown="vacKey('donesub',${i},event)" onblur="vacClose('donesub',${i})">
+        <div class="vac-list" id="vac-donesub-${i}"></div>
+      </div>
+      <label class="chk-internal"><input type="checkbox" ${r.내부?'checked':''} onchange="actInternal('done',${i},this.checked)"> 업체 없음 (내근·회의·교육 등 내부 일정 — 업체 집계에서 제외)</label>
+      <div class="seg st${(!r.내부&&!r.상태&&String(r.업체명||'').trim())?' need':''}">
         ${VSTATES.map(s=>`<button type="button" data-v="${s}" class="${r.상태===s?'on':''}" onclick="doneState(${i},'${s}')">${s}</button>`).join('')}
       </div>
       <textarea class="fi" rows="1" placeholder="미팅 주요사항" oninput="doneField(${i},'내용',this.value);autoGrow(this)">${esc(r.내용||'')}</textarea>
@@ -1909,20 +1922,41 @@ function renderDone(){
   cont.querySelectorAll('textarea').forEach(autoGrow);
   doneCount();
 }
+/* [v58] 업체 없음(내부 일정) 토글 — 업체명·재위탁·상태를 비우고 행을 회색으로. 서버는 업체명 '(내부)'로 저장 */
+function actInternal(kind,i,on){
+  const r=(kind==='done'?daily.한일:daily.할일)[i]; if(!r) return;
+  r.내부=!!on; if(on){ r.업체명=''; r.재위탁=''; if(kind==='done') r.상태=''; }
+  if(kind==='done') renderDone(); else renderTodo();
+  saveDaily();
+}
+/* [v58] 재위탁 CSO 자동완성 소스 — 업체마스터의 재위탁 중 이 행의 소속 CSO 아래 것 먼저, 소속이 비었거나 매칭이 없으면 전체 재위탁 */
+function subSource(kind,i){
+  const row=(kind==='donesub'?daily.한일:daily.할일)[i]||{}, pk=normVendorKey(row.업체명||'');
+  const subs=(vendorRoster||[]).filter(r=>r.kind==='재위탁');
+  const mine=pk?subs.filter(r=>normVendorKey(r.parent||'')===pk):[];
+  const pool=(mine.length?mine:subs).map(r=>({name:r.name,recent:mine.length>0,sub:'소속 '+(r.parent||'-')}));
+  return pool;
+}
 function addTodo(){ daily.할일.push({업체명:'',내용:''}); renderTodo(); saveDaily(); }
 function delTodo(i){ daily.할일.splice(i,1); if(!daily.할일.length) daily.할일=[{업체명:'',내용:''}]; renderTodo(); saveDaily(); }
 function todoField(i,f,v){ daily.할일[i][f]=v; todoCount(); saveDaily(); }
-function todoCount(){ const n=(daily.할일||[]).filter(r=>String(r.업체명||'').trim()).length; const el=document.getElementById('todo-cnt'); if(el) el.textContent=n; }
+function todoCount(){ const n=(daily.할일||[]).filter(r=>r.내부?String(r.내용||'').trim():String(r.업체명||'').trim()).length; /* [v58] */ const el=document.getElementById('todo-cnt'); if(el) el.textContent=n; }
 function renderTodo(){
   const cont=document.getElementById('todo-list'); if(!cont) return;
-  cont.innerHTML=daily.할일.map((r,i)=>`<div class="rowbox">
+  cont.innerHTML=daily.할일.map((r,i)=>`<div class="rowbox${r.내부?' internal':''}">
       <button class="row-del" onclick="delTodo(${i})">×</button>
       <div class="vac" style="padding-right:34px">
-        <input class="fi" type="text" id="vin-todo-${i}" value="${esc(r.업체명||'')}" placeholder="업체명 (자동완성)" autocomplete="off"
+        <input class="fi" type="text" id="vin-todo-${i}" value="${esc(r.업체명||'')}" placeholder="소속 CSO (업체명 자동완성)" autocomplete="off" ${r.내부?'disabled':''}
           oninput="todoField(${i},'업체명',this.value);vacSearch('todo',${i},this.value)" onkeydown="vacKey('todo',${i},event)" onblur="vacClose('todo',${i})">
         <div class="vac-list" id="vac-todo-${i}"></div>
       </div>
-      <input class="fi" type="text" value="${esc(r.내용||'')}" placeholder="할 일 (한 줄)" oninput="todoField(${i},'내용',this.value)">
+      <div class="vac" style="padding-right:34px">
+        <input class="fi" type="text" id="vin-todosub-${i}" value="${esc(r.재위탁||'')}" placeholder="재위탁 CSO (있을 때만)" autocomplete="off" ${r.내부?'disabled':''}
+          oninput="todoField(${i},'재위탁',this.value);vacSearch('todosub',${i},this.value)" onkeydown="vacKey('todosub',${i},event)" onblur="vacClose('todosub',${i})">
+        <div class="vac-list" id="vac-todosub-${i}"></div>
+      </div>
+      <label class="chk-internal"><input type="checkbox" ${r.내부?'checked':''} onchange="actInternal('todo',${i},this.checked)"> 업체 없음 (내근·회의·교육 등 내부 일정)</label>
+      <input class="fi" type="text" value="${esc(r.내용||'')}" placeholder="${r.내부?'내부 일정 (한 줄)':'할 일 (한 줄)'}" oninput="todoField(${i},'내용',this.value)">
     </div>`).join('');
   todoCount();
 }
@@ -1934,6 +1968,7 @@ function onIssueInput(el){ daily.이슈=el.value; autoGrow(el); saveDaily(); }
 let vacState={kind:'',idx:-1,sel:-1,hits:[]};
 /* kind: done·todo·vuc(볼륨업 업체명)=업체 마스터 / plan=유형에 따라 병원 마스터 ↔ 업체 마스터 */
 function vacSource(kind,i){
+  if(kind==='donesub'||kind==='todosub') return subSource(kind,i);   // [v58] 재위탁 CSO
   if(kind!=='plan') return vendorMaster;
   return (planTypeNorm((daily.계획[i]||{}).유형)==='업체') ? vendorMaster : hospOptions();
 }
@@ -1965,6 +2000,8 @@ function vacPick(kind,i,k){
   const v=vacState.hits[k]; if(!v) return;
   if(kind==='done')      daily.한일[i].업체명=v.name;
   else if(kind==='todo') daily.할일[i].업체명=v.name;
+  else if(kind==='donesub') daily.한일[i].재위탁=v.name;   // [v58]
+  else if(kind==='todosub') daily.할일[i].재위탁=v.name;
   else if(kind==='plan') daily.계획[i].거래처=v.name;
   // [fix4-V] 볼륨업 업체명 — 목록에서 고른 값은 '사용자 선택'이므로 자동 배지를 뗀다
   else if(kind==='vuc' && volumeUp[i]) { volumeUp[i].업체명=v.name; volumeUp[i]._업체자동=false; }
@@ -1972,6 +2009,8 @@ function vacPick(kind,i,k){
   const box=document.getElementById('vac-'+kind+'-'+i); if(box) box.style.display='none';
   if(kind==='done')      { doneCount(); renderDone(); }
   else if(kind==='todo') { todoCount(); }
+  else if(kind==='donesub') { doneCount(); }
+  else if(kind==='todosub') { todoCount(); }
   else if(kind==='plan') { updatePlanNew(i); planSummary(); }
   else if(kind==='vuc')  { const bd=document.getElementById('vu-auto-'+i); if(bd) bd.classList.remove('on'); vuSyncMultiDom(i); }
   saveDaily();
@@ -1985,15 +2024,19 @@ function collectPlanRows(){
     .filter(p=>String(p.거래처||'').trim()||String(p.품목||'').trim()||numOf(p.MBO만))
     .map(p=>({년월:ym,유형:planTypeNorm(p.유형),거래처:String(p.거래처||'').trim(),품목:String(p.품목||'').trim(),MBO:Math.round(numOf(p.MBO만)*10000)}));
 }
+/* [v58] 업체명 = 재위탁 CSO가 있으면 재위탁(실제 만난 업체), 없으면 소속 CSO · 소속CSO 키 = 재위탁일 때 소속 · 내부 일정은 내부:true(서버가 '(내부)'로 저장) */
+function actRow(r,d,withStatus){
+  if(r.내부) return Object.assign({일자:d,업체명:'',내부:true,내용:String(r.내용||'').trim()}, withStatus?{상태:''}:{});
+  const parent=String(r.업체명||'').trim(), sub=String(r.재위탁||'').trim();
+  return Object.assign({일자:d,업체명:sub||parent,소속CSO:sub?parent:'',내용:String(r.내용||'').trim()}, withStatus?{상태:r.상태||''}:{});
+}
 function collectDoneRows(){
   const d=today();
-  return (daily.한일||[]).filter(r=>String(r.업체명||'').trim())
-    .map(r=>({일자:d,업체명:String(r.업체명||'').trim(),상태:r.상태||'',내용:String(r.내용||'').trim()}));
+  return (daily.한일||[]).filter(r=>r.내부?String(r.내용||'').trim():String(r.업체명||'').trim()).map(r=>actRow(r,d,true));
 }
 function collectTodoRows(){
   const d=today();
-  return (daily.할일||[]).filter(r=>String(r.업체명||'').trim())
-    .map(r=>({일자:d,업체명:String(r.업체명||'').trim(),내용:String(r.내용||'').trim()}));
+  return (daily.할일||[]).filter(r=>r.내부?String(r.내용||'').trim():String(r.업체명||'').trim()).map(r=>actRow(r,d,false));
 }
 
 /* ════════════ ② 신약 진행상황 — 자동표시 3종 ════════════ */
