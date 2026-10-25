@@ -2659,7 +2659,7 @@ function renderFcVolumeUp(vu, meta){
 
 <!-- ══════════════════════════════════════════
      📈 매출예측/고객관리 (MS팀 성과관리 CRM · v38)
-     mode=crm JSONP 단일 호출 → 본부지표·2배경로·연도별표·지부장 통합표 → 행 클릭 시 지부장 상세 8블록 → 업체 칩 클릭 시 업체 상세
+     mode=crm JSONP 단일 호출 → 본부지표·2배경로·연도별표·지부장 통합표 → 행 클릭 시 지부장 상세 9블록([v57] 7 할일 이행·상태 경보) → 업체 칩 클릭·검색 시 업체 히스토리(최근 12개월)
      응답 계약 = _workspace\01_architect_datamodel.md §11-4 (meta·team·yearly·directors·activities·monthlyPlans·sales·vendors)
      ══════════════════════════════════════════ -->
 <style>
@@ -2737,6 +2737,10 @@ function renderFcVolumeUp(vu, meta){
 .kb.한일{background:var(--blue-lt);color:var(--blue-dk)}
 .kb.할일{background:var(--watch-lt);color:var(--watch)}
 .kb.이슈{background:var(--bad-lt);color:var(--bad)}
+.crm-link{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--blue);cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px}   /* [v57] 업체 히스토리 열기 */
+.vd-hist-strip{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:6px}
+.vd-mark{font-size:10px;font-weight:800;padding:1px 7px;border-radius:5px;white-space:nowrap;margin-left:auto}
+.vd-mark.ok{background:var(--ok-lt);color:var(--ok)}.vd-mark.bad{background:var(--bad-lt);color:var(--bad)}.vd-mark.wait{background:var(--gray1);color:var(--gray3)}
 .tb{font-size:9.5px;font-weight:800;padding:1px 6px;border-radius:5px}
 .tb.신약{background:var(--blue-lt);color:var(--blue-dk)}
 .tb.볼륨업{background:var(--ok-lt);color:var(--ok)}
@@ -2747,7 +2751,7 @@ function renderFcVolumeUp(vu, meta){
 </style>
 <script>
 var crmData=null, crmLoaded=false, crmLoading=false;
-var crmView={mode:'all', dirIdx:-1, vendorIdx:-1};
+var crmView={mode:'all', dirIdx:-1, vendorKey:'', vendorName:''};   /* [v57] vendorIdx(이번달 칩 번호) → vendorKey(업체 키) — 칩·검색·경보표 어디서 열어도 같은 업체 히스토리 */
 
 /* ── 로드 (loadForecast 템플릿 복제 · 콜백만 __crmCallback으로 분리) ── */
 function loadCrm(){
@@ -2771,7 +2775,7 @@ function loadCrm(){
   s.onerror=function(){crmLoading=false;st.innerHTML='<span style="color:var(--bad)">연결 실패 — 네트워크/URL 확인</span>';s.remove();};
   document.head.appendChild(s);
 }
-function refreshCrm(){crmLoaded=false;crmLoading=false;crmView={mode:'all',dirIdx:-1,vendorIdx:-1};loadCrm();}
+function refreshCrm(){crmLoaded=false;crmLoading=false;crmView={mode:'all',dirIdx:-1,vendorKey:'',vendorName:''};loadCrm();}
 
 /* ── 공통 유틸 ── */
 function crmMeta(){return (crmData&&crmData.meta)||{};}
@@ -2891,8 +2895,10 @@ function renderCrmDirectors(){
       +'<th style="background:var(--blue-lt);color:var(--blue-dk)">'+crmMon(meta.nowMonth)+' 목표</th>'
       +'<th style="background:var(--gray1)">파이프라인<br><span style="font-size:9px;color:var(--gray3)">건 · MBO</span></th>'
       +'<th style="background:var(--gray1)">업체 상태<br><span style="font-size:9px;color:var(--gray3)">순항·관찰·부진 (이번달)</span></th>'
+      +'<th style="background:var(--gray1)">할일 이행<br><span style="font-size:9px;color:var(--gray3)">90~30일 전 할일 → 30일 내 한일</span></th>'
+      +'<th style="background:var(--gray1)">상태 경보<br><span style="font-size:9px;color:var(--gray3)">최근 60일 하락·부진지속</span></th>'
       +'<th style="background:var(--gray1)">이슈<br><span style="font-size:9px;color:var(--gray3)">이번달</span></th><th></th></tr>';
-  var body='', sumM={}, sumPrev=0, sumGoal=0, sumCnt=0, sumMbo=0, sumIss=0;
+  var body='', sumM={}, sumPrev=0, sumGoal=0, sumCnt=0, sumMbo=0, sumIss=0, sumTd=0, sumTt=0, sumAl=0;
   dirs.forEach(function(d,i){
     var f=d.flow||{}, ac=d.actuals||{}, pl=(d.pipeline&&d.pipeline.total)||{};
     var snap=crmMonthSnap(d), vs=snap.st; /* [v44b] 업체 상태·이슈 = 이번달 분만(월 리셋). 이력은 구글시트 */
@@ -2910,19 +2916,25 @@ function renderCrmDirectors(){
     row+='<td style="background:var(--blue-lt);color:var(--blue-dk);font-weight:700">'+(gv?fcEok(gv):'<span style="color:var(--gray3)">-</span>')+'</td>';
     row+='<td style="background:var(--gray1)">'+(Number(pl.count)||0)+'건 <span style="color:var(--gray3)">·</span> '+fcEok(pl.mbo)+'억</td>';
     row+='<td style="background:var(--gray1)"><span style="color:var(--ok);font-weight:700">'+(Number(vs['순항'])||0)+'</span> · <span style="color:var(--watch);font-weight:700">'+(Number(vs['관찰'])||0)+'</span> · <span style="color:var(--bad);font-weight:700">'+(Number(vs['부진'])||0)+'</span></td>';
+    var td=d.todo||{}, alc=Number(d.alertCount)||0; sumTd+=Number(td.done)||0; sumTt+=Number(td.total)||0; sumAl+=alc;   /* [v57] 서버 buildCrm_ [7-1] 산출 — 구버전 백엔드(todo 없음)는 '-' */
+    row+='<td style="background:var(--gray1)">'+(td.total?('<span style="font-weight:700;color:'+crmRateColor(td.rate)+'">'+td.rate+'%</span> <span style="color:var(--gray3);font-size:10px">'+td.done+'/'+td.total+'</span>'):'<span style="color:var(--gray3)">-</span>')+'</td>';
+    row+='<td style="background:var(--gray1)">'+(alc?('<span class="crm-badge bad">'+alc+'</span>'):(d.alerts?'<span style="color:var(--ok);font-weight:700">0</span>':'<span style="color:var(--gray3)">-</span>'))+'</td>';
     row+='<td style="background:var(--gray1)">'+(snap.issues.length?('<span class="crm-badge bad">'+snap.issues.length+'</span>'):'<span style="color:var(--gray3)">-</span>')+'</td>';
     row+='<td style="color:var(--blue);font-weight:700">상세 ›</td></tr>';
     body+=row;
   });
   var sumRow='<tr style="background:var(--gray1);font-weight:700"><td style="text-align:left">MS팀 합계</td>';
   cols.forEach(function(m){sumRow+='<td>'+fcEok(sumM[m]||0)+'</td>';});
-  sumRow+='<td>'+fcEok(sumPrev)+'</td><td style="color:var(--blue-dk)">'+fcEok(sumGoal)+'</td><td>'+sumCnt+'건 · '+fcEok(sumMbo)+'억</td><td>-</td><td>'+(sumIss||'-')+'</td><td></td></tr>';
+  sumRow+='<td>'+fcEok(sumPrev)+'</td><td style="color:var(--blue-dk)">'+fcEok(sumGoal)+'</td><td>'+sumCnt+'건 · '+fcEok(sumMbo)+'억</td><td>-</td>'
+    +'<td>'+(sumTt?(Math.round(sumTd/sumTt*100)+'% <span style="color:var(--gray3);font-size:10px;font-weight:400">'+sumTd+'/'+sumTt+'</span>'):'-')+'</td><td>'+(sumAl||'-')+'</td><td>'+(sumIss||'-')+'</td><td></td></tr>';
   el.innerHTML='<div class="section-card"><h3>👥 지부장 성과 통합 <span style="font-size:11px;color:var(--gray3);font-weight:400">단위: 억원 · 실적=확정월까지 · 행을 클릭하면 지부장 상세로 전환</span></h3>'
     +'<div class="tbl-wrap"><table class="btbl fc-tbl crm-tbl"><thead>'+head+'</thead><tbody>'+body+sumRow+'</tbody></table></div></div>';
 }
-function crmOpenDir(i){ crmView={mode:'dir',dirIdx:i,vendorIdx:-1}; renderCrm(); window.scrollTo({top:0,behavior:'smooth'}); }
-function crmBackAll(){ crmView={mode:'all',dirIdx:-1,vendorIdx:-1}; renderCrm(); }
-function crmToggleVendor(i){ crmView.vendorIdx=(crmView.vendorIdx===i?-1:i); renderCrmDirector(); }
+function crmOpenDir(i){ crmView={mode:'dir',dirIdx:i,vendorKey:'',vendorName:''}; renderCrm(); window.scrollTo({top:0,behavior:'smooth'}); }
+function crmBackAll(){ crmView={mode:'all',dirIdx:-1,vendorKey:'',vendorName:''}; renderCrm(); }
+/* [v57] 업체 히스토리 열기/닫기 — 지부장별 업체 목록(crmVendorList) 번호로 호출(칩·경보표·미이행표·검색 공용). 같은 업체를 다시 누르면 닫힘 */
+function crmOpenVendorI(i){ var d=crmDirs()[crmView.dirIdx]; var v=d?crmVendorList(d)[i]:null; if(!v)return; var same=(crmView.vendorKey===v.key); crmView.vendorKey=same?'':v.key; crmView.vendorName=same?'':v.name; renderCrmDirector(); if(!same){var el=document.getElementById('crm-vendor-card'); if(el) el.scrollIntoView({behavior:'smooth',block:'start'});} }
+function crmFindVendor(val){ var d=crmDirs()[crmView.dirIdx]; if(!d)return; var q=String(val||'').trim(); if(!q)return; var list=crmVendorList(d); var i=-1; list.forEach(function(v,j){if(i<0&&v.name===q)i=j;}); if(i<0) list.forEach(function(v,j){if(i<0&&(v.name.indexOf(q)>=0||q.indexOf(v.name)>=0))i=j;}); if(i<0){alert('이 지부장의 최근 12개월 활동에 없는 업체입니다: '+q);return;} if(crmView.vendorKey===list[i].key)return; crmOpenVendorI(i); }
 
 /* ── [v44 2026-09-01 박본님, v44b 월 단위로 교정] 일일보고 업체 내용 '월 리셋' 표시 ──
    대시보드는 지부장별 '이번달' 분을 누적으로 보여주고, 달이 바뀌면 리셋된다(지난달 분은 화면에서 제외).
@@ -2949,7 +2961,7 @@ function crmMonthSnap(d){
   return {month:nowM,chips:chips,st:st,issues:issues};
 }
 
-/* ── 지부장 상세 8블록 ── */
+/* ── 지부장 상세 9블록 ([v57] 7 할일 이행·상태 경보 추가 → 8 미팅 업체+히스토리 검색 → 9 이슈) ── */
 function renderCrmDirector(){
   var el=document.getElementById('crm-detail'), meta=crmMeta();
   var d=crmDirs()[crmView.dirIdx];
@@ -3073,45 +3085,107 @@ function renderCrmDirector(){
   h+='<div class="section-card"><h3>📈 6. 매출 볼륨업 <span style="font-size:11px;color:var(--gray3);font-weight:400">'+vrows.length+'건 · 총 증대MBO '+fcMan(vu.total)+'만원</span></h3>'
     +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead><tr><th style="text-align:left">병원명</th><th>품목</th><th style="text-align:left">내용</th><th>증대MBO</th><th>목표월</th><th>상태</th></tr></thead><tbody>'+vbody+'</tbody></table></div></div>';
 
-  /* 7. 미팅 업체 칩 (+ 업체 상세 카드) — [v44b] 이번달 누적 표시, 달이 바뀌면 리셋. 이력은 구글시트 '업체활동' 탭 */
+  /* 7. 할일 이행률 · 상태 전이 경보 — [v57 2026-10-25 박본님] 서버 buildCrm_ [7-1] 산출(todo·alerts). 업체명 클릭 → 8의 업체 히스토리 */
+  var vlist=crmVendorList(d), vIdx={}; vlist.forEach(function(v,i){vIdx[v.key]=i;});
+  var vLink=function(key,name){ var i=vIdx[key]; return (i==null)?fcEsc(name||key||'-'):('<button class="crm-link" onclick="crmOpenVendorI('+i+')">'+fcEsc(name||key||'-')+'</button>'); };
+  var td=d.todo||null, als=d.alerts||[], alLive=als.filter(function(a){return !a.recovered;}), alBad=alLive.filter(function(a){return a.to==='부진';}).length;
+  if(td||d.alerts){
+    var rateTxt=(td&&td.rate!=null)?(td.rate+'%'):'-', rateCol=td?crmRateColor(td.rate):'var(--gray3)';
+    var pend=(td&&td.pending)||[];
+    var pbody7=pend.length?pend.map(function(p){
+      return '<tr><td style="text-align:left;font-weight:600">'+vLink(p.key,p['업체명'])+'</td><td style="white-space:nowrap">'+fcEsc(p['일자']||'')+'</td><td style="text-align:left;color:var(--gray4)">'+fcEsc(p['내용']||'-')+'</td></tr>';
+    }).join(''):'<tr><td colspan="3" style="color:var(--gray3);padding:12px">'+(td&&td.total?'확정 창의 할일이 모두 이행되었습니다':'확정 창에 업체명이 있는 할일이 없습니다')+'</td></tr>';
+    var alsSorted=als.slice().sort(function(x,y){ if(!!x.recovered!==!!y.recovered)return x.recovered?1:-1; var bx=(x.to==='부진')?0:1, by=(y.to==='부진')?0:1; if(bx!==by)return bx-by; return String(y['일자']).localeCompare(String(x['일자'])); });
+    var abody7=alsSorted.length?alsSorted.map(function(a){
+      var tr='<span class="crm-chip '+fcEsc(a.from)+'" style="cursor:default;padding:1px 8px;font-size:10px">'+fcEsc(a.from)+'</span> → <span class="crm-chip '+fcEsc(a.to)+'" style="cursor:default;padding:1px 8px;font-size:10px">'+fcEsc(a.to)+'</span>';
+      return '<tr'+(a.recovered?' style="opacity:.55"':'')+'><td style="text-align:left;font-weight:600">'+vLink(a.key,a['업체명'])+'</td><td style="white-space:nowrap">'+tr+'</td><td style="white-space:nowrap">'+fcEsc(a['일자']||'')+'</td>'
+        +'<td style="text-align:left;color:var(--gray4)">'+fcEsc(a['내용']||'-')+'</td><td>'+(a.recovered?'<span class="crm-badge on">회복</span>':(a.kind==='지속'?'<span class="crm-badge bad">부진 지속</span>':'<span class="crm-badge wait">진행</span>'))+'</td></tr>';
+    }).join(''):'<tr><td colspan="5" style="color:var(--gray3);padding:12px">최근 60일 상태 하락 전이가 없습니다</td></tr>';
+    h+='<div class="section-card"><h3>✅ 7. 할일 이행률 · 상태 전이 경보 <span style="font-size:11px;color:var(--gray3);font-weight:400">이행 = 할일 뒤 30일 안에 같은 업체 한일 보고 · 경보 = 한일 상태가 직전 보고보다 나빠짐(최근 60일) · 업체명 클릭 → 히스토리</span></h3>'
+      +'<div class="crm-stat">'
+      +'<div class="b"><div class="l">할일 이행률'+(td?' <span style="color:var(--gray3)">· '+fcEsc(String(td.from||'').slice(5))+'~'+fcEsc(String(td.to||'').slice(5))+' 할일(30일 경과분)</span>':'')+'</div><div class="v" style="color:'+rateCol+'">'+rateTxt+'</div><div class="s">'+(td?(td.done+'/'+td.total+'건 이행 · 미이행 '+(td.total-td.done)+'건'):'백엔드 v57 배포 전')+'</div></div>'
+      +'<div class="b"><div class="l">최근 4주 할일</div><div class="v">'+(td&&td.recent?(td.recent.done+'<span style="font-size:13px;color:var(--gray3)">/'+td.recent.total+'</span>'):'-')+'</div><div class="s">판정 진행 중(30일 미경과 포함) · 참고</div></div>'
+      +'<div class="b"><div class="l">상태 전이 경보</div><div class="v" style="color:'+(alLive.length?'var(--bad)':'var(--ok)')+'">'+alLive.length+'건</div><div class="s">부진行 '+alBad+' · 관찰行 '+(alLive.length-alBad)+' · 회복 '+(als.length-alLive.length)+'</div></div>'
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:12px;margin-top:12px">'
+      +'<div><div style="font-size:12px;font-weight:700;margin-bottom:5px">미이행 할일 <span style="font-size:10.5px;color:var(--gray3);font-weight:400">'+pend.length+'건 · 최신순(최대 12)</span></div>'
+      +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead><tr><th style="text-align:left">업체</th><th>할일 일자</th><th style="text-align:left">할일 내용</th></tr></thead><tbody>'+pbody7+'</tbody></table></div></div>'
+      +'<div><div style="font-size:12px;font-weight:700;margin-bottom:5px">상태 전이 경보 <span style="font-size:10.5px;color:var(--gray3);font-weight:400">'+als.length+'건 · 부진行·진행 중 먼저</span></div>'
+      +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead><tr><th style="text-align:left">업체</th><th>전이</th><th>일자</th><th style="text-align:left">그날 한일</th><th>현재</th></tr></thead><tbody>'+abody7+'</tbody></table></div></div>'
+      +'</div></div>';
+  }
+
+  /* 8. 미팅 업체 칩 (+ 업체 히스토리) — [v44b] 칩 = 이번달 누적(달이 바뀌면 리셋) · [v57] 칩 클릭/검색 → 최근 12개월 히스토리 카드, 경보 업체 칩에 ↓ */
   var snap=crmMonthSnap(d); d._monthSnap=snap;
-  var chips=snap.chips, vs=snap.st;
-  var chipHtml=chips.length?chips.map(function(c,i){
-    return '<button class="crm-chip '+fcEsc(c.status||'none')+(crmView.vendorIdx===i?' sel':'')+'" onclick="crmToggleVendor('+i+')">'
-      +fcEsc(c.name||c.key||'-')+'<span class="n">'+(Number(c.count)||0)+'회</span></button>';
+  var chips=snap.chips, vs=snap.st, alKeys={}; alLive.forEach(function(a){alKeys[a.key]=a.kind;});
+  var chipHtml=chips.length?chips.map(function(c){
+    var i=vIdx[c.key];
+    return '<button class="crm-chip '+fcEsc(c.status||'none')+(crmView.vendorKey===c.key?' sel':'')+'" onclick="crmOpenVendorI('+(i==null?-1:i)+')">'
+      +fcEsc(c.name||c.key||'-')+'<span class="n">'+(Number(c.count)||0)+'회</span>'+(alKeys[c.key]?'<span class="n" style="color:var(--bad)" title="상태 전이 경보">↓</span>':'')+'</button>';
   }).join(''):'<div class="no-data">이번달 미팅 기록이 없습니다 (폼 ⑤ 오늘 한일)</div>';
-  h+='<div class="section-card"><h3>🏢 7. 미팅 업체 <span style="font-size:11px;color:var(--gray3);font-weight:400">'+fcEsc(snap.month||'')+' 누적 · '+chips.length+'처 · '
-    +'<span style="color:var(--ok)">순항 '+vs['순항']+'</span> · <span style="color:var(--watch)">관찰 '+vs['관찰']+'</span> · <span style="color:var(--bad)">부진 '+vs['부진']+'</span> · 칩을 클릭하면 업체 상세</span></h3>'
+  var dl='<datalist id="crm-vendor-dl">'+vlist.map(function(v){return '<option value="'+fcEsc(v.name)+'">';}).join('')+'</datalist>';
+  h+='<div class="section-card"><h3>🏢 8. 미팅 업체 <span style="font-size:11px;color:var(--gray3);font-weight:400">'+fcEsc(snap.month||'')+' 누적 · '+chips.length+'처 · '
+    +'<span style="color:var(--ok)">순항 '+vs['순항']+'</span> · <span style="color:var(--watch)">관찰 '+vs['관찰']+'</span> · <span style="color:var(--bad)">부진 '+vs['부진']+'</span> · ↓ = 상태 전이 경보 · 칩을 클릭하면 업체 히스토리</span></h3>'
+    +'<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:9px"><input list="crm-vendor-dl" id="crm-vendor-q" placeholder="🔍 업체 히스토리 찾기 — 업체명 입력 후 Enter (최근 12개월 활동 '+vlist.length+'처)" style="flex:1;min-width:260px;border:1px solid var(--hair);border-radius:10px;padding:8px 11px;font-size:12.5px" onkeydown="if(event.key===\'Enter\')crmFindVendor(this.value)" onchange="crmFindVendor(this.value)">'+dl+'</div>'
     +'<div class="crm-chips">'+chipHtml+'</div>'
-    +'<div style="font-size:10.5px;color:var(--gray3);margin-top:7px">이번달 보고 누적입니다 — 달이 바뀌면 리셋되며, 지난달 기록은 구글시트 \'업체활동\' 탭에 전량 남아 매출 확정 후 활동↔실적 평가에 사용합니다.</div>'
+    +'<div style="font-size:10.5px;color:var(--gray3);margin-top:7px">칩은 이번달 보고 누적(달이 바뀌면 리셋) · 업체 히스토리는 칩 클릭 또는 위 검색으로 최근 12개월 활동·상태 추이·할일 이행·월 매출을 봅니다. 그 이전 이력은 구글시트 \'업체활동\' 탭 원장.</div>'
     +renderCrmVendor(d)+'</div>';
 
-  /* 8. 이슈·고민 — [v44b] 이번달 분만 표시(월 리셋). 지난달 이슈는 구글시트 기록 */
+  /* 9. 이슈·고민 — [v44b] 이번달 분만 표시(월 리셋). 지난달 이슈는 구글시트 기록 */
   var issMon=snap.issues;
   var ibody=issMon.length?issMon.map(function(it){
     return '<div class="it"><span class="d">'+fcEsc(it['일자']||'')+'</span><span>'+fcEsc(it['내용']||'').replace(/\n/g,'<br>')+'</span></div>';
   }).join(''):'<div class="no-data">이번달 등록된 이슈가 없습니다</div>';
-  h+='<div class="section-card"><h3>💬 8. 고민·이슈 <span style="font-size:11px;color:var(--gray3);font-weight:400">'+fcEsc(snap.month||'')+' 누적 · 달이 바뀌면 리셋 · 지난달 이슈는 구글시트에 기록</span></h3><div class="vd-tl">'+ibody+'</div></div>';
+  h+='<div class="section-card"><h3>💬 9. 고민·이슈 <span style="font-size:11px;color:var(--gray3);font-weight:400">'+fcEsc(snap.month||'')+' 누적 · 달이 바뀌면 리셋 · 지난달 이슈는 구글시트에 기록</span></h3><div class="vd-tl">'+ibody+'</div></div>';
 
   h+='<div style="margin-top:6px"><button class="crm-back" onclick="crmBackAll()">‹ 전체 지부장 보기</button></div>';
   el.innerHTML=h;
 }
 
-/* ── 업체 상세 카드 (칩 클릭 토글) ── */
+/* ── [v57 2026-10-25 박본님] 업체 히스토리 — 공용 유틸 ── */
+var CRM_ST_RANK={'순항':0,'관찰':1,'부진':2};
+function crmFmtYmd(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}   /* Date → 'YYYY-MM-DD' (기존 crmYmd(문자열)와 다른 함수) */
+function crmAddDays(ymd,n){var d=new Date(+ymd.slice(0,4),+ymd.slice(5,7)-1,+ymd.slice(8,10));d.setDate(d.getDate()+n);return crmFmtYmd(d);}
+function crmTodayYmd(){var g=String(crmMeta().generatedAt||'').slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(g)?g:crmFmtYmd(new Date());}
+function crmRateColor(r){return (r==null||isNaN(r))?'var(--gray3)':(r>=80?'var(--ok)':(r>=60?'var(--watch)':'var(--bad)'));}
+function crmVendorList(d){ /* 이 지부장 activities(최근 12개월)의 업체 목록 — 키별 최신 표기(activities는 일자 내림차순), 이름순. 칩·경보표·미이행표·검색이 같은 번호를 쓴다 */
+  if(d._vlist)return d._vlist;
+  var acts=((crmData&&crmData.activities)||{})[d.name]||[], map={}, list=[];
+  acts.forEach(function(a){var k=a.vendorKey||a['업체명']||'';if(!k)return;if(!map[k]){map[k]={key:k,name:a['업체명']||k,n:0};list.push(map[k]);}map[k].n++;});
+  list.sort(function(x,y){return String(x.name).localeCompare(String(y.name),'ko');});
+  d._vlist=list;return list;
+}
+function crmTodoMark(a,mine,today){ /* 할일 1건 판정: 같은 업체 한일이 (D, D+30] 안에 있으면 이행 · 30일 미경과면 판정 전 · 아니면 미이행 (서버 buildCrm_ [7-1]과 같은 규칙) */
+  var D=String(a['일자']||'').slice(0,10), lim=crmAddDays(D,30), hit='';
+  mine.forEach(function(b){if(b['구분']!=='한일')return;var bd=String(b['일자']||'').slice(0,10);if(bd>D&&bd<=lim&&(!hit||bd<hit))hit=bd;});
+  if(hit)return {cls:'ok',txt:'✓ 이행 '+hit.slice(5)};
+  if(lim>=today)return {cls:'wait',txt:'⏳ '+lim.slice(5)+'까지'};
+  return {cls:'bad',txt:'✗ 미이행'};
+}
+
+/* ── 업체 히스토리 카드 [v57] — 칩 클릭·검색·경보표에서 열림. 이 지부장의 해당 업체 활동 전부(activities 범위 = 최근 12개월) · 상태 추이 · 할일 이행 · 월 매출.
+   (v44b '이번달만 표시'는 칩에만 남기고, 카드는 히스토리로 전환 — 박본님 2026-10-25 "업체 히스토리가 쌓이고 확인할 수 있게") ── */
 function renderCrmVendor(d){
-  if(crmView.vendorIdx<0)return'';
-  var snap=d._monthSnap||crmMonthSnap(d);
-  var c=(snap.chips||[])[crmView.vendorIdx];   /* [v44b] 칩 = 이번달 한일 업체 */
-  if(!c)return'';
-  var meta=crmMeta(), sales=(crmData&&crmData.sales)||{}, sv=(sales.vendors||{})[c.key]||msResolveVendor(c.key||c.name,(sales.vendors||{}))||null;
-  var months=sales.months||[];
-  var h='<div class="vd-card">';
+  var key=crmView.vendorKey; if(!key)return'';
+  var mine=(((crmData&&crmData.activities)||{})[d.name]||[]).filter(function(a){return (a.vendorKey||a['업체명']||'')===key;});   /* 일자 내림차순 유지 */
+  var name=crmView.vendorName||(mine[0]&&mine[0]['업체명'])||key, today=crmTodayYmd(), nowM=crmMeta().nowMonth||today.slice(0,7);
+  var sales=(crmData&&crmData.sales)||{}, sv=(sales.vendors||{})[key]||msResolveVendor(name,(sales.vendors||{}))||null, months=sales.months||[];
+  var seq=mine.filter(function(a){return a['구분']==='한일'&&CRM_ST_RANK[a['상태']]!=null;}).slice().reverse();   /* 오래된→최신 */
+  var latest=seq.length?seq[seq.length-1]['상태']:'', lastDrop=null, mSeen=[], mStat={};
+  seq.forEach(function(a,i){var m=String(a['일자']).slice(0,7);if(!mStat[m])mSeen.push(m);mStat[m]=a['상태'];
+    if(i>0&&CRM_ST_RANK[a['상태']]>CRM_ST_RANK[seq[i-1]['상태']])lastDrop={from:seq[i-1]['상태'],to:a['상태'],date:String(a['일자']).slice(0,10)};});
+  var todos=mine.filter(function(a){return a['구분']==='할일';}), tDone=0,tBad=0,tWait=0;
+  todos.forEach(function(a){var mk=crmTodoMark(a,mine,today);if(mk.cls==='ok')tDone++;else if(mk.cls==='bad')tBad++;else tWait++;});
+  var cntAll=mine.filter(function(a){return a['구분']==='한일';}).length, cntMon=mine.filter(function(a){return a['구분']==='한일'&&String(a['일자']||'').slice(0,7)===nowM;}).length;
+  var first=mine.length?String(mine[mine.length-1]['일자']||'').slice(0,10):'', last=mine.length?String(mine[0]['일자']||'').slice(0,10):'';
+  var h='<div class="vd-card" id="crm-vendor-card">';
   h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">'
-    +'<b style="font-size:15px">'+fcEsc(c.name||c.key||'-')+'</b>'
-    +(c.status?'<span class="crm-chip '+fcEsc(c.status)+'" style="cursor:default;padding:3px 10px">'+fcEsc(c.status)+'</span>':'')
-    +'<span class="crm-badge">'+fcEsc(snap.month||'')+' 보고</span>'
+    +'<b style="font-size:15px">'+fcEsc(name)+'</b>'
+    +(latest?'<span class="crm-chip '+fcEsc(latest)+'" style="cursor:default;padding:3px 10px">최근 상태 '+fcEsc(latest)+'</span>':'<span class="crm-chip none" style="cursor:default;padding:3px 10px">상태 기록 없음</span>')
+    +'<span class="crm-badge">히스토리 '+(first?fcEsc(first)+' ~ '+fcEsc(last):'활동 없음')+' · '+mine.length+'건</span>'
+    +'<button class="crm-back" style="margin-left:auto" onclick="crmView.vendorKey=\'\';crmView.vendorName=\'\';renderCrmDirector()">✕ 닫기</button>'
     +'</div>';
-  /* 월 매출 추이 미니 막대 */
+  /* 월 매출 추이 미니 막대 (업체실적 — 일일보고가 아니라 리셋 대상 아님) */
   if(sv&&months.length){
     var vals=months.map(function(m){return Number((sv.monthly||{})[m])||0;});
     var mx=Math.max.apply(null,vals.concat([1]));
@@ -3123,33 +3197,39 @@ function renderCrmVendor(d){
   }else{
     h+='<div class="no-data" style="padding:14px">업체실적 데이터가 없습니다 — 활동 이력만 표시합니다</div>';
   }
-  /* 지표 — 매출은 일일보고가 아니므로 리셋 대상 아님. 미팅은 이번달 누적([v44b] 3개월 미팅 등 월 넘는 누적 지표는 제거 유지 — 평가는 구글시트에서) */
+  var tTot=tDone+tBad, tRate=tTot?Math.round(tDone/tTot*100):null;
   h+='<div class="vd-kpi">'
-    +'<div class="k"><div class="l">이번달 미팅</div><div class="v">'+(Number(c.count)||0)+'회</div></div>'
+    +'<div class="k"><div class="l">미팅(한일) · 전체 / 이번달</div><div class="v">'+cntAll+'<span style="font-size:12px;color:var(--gray3)">회</span> / '+cntMon+'<span style="font-size:12px;color:var(--gray3)">회</span></div></div>'
+    +'<div class="k"><div class="l">할일 이행 (30일 경과분)</div><div class="v" style="color:'+crmRateColor(tRate)+'">'+(tRate==null?'-':tRate+'%')+'</div><div style="font-size:10.5px;color:var(--gray3)">'+tDone+'/'+tTot+'건'+(tWait?' · 판정 전 '+tWait:'')+'</div></div>'
+    +'<div class="k"><div class="l">최근 상태 하락</div><div class="v" style="font-size:14px;color:'+(lastDrop?'var(--bad)':'var(--ok)')+'">'+(lastDrop?(fcEsc(lastDrop.from)+' → '+fcEsc(lastDrop.to)+' <span style="font-weight:400;color:var(--gray3)">'+fcEsc(lastDrop.date.slice(5))+'</span>'):'없음')+'</div></div>'
     +'<div class="k"><div class="l">매출 전월比</div><div class="v" style="color:'+crmPctColor(sv&&sv.momPct)+'">'+crmPctTxt(sv&&sv.momPct)+'</div></div>'
     +'<div class="k"><div class="l">3개월 매출 추세</div><div class="v" style="color:'+crmPctColor(sv&&sv.trend3Pct)+'">'+crmPctTxt(sv&&sv.trend3Pct)+'</div></div>'
     +'</div>';
-  /* [v44b] 이번달 활동만 표시(한일·이슈=이번달, 할일=이번달 이후 예정 포함). 지난달 이력은 구글시트 '업체활동' 탭 */
-  var acts=((crmData&&crmData.activities)||{})[d.name]||[];
-  var mine=acts.filter(function(a){
-    if((a.vendorKey||a['업체명'])!==c.key&&a['업체명']!==c.name)return false;
-    var m=String(a['일자']||'').slice(0,7);
-    return (a['구분']==='할일')?(m>=snap.month):(m===snap.month);
-  });
+  /* 상태 추이 — 월별 마지막 보고 상태(오래된→최신), 나빠진 달에 ↓ */
+  if(mSeen.length){
+    h+='<div style="font-size:11px;color:var(--gray3);margin-top:12px">상태 추이 (월별 마지막 보고 상태)</div><div class="vd-hist-strip">'
+      +mSeen.map(function(m,i){var st=mStat[m], prev=i>0?mStat[mSeen[i-1]]:null, down=prev&&CRM_ST_RANK[st]>CRM_ST_RANK[prev];
+        return (i>0?'<span style="color:var(--gray3)">→</span>':'')+'<span class="crm-chip '+fcEsc(st)+'" style="cursor:default;padding:2px 9px;font-size:10.5px">'+fcEsc(crmMon(m))+' '+fcEsc(st)+(down?' ↓':'')+'</span>';}).join('')
+      +'</div>';
+  }
+  /* 활동 히스토리 — 월별 접기(최신 달 펼침), 할일엔 이행 판정 */
   if(mine.length){
-    var todo=mine.filter(function(a){return a['구분']==='할일';});
-    var done=mine.filter(function(a){return a['구분']!=='할일';});
-    todo.sort(function(a,b){return String(b['일자']||'').localeCompare(String(a['일자']||''));});
-    done.sort(function(a,b){return String(b['일자']||'').localeCompare(String(a['일자']||''));});
-    h+='<div class="vd-tl"><div style="font-size:11px;color:var(--gray3);margin-bottom:5px">이번달 활동 ('+fcEsc(snap.month||'')+' · 예정 할일 → 한일 역순) — 지난달 이력은 구글시트 \'업체활동\' 탭</div>'
-      +todo.concat(done).map(function(a){
-        return '<div class="it"><span class="d">'+fcEsc(a['일자']||'')+'</span>'
-          +'<span class="kb '+fcEsc(a['구분']||'')+'">'+fcEsc(a['구분']||'')+'</span>'
-          +(a['상태']?'<span class="crm-chip '+fcEsc(a['상태'])+'" style="cursor:default;padding:1px 8px;font-size:10px">'+fcEsc(a['상태'])+'</span>':'')
-          +'<span style="flex:1">'+fcEsc(a['내용']||'-').replace(/\n/g,'<br>')+'</span></div>';
+    var groups=[], gmap={};
+    mine.forEach(function(a){var m=String(a['일자']||'').slice(0,7)||'-';if(!gmap[m]){gmap[m]={m:m,items:[],n:{'한일':0,'할일':0,'이슈':0}};groups.push(gmap[m]);}gmap[m].items.push(a);gmap[m].n[a['구분']]=(gmap[m].n[a['구분']]||0)+1;});
+    h+='<div class="vd-tl"><div style="font-size:11px;color:var(--gray3);margin-bottom:5px">활동 히스토리 — 최근 12개월 · '+mine.length+'건 (한일 '+cntAll+' · 할일 '+todos.length+' · 이슈 '+mine.filter(function(a){return a['구분']==='이슈';}).length+') · 월별 접기, 최신 달 펼침</div>'
+      +groups.map(function(g,gi){
+        return '<details'+(gi===0?' open':'')+'><summary>'+fcEsc(g.m)+' <span style="color:var(--gray3);font-weight:400;font-size:11px">한일 '+g.n['한일']+' · 할일 '+g.n['할일']+' · 이슈 '+g.n['이슈']+'</span></summary>'
+          +g.items.map(function(a){
+            return '<div class="it"><span class="d">'+fcEsc(String(a['일자']||'').slice(0,10))+'</span>'
+              +'<span class="kb '+fcEsc(a['구분']||'')+'">'+fcEsc(a['구분']||'')+'</span>'
+              +(a['상태']?'<span class="crm-chip '+fcEsc(a['상태'])+'" style="cursor:default;padding:1px 8px;font-size:10px">'+fcEsc(a['상태'])+'</span>':'')
+              +'<span style="flex:1">'+fcEsc(a['내용']||'-').replace(/\n/g,'<br>')+'</span>'
+              +(a['구분']==='할일'?(function(){var m2=crmTodoMark(a,mine,today);return '<span class="vd-mark '+m2.cls+'">'+m2.txt+'</span>';})():'')
+              +'</div>';}).join('')
+          +'</details>';
       }).join('')+'</div>';
   }else{
-    h+='<div class="no-data" style="padding:12px">이번달 이 업체 활동이 없습니다 — 이력은 구글시트 \'업체활동\' 탭</div>';
+    h+='<div class="no-data" style="padding:12px">최근 12개월 이 업체 활동이 없습니다 — 그 이전 이력은 구글시트 \'업체활동\' 탭</div>';
   }
   h+='</div>';
   return h;
