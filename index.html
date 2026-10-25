@@ -13,7 +13,7 @@ window.__gateGo=function(reason){var n=0;try{n=Number(sessionStorage.getItem("ga
 window.__gateGuard=function(res){if(!res||res.auth!=="required")return false;if(res.reason==="not_allowed"){alert("이 계정은 열람 권한이 없습니다. 담당자에게 요청해 주세요.");return true;}window.__gateGo(res.reason);return true;};
 /* [v46] 대시보드 내장데이터(110대 실적·마스터·과정관리)는 공개 파일이 아니라 D ?doc=dashdata 로 받는다(dash 토큰). 수신 전엔 crm 자동로드·과정관리 초기화를 기다린다 */
 window.__dashData=new Promise(function(r){window.__ddResolve=r;window.__ddTimeout=setTimeout(function(){r(null);},20000);});
-window.__ddCallback=function(r){if(window.__gateGuard&&window.__gateGuard(r)){window.__ddResolve(null);return;}if(r&&r.embeddedSales){window.__EMBEDDED_SALES__=r.embeddedSales;window.__H110__=r.h110||[];window.MS_PROCESS=r.msProcess||null;}window.__ddResolve(r||null);try{document.dispatchEvent(new Event("dashdata-ready"));}catch(e){}try{if(typeof loadEmbeddedSales==="function"&&typeof salesLoaded!=="undefined"&&!salesLoaded)loadEmbeddedSales();}catch(e){}try{if(typeof allData!=="undefined"&&allData.length){if(typeof render110==="function")render110();if(typeof render110sum==="function")render110sum();}}catch(e){}};
+window.__ddCallback=function(r){if(window.__gateGuard&&window.__gateGuard(r)){window.__ddResolve(null);return;}if(r&&r.embeddedSales){window.__EMBEDDED_SALES__=r.embeddedSales;window.__H110__=r.h110||[];window.MS_PROCESS=r.msProcess||null;}if(r){window.__VENDOR_SALES__=r.vendorSales||null;window.__VENDOR_FEE__=r.vendorFee||null;try{var vp=document.getElementById("t-vendors");if(vp&&vp.classList.contains("active")&&typeof renderVendorBoard==="function")renderVendorBoard();}catch(e){}}window.__ddResolve(r||null);try{document.dispatchEvent(new Event("dashdata-ready"));}catch(e){}try{if(typeof loadEmbeddedSales==="function"&&typeof salesLoaded!=="undefined"&&!salesLoaded)loadEmbeddedSales();}catch(e){}try{if(typeof allData!=="undefined"&&allData.length){if(typeof render110==="function")render110();if(typeof render110sum==="function")render110sum();}}catch(e){}};
 window.__loadDashData=function(){var s=document.createElement("script");s.src=DATA+"?doc=dashdata&callback=__ddCallback&_="+Date.now()+window.__gateQ();s.onerror=function(){window.__ddResolve(null);};document.head.appendChild(s);};
 if(!window.__gateTok())window.__gateGo("no_token");else if(DOC==="dash")window.__loadDashData();
 })();</script>
@@ -3265,13 +3265,22 @@ function renderCrmVendor(d){
 <script>
 /* ═══ [v58 2026-10-25 박본님] 업체 현황 탭 — mode=crm vendorBoard ═══
    표: 업체(소속·재위탁 2단계) × 최근 2분기 매출(실매출·VAT 제외) + 전분기比(월평균 기준) + 전년 동분기比(같은 개월) + 최근 상태·경보 + 신약·PRM 블럭 + 활동.
-   행 클릭 → 상세: ① 분기 트렌드(8분기)·월별 20개월 ② 품목별 매출(2단계 예정) ③ 수수료·혜택(2단계 예정) ④ 진행사항(MBO 블럭·PRM) ⑤ 활동 히스토리(지부장 전체·재위탁 포함) */
-var vbView={dir:'',kind:'',q:'',sort:'amt',sel:''};
+   행 클릭 → 상세: ① 분기 트렌드(8분기)·월별 20개월 ② 품목별 매출(dashdata vendorSales) ③ 수수료·혜택(dashdata vendorFee, 정산월 선택) ④ 진행사항(MBO 블럭·PRM) ⑤ 활동 히스토리(지부장 전체·재위탁 포함) */
+var vbView={dir:'',kind:'',q:'',sort:'amt',sel:'',feeM:''};
 function vbRows(){ return (crmData&&Array.isArray(crmData.vendorBoard))?crmData.vendorBoard:[]; }
 function vbMeta(){ return (crmData&&crmData.vendorBoardMeta)||{quarters:[]}; }
 function vbQ(q){ return q?(q.slice(2,4)+'년 '+q.slice(5)+'Q'):'-'; }
 function vbPct(p){ return (p==null||isNaN(p))?'<span style="color:var(--gray3)">-</span>':'<span style="font-weight:700;color:'+crmPctColor(p)+'">'+crmPctTxt(p)+'</span>'; }
 function vbSet(k,v){ vbView[k]=v; renderVendorBoard(); }
+/* ── [2단계 2026-10-25 박본님] dash_data.json(D ?doc=dashdata, 대외비) vendorSales·vendorFee — 월 1회 CSO업체관리\scripts\build_vendor_embed.py ── */
+function vbNk(s){ return String(s||'').replace(/㈜|\(\s*주\s*\)|주\s*\)|주식회사|유한회사/g,'').replace(/[\s()（）.·,\-]/g,'').toLowerCase(); }
+function vbLookup(store,r){ if(!store||!store.vendors) return null; if(r.biz&&store.vendors[r.biz]) return store.vendors[r.biz]; var k=vbNk(r.name), hit=Object.keys(store.vendors).filter(function(b){return vbNk(store.vendors[b].n)===k;}); return hit.length===1?store.vendors[hit[0]]:null; }
+function vbSalesOf(r){ return vbLookup(window.__VENDOR_SALES__,r); }
+function vbFeeOf(r){ return vbLookup(window.__VENDOR_FEE__,r); }
+function vbYm(ym){ return ym?(ym.slice(2,4)+'.'+parseInt(ym.slice(5,7),10)+'월'):'-'; }
+function vbFm(m){ return m?(m.slice(2,4)+'.'+parseInt(m.slice(4),10)+'월'):'-'; }
+function vbFeeMonths(){ var F=window.__VENDOR_FEE__; return (F&&F.months)||[]; }
+function vbFeeCur(){ var ms=vbFeeMonths(); if(!ms.length) return ''; return (vbView.feeM&&ms.indexOf(vbView.feeM)>=0)?vbView.feeM:ms[ms.length-1]; }
 function vbSel(){ var r=document.createElement('select'); return r; }
 function renderVendorBoard(){
   var root=document.getElementById('vb-root'); if(!root) return;
@@ -3299,7 +3308,7 @@ function renderVendorBoard(){
     +'<input id="vb-q" value="'+fcEsc(vbView.q)+'" placeholder="🔍 업체명 검색" style="flex:1;min-width:200px;padding:6px 10px;border:1px solid var(--hair);border-radius:8px;font-size:12px" onkeydown="if(event.key===\'Enter\')vbSet(\'q\',this.value)" onchange="vbSet(\'q\',this.value)">'
     +'<span style="font-size:11px;color:var(--gray3)">'+f.length+'처 표시</span></div>';
   var mx=1; f.forEach(function(r){ r.q.slice(-2).forEach(function(x){ if(x.amt>mx) mx=x.amt; }); });
-  h+='<div class="tbl-wrap"><table class="btbl fc-tbl"><thead><tr><th style="text-align:left">업체</th><th>지부장</th><th>'+fcEsc(vbQ(qPrev))+'</th><th>'+fcEsc(vbQ(qCur))+'</th><th>전분기比<br><span style="font-size:9px;color:var(--gray3)">월평균</span></th><th>전년 동분기比<br><span style="font-size:9px;color:var(--gray3)">같은 개월</span></th><th>최근 상태</th><th>신약 진행<br><span style="font-size:9px;color:var(--gray3)">진행/처방/전체</span></th><th>PRM 블럭<br><span style="font-size:9px;color:var(--gray3)">건 · 최근 계획월</span></th><th>활동<br><span style="font-size:9px;color:var(--gray3)">30일 · 마지막</span></th></tr></thead><tbody>';
+  h+='<div class="tbl-wrap"><table class="btbl fc-tbl"><thead><tr><th style="text-align:left">업체</th><th>지부장</th><th>'+fcEsc(vbQ(qPrev))+'</th><th>'+fcEsc(vbQ(qCur))+'</th><th>전분기比<br><span style="font-size:9px;color:var(--gray3)">월평균</span></th><th>전년 동분기比<br><span style="font-size:9px;color:var(--gray3)">같은 개월</span></th><th>최근 상태</th><th>신약 진행<br><span style="font-size:9px;color:var(--gray3)">진행/처방/전체</span></th><th>PRM 블럭<br><span style="font-size:9px;color:var(--gray3)">건 · 최근 계획월</span></th><th>최종 수수료율<br><span style="font-size:9px;color:var(--gray3)">정산 '+fcEsc(vbFm(vbFeeCur()))+' · 혜택률</span></th><th>활동<br><span style="font-size:9px;color:var(--gray3)">30일 · 마지막</span></th></tr></thead><tbody>';
   f.slice(0,400).forEach(function(r){
     var qp=r.q[r.q.length-2]||{amt:0,n:0}, qc=r.q[r.q.length-1]||{amt:0,n:0};
     var bar=function(x){ var w=mx?Math.max(2,Math.round(x.amt/mx*100)):2; return '<div style="display:flex;align-items:center;gap:6px;justify-content:flex-end"><div style="width:56px;height:8px;background:var(--gray1);border-radius:4px;overflow:hidden"><div style="width:'+w+'%;height:100%;background:var(--blue)"></div></div><span style="min-width:58px;text-align:right">'+(x.amt?crmMoney(x.amt):'-')+'</span>'+(x.n&&x.n<3?'<span style="font-size:9px;color:var(--gray3)">'+x.n+'개월</span>':'')+'</div>'; };
@@ -3308,10 +3317,11 @@ function renderVendorBoard(){
     var nm='<b>'+fcEsc(r.name)+'</b>'+(r.kind==='재위탁'?' <span class="crm-badge wait" style="font-size:10px">재위탁 · '+fcEsc(r.parentName||'')+'</span>':'')+(r.kind==='미확인'?' <span class="crm-badge" style="font-size:10px">미확인</span>':'')+(r.subs&&r.subs.length?' <span style="font-size:10px;color:var(--gray3)">재위탁 '+r.subs.length+'</span>':'');
     h+='<tr class="clickable'+(vbView.sel===r.key?' sel':'')+'" onclick="vbOpen(this.dataset.k)" data-k="'+fcEsc(r.key)+'"><td style="text-align:left">'+nm+'</td><td>'+fcEsc(r.dir||'-')+'</td><td>'+bar(qp)+'</td><td>'+bar(qc)+'</td><td>'+vbPct(r.qoqPct)+'</td><td>'+vbPct(r.yoyPct)+'</td><td style="white-space:nowrap">'+st+'</td>'
       +'<td>'+(r.mbo&&r.mbo.n?('<b>'+r.mbo.active+'</b> / '+r.mbo.rx+' / '+r.mbo.n):'<span style="color:var(--gray3)">-</span>')+'</td><td>'+(r.prm?(r.prm.n+'<span style="font-size:9px;color:var(--gray3)"> · '+fcEsc(r.prm.last||'')+'</span>'):'<span style="color:var(--gray3)">-</span>')+'</td>'
+      +(function(){ var fv=vbFeeOf(r), fm=vbFeeCur(), rec=fv&&fv.byMonth&&fv.byMonth[fm]; if(!rec) return '<td><span style="color:var(--gray3)">-</span></td>'; return '<td style="white-space:nowrap"><b>'+(rec.finalRate==null?'-':rec.finalRate.toFixed(1)+'%')+'</b> <span style="font-size:10px;color:var(--gray3)">'+(rec.benefitPct==null?'':'혜택 '+rec.benefitPct+'%')+'</span></td>'; })()
       +'<td style="white-space:nowrap">'+(r.meet30?('<b>'+r.meet30+'회</b>'):'<span style="color:var(--gray3)">0</span>')+' <span style="font-size:10px;color:var(--gray3)">'+fcEsc(String(r.lastAct||'').slice(5))+'</span></td></tr>';
   });
   h+='</tbody></table></div>'+(f.length>400?'<div style="font-size:11px;color:var(--gray3);margin-top:6px">상위 400처만 표시 — 검색·필터로 좁히세요</div>':'')
-    +'<div style="font-size:10.5px;color:var(--gray3);margin-top:8px;line-height:1.6">전분기比 = 최근 분기 월평균 ÷ 전분기 월평균 − 1(진행 중 분기도 같은 기준, "n개월" = 실적 있는 달 수) · 전년 동분기比 = 최근 분기에 실적이 있는 달과 전년 같은 달의 합 비교 · 신약 진행 = MBO 블럭(진행 = DC신청~코딩 정상 건 / 처방 / 전체) · PRM 블럭 = PRM블럭신청현황 CSO명 기준 신청 건 · 재위탁 업체의 매출·수수료는 소속 CSO에 잡힙니다(활동은 소속에도 합산) · 품목별 매출·수수료·혜택은 2단계(월 임베드)에서 추가</div></div>';
+    +'<div style="font-size:10.5px;color:var(--gray3);margin-top:8px;line-height:1.6">전분기比 = 최근 분기 월평균 ÷ 전분기 월평균 − 1(진행 중 분기도 같은 기준, "n개월" = 실적 있는 달 수) · 전년 동분기比 = 최근 분기에 실적이 있는 달과 전년 같은 달의 합 비교 · 신약 진행 = MBO 블럭(진행 = DC신청~코딩 정상 건 / 처방 / 전체) · PRM 블럭 = PRM블럭신청현황 CSO명 기준 신청 건 · 재위탁 업체의 매출·수수료는 소속 CSO에 잡힙니다(활동은 소속에도 합산) · 최종 수수료율 = 정산(VAT 포함) 최종수수료 ÷ 매출, 혜택률 = (구간 인센 + 품목 인센) ÷ 최종수수료 — 정산 확정 월 기준, 월 1회 갱신(build_vendor_embed.py)</div></div>';
   h+='<div id="vb-detail">'+renderVendorDetail()+'</div>';
   root.innerHTML=h;
 }
@@ -3338,9 +3348,44 @@ function renderVendorDetail(){
   else h+='<div class="vd-bars" style="height:120px">'+qs.map(function(x){ var hp=Math.max(2,Math.round(x.amt/qmx*100)); return '<div class="vd-bar"><div class="bv">'+(x.amt?crmMoney(x.amt):'-')+'</div><div class="bar" style="height:'+hp+'%'+(x.n&&x.n<3?';opacity:.55':'')+'"></div><div class="bl">'+fcEsc(vbQ(x.q))+(x.n&&x.n<3?'<br><span style="font-size:9px">'+x.n+'개월</span>':'')+'</div></div>'; }).join('')+'</div>';
   var mons=Object.keys(r.monthly||{}).sort();
   if(mons.length) h+='<details style="margin-top:6px"><summary style="font-size:11px;color:var(--gray3);cursor:pointer">월별 '+mons.length+'개월 펼치기</summary><div class="tbl-wrap"><table class="btbl fc-tbl" style="margin-top:6px"><thead><tr>'+mons.map(function(m){return '<th>'+fcEsc(m.slice(2))+'</th>';}).join('')+'</tr></thead><tbody><tr>'+mons.map(function(m){return '<td>'+crmMoney(r.monthly[m])+'</td>';}).join('')+'</tr></tbody></table></div></details>';
-  h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:12px">'
-    +'<div style="border:1px dashed var(--hair);border-radius:12px;padding:10px;font-size:11.5px;color:var(--gray3)"><b style="color:var(--gray4)">② 품목별 매출</b> — 2단계: 평가실적(업체×품목×월) 월 임베드 후 표시</div>'
-    +'<div style="border:1px dashed var(--hair);border-radius:12px;padding:10px;font-size:11.5px;color:var(--gray3)"><b style="color:var(--gray4)">③ 수수료·혜택</b> — 2단계: 정산(VAT 포함 기준) 구간율·품목수수료·구간 인센·품목 인센·혜택률, CSO 리포트 링크</div></div>';
+  /* ② 품목별 매출 — dash_data.json vendorSales(평가실적 실매출·VAT 제외, 대표품목 × 최근 6개월 + 12개월 합) */
+  var S=window.__VENDOR_SALES__, sv=(r.kind==='재위탁')?null:vbSalesOf(r);
+  h+='<div style="font-size:12px;font-weight:700;margin-top:14px">② 품목별 매출 <span style="font-size:10.5px;color:var(--gray3);font-weight:400">'+(S?('평가실적 실매출(VAT 제외) · '+fcEsc(S.source||'')+' · 12개월 합 = '+fcEsc(vbYm(S.months12[0]))+'~'+fcEsc(vbYm(S.latestMonth))):'2단계 임베드 전(build_vendor_embed.py 실행 전)')+'</span></div>';
+  if(r.kind==='재위탁') h+='<div class="no-data" style="padding:10px">재위탁 업체 — 품목별 매출은 소속 CSO <b>'+fcEsc(r.parentName||'')+'</b>에서 봅니다</div>';
+  else if(!S) h+='<div class="no-data" style="padding:10px">품목별 매출 데이터가 아직 임베드되지 않았습니다</div>';
+  else if(!sv) h+='<div class="no-data" style="padding:10px">평가실적에 이 업체(사업자번호 '+fcEsc(r.biz||'-')+')의 매출이 없습니다</div>';
+  else {
+    var m6=S.months6||[], its=Object.keys(sv.items).map(function(p){return [p,sv.items[p]];}).sort(function(a,b){return b[1].t12-a[1].t12;});
+    h+='<div class="tbl-wrap"><table class="btbl fc-tbl" style="margin-top:6px"><thead><tr><th style="text-align:left">품목(대표품목)</th>'+m6.map(function(x){return '<th>'+fcEsc(vbYm(x))+'</th>';}).join('')+'<th>12개월 합</th><th>비중</th></tr></thead><tbody>'
+      +its.map(function(kv){ var p=kv[0], it=kv[1]; return '<tr><td style="text-align:left;font-weight:600">'+fcEsc(p)+'</td>'+m6.map(function(x,i){return '<td>'+(it.m[i]?crmMoney(it.m[i]):'<span style="color:var(--gray3)">-</span>')+'</td>';}).join('')+'<td style="font-weight:700">'+crmMoney(it.t12)+'</td><td>'+(sv.t12?Math.round(it.t12/sv.t12*100)+'%':'-')+'</td></tr>'; }).join('')
+      +'<tr style="background:var(--gray1);font-weight:700"><td style="text-align:left">합계</td>'+m6.map(function(x,i){return '<td>'+(sv.m[i]?crmMoney(sv.m[i]):'-')+'</td>';}).join('')+'<td>'+crmMoney(sv.t12)+'</td><td>100%</td></tr></tbody></table></div>';
+  }
+  /* ③ 수수료·혜택 — dash_data.json vendorFee(수수료정산 VAT 포함: 4단 + 혜택 = 구간 인센 + 품목 인센 + 품목별 수수료율) */
+  var F=window.__VENDOR_FEE__, fv=(r.kind==='재위탁')?null:vbFeeOf(r), fms=vbFeeMonths(), fm=vbFeeCur(), rec=fv&&fv.byMonth&&fv.byMonth[fm];
+  h+='<div style="font-size:12px;font-weight:700;margin-top:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">③ 수수료·혜택 <span style="font-size:10.5px;color:var(--gray3);font-weight:400">수수료정산 기준(VAT 포함 매출 — ①②의 실매출과 다름) · 혜택 = 구간 인센 + 품목 인센'+(F?'':' · 2단계 임베드 전')+'</span>'
+    +(fms.length?'<span style="margin-left:auto;display:flex;gap:4px">'+fms.map(function(m){return '<button class="crm-chip'+(m===fm?' sel':'')+'" style="padding:2px 9px;font-size:10.5px" onclick="vbView.feeM=\''+m+'\';renderVendorBoard()">'+fcEsc(vbFm(m))+'</button>';}).join('')+'</span>':'')+'</div>';
+  if(r.kind==='재위탁') h+='<div class="no-data" style="padding:10px">재위탁 업체 — 수수료는 소속 CSO <b>'+fcEsc(r.parentName||'')+'</b>에 지급됩니다</div>';
+  else if(!F) h+='<div class="no-data" style="padding:10px">수수료 데이터가 아직 임베드되지 않았습니다</div>';
+  else if(!rec) h+='<div class="no-data" style="padding:10px">'+fcEsc(vbFm(fm))+' 정산에 이 업체가 없습니다(수수료 미지급 또는 표기 차이)</div>';
+  else {
+    var tile=function(l,v,s,c){return '<div class="k"><div class="l">'+l+'</div><div class="v" style="font-size:15px'+(c?';color:'+c:'')+'">'+v+'</div>'+(s?'<div style="font-size:10.5px;color:var(--gray3)">'+s+'</div>':'')+'</div>';};
+    h+='<div class="vd-kpi">'
+      +tile('매출(VAT 포함)',crmMoney(rec.sales),'구간 산정 '+crmMoney(rec.base)+' · 구간율 '+(rec.rate*100).toFixed(0)+'%')
+      +tile('품목 수수료',crmMoney(rec.fee),'기본 품목별 요율 합')
+      +tile('구간 인센 ①',crmMoney(rec.tier),'전체 매출 구간','var(--ok)')
+      +tile('품목 인센 ②',crmMoney(rec.focus),'집중·글루 품목','var(--ok)')
+      +tile('소급 ③',(rec.adj?crmMoney(rec.adj):'-'),'업체 인센 (+/−)')
+      +tile('최종 수수료',crmMoney(rec.final),'최종 수수료율 '+(rec.finalRate==null?'-':rec.finalRate.toFixed(1)+'%'),'var(--blue-dk)')
+      +tile('혜택 (①+②)',crmMoney(rec.benefit),'혜택률 '+(rec.benefitPct==null?'-':rec.benefitPct+'%')+' (최종 수수료 대비)','var(--ok)')
+      +'</div>';
+    if(rec.items&&rec.items.length){
+      h+='<div style="font-size:11px;color:var(--gray3);margin-top:10px">품목별 수수료 — '+fcEsc(vbFm(fm))+' 매출 상위 '+rec.items.length+'품목 · ★ 집중품목</div>'
+        +'<div class="tbl-wrap"><table class="btbl fc-tbl" style="margin-top:4px"><thead><tr><th style="text-align:left">품목</th><th>매출(VAT 포함)</th><th>수수료율</th><th>수수료</th></tr></thead><tbody>'
+        +rec.items.map(function(it){return '<tr><td style="text-align:left;font-weight:600">'+(it.focus?'<span style="color:var(--ok)">★</span> ':'')+fcEsc(it.p)+'</td><td>'+crmMoney(it.amt)+'</td><td>'+(it.rate==null?'-':it.rate.toFixed(1)+'%')+'</td><td style="font-weight:700">'+crmMoney(it.fee)+'</td></tr>';}).join('')
+        +'</tbody></table></div>';
+    }
+    h+='<div style="font-size:10.5px;color:var(--gray3);margin-top:6px">전체 품목·수수료 규칙·추천은 상단 📑 CSO 업체 리포트(해당 정산월 선택 → 업체 검색)에서 봅니다 · 원천 '+fcEsc((F.sources||{})[fm]||'')+'</div>';
+  }
   var ml=(r.mbo&&r.mbo.list)||[];
   h+='<div style="font-size:12px;font-weight:700;margin-top:14px">④ 진행사항 <span style="font-size:10.5px;color:var(--gray3);font-weight:400">신약 MBO 블럭 '+(r.mbo?r.mbo.n:0)+'건(진행 '+(r.mbo?r.mbo.active:0)+' · 처방 '+(r.mbo?r.mbo.rx:0)+')'+(r.prm?' · PRM 신청 블럭 '+r.prm.n+'건 · 거래처 '+r.prm.hosp+'처 · 최근 계획월 '+fcEsc(r.prm.last||'-'):' · PRM 신청 없음')+'</span></div>';
   if(ml.length){
