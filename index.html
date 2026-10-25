@@ -64,6 +64,7 @@ function loadFromSheets() {
     // 빈블럭 데이터 저장 (이중래핑 또는 단일래핑 모두 처리)
     emptyBlockData = (data.data && data.data.emptyBlock) || data.emptyBlock || [];
     multiOpenData = (data.data && data.data.multiOpen) || data.multiOpen || [];   // [v53] 복수오픈 행(진행·종료)
+    masterCheckData = (data.data && data.data.masterCheck) || data.masterCheck || { at: '', rows: [] };   // [v55]
     if (!Array.isArray(rows)) {
       info.textContent = "❌ 응답 형식 오류 (rows is not array): " + typeof rows;
       btn.classList.remove("loading");
@@ -123,6 +124,7 @@ function loadFromSheets() {
 // 빈블럭 시트 데이터 저장 (실패/오픈블럭 카운트용)
 let emptyBlockData = [];
 let multiOpenData = [];   // [v53] 복수오픈 시트(2·3번째 업체) — 전체현황 '복수오픈' 카드
+let masterCheckData = { at: '', rows: [] };   // [v55] 마스터점검 탭(마스터에 없는 수기 입력) — 전체현황 '마스터 점검' 카드
 function parseGsData(rows) {
   allData = rows.map((r, i) => {
     // Google Sheets에서 날짜는 Date 객체 또는 문자열로 올 수 있음
@@ -432,6 +434,11 @@ body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var
     <div class="section-card" id="multi-card">
       <h3>🔀 복수오픈 <span style="font-size:11px;color:var(--gray3);font-weight:400">110대 병원만 · 같은 병원·품목에 DC접수 전까지 업체 최대 3곳 · DC접수한 업체가 대표 · 먼저 코딩한 업체 인정(나머지 자동 종료)</span></h3>
       <div id="multi-body"></div>
+    </div>
+    <!-- [v55] 마스터 점검 — 폼에서 직접 입력한 품목·업체·번호 없는 병원을 매주 월 07시 모아 보여 준다 -->
+    <div class="section-card" id="mcheck-card">
+      <h3>🧾 마스터 점검 <span style="font-size:11px;color:var(--gray3);font-weight:400">마스터에 없는 수기 입력 · 매주 월 07시 자동 점검 · 품목마스터/업체실적 탭에 추가하거나 해당 행을 고치면 다음 점검에서 사라짐</span></h3>
+      <div id="mcheck-body"></div>
     </div>
     <div class="section-card" id="monthrep-card">
       <h3>🗓️ 월별 RPM 보고 · 신규등록 <span style="font-size:11px;color:var(--gray3);font-weight:400">보고=작성일 기준 · 신규=신청월 기준</span></h3>
@@ -1201,6 +1208,20 @@ function renderAll(){
   const d=getFiltered();
   renderStats(d);renderIssues(d);renderCharts(d);renderMonthlyHosp(d);renderRpmTable(d);renderMonthlyDC(d);renderWeeklySummary(d);renderTimeline(d);renderTable(d);renderPipeline(d);renderMboStage(d);renderAging(d);renderMonthlyReport();
   try{renderMultiOpen();}catch(e){console.warn('복수오픈 카드',e);}   // [v53] 실패해도 다른 카드 렌더 무영향
+  try{renderMasterCheck();}catch(e){console.warn('마스터 점검 카드',e);}   // [v55]
+}
+/* ── [v55] 마스터 점검 카드 — 마스터점검 탭(checkMasterGaps, 매주 월 07시) 그대로 ── */
+function renderMasterCheck(){
+  const el=document.getElementById('mcheck-body'); if(!el) return;
+  const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const rows=((masterCheckData||{}).rows||[]).filter(r=>r&&String(r['입력값']||'').trim());
+  const at=(masterCheckData||{}).at||'';
+  if(!rows.length){el.innerHTML='<div style="color:var(--gray3);font-size:12px;padding:6px">'+(at?'마지막 점검 '+esc(at)+' — 마스터에 없는 수기 입력 없음':'아직 점검 전(매주 월 07시 자동, 또는 GAS 편집기에서 checkMasterGaps 실행)')+'</div>';return;}
+  const kinds=['품목','업체','병원'].map(k=>k+' '+rows.filter(r=>r['구분']===k).length).join(' · ');
+  const KC={'품목':'#7c3aed','업체':'#0369a1','병원':'#b91c1c'};
+  let h=`<div style="font-size:12px;color:var(--gray4);margin-bottom:6px">마지막 점검 ${esc(at)} · ${esc(kinds)}</div><div class="tbl-wrap"><table class="btbl"><thead><tr><th>구분</th><th>입력값</th><th>건수</th><th>최근 작성일</th><th>지부장</th><th>출처</th><th>해야 할 것</th></tr></thead><tbody>`;
+  rows.forEach(r=>{h+=`<tr><td><span class="sb" style="background:#eef2f9;color:${KC[r['구분']]||'#475569'}">${esc(r['구분'])}</span></td><td style="font-weight:700">${esc(r['입력값'])}</td><td style="text-align:right">${esc(r['건수'])}</td><td>${esc(String(r['최근 작성일']||'').slice(0,10))}</td><td>${esc(r['지부장'])}</td><td>${esc(r['출처'])}</td><td style="font-size:11px;color:var(--gray4)">${esc(r['제안'])}</td></tr>`;});
+  el.innerHTML=h+'</tbody></table></div>';
 }
 /* ── [v53] 복수오픈 카드 — 복수오픈 시트(2·3번째 업체) + MBO 대표 행을 병원·품목으로 묶어 표시. 최근 30일 자동 종료도 함께 ── */
 const MB_FORM=/(연질캡슐|경질캡슐|서방정|장용정|나정|산제|건조시럽|시럽|주사|캡슐|정|환|산|액|겔|크림|패치|ODT|OD장|OD정|OD)$/i;

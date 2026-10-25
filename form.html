@@ -778,10 +778,16 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
         </div>
         <div class="ig"><label>사업자번호 <span style="font-size:10px;color:var(--gray3);font-weight:400">자동채움</span></label><input type="text" id="nb-biz" placeholder="자동 또는 직접입력" oninput="nbMultiHint()"></div>
         <div class="ig"><label>시군구 <span style="font-size:10px;color:var(--gray3);font-weight:400">자동채움</span></label><input type="text" id="nb-sgg" placeholder="자동 또는 직접입력"></div>
-        <div class="ig full"><label>기준품명 *</label><input type="text" id="nb-p" placeholder="예) 프레논OD정" oninput="nbMultiHint()"></div>
+        <!-- [v55] 기준품명 = 품목마스터에서 고르기, 없으면 '직접 입력'(점검 대상으로 표시) -->
+        <div class="ig full"><label>기준품명 * <span style="font-size:10px;color:var(--gray3);font-weight:400">목록에서 선택 · 없으면 맨 아래 '직접 입력'</span></label>
+          <select id="nb-p-sel" onchange="nbPickItem(this.value)"><option value="">-- 선택 --</option><option value="__custom">➕ 직접 입력…</option></select>
+          <input type="text" id="nb-p" placeholder="예) 프레논OD정 — 목록에 없는 품목을 적어 주세요" oninput="nbMultiHint();nbItemFlag()" style="display:none;margin-top:6px">
+          <div id="nb-p-flag" style="font-size:11px;margin-top:4px"></div>
+        </div>
         <!-- [v53] 복수오픈 사전 안내 — 같은 병원·품목이 이미 진행 중이면 업체·단계와 등록 가능 여부를 전송 전에 보여 준다 -->
         <div class="ig full" id="nb-multi" style="display:none;margin-top:-6px;padding:8px 12px;background:#eff5fe;border:1.5px solid #93c5fd;border-radius:8px;font-size:12px;line-height:1.55"></div>
-        <div class="ig"><label>CSO 업체명</label><input type="text" id="nb-c" placeholder="업체명 검색 또는 직접 입력" list="vendor-list" autocomplete="off" oninput="nbMultiHint()"></div>
+        <div class="ig"><label>CSO 업체명 <span style="font-size:10px;color:var(--gray3);font-weight:400">목록(업체실적)에서 고르거나 직접 입력</span></label><input type="text" id="nb-c" placeholder="업체명 검색 또는 직접 입력" list="vendor-list" autocomplete="off" oninput="nbMultiHint();nbVendorFlag()">
+          <div id="nb-c-flag" style="font-size:11px;margin-top:4px"></div></div>
         <div class="ig"><label>업체 사업자번호 <span style="font-size:10px;color:var(--gray3);font-weight:400">CSO 사업자(J열)</span></label><input type="text" id="nb-cbiz" placeholder="000-00-00000"></div>
         <div class="ig"><label>CSO 연락처</label><input type="text" id="nb-ct" placeholder="010-0000-0000"></div>
         <div class="ig"><label>MBO (만원)</label><input type="number" inputmode="numeric" id="nb-m" placeholder="예) 500" oninput="nbMboHint(this.value)">
@@ -1138,6 +1144,7 @@ function paintIssueSelect(sel){sel.className='iss-sel '+(sel.value?sel.value.rep
 
 let data=[],rpm='',items=[];              // items = 신약진행 보고 대상(자동표시+검색추가)
 let multiOpen=[];                          // [v53] 복수오픈 진행 행(서버 getMboData.multiOpen, 종료 제외) — 신규 블럭 모달 사전 안내용
+let itemMaster=[], vendorMasterNames=[];   // [v55] 품목마스터 탭(표준명·별칭) · 업체실적 탭 업체명 — 고르기 + 없으면 직접 입력(점검 대상 표시)
 /* [fix1-H1] 이번 세션에 실제로 전송된 신약 건 — 전송 후 이메일·엑셀에서 신약이 사라지지 않게 한다 */
 let lastSentItems=[], lastSentDate='';
 let volumeUp=[];                           // ④ 볼륨업 행
@@ -1208,6 +1215,9 @@ function loadFromGAS(){
         업체_변경일:   r['업체_변경일']||''
       }));
       multiOpen=((res.multiOpen)||(res.data&&res.data.multiOpen)||[]).filter(r=>String(r['상태']||'').trim()!=='종료');   // [v53]
+      itemMaster=((res.itemMaster)||(res.data&&res.data.itemMaster)||[]).filter(m=>m&&m.std);   // [v55]
+      vendorMasterNames=((res.vendorMaster)||(res.data&&res.data.vendorMaster)||[]);
+      fillItemSelect(); fillVendorList();
 
       buildHospitalMaster();
       hd.textContent='✅ 데이터 연결 완료';
@@ -1436,6 +1446,42 @@ function nbMultiHint(){
   else if(vendors.length>=3) verdict='<span style="color:#b91c1c">⛔ 이미 3곳 진행 중 — 추가할 수 없습니다</span>';
   else verdict=`<span style="color:#92400e">↳ 전송하면 <b>복수오픈 ${vendors.length+1}/3</b>으로 등록됩니다 — DC접수한 업체가 대표가 되고, 먼저 코딩한 업체를 인정합니다(나머지 자동 종료)</span>`;
   el.innerHTML=`<b>이 병원·품목 진행 중:</b> ${list}<br>${verdict}`; el.style.display='block';
+}
+/* ── [v55] 품목·업체 마스터 — 고르기 + 없으면 직접 입력. 마스터에 없는 값은 바로 표시하고(저장은 그대로) 서버가 매주 월요일 '마스터점검' 탭에 모은다 ── */
+const FLAG_OK='<span style="color:#166534">✔ 마스터 항목</span>';
+function itemStdOf(p){const k=normProdC(p);if(!k)return '';for(const m of itemMaster){if(normProdC(m.std)===k)return m.std;for(const a of (m.aliases||[]))if(normProdC(a)===k)return m.std;}return '';}   // 표기 흔들림 흡수 → 표준명, 없으면 ''
+function vendorInMaster(v){const k=normVendorKey(v);return !!k&&vendorMasterNames.some(n=>normVendorKey(n)===k);}
+function fillItemSelect(){
+  const sel=document.getElementById('nb-p-sel'); if(!sel) return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">-- 선택 --</option>'+itemMaster.map(m=>`<option value="${esc(m.std)}">${esc(m.std)}${m.family?' ('+esc(m.family)+' 계열)':''}</option>`).join('')+'<option value="__custom">➕ 직접 입력…</option>';
+  if(cur&&[...sel.options].some(o=>o.value===cur)) sel.value=cur;
+}
+function fillVendorList(){   // datalist에 업체실적 업체명을 보태 '고르기'가 마스터 표기로 들어가게
+  const dl=document.getElementById('vendor-list'); if(!dl) return;
+  const have={}; dl.querySelectorAll('option').forEach(o=>{have[normVendorKey(o.value)]=1;});
+  vendorMasterNames.forEach(n=>{const k=normVendorKey(n); if(!n||have[k]) return; have[k]=1; const o=document.createElement('option'); o.value=n; dl.appendChild(o);});
+}
+function nbPickItem(v){
+  const inp=document.getElementById('nb-p'), flag=document.getElementById('nb-p-flag');
+  if(v==='__custom'){inp.style.display='block'; inp.value=''; flag.innerHTML='<span style="color:#92400e">⚠ 마스터에 없는 품목 — 직접 입력(매주 월요일 점검 대상). 같은 품목이 목록에 있으면 그걸 골라 주세요</span>'; try{inp.focus();}catch(e){}}
+  else {inp.style.display='none'; inp.value=v; flag.innerHTML=v?FLAG_OK:'';}
+  nbMultiHint();
+}
+function nbItemFlag(){   // 직접 입력 중 — 마스터 표기와 같으면 그 표준명으로 안내
+  const v=V('nb-p'), flag=document.getElementById('nb-p-flag'); if(!flag) return;
+  if(!v){flag.innerHTML='';return;}
+  const std=itemStdOf(v);
+  flag.innerHTML=std?`<span style="color:#166534">✔ 마스터 '${esc(std)}'와 같은 품목 — 저장 시 그 표기로 통일됩니다</span>`:'<span style="color:#92400e">⚠ 마스터에 없는 품목 — 직접 입력(매주 월요일 점검 대상)</span>';
+}
+function nbVendorFlag(){
+  const v=V('nb-c'), flag=document.getElementById('nb-c-flag'); if(!flag) return;
+  flag.innerHTML=!v?'':vendorInMaster(v)?FLAG_OK:'<span style="color:#92400e">⚠ 업체실적(업체 마스터)에 없는 업체 — 직접 입력(매주 월요일 점검 대상)</span>';
+}
+function vendorFlagHtml(v){return !v?'':vendorInMaster(v)?FLAG_OK:'<span style="color:#92400e">⚠ 업체 마스터에 없음(점검 대상)</span>';}
+function nbResetMaster(){
+  const sel=document.getElementById('nb-p-sel'), inp=document.getElementById('nb-p'); if(sel) sel.value=''; if(inp){inp.style.display='none';inp.value='';}
+  ['nb-p-flag','nb-c-flag'].forEach(id=>{const e=document.getElementById(id); if(e) e.innerHTML='';});
 }
 /* [v53] 전송 결과를 토스트(2.4초)와 별도로 남겨 둔다 — 복수오픈 등록·추가 불가 안내를 놓치지 않게 */
 function showSendResult(msg,ok){
@@ -2136,7 +2182,8 @@ function buildRI(it,i){
     <div class="ri-bd">
       <div class="row2">
         ${!it._new?`<div class="ig"><label>🏢 CSO 업체명 <span style="font-size:10px;color:var(--gray3);font-weight:400">변경 시 수정</span>${vendorHistIcon}</label>
-          <input type="text" value="${esc(it.업체명||'')}" placeholder="업체명 검색 또는 직접 입력" list="vendor-list" autocomplete="off" onchange="setF(${i},'업체명',this.value)">
+          <input type="text" value="${esc(it.업체명||'')}" placeholder="업체명 검색 또는 직접 입력" list="vendor-list" autocomplete="off" onchange="setF(${i},'업체명',this.value);this.nextElementSibling.innerHTML=vendorFlagHtml(this.value)">
+          <div style="font-size:11px;margin-top:3px">${vendorFlagHtml(it.업체명)}</div>
         </div>
         <div class="ig"><label>💰 MBO (만원) <span style="font-size:10px;color:var(--gray3);font-weight:400">변경 시 수정</span>${mboHistIcon}</label>
           <input type="number" inputmode="numeric" id="nd-mbo-${i}" value="${esc(numOf(it.MBO)?wonToMan(it.MBO):'')}" placeholder="예) 500" onchange="setMboMan(${i},this.value)">
@@ -2227,6 +2274,7 @@ let acState={ctx:'',sel:-1,hits:[]};
    ※ '병원명 유지 + 파생값 재계산'은 채택하지 않았다. 마스터 미등록 병원에서 사용자가 손으로 넣은 사업자번호와
      직전에 고른 다른 병원의 잔여 사업자번호를 구분할 수 없어, 이름과 남의 사업자번호를 조용히 재결합시킬 수 있다. */
 function openNB(){
+  fillItemSelect();   // [v55] 데이터가 늦게 와도 열 때 다시 채움
   document.getElementById('nb-modal').classList.add('show');
   document.getElementById('nb-h').value='';
   document.getElementById('nb-is110').checked=false;
@@ -2287,7 +2335,7 @@ function nbMboHint(v){
   if(h){ h.classList.remove('warn'); const won=manToWon(v); h.textContent=(won===''||won===0)?manHint():manConv(won); }
 }
 function addNB(){
-  const h=V('nb-h'),p=V('nb-p');
+  const h=V('nb-h'),p=itemStdOf(V('nb-p'))||V('nb-p');   // [v55] 직접 입력이 마스터 표기 흔들림이면 표준명으로 통일
   if(!h||!p){toast('병원명과 기준품명은 필수입니다');return;}
   // [fix6] 만원 칸에 원 단위를 친 경우 — 5조가 저장되는 사고를 막고 그 자리에서 되돌린다
   const mboMan=manValue(V('nb-m'));
@@ -2306,6 +2354,7 @@ function addNB(){
     이슈상태:issVal,진행사항:V('nb-n'),작성일:today(),비고:V('nb-e')});
   ['nb-h','nb-p','nb-c','nb-cbiz','nb-ct','nb-m','nb-ld','nb-cd','nb-kol','nb-n','nb-e','nb-biz','nb-sgg'].forEach(id=>document.getElementById(id).value='');
   nbMboHint('');   // [fix6] MBO 환산 힌트·경고 초기화
+  nbResetMaster();   // [v55] 품목 선택·플래그 초기화
   document.getElementById('nb-st').value='';
   document.getElementById('nb-matchinfo').innerHTML='';
   {const _nm=document.getElementById('nb-multi');if(_nm)_nm.style.display='none';}   // [v53]
