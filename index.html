@@ -564,6 +564,11 @@ body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var
 
   <!-- [v59 2026-10-25 박본님] '매월 과정관리' 탭 제거 — MS팀 현황 대시보드에서 본다. dash_data.json msProcess는 업체명 별칭(msResolveVendor)에만 쓰고, 성과관리 월 갱신 빌더의 msProcess 기록은 그대로 둔다 -->
 
+  <!-- [v58 2026-10-25 박본님] 업체 현황 탭 — mode=crm vendorBoard(업체 단위 분기 트렌드·진행·활동). 품목별 매출·수수료·혜택은 2단계(월 임베드) -->
+  <div class="tab-panel" id="t-vendors">
+    <div id="vb-root"><div class="no-data">성과관리 데이터를 불러오면 업체 현황이 표시됩니다 (매출예측/고객관리 탭과 같은 호출)</div></div>
+  </div>
+
   <!-- 4) 프레논 교차판매 탭 -->
   <div class="tab-panel" id="t-prenon">
     <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px" id="pn-cards"></div>
