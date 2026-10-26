@@ -319,9 +319,10 @@ function card(r){
   const rt=replyText(r);
   el.innerHTML=`<div class="ch"><div><h2>${esc(nm)}</h2><div class="sub">${fmtBiz(r.b)} · ${r.kind}</div></div>
     <div class="row"><span class="pill ${r.cls}">${esc(r.v)}</span><button class="sm" data-flip>${r.kind==='로컬'?'병원으로 보기':'로컬로 보기'}</button></div></div>
-    ${body}<div class="ft"><span>${esc(rt)}</span><button class="sm" data-copy>회신 문구 복사</button></div>`;
+    ${body}<div class="ft"><span>${esc(rt)}</span><div class="row"><button class="sm" data-copycard title="거래처·판정·사유·주소·블록·매출·현 담당을 글로 복사 — 거래처가 겹칠 때 영업부·지부장과 소통용">카드 내용 복사</button><button class="sm" data-copy>회신 문구 복사</button></div></div>`;
   el.querySelector('[data-flip]').onclick=()=>el.replaceWith(card(r.kind==='로컬'?judgeHosp(r.b,r.wantKeep||null):Object.assign(judgeLocal(r.b),{wantKeep:r.want})));
   el.querySelector('[data-copy]').onclick=e=>copy(rt,e.target);
+  el.querySelector('[data-copycard]').onclick=e=>copy(cardText(r),e.target);
   return el;
 }
 function badCard(b){
@@ -330,12 +331,38 @@ function badCard(b){
     <div class="reason chk">원천 데이터에 없고 사업자번호 형식(검증번호)이 맞지 않습니다. 번호를 다시 확인해 주세요.</div>`;
   return el;
 }
+/* 카드 내용을 글로 — 거래처가 겹칠 때 해당 영업부·지부장과 소통할 때 쓴다(10-26 지부장 요청). 화면 카드와 같은 항목·순서,
+   병원은 요청 품목 + 가능(협의필요)·불가 품목(8개 이하면 사유까지, 넘으면 수만 — 카드 접기 규칙과 같음), 가능 품목은 수만. 끝에 조회일·데이터 기준일 */
+function cardText(r){
+  const nm=nameOf(r.b),l=r.l,cm=l?l[4]:[],L=[];
+  L.push(`■ ${nm} · ${fmtBiz(r.b)} · ${r.kind}`);
+  L.push(`판정: ${r.v}${r.kind==='로컬'?' — '+r.reason:''}`);
+  if(r.kind==='로컬'){
+    L.push(`주소: ${(l&&l[1])||'-'}`,`블록: ${(l&&l[2])||'-'}`,`매출(6개월 평균): ${won(l&&l[3])}원`);
+  }else{
+    if(r.req){L.push('요청 품목:');r.req.forEach(q=>L.push(`  [${q.v}] ${q.label} — ${q.det}`))}
+    L.push(`블록: ${(l&&l[2])||'-'}`);
+  }
+  L.push('현 담당:'+(cm.length?'':' 없음'));
+  cm.forEach(c=>L.push(`  [${SIDE_LABEL[side(c[0])]}] ${c[0]} ${c[1]} · ${c[2]} · 코드생성 ${xd(c[3])}${c[5]?' · CSO '+c[5]:''}${c[4]?' · '+c[4]:''}`));
+  if(l&&l[5]&&l[5].length){L.push('CSO 마스터:');l[5].forEach(m=>L.push(`  ${m[0]} — ${m[1]||'-'}`))}
+  if(r.kind!=='로컬'){
+    if(r.cf.length){L.push(`영업관리 컨펌 이력(최근 ${Math.min(3,r.cf.length)}건):`);r.cf.slice(0,3).forEach(c=>L.push('  '+cfText(c)))}
+    L.push(`전체 품목 ${D.items.length}개 기준(최근 6개월 매출·담당): 가능 ${r.g['가능'].length} · 가능(협의필요) ${r.g['가능(협의필요)'].length} · 불가 ${r.g['불가'].length}`);
+    [['가능(협의필요)',r.g['가능(협의필요)']],['불가 (매출 有·신규 유예·CRM 진행)',r.g['불가']]].forEach(([k,idx])=>{if(!idx.length)return;   // 카드와 같은 접기 규칙 — 8개 넘으면 수만(요청 품목은 위에 품목별로 있다)
+      if(idx.length>8){L.push(`${k} ${idx.length} (품목 목록 생략 — 품목을 적어 조회하면 품목별로 나옵니다)`);return}
+      L.push(`${k} ${idx.length}:`);idx.forEach(i=>L.push(`  ${D.items[i][1]} — ${r.det[i]}`))});
+  }
+  L.push(`(조회 ${dstr(new Date())} · 데이터 기준 ${D.meta['기준일']})`);
+  return L.join('\n');
+}
 function copy(t,btn){
-  const done=()=>{const o=btn.textContent;btn.textContent='복사됨';setTimeout(()=>btn.textContent=o,1400)};
+  const o=btn.textContent;   // 어느 버튼이든 원래 글자로 돌아온다(전엔 '회신 문구 복사'로 고정)
+  const done=()=>{btn.textContent='복사됨';setTimeout(()=>btn.textContent=o,1400)};
   const fb=()=>{   // 클립보드 API가 막힌 인앱 브라우저용 — 키보드가 뜨지 않게 readOnly·고정 위치, 실패하면 실패라고 알린다
     const ta=document.createElement('textarea');ta.value=t;ta.readOnly=true;ta.style.cssText='position:fixed;top:0;left:0;opacity:0;font-size:16px';
     document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,t.length);let ok=false;try{ok=document.execCommand('copy')}catch(e){}ta.remove();
-    if(ok)done();else{btn.textContent='복사 안 됨 — 문구를 길게 눌러 복사';setTimeout(()=>btn.textContent='회신 문구 복사',3000)}
+    if(ok)done();else{btn.textContent='복사 안 됨 — 문구를 길게 눌러 복사';setTimeout(()=>btn.textContent=o,3000)}
   };
   try{navigator.clipboard.writeText(t).then(done,fb)}catch(e){fb()}
 }
@@ -378,7 +405,8 @@ function run1(){
   $('#st1').textContent=note+`${seq.length}건 조회`;
   const cnt={};res.forEach(r=>cnt[r.v]=(cnt[r.v]||0)+1);const bad=seq.length-res.length;if(bad)cnt['확인필요']=(cnt['확인필요']||0)+bad;
   sum.innerHTML=ORDER.filter(([k])=>cnt[k]).map(([k,c])=>`<span class="chip ${c}">${k} ${cnt[k]}</span>`).join('');
-  if(res.length>1){const all=res.map(replyText).join('\n'),b=document.createElement('button');b.className='sm';b.textContent='전체 회신 문구 복사';b.onclick=()=>copy('안녕하세요.\n'+all,b);sum.appendChild(b)}
+  if(res.length>1){const all=res.map(replyText).join('\n'),b=document.createElement('button');b.className='sm';b.textContent='전체 회신 문구 복사';b.onclick=()=>copy('안녕하세요.\n'+all,b);sum.appendChild(b);
+    const b2=document.createElement('button');b2.className='sm';b2.textContent='전체 카드 내용 복사';b2.onclick=()=>copy(res.map(cardText).join('\n\n'),b2);sum.appendChild(b2)}
   sum.hidden=false;
   seq.forEach(r=>out.appendChild(r instanceof Element?r:card(r)));
 }
