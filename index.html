@@ -3575,12 +3575,14 @@ function acxLoadIdx(){
 }
 function acxShardOf(b){ /* undefined = 불러오는 중, null = 실패, 객체 = 분할 파일(그 거래처가 없으면 키 없음) */
   var k=b.slice(0,2); if(Object.prototype.hasOwnProperty.call(acxShard,k)) return acxShard[k]; if(acxWait[k]) return undefined; acxWait[k]=1;
+  var done=function(v){ acxShard[k]=v; if(acView.sel&&acView.sel.slice(0,2)===k) renderAccountBoard(); };   /* 열린 상세의 분할일 때만 다시 그림(미리 받기 도착으로 목록이 클릭 중에 바뀌지 않게) */
   acxJsonp(k,function(r){ acxWait[k]=0;
-    if(typeof r!=='string'){ acxShard[k]=null; renderAccountBoard(); return; }
-    acUnpack(r).then(function(o){ acxShard[k]=o||{}; renderAccountBoard(); }).catch(function(){ acxShard[k]=null; renderAccountBoard(); });
+    if(typeof r!=='string'){ done(null); return; }
+    acUnpack(r).then(function(o){ done(o||{}); }).catch(function(){ done(null); });
   });
   return undefined;
 }
+function acxPre(b){ if(window.__ACX__&&b) acxShardOf(b); }   /* [10-27 속도] 목록 행에 마우스를 올리면 그 거래처 분할을 미리 받는다 */
 function acIndex(){ /* 거래처 목록 = 1단계(MS팀 평가실적·PRM) ∪ 병원신약(실시간) ∪ 2단계 색인(타 채널·현 담당) */
   var D=window.__ACCT__, X=window.__ACX__||null, mbo=acMbo(), mo=acMulti(), sig=mbo.length+'|'+mo.length+'|'+(X?1:0);
   if(acView.idx&&acView.idxSig===sig) return acView.idx;
@@ -3656,7 +3658,7 @@ function renderAccountBoard(){
   var dash='<span style="color:var(--gray3)">-</span>';
   f.slice(0,300).forEach(function(x){
     var who=x.d||String(x.who||'').split(' / ')[0]||'';
-    h+='<tr class="clickable'+(acView.sel===x.b?' sel':'')+'" onclick="acOpen(this.dataset.b)" data-b="'+fcEsc(x.b)+'"><td style="text-align:left"><b>'+fcEsc(x.n||'(이름 없음)')+'</b> <span class="crm-badge" style="font-size:10px">'+fcEsc(x.g)+'</span></td><td style="white-space:nowrap">'+fcEsc(acBizFmt(x.b))+'</td><td style="white-space:nowrap">'+(acTagHtml(x.tags)||dash)+'</td><td style="font-size:11px" title="'+fcEsc(x.who||'')+'">'+(fcEsc(who)||dash)+'</td><td>'+(x.t12?crmMoney(x.t12):dash)+'</td><td style="text-align:left;font-size:11px">'+(fcEsc(acAvTxt(x.av))||dash)+(x.av.T?' <span style="color:var(--gray3)" title="영업관리 거래처 합계(전 채널·품목 없음) 최근 6개월 월평균">(합계 '+crmMoney(x.av.T)+')</span>':'')+'</td><td>'+(x.nIt||dash)+'</td><td style="text-align:left">'+(x.v?fcEsc(x.v)+(x.vn>1?' <span style="font-size:10px;color:var(--gray3)">외 '+(x.vn-1)+'</span>':''):dash)+'</td><td>'+(x.prm?'<b>'+x.prm+'</b>':dash)+'</td><td>'+((x.mbo||x.mo)?'<b>'+(x.mbo+x.mo)+'</b>':dash)+'</td></tr>';
+    h+='<tr class="clickable'+(acView.sel===x.b?' sel':'')+'" onclick="acOpen(this.dataset.b)" onmouseenter="acxPre(this.dataset.b)" data-b="'+fcEsc(x.b)+'"><td style="text-align:left"><b>'+fcEsc(x.n||'(이름 없음)')+'</b> <span class="crm-badge" style="font-size:10px">'+fcEsc(x.g)+'</span></td><td style="white-space:nowrap">'+fcEsc(acBizFmt(x.b))+'</td><td style="white-space:nowrap">'+(acTagHtml(x.tags)||dash)+'</td><td style="font-size:11px" title="'+fcEsc(x.who||'')+'">'+(fcEsc(who)||dash)+'</td><td>'+(x.t12?crmMoney(x.t12):dash)+'</td><td style="text-align:left;font-size:11px">'+(fcEsc(acAvTxt(x.av))||dash)+(x.av.T?' <span style="color:var(--gray3)" title="영업관리 거래처 합계(전 채널·품목 없음) 최근 6개월 월평균">(합계 '+crmMoney(x.av.T)+')</span>':'')+'</td><td>'+(x.nIt||dash)+'</td><td style="text-align:left">'+(x.v?fcEsc(x.v)+(x.vn>1?' <span style="font-size:10px;color:var(--gray3)">외 '+(x.vn-1)+'</span>':''):dash)+'</td><td>'+(x.prm?'<b>'+x.prm+'</b>':dash)+'</td><td>'+((x.mbo||x.mo)?'<b>'+(x.mbo+x.mo)+'</b>':dash)+'</td></tr>';
   });
   h+='</tbody></table></div>'+(f.length>300?'<div style="font-size:11px;color:var(--gray3);margin-top:6px">상위 300곳만 표시 — 검색·필터로 좁히세요 (목록 엑셀은 전체)</div>':'');
   h+='<div style="font-size:10.5px;color:var(--gray3);margin-top:8px;line-height:1.6">MS팀 = 평가실적 실매출(VAT 제외·소급 반영) · 타 채널 = 한올 의약사업부 평가실적 · 한올 병원사업부 실적 · 대웅 담당 병원(영업관리 DW병원) — 채널마다 원천·기간이 다르고, 각 채널 최근 6개월 월평균 · 합계 = 영업관리 거래처 합계(전 채널, 품목 없음, 참고) · 현 담당 = 영업관리 채널매핑 부서(DW_ = 대웅, 기타 = 영업기획·영업관리 등) · 매출 있음 = 어느 한 채널이라도 최근 6개월 월평균 > 0(채널끼리 더하지 않음) · 지부장·담당 = MS 지부장, 없으면 채널매핑 첫 담당 · 구분 = 병원마스터(110대·그외병원), 없으면 로컬 · PRM = '+fcEsc(src.prm||'')+' · 병원신약 = CRM MBO + 복수오픈 · 월 1회 갱신(build_account_embed.py '+fcEsc(D.generated||'')+(X?' · build_account_channels.py '+fcEsc(X.generated||''):'')+')</div></div>';
