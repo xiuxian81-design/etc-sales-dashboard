@@ -214,6 +214,7 @@ const SIDE_LABEL={한올:'한올',대웅:'대웅',비활성:'비활성',기타:'
 /* 담당자·소속사무소(10-30 박본님 — 담당자를 알아야 소통) = 채널매핑 사원명(c[1])·사무소명(c[0]). 같은 사람·사무소의 채널 행(HA_일반·처방_로컬 등)은 한 줄로 묶는다 */
 const pname=c=>`${c[1]||'이름 미기재'}(${c[0]||'사무소 미기재'})`;
 function staffOf(cm){const m=new Map();cm.forEach(c=>{const k=c[1]+'|'+c[0];if(!m.has(k))m.set(k,{n:c[1]||'이름 미기재',o:c[0]||'사무소 미기재',s:side(c[0]),rows:[]});m.get(k).rows.push(c)});return [...m.values()]}
+const csoMgr=m=>{const v=(m&&m[2])||'';return !v?'':/^(종료|폐업종료|휴업|행삭제)$/.test(v)?`마스터 CSO담당 '${v}'`:`담당 지부장 ${v}`};   // CSO 마스터 'CSO담당' = 그 CSO 코드를 맡은 MS팀 지부장(10-30 박본님)
 const rowTxt=c=>`${c[2]} · 코드생성 ${xd(c[3])}${c[5]?' · CSO '+c[5]:''}${c[4]?' · '+c[4]:''}`;
 function csoOf(l){return l?[...new Set([...l[5].map(m=>m[0]),...l[4].map(r=>r[5])].filter(Boolean))]:[]}
 function judgeLocal(b){
@@ -298,7 +299,7 @@ function card(r){
   const el=document.createElement('article');el.className='card';
   const nm=nameOf(r.b),l=r.l,cm=l?l[4]:[];let body='';
   const reps=cm.length?staffOf(cm).map(p=>`<div><span class="tag">${esc(SIDE_LABEL[p.s])}</span><b>${esc(p.n)}</b> · 소속 ${esc(p.o)}<div class="hint">${p.rows.map(c=>esc(rowTxt(c))).join('<br>')}</div></div>`).join(''):'없음 (영업관리 채널매핑에 담당 없음)';
-  const msL=l&&l[5].length?`<dt>CSO 마스터</dt><dd>${l[5].map(m=>esc(m[0])+' — '+esc(m[1]||'-')).join('<br>')}</dd>`:'';
+  const msL=l&&l[5].length?`<dt>CSO 마스터</dt><dd>${l[5].map(m=>esc(m[0])+' — '+esc(m[1]||'-')+(csoMgr(m)?' · <b>'+esc(csoMgr(m))+'</b>':'')).join('<br>')}</dd>`:'';
   if(r.kind==='로컬'){
     body=`<div class="reason ${r.cls}">${esc(r.reason)}</div><dl>
       <dt>주소</dt><dd>${esc((l&&l[1])||'-')}</dd>
@@ -349,7 +350,7 @@ function cardText(r){
   }
   L.push('담당자 · 소속사무소:'+(cm.length?'':' 없음'));
   staffOf(cm).forEach(p=>{L.push(`  [${SIDE_LABEL[p.s]}] ${p.n} — 소속 ${p.o}`);p.rows.forEach(c=>L.push('      '+rowTxt(c)))});
-  if(l&&l[5]&&l[5].length){L.push('CSO 마스터:');l[5].forEach(m=>L.push(`  ${m[0]} — ${m[1]||'-'}`))}
+  if(l&&l[5]&&l[5].length){L.push('CSO 마스터:');l[5].forEach(m=>L.push(`  ${m[0]} — ${m[1]||'-'}${csoMgr(m)?' · '+csoMgr(m):''}`))}
   if(r.kind!=='로컬'){
     if(r.cf.length){L.push(`영업관리 컨펌 이력(최근 ${Math.min(3,r.cf.length)}건):`);r.cf.slice(0,3).forEach(c=>L.push('  '+cfText(c)))}
     L.push(`전체 품목 ${D.items.length}개 기준(최근 6개월 매출·담당): 가능 ${r.g['가능'].length} · 가능(협의필요) ${r.g['가능(협의필요)'].length} · 불가 ${r.g['불가'].length}`);
