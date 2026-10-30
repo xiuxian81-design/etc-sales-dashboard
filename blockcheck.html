@@ -211,10 +211,14 @@ function isHosp(b){return !!D.H[b]}   // 빌더가 병원 매출·병원 컨펌 
 function nameOf(b){const l=D.L[b];return (l&&l[0])||'(이름 정보 없음)'}
 const side=d=>{d=String(d||'');if(/^HA_(영업기획팀|영업관리팀)/.test(d))return '비활성';if(/^HA_/.test(d))return '한올';if(/^(DW|DA|DB)_|^폴라리스/.test(d))return '대웅';return '기타'};
 const SIDE_LABEL={한올:'한올',대웅:'대웅',비활성:'비활성',기타:'기타'};
+/* 담당자·소속사무소(10-30 박본님 — 담당자를 알아야 소통) = 채널매핑 사원명(c[1])·사무소명(c[0]). 같은 사람·사무소의 채널 행(HA_일반·처방_로컬 등)은 한 줄로 묶는다 */
+const pname=c=>`${c[1]||'이름 미기재'}(${c[0]||'사무소 미기재'})`;
+function staffOf(cm){const m=new Map();cm.forEach(c=>{const k=c[1]+'|'+c[0];if(!m.has(k))m.set(k,{n:c[1]||'이름 미기재',o:c[0]||'사무소 미기재',s:side(c[0]),rows:[]});m.get(k).rows.push(c)});return [...m.values()]}
+const rowTxt=c=>`${c[2]} · 코드생성 ${xd(c[3])}${c[5]?' · CSO '+c[5]:''}${c[4]?' · '+c[4]:''}`;
 function csoOf(l){return l?[...new Set([...l[5].map(m=>m[0]),...l[4].map(r=>r[5])].filter(Boolean))]:[]}
 function judgeLocal(b){
   const l=D.L[b]||['','','',0,[],[]],cm=l[4],cso=csoOf(l),sides=new Set(cm.map(r=>side(r[0])));
-  const who=f=>[...new Set(cm.filter(r=>f(side(r[0]))).map(r=>r[0]+' '+r[1]))].join(', ');
+  const who=f=>[...new Set(cm.filter(r=>f(side(r[0]))).map(pname))].join(', ');
   let v,cls,reason,why;
   if(cso.length){v='불가';cls='no';why='cso';reason='다른 CSO가 이미 코드 생성: '+cso.join(', ')}
   else if(!cm.length){v='가능';cls='ok';why='new';reason=known(b)?'비거래처 (담당 없음)':'비거래처 (원천 데이터에 없는 번호 — 번호 확인 권장)'}
@@ -242,7 +246,7 @@ const RANK={'불가':3,'가능(협의필요)':2,'가능':1};
 const mboOf=b=>(D.M[b]||[]).concat((D.L[b]&&D.L[b][0]&&D.MN[nname(D.L[b][0])])||[]);   // CRM 진행 블럭 — 사업자번호, 없으면 영업관리 거래처명으로
 function judgeHosp(b,want){   // want = itemIdx 결과(요청 품목) 또는 null
   const h=D.H[b]||{s:{},p:{}},l=D.L[b],cm=l?l[4]:[],cso=csoOf(l),pr=h.p||{},today=new Date();today.setHours(0,0,0,0);
-  const act=[...new Set(cm.filter(r=>side(r[0])!=='비활성').map(r=>r[0]+' '+r[1]))];   // MS팀·한올영업부·대웅영업부 등 실제 담당
+  const act=[...new Set(cm.filter(r=>side(r[0])!=='비활성').map(pname))];   // MS팀·한올영업부·대웅영업부 등 실제 담당
   const hy=[];if(act.length)hy.push('담당 '+act.join(', '));if(cso.length)hy.push('CSO 코드 보유 '+cso.join(', '));
   const per={},det={},g={'가능':[],'가능(협의필요)':[],'불가':[]},mbAll=mboOf(b);
   const vtxt=e=>`${e.v||'업체 미기재'} ${e.s||'단계 미입력'}${e.rpm?'·'+e.rpm:''}`;
@@ -293,14 +297,14 @@ function replyText(r){
 function card(r){
   const el=document.createElement('article');el.className='card';
   const nm=nameOf(r.b),l=r.l,cm=l?l[4]:[];let body='';
-  const reps=cm.length?cm.map(c=>`<div><span class="tag">${esc(SIDE_LABEL[side(c[0])])}</span>${esc(c[0])} ${esc(c[1])} · ${esc(c[2])} · 코드생성 ${xd(c[3])}${c[5]?' · CSO '+esc(c[5]):''}${c[4]?' · '+esc(c[4]):''}</div>`).join(''):'없음';
+  const reps=cm.length?staffOf(cm).map(p=>`<div><span class="tag">${esc(SIDE_LABEL[p.s])}</span><b>${esc(p.n)}</b> · 소속 ${esc(p.o)}<div class="hint">${p.rows.map(c=>esc(rowTxt(c))).join('<br>')}</div></div>`).join(''):'없음 (영업관리 채널매핑에 담당 없음)';
   const msL=l&&l[5].length?`<dt>CSO 마스터</dt><dd>${l[5].map(m=>esc(m[0])+' — '+esc(m[1]||'-')).join('<br>')}</dd>`:'';
   if(r.kind==='로컬'){
     body=`<div class="reason ${r.cls}">${esc(r.reason)}</div><dl>
       <dt>주소</dt><dd>${esc((l&&l[1])||'-')}</dd>
       <dt>블록</dt><dd>${esc((l&&l[2])||'-')}</dd>
       <dt>매출(6개월 평균)</dt><dd>${won(l&&l[3])}</dd>
-      <dt>현 담당</dt><dd>${reps}</dd>${msL}
+      <dt>담당자 · 소속사무소</dt><dd>${reps}</dd>${msL}
     </dl>`;
   }else{
     // 품목 그룹 — 8개 넘으면 접어서 숫자만
@@ -311,7 +315,7 @@ function card(r){
       :`<div class="reason chk">병원은 품목을 함께 입력해 주세요 — 위 '품목' 칸이나 같은 줄에 적으면 품목별로 판정합니다 (예: ${esc(fmtBiz(r.b))} 노르믹스)</div>`;
     body=`${req}<dl>
       <dt>블록</dt><dd>${esc((l&&l[2])||'-')}</dd>
-      <dt>현 담당</dt><dd>${reps}</dd>${msL}
+      <dt>담당자 · 소속사무소</dt><dd>${reps}</dd>${msL}
     </dl>${cf}
       <div class="grp"><span class="hint">전체 품목 ${D.items.length}개 기준 (최근 6개월 매출·담당)</span></div>
       ${grp('가능','ok',r.g['가능'])}${grp('가능(협의필요)','warn',r.g['가능(협의필요)'])}${grp('불가 (매출 有·신규 유예·CRM 진행)','no',r.g['불가'])}`;
@@ -319,7 +323,7 @@ function card(r){
   const rt=replyText(r);
   el.innerHTML=`<div class="ch"><div><h2>${esc(nm)}</h2><div class="sub">${fmtBiz(r.b)} · ${r.kind}</div></div>
     <div class="row"><span class="pill ${r.cls}">${esc(r.v)}</span><button class="sm" data-flip>${r.kind==='로컬'?'병원으로 보기':'로컬로 보기'}</button></div></div>
-    ${body}<div class="ft"><span>${esc(rt)}</span><div class="row"><button class="sm" data-copycard title="거래처·판정·사유·주소·블록·매출·현 담당을 글로 복사 — 거래처가 겹칠 때 영업부·지부장과 소통용">카드 내용 복사</button><button class="sm" data-copy>회신 문구 복사</button></div></div>`;
+    ${body}<div class="ft"><span>${esc(rt)}</span><div class="row"><button class="sm" data-copycard title="거래처·판정·사유·주소·블록·매출·담당자·소속사무소를 글로 복사 — 거래처가 겹칠 때 영업부·지부장과 소통용">카드 내용 복사</button><button class="sm" data-copy>회신 문구 복사</button></div></div>`;
   el.querySelector('[data-flip]').onclick=()=>el.replaceWith(card(r.kind==='로컬'?judgeHosp(r.b,r.wantKeep||null):Object.assign(judgeLocal(r.b),{wantKeep:r.want})));
   el.querySelector('[data-copy]').onclick=e=>copy(rt,e.target);
   el.querySelector('[data-copycard]').onclick=e=>copy(cardText(r),e.target);
@@ -343,8 +347,8 @@ function cardText(r){
     if(r.req){L.push('요청 품목:');r.req.forEach(q=>L.push(`  [${q.v}] ${q.label} — ${q.det}`))}
     L.push(`블록: ${(l&&l[2])||'-'}`);
   }
-  L.push('현 담당:'+(cm.length?'':' 없음'));
-  cm.forEach(c=>L.push(`  [${SIDE_LABEL[side(c[0])]}] ${c[0]} ${c[1]} · ${c[2]} · 코드생성 ${xd(c[3])}${c[5]?' · CSO '+c[5]:''}${c[4]?' · '+c[4]:''}`));
+  L.push('담당자 · 소속사무소:'+(cm.length?'':' 없음'));
+  staffOf(cm).forEach(p=>{L.push(`  [${SIDE_LABEL[p.s]}] ${p.n} — 소속 ${p.o}`);p.rows.forEach(c=>L.push('      '+rowTxt(c)))});
   if(l&&l[5]&&l[5].length){L.push('CSO 마스터:');l[5].forEach(m=>L.push(`  ${m[0]} — ${m[1]||'-'}`))}
   if(r.kind!=='로컬'){
     if(r.cf.length){L.push(`영업관리 컨펌 이력(최근 ${Math.min(3,r.cf.length)}건):`);r.cf.slice(0,3).forEach(c=>L.push('  '+cfText(c)))}
@@ -395,7 +399,7 @@ function run1(){
       $('#st1').textContent=note+`${hits.length}곳 일치 — 선택하세요`+(hits.length>80?' (앞 80곳만 표시, 이름을 더 길게 넣어 주세요)':'');
       const box=document.createElement('div');box.className='card pick';
       hits.slice(0,80).forEach(([b,n])=>{
-        const l=D.L[b],bt=document.createElement('button'),who=l&&l[4][0]?l[4][0][0]+' '+l[4][0][1]:'담당 없음';
+        const l=D.L[b],bt=document.createElement('button'),who=l&&l[4][0]?pname(l[4][0]):'담당 없음';
         bt.innerHTML=`<span>${esc(n)} <span class="hint">${esc((l&&l[1])||'')}</span></span><span class="hint">${fmtBiz(b)} · ${isHosp(b)?'병원 · ':''}${esc(who)}</span>`;
         bt.onclick=()=>{$('#q').value=b+(iw.length?' '+iw.join(' '):'');run1()};box.appendChild(bt);
       });
@@ -416,7 +420,7 @@ const LIB_X='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js
 const LIB_E='https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';
 const HK={biz:['사업자번호','사업자등록번호','사업자','등록번호'],name:['거래처명','거래처','병원명','요양기관명','기관명','상호명','상호','실납처명','처방처','의원명','병의원','약국명'],addr:['주소','소재지'],item:['품목','제품']};
 const HX=/업체|대표|코드|담당/;   // 업체(CSO 자신)·대표자·코드 열은 거래처 열로 잡지 않는다
-const OUTCOLS=['블럭판정','구분','사유','요청 품목 판정','불가 품목(병원 — 매출·신규 유예)','현 담당','코드생성 CSO','매칭 거래처','회신 문구','영업관리 컨펌(최근)'];
+const OUTCOLS=['블럭판정','구분','사유','요청 품목 판정','불가 품목(병원 — 매출·신규 유예)','담당자','소속사무소','코드생성 CSO','매칭 거래처','회신 문구','영업관리 컨펌(최근)'];
 async function onFile(f){
   if(!f)return;
   $('#st2').textContent='';$('#xres').hidden=true;$('#xmap').hidden=true;
@@ -511,7 +515,7 @@ function judgeRow(cell){
   const bad=isHosp(b)&&item&&(!want||miss.length);   // 병원인데 적은 품목을 못 찾음 → 품목 없이 판정하지 않는다
   const r=judge(b,bad?null:want),l=r.l||D.L[b],cm=l?l[4]:[];
   const out={kind:r.kind,v:r.v,cls:r.cls,reason:note+r.reason,match:`${nameOf(b)} (${fmtBiz(b)})`,
-    who:[...new Set(cm.map(c=>c[0]+' '+c[1]))].join(', '),cso:csoOf(l).join(', '),reply:replyText(r),req:'',sales:'',
+    who:staffOf(cm).map(p=>p.n).join(', '),office:staffOf(cm).map(p=>p.o).join(', '),cso:csoOf(l).join(', '),reply:replyText(r),req:'',sales:'',
     cf:(D.C&&D.C[b]&&D.C[b][0])?cfText(D.C[b][0]):''};
   if(r.kind==='병원'){
     out.req=r.req?r.req.map(q=>`${q.label}=${q.v}`+(q.v!=='가능'?` (${q.det})`:'')).join(', '):'';   // 가능이 아니면 품목별 사유까지(복수오픈 n/3·진행 업체 등)
@@ -546,7 +550,7 @@ function draw2(){
   $('#xmore').hidden=rows.length<=XN;$('#xmore').textContent=`더 보기 (${rows.length-XN}건 남음)`;
 }
 const FILL={ok:'FFDFF3E4',no:'FFFDE8E8',warn:'FFFDF1DF',chk:'FFECECF0'},FONT={ok:'FF248A3D',no:'FFD70015',warn:'FFC76B00',chk:'FF6E6E73'};
-function outVals(r){return [r.v,r.kind,r.reason,r.req||'',r.sales||'',r.who||'',r.cso||'',r.match||'',r.reply||'',r.cf||'']}
+function outVals(r){return [r.v,r.kind,r.reason,r.req||'',r.sales||'',r.who||'',r.office||'',r.cso||'',r.match||'',r.reply||'',r.cf||'']}
 async function download(){
   const btn=$('#xdl');btn.disabled=true;$('#st2').textContent='만드는 중…';
   try{
@@ -565,7 +569,7 @@ async function download(){
     OUTCOLS.forEach((t,j)=>{const c=ws.getCell(hr,c1+j);c.value=t;c.font={bold:true,color:{argb:'FFFFFFFF'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF0071E3'}};c.alignment={vertical:'middle',wrapText:true}});
     XROWS.forEach(r=>{
       const rr=r.i+base;
-      outVals(r).forEach((v,j)=>{const c=ws.getCell(rr,c1+j);c.value=v;if(j===0){c.fill={type:'pattern',pattern:'solid',fgColor:{argb:FILL[r.cls]}};c.font={bold:true,color:{argb:FONT[r.cls]}}}if(j===2||j===8)c.alignment={wrapText:false}});
+      outVals(r).forEach((v,j)=>{const c=ws.getCell(rr,c1+j);c.value=v;if(j===0){c.fill={type:'pattern',pattern:'solid',fgColor:{argb:FILL[r.cls]}};c.font={bold:true,color:{argb:FONT[r.cls]}}}if(j===2||j===9)c.alignment={wrapText:false}});
     });
     [10,7,48,30,22,22,22,30,60,48].forEach((w,j)=>ws.getColumn(c1+j).width=w);
     const sm=wb.addWorksheet('조회요약');
