@@ -181,6 +181,10 @@ function loadData(){
   s.onerror=()=>{clearTimeout(to);fatal(`서버에 연결하지 못했습니다. 새로고침해 주세요. → ${again}`)};
   document.head.appendChild(s);
 }
+/* 사용 기록(10-30 박본님 — 지부장 활동지표: 조회 횟수·거래처 수) — 건수·판정 분포만 D '블럭조회로그'로(거래처 번호는 안 보냄). 응답·실패는 무시(조회엔 영향 없음) */
+function logUse(m,vs){try{const c={ok:0,warn:0,no:0,chk:0};vs.forEach(v=>{v=String(v||'');if(v==='가능')c.ok++;else if(v==='불가')c.no++;else if(v.includes('협의'))c.warn++;else c.chk++});
+  window.__bcLog=window.__bcLog||function(){};const s=document.createElement('script');s.onload=s.onerror=()=>s.remove();
+  s.src=window.__DATA+`?doc=blocklog&callback=__bcLog&m=${m}&n=${vs.length}&ok=${c.ok}&warn=${c.warn}&no=${c.no}&chk=${c.chk}&_=${Date.now()}&tok=`+encodeURIComponent(window.__gateTok());document.head.appendChild(s)}catch(e){}}
 function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('라이브러리 로드 실패: '+src));document.head.appendChild(s)})}
 function ready(){
   if(!Array.isArray(D.items&&D.items[0])){fatal('데이터를 새 형식으로 바꾸는 중입니다. 1~2분 뒤 새로 고침해 주세요.');D=null;return}   // 10-24 구조 변경(품목 [약호,이름]) — 옛 데이터를 받은 경우
@@ -413,6 +417,7 @@ function run1(){
     }
   }
   $('#st1').textContent=note+`${seq.length}건 조회`;
+  logUse('d',res.map(r=>r.v).concat(Array(seq.length-res.length).fill('확인필요')));   // 직접 조회 1회 = 1행(거래처 수 = 카드 수)
   const cnt={};res.forEach(r=>cnt[r.v]=(cnt[r.v]||0)+1);const bad=seq.length-res.length;if(bad)cnt['확인필요']=(cnt['확인필요']||0)+bad;
   sum.innerHTML=ORDER.filter(([k])=>cnt[k]).map(([k,c])=>`<span class="chip ${c}">${k} ${cnt[k]}</span>`).join('');
   if(res.length>1){const all=res.map(replyText).join('\n'),b=document.createElement('button');b.className='sm';b.textContent='전체 회신 문구 복사';b.onclick=()=>copy('안녕하세요.\n'+all,b);sum.appendChild(b);
@@ -549,6 +554,7 @@ function run2(){
   $('#xchips').innerHTML=`<button class="chip on" data-f="all">전체 ${XROWS.length}</button>`+ORDER.filter(([k])=>cnt(k)).map(([k,c])=>`<button class="chip ${c}" data-f="${k}">${k} ${cnt(k)}</button>`).join('');
   $('#xchips').querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{XF=b.dataset.f;XN=200;$('#xchips').querySelectorAll('[data-f]').forEach(x=>x.classList.toggle('on',x===b));draw2()});
   $('#xres').hidden=false;draw2();
+  if(!XL.logged&&XROWS.length){XL.logged=1;logUse('x',XROWS.map(r=>r.v))}   // 엑셀은 파일당 1행(열 지정을 바꿔 다시 판정해도 다시 안 셈)
 }
 function draw2(){
   const rows=XROWS.filter(r=>XF==='all'||r.v===XF),sh=XL.sheets[XL.si];
