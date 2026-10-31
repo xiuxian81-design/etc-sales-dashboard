@@ -3306,7 +3306,7 @@ function renderCrmVendor(d){
 (function(){
   function bootCrm(){
     var el=document.getElementById('gs-sheet-url');
-    if(el&&String(el.value||'').trim()) loadCrm();
+    if(el&&String(el.value||'').trim()){ loadCrm(); loadFromSheets(); }   /* [2026-10-31 박본님] 진입 즉시 MBO 실시간도 — 버튼 없이 탭 메뉴·전체 현황까지 */
   }
   function bootCrmReady(){ if(window.__dashData) window.__dashData.then(bootCrm); else bootCrm(); }   // [v46] 내장데이터(dashdata) 수신 후 crm 로드(110대 마스터 병합 순서 보장)
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bootCrmReady);
@@ -3318,7 +3318,7 @@ function renderCrmVendor(d){
    표: 업체(소속·재위탁 2단계) × 최근 2분기 매출(실매출·VAT 제외) + 전분기比(월평균 기준) + 전년 동분기比(같은 개월) + 최근 상태·경보 + 신약·PRM 블럭 + 활동.
    행 클릭 → 상세: ① 분기 트렌드(8분기)·월별 20개월 ② 품목별 매출(dashdata vendorSales) ③ 수수료·혜택(dashdata vendorFee, 정산월 선택) ④ 진행사항(MBO 블럭·PRM) ⑤ 활동 히스토리(지부장 전체·재위탁 포함)
    엑셀(v58c, 박본님 10-25): '⬇ 목록 엑셀' = 현재 필터·정렬 목록(업체현황·정의 시트) / 체크 또는 상세 '⬇ 이 업체 엑셀' = 세부(요약·분기·월별·품목별매출·수수료혜택·품목별수수료·신약진행·활동·정의) */
-var vbView={dir:'',kind:'',q:'',tier:'',fi:'',sort:'amt',sel:'',feeM:'',chk:{},_f:[]};   /* chk = 세부 엑셀 선택 업체, _f = 현재 필터·정렬 목록 · tier = 구간 인센율(%) · fi = 품목 인센(any·none·품목명) — 10-28, 선택 정산월 기준 */
+var vbView={dir:'',kind:'',q:'',tier:'',fi:'',sort:'amt',asc:false,sel:'',feeM:'',chk:{},_f:[]};   /* chk = 세부 엑셀 선택 업체, _f = 현재 필터·정렬 목록 · tier = 구간 인센율(%) · fi = 품목 인센(any·none·품목명) — 10-28, 선택 정산월 기준 */
 function vbRows(){ return (crmData&&Array.isArray(crmData.vendorBoard))?crmData.vendorBoard:[]; }
 function vbMeta(){ return (crmData&&crmData.vendorBoardMeta)||{quarters:[]}; }
 function vbQ(q){ return q?(q.slice(2,4)+'년 '+q.slice(5)+'Q'):'-'; }
@@ -3342,6 +3342,33 @@ function vbSel(){ var r=document.createElement('select'); return r; }
 function vbRatePct(rec){ return (rec&&rec.rate!=null)?Math.round(rec.rate*1000)/10:null; }   /* 구간 인센율 %(0.5 단위) — 저장값 0.005000000000000001 같은 끝자리 정리 */
 function vbFocusItems(){ var F=window.__VENDOR_FEE__; return (F&&F.focusItems)||[]; }   /* 품목 인센(집중품목) 품목 — build_vendor_embed.py 10-28부터 */
 function vbFiOk(rec){ var fi=vbView.fi; if(!fi) return true; if(fi==='any') return rec.focus>0; if(fi==='none') return !(rec.focus>0); return ((rec.focusBy||{})[fi]||0)>0; }
+/* [2026-10-31 박본님] 표 머리글 정렬 — 첫 클릭 = 큰 값부터(업체·지부장은 가나다), 다시 누르면 반대, 빈 값은 늘 맨 아래, 같으면 최근 분기 매출순 */
+var VB_SORT_LBL={name:'업체',dir:'지부장',prev:'전분기 매출',amt:'최근 분기 매출',qoq:'전분기比',yoy:'전년 동분기比',st:'최근 상태(경보·부진 먼저)',alert:'경보',mbo:'신약 진행',prm:'PRM 블럭',fee:'최종 수수료 금액',tier:'구간율·품목 인센',meet:'30일 활동',act:'마지막 활동'};
+function vbFeeCell(r){ var fv=vbFeeOf(r), fm=vbFeeCur(); return (fv&&fv.byMonth&&fv.byMonth[fm])||null; }
+function vbSortVal(k,r){ var q=r.q||[], cur=q[q.length-1], prv=q[q.length-2];
+  switch(k){
+    case 'name': return [String(r.name||'')];
+    case 'dir': return [r.dir||null];
+    case 'prev': return [prv?prv.amt:0];
+    case 'amt': return [cur?cur.amt:0];
+    case 'qoq': return [r.qoqPct==null||isNaN(r.qoqPct)?null:Number(r.qoqPct)];
+    case 'yoy': return [r.yoyPct==null||isNaN(r.yoyPct)?null:Number(r.yoyPct)];
+    case 'st': var sr={'부진':3,'관찰':2,'순항':1}[r.lastStatus]||0; return [(r.alert||sr)?((r.alert?10:0)+sr):null];
+    case 'alert': return [r.alert?1:0];
+    case 'mbo': return (r.mbo&&r.mbo.n)?[r.mbo.active,r.mbo.n]:[null];
+    case 'prm': return r.prm?[r.prm.n]:[null];
+    case 'fee': var rec=vbFeeCell(r); return [rec&&rec.final!=null?Number(rec.final):null];
+    case 'tier': var fr=vbFeeRec(r); if(!fr) return [null]; var one=vbView.fi&&vbView.fi!=='any'&&vbView.fi!=='none'; return [vbRatePct(fr),one?((fr.focusBy||{})[vbView.fi]||0):(fr.focus||0)];
+    case 'meet': return [r.meet30||0,String(r.lastAct||'')];
+    case 'act': return [r.lastAct?String(r.lastAct):null];
+  } return [cur?cur.amt:0]; }
+function vbCmp(a,b,asc){ for(var i=0;i<Math.max(a.length,b.length);i++){ var x=a[i], y=b[i];
+    if(x==null&&y==null) continue; if(x==null) return 1; if(y==null) return -1;   /* 빈 값은 방향과 상관없이 맨 아래 */
+    var c=(typeof x==='string'||typeof y==='string')?String(x).localeCompare(String(y),'ko'):(x-y); if(c) return asc?c:-c; }
+  return 0; }
+function vbSortBy(k){ if(vbView.sort===k) vbView.asc=!vbView.asc; else { vbView.sort=k; vbView.asc=(k==='name'||k==='dir'); } renderVendorBoard(); }
+function vbSortPick(v){ var p=String(v).split(':'); vbView.sort=p[0]; vbView.asc=(p[1]==='a'); renderVendorBoard(); }
+function vbTh(k,label,st){ var on=vbView.sort===k; return '<th onclick="vbSortBy(\''+k+'\')" title="클릭: '+((k==='name'||k==='dir')?'가나다순':'큰 값부터')+' · 다시 클릭: 반대 순서" style="cursor:pointer;user-select:none'+(on?';color:var(--blue-dk);background:var(--blue-lt)':'')+(st?';'+st:'')+'">'+label+(on?' <span style="font-size:10px">'+(vbView.asc?'▲':'▼')+'</span>':'')+'</th>'; }
 function renderVendorBoard(){
   var root=document.getElementById('vb-root'); if(!root) return;
   var rows=vbRows(), meta=vbMeta(), qs=meta.quarters||[];
@@ -3352,14 +3379,13 @@ function renderVendorBoard(){
     if(vbView.tier!==''||vbView.fi){ var fr=vbFeeRec(r); if(!fr) return false; if(vbView.tier!==''&&vbRatePct(fr)!==Number(vbView.tier)) return false; if(!vbFiOk(fr)) return false; }   /* [10-28] 구간·품목 인센 = 선택 정산월, 정산에 없는 업체·재위탁은 빠짐 */
     return true; });
   var fmL=vbFeeCur(), tierCnt={}, fiCnt={any:0,none:0}; rows.forEach(function(r){ var fr=vbFeeRec(r); if(!fr) return; var t=vbRatePct(fr); if(t!=null) tierCnt[t]=(tierCnt[t]||0)+1; if(fr.focus>0) fiCnt.any++; else fiCnt.none++; Object.keys(fr.focusBy||{}).forEach(function(p){ if(fr.focusBy[p]>0) fiCnt[p]=(fiCnt[p]||0)+1; }); });
-  var amtOf=function(r){ var x=r.q[r.q.length-1]; return x?x.amt:0; };
-  var sorters={amt:function(a,b){return amtOf(b)-amtOf(a);}, qoq:function(a,b){return (a.qoqPct==null?1e9:a.qoqPct)-(b.qoqPct==null?1e9:b.qoqPct);}, yoy:function(a,b){return (a.yoyPct==null?1e9:a.yoyPct)-(b.yoyPct==null?1e9:b.yoyPct);}, alert:function(a,b){return ((b.alert?1:0)-(a.alert?1:0))||(amtOf(b)-amtOf(a));}, act:function(a,b){return String(b.lastAct||'').localeCompare(String(a.lastAct||''));}, name:function(a,b){return String(a.name).localeCompare(String(b.name),'ko');}};
-  f.sort(sorters[vbView.sort]||sorters.amt);
+  var sk=VB_SORT_LBL[vbView.sort]?vbView.sort:'amt';
+  f.sort(function(a,b){ return vbCmp(vbSortVal(sk,a),vbSortVal(sk,b),vbView.asc)||vbCmp(vbSortVal('amt',a),vbSortVal('amt',b),false)||vbCmp([String(a.name||'')],[String(b.name||'')],true); });
   vbView._f=f;
   var nChk=Object.keys(vbView.chk).length;
   var up=rows.filter(function(r){return r.qoqPct!=null&&r.qoqPct>0;}).length, down=rows.filter(function(r){return r.qoqPct!=null&&r.qoqPct<0;}).length, al=rows.filter(function(r){return r.alert;}).length, act30=rows.filter(function(r){return r.meet30>0;}).length;
   var c=meta.counts||{};
-  var h='<div class="section-card"><h3>🏢 업체 현황 <span style="font-size:11px;color:var(--gray3);font-weight:400">업체 '+rows.length+'처(계약 '+(c['계약']||0)+' · 재위탁 '+(c['재위탁']||0)+' · 미확인 '+(c['미확인']||0)+') · 실적 '+fcEsc(crmMon(meta.latestMonth))+'까지 · 매출 = 업체실적(실매출·VAT 제외) · 행을 클릭하면 상세</span></h3>';
+  var h='<div class="section-card"><h3>🏢 업체 현황 <span style="font-size:11px;color:var(--gray3);font-weight:400">업체 '+rows.length+'처(계약 '+(c['계약']||0)+' · 재위탁 '+(c['재위탁']||0)+' · 미확인 '+(c['미확인']||0)+') · 실적 '+fcEsc(crmMon(meta.latestMonth))+'까지 · 매출 = 업체실적(실매출·VAT 제외) · 행을 클릭하면 상세 · 표 머리글을 누르면 그 항목 순 정렬</span></h3>';
   h+='<div class="crm-stat" style="margin-bottom:12px">'
     +'<div class="b"><div class="l">전분기比 상승 / 하락 업체</div><div class="v"><span style="color:var(--ok)">'+up+'</span> / <span style="color:var(--bad)">'+down+'</span></div><div class="s">'+fcEsc(vbQ(qCur))+' vs '+fcEsc(vbQ(qPrev))+' · 월평균 기준</div></div>'
     +'<div class="b"><div class="l">상태 전이 경보 업체</div><div class="v" style="color:'+(al?'var(--bad)':'var(--ok)')+'">'+al+'</div><div class="s">최근 60일 하락·부진지속(미회복)</div></div>'
@@ -3371,13 +3397,15 @@ function renderVendorBoard(){
     +'<select onchange="vbSet(\'kind\',this.value)" style="'+selSt+'"><option value="">구분 전체</option>'+['계약','재위탁','미확인'].map(function(k){return '<option value="'+k+'"'+(vbView.kind===k?' selected':'')+'>'+k+'</option>';}).join('')+'</select>'
     +(fmL?'<select onchange="vbSet(\'tier\',this.value)" style="'+selSt+(vbView.tier!==''?';border-color:var(--blue);font-weight:700':'')+'" title="정산 도매별 \'구간별 인센율\' — '+fcEsc(vbFm(fmL))+' 정산(상세 ③에서 정산월을 바꾸면 따라 바뀜)"><option value="">구간 인센율 전체 ('+fcEsc(vbFm(fmL))+' 정산)</option>'+Object.keys(tierCnt).map(Number).sort(function(a,b){return b-a;}).map(function(t){ return '<option value="'+t+'"'+(vbView.tier===String(t)?' selected':'')+'>'+(t?'구간 '+t+'%':'구간 미해당(0%)')+' · '+tierCnt[t]+'처</option>'; }).join('')+'</select>'
       +'<select onchange="vbSet(\'fi\',this.value)" style="'+selSt+(vbView.fi?';border-color:var(--blue);font-weight:700':'')+'" title="정산 ② 품목인센(집중·글루) — '+fcEsc(vbFm(fmL))+' 정산"><option value="">품목 인센 전체 ('+fcEsc(vbFm(fmL))+' 정산)</option><option value="any"'+(vbView.fi==='any'?' selected':'')+'>품목 인센 받는 업체 · '+fiCnt.any+'처</option>'+vbFocusItems().map(function(p){ return '<option value="'+fcEsc(p)+'"'+(vbView.fi===p?' selected':'')+'>품목 인센: '+fcEsc(p)+' · '+(fiCnt[p]||0)+'처</option>'; }).join('')+'<option value="none"'+(vbView.fi==='none'?' selected':'')+'>품목 인센 없음 · '+fiCnt.none+'처</option></select>':'')
-    +'<select onchange="vbSet(\'sort\',this.value)" style="'+selSt+'">'+[['amt','최근 분기 매출순'],['qoq','전분기比 낮은 순'],['yoy','전년比 낮은 순'],['alert','경보 먼저'],['act','최근 활동순'],['name','가나다']].map(function(o){return '<option value="'+o[0]+'"'+(vbView.sort===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>'
+    +(function(){ var ops=[['amt:d','최근 분기 매출순'],['qoq:a','전분기比 낮은 순'],['yoy:a','전년比 낮은 순'],['alert:d','경보 먼저'],['act:d','최근 활동순'],['name:a','가나다']], cv=sk+':'+(vbView.asc?'a':'d');
+      if(!ops.some(function(o){return o[0]===cv;})) ops.unshift([cv,'머리글 정렬: '+VB_SORT_LBL[sk]+(vbView.asc?' ▲':' ▼')]);
+      return '<select onchange="vbSortPick(this.value)" style="'+selSt+'">'+ops.map(function(o){return '<option value="'+o[0]+'"'+(o[0]===cv?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>'; })()
     +'<input id="vb-q" value="'+fcEsc(vbView.q)+'" placeholder="🔍 업체명 검색" style="flex:1;min-width:200px;padding:6px 10px;border:1px solid var(--hair);border-radius:8px;font-size:12px" onkeydown="if(event.key===\'Enter\')vbSet(\'q\',this.value)" onchange="vbSet(\'q\',this.value)">'
     +'<span style="font-size:11px;color:var(--gray3)">'+f.length+'처 표시</span>'
     +'<button class="crm-back" onclick="vbExportList()" title="현재 필터·정렬 목록을 엑셀로">⬇ 목록 엑셀</button>'
     +'<button class="crm-back" id="vb-exp-sel" onclick="vbExportChecked()" title="체크한 업체(없으면 열린 상세 업체)의 분기·월별·품목별 매출·수수료·혜택·신약 진행·활동">⬇ 선택 업체 세부 엑셀 ('+nChk+')</button></div>';
   var mx=1; f.forEach(function(r){ r.q.slice(-2).forEach(function(x){ if(x.amt>mx) mx=x.amt; }); });
-  h+='<div class="tbl-wrap"><table class="btbl fc-tbl"><thead><tr><th style="width:26px"><input type="checkbox" title="필터 결과 전체 선택(표시 400처 초과분 포함)" '+(f.length&&f.every(function(r){return vbView.chk[r.key];})?'checked':'')+' onclick="event.stopPropagation()" onchange="vbChkAll(this.checked)"></th><th style="text-align:left">업체</th><th>지부장</th><th>'+fcEsc(vbQ(qPrev))+'</th><th>'+fcEsc(vbQ(qCur))+'</th><th>전분기比<br><span style="font-size:9px;color:var(--gray3)">월평균</span></th><th>전년 동분기比<br><span style="font-size:9px;color:var(--gray3)">같은 개월</span></th><th>최근 상태</th><th>신약 진행<br><span style="font-size:9px;color:var(--gray3)">진행/처방/전체</span></th><th>PRM 블럭<br><span style="font-size:9px;color:var(--gray3)">건 · 최근 계획월</span></th><th>최종 수수료율<br><span style="font-size:9px;color:var(--gray3)">정산 '+fcEsc(vbFm(vbFeeCur()))+' · 혜택률</span></th><th>구간율 · 품목 인센<br><span style="font-size:9px;color:var(--gray3)">정산 '+fcEsc(vbFm(vbFeeCur()))+(vbView.fi&&vbView.fi!=='any'&&vbView.fi!=='none'?' · '+fcEsc(vbView.fi):'')+'</span></th><th>활동<br><span style="font-size:9px;color:var(--gray3)">30일 · 마지막</span></th></tr></thead><tbody>';
+  h+='<div class="tbl-wrap"><table class="btbl fc-tbl"><thead><tr><th style="width:26px"><input type="checkbox" title="필터 결과 전체 선택(표시 400처 초과분 포함)" '+(f.length&&f.every(function(r){return vbView.chk[r.key];})?'checked':'')+' onclick="event.stopPropagation()" onchange="vbChkAll(this.checked)"></th>'+vbTh('name','업체','text-align:left')+vbTh('dir','지부장')+vbTh('prev',fcEsc(vbQ(qPrev)))+vbTh('amt',fcEsc(vbQ(qCur)))+vbTh('qoq','전분기比<br><span style="font-size:9px;color:var(--gray3)">월평균</span>')+vbTh('yoy','전년 동분기比<br><span style="font-size:9px;color:var(--gray3)">같은 개월</span>')+vbTh('st','최근 상태')+vbTh('mbo','신약 진행<br><span style="font-size:9px;color:var(--gray3)">진행/처방/전체</span>')+vbTh('prm','PRM 블럭<br><span style="font-size:9px;color:var(--gray3)">건 · 최근 계획월</span>')+vbTh('fee','최종 수수료<br><span style="font-size:9px;color:var(--gray3)">정산 '+fcEsc(vbFm(vbFeeCur()))+' · 율 · 금액 · 혜택률</span>')+vbTh('tier','구간율 · 품목 인센<br><span style="font-size:9px;color:var(--gray3)">정산 '+fcEsc(vbFm(vbFeeCur()))+(vbView.fi&&vbView.fi!=='any'&&vbView.fi!=='none'?' · '+fcEsc(vbView.fi):'')+'</span>')+vbTh('meet','활동<br><span style="font-size:9px;color:var(--gray3)">30일 · 마지막</span>')+'</tr></thead><tbody>';
   f.slice(0,400).forEach(function(r){
     var qp=r.q[r.q.length-2]||{amt:0,n:0}, qc=r.q[r.q.length-1]||{amt:0,n:0};
     var bar=function(x){ var w=mx?Math.max(2,Math.round(x.amt/mx*100)):2; return '<div style="display:flex;align-items:center;gap:6px;justify-content:flex-end"><div style="width:56px;height:8px;background:var(--gray1);border-radius:4px;overflow:hidden"><div style="width:'+w+'%;height:100%;background:var(--blue)"></div></div><span style="min-width:58px;text-align:right">'+(x.amt?crmMoney(x.amt):'-')+'</span>'+(x.n&&x.n<3?'<span style="font-size:9px;color:var(--gray3)">'+x.n+'개월</span>':'')+'</div>'; };
@@ -3386,7 +3414,7 @@ function renderVendorBoard(){
     var nm='<b>'+fcEsc(r.name)+'</b>'+(r.kind==='재위탁'?' <span class="crm-badge wait" style="font-size:10px">재위탁 · '+fcEsc(r.parentName||'')+'</span>':'')+(r.kind==='미확인'?' <span class="crm-badge" style="font-size:10px">미확인</span>':'')+(r.subs&&r.subs.length?' <span style="font-size:10px;color:var(--gray3)">재위탁 '+r.subs.length+'</span>':'');
     h+='<tr class="clickable'+(vbView.sel===r.key?' sel':'')+'" onclick="vbOpen(this.dataset.k)" data-k="'+fcEsc(r.key)+'"><td onclick="event.stopPropagation()"><input type="checkbox" '+(vbView.chk[r.key]?'checked':'')+' onchange="vbChk(this.parentNode.parentNode.dataset.k,this.checked)"></td><td style="text-align:left">'+nm+'</td><td>'+fcEsc(r.dir||'-')+'</td><td>'+bar(qp)+'</td><td>'+bar(qc)+'</td><td>'+vbPct(r.qoqPct)+'</td><td>'+vbPct(r.yoyPct)+'</td><td style="white-space:nowrap">'+st+'</td>'
       +'<td>'+(r.mbo&&r.mbo.n?('<b>'+r.mbo.active+'</b> / '+r.mbo.rx+' / '+r.mbo.n):'<span style="color:var(--gray3)">-</span>')+'</td><td>'+(r.prm?(r.prm.n+'<span style="font-size:9px;color:var(--gray3)"> · '+fcEsc(r.prm.last||'')+'</span>'):'<span style="color:var(--gray3)">-</span>')+'</td>'
-      +(function(){ var fv=vbFeeOf(r), fm=vbFeeCur(), rec=fv&&fv.byMonth&&fv.byMonth[fm]; if(!rec) return '<td><span style="color:var(--gray3)">-</span></td>'; return '<td style="white-space:nowrap"><b>'+(rec.finalRate==null?'-':rec.finalRate.toFixed(1)+'%')+'</b> <span style="font-size:10px;color:var(--gray3)">'+(rec.benefitPct==null?'':'혜택 '+rec.benefitPct+'%')+'</span></td>'; })()
+      +(function(){ var rec=vbFeeCell(r); if(!rec) return '<td><span style="color:var(--gray3)">-</span></td>'; return '<td style="white-space:nowrap"><b>'+(rec.finalRate==null?'-':rec.finalRate.toFixed(1)+'%')+'</b> <span style="font-size:10px;color:var(--gray4)">'+crmMoney(rec.final)+'</span> <span style="font-size:10px;color:var(--gray3)">'+(rec.benefitPct==null?'':'혜택 '+rec.benefitPct+'%')+'</span></td>'; })()
       +(function(){ var fr=vbFeeRec(r); if(!fr) return '<td><span style="color:var(--gray3)">-</span></td>'; var t=vbRatePct(fr), one=vbView.fi&&vbView.fi!=='any'&&vbView.fi!=='none', fa=one?((fr.focusBy||{})[vbView.fi]||0):fr.focus;   /* [10-28] 구간 인센율 + 품목 인센(품목 고르면 그 품목 금액) */
         return '<td style="white-space:nowrap"><b>'+(t==null?'-':t+'%')+'</b> <span style="font-size:10px;color:var(--gray3)">'+(fa>0?'품목 '+crmMoney(fa):'품목 인센 없음')+'</span></td>'; })()
       +'<td style="white-space:nowrap">'+(r.meet30?('<b>'+r.meet30+'회</b>'):'<span style="color:var(--gray3)">0</span>')+' <span style="font-size:10px;color:var(--gray3)">'+fcEsc(String(r.lastAct||'').slice(5))+'</span></td></tr>';
@@ -3418,7 +3446,7 @@ function vbDefAoa(){
   var meta=vbMeta(), S=window.__VENDOR_SALES__, F=window.__VENDOR_FEE__;
   return [['항목','정의'],
     ['기준','실적 '+(meta.latestMonth||'-')+'까지(CRM 업체실적 = 평가실적 실매출·VAT 제외) · 정산 '+vbFm(vbFeeCur())+' · 생성 '+(crmMeta().generatedAt||'')+' · 내보낸 날 '+vbToday()],
-    ['필터','지부장 '+(vbView.dir||'전체')+' · 구분 '+(vbView.kind||'전체')+' · 구간 인센율 '+(vbView.tier===''?'전체':vbView.tier+'%')+' · 품목 인센 '+({'':'전체',any:'받는 업체',none:'없음'}[vbView.fi]||vbView.fi)+' · 검색 "'+(vbView.q||'')+'" · 정렬 '+vbView.sort],
+    ['필터','지부장 '+(vbView.dir||'전체')+' · 구분 '+(vbView.kind||'전체')+' · 구간 인센율 '+(vbView.tier===''?'전체':vbView.tier+'%')+' · 품목 인센 '+({'':'전체',any:'받는 업체',none:'없음'}[vbView.fi]||vbView.fi)+' · 검색 "'+(vbView.q||'')+'" · 정렬 '+(VB_SORT_LBL[vbView.sort]||vbView.sort)+(vbView.asc?' 오름차순':' 내림차순')],
     ['구간율·품목 인센','정산 '+vbFm(vbFeeCur())+' 도매별 — 구간 인센율 = \'구간별 인센율\', 품목 인센 = ② 품목인센(집중·글루: '+vbFocusItems().join('·')+') 품목별 금액. 필터 중에는 정산에 없는 업체·재위탁 업체가 빠짐'],
     ['분기 매출','업체실적(실매출·VAT 제외) 월 합. 최근 분기는 진행 중일 수 있음(실적 개월 열 참고)'],
     ['전분기比','최근 분기 월평균 ÷ 전분기 월평균 − 1'],
