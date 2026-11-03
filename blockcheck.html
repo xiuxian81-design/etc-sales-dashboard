@@ -531,12 +531,19 @@ function itemIdx(req){
   const parts=String(req||'').replace(/(\d)\s*\/\s*(\d)/g,'$1∕$2').split(/[,\/·\n]+/).map(s=>s.trim()).filter(s=>{const p=nkey(s);return p.length>=2&&!STRENGTH.test(p)});
   if(!parts.length)return null;
   const keys=D.__ik||(D.__ik=D.items.map(x=>nkey(x[1])));   // D.items = [[처방약호, 품목명]]
-  return parts.map(s=>{
+  const one=s=>{
     const f=famOf(s);if(f)return {q:s,fam:f,idx:D.ik.map((k,i)=>k===f?i:-1).filter(i=>i>=0)};   // 프레논 계열 — 제형·용량이 달라도('프레논 OD', '프레논 50mg') 계열 전 품목 하나로(박본님 10-24)
     const p=nkey(s),toks=s.split(/\s+/).map(nkey).filter(Boolean),code=s.trim().toUpperCase();   // '하노마린 350' → 하노마린·350이 모두 들어 있는 품목 · 'NORT200B'처럼 약호로 적어도 된다
     const multi=toks.length>1&&toks.some(t=>t.length>=2&&!STRENGTH.test(t));
     const has=(k,t)=>{if(!STRENGTH.test(t))return k.includes(t);let j=k.indexOf(t);while(j>=0){if(j===0||!/[\d.]/.test(k[j-1]))return true;j=k.indexOf(t,j+1)}return false};   // '50mg'가 '150mg'에 걸리지 않게
     return {q:s,idx:keys.map((k,i)=>(D.items[i][0]===code||k.includes(p)||p.includes(k)||(multi&&toks.every(t=>has(k,t))))?i:-1).filter(i=>i>=0)};
+  };
+  return parts.flatMap(s=>{
+    const w=one(s);if(w.idx.length)return [w];
+    // 띄어쓰기로만 이은 품목('노르믹스 알파본디') — 통째로 못 찾을 때만 단어마다 따로 찾고, 단어가 전부 찾아질 때만 나눈다(박본님 11-04 · '하노마린 350'은 통째로 찾아져 그대로)
+    const ws=s.split(/\s+/).filter(t=>{const p=nkey(t);return p.length>=2&&!STRENGTH.test(p)});
+    if(ws.length<2)return [w];
+    const sub=ws.map(one);return sub.every(x=>x.idx.length)?sub:[w];
   });
 }
 function judgeRow(cell){
