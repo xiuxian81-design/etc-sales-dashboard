@@ -13,7 +13,7 @@ window.__gateGo=function(reason){var n=0;try{n=Number(sessionStorage.getItem("ga
 window.__gateGuard=function(res){if(!res||res.auth!=="required")return false;if(res.reason==="not_allowed"){alert("이 계정은 열람 권한이 없습니다. 담당자에게 요청해 주세요.");return true;}window.__gateGo(res.reason);return true;};
 /* [v46] 대시보드 내장데이터(110대 실적·마스터·과정관리)는 공개 파일이 아니라 D ?doc=dashdata 로 받는다(dash 토큰). 수신 전엔 crm 자동로드·과정관리 초기화를 기다린다 */
 window.__dashData=new Promise(function(r){window.__ddResolve=r;window.__ddTimeout=setTimeout(function(){r(null);},20000);});
-window.__ddCallback=function(r){if(window.__gateGuard&&window.__gateGuard(r)){window.__ddResolve(null);return;}if(r&&r.embeddedSales){window.__EMBEDDED_SALES__=r.embeddedSales;window.__H110__=r.h110||[];window.__EMBEDDED_SALES_META__=r.embeddedSalesMeta||null;try{if(typeof h110ApplyMeta==="function")h110ApplyMeta(window.__EMBEDDED_SALES_META__);}catch(e){}window.MS_PROCESS=r.msProcess||null;}if(r){window.__VENDOR_SALES__=r.vendorSales||null;window.__VENDOR_FEE__=r.vendorFee||null;window.__ACCT_RAW__=r.acctData||null;window.__ACCT_META__=r.acctMeta||null;try{var vp=document.getElementById("t-vendors");if(vp&&vp.classList.contains("active")&&typeof renderVendorBoard==="function")renderVendorBoard();}catch(e){}try{var ap=document.getElementById("t-accounts");if(ap&&ap.classList.contains("active")&&typeof renderAccountBoard==="function")renderAccountBoard();}catch(e){}}window.__ddResolve(r||null);try{document.dispatchEvent(new Event("dashdata-ready"));}catch(e){}try{if(typeof loadEmbeddedSales==="function"&&typeof salesLoaded!=="undefined"&&!salesLoaded)loadEmbeddedSales();}catch(e){}try{if(typeof allData!=="undefined"&&allData.length){if(typeof render110==="function")render110();if(typeof render110sum==="function")render110sum();}}catch(e){}};
+window.__ddCallback=function(r){if(window.__gateGuard&&window.__gateGuard(r)){window.__ddResolve(null);return;}if(r&&r.embeddedSales){window.__EMBEDDED_SALES__=r.embeddedSales;window.__H110__=r.h110||[];window.__EMBEDDED_SALES_META__=r.embeddedSalesMeta||null;try{if(typeof h110ApplyMeta==="function")h110ApplyMeta(window.__EMBEDDED_SALES_META__);}catch(e){}window.MS_PROCESS=r.msProcess||null;}if(r){window.__PRM_TODO__=r.prmTodo||null;window.__PRM_TODO_META__=r.prmTodoMeta||null;try{if(typeof renderPrmTodo==="function")renderPrmTodo();}catch(e){}window.__VENDOR_SALES__=r.vendorSales||null;window.__VENDOR_FEE__=r.vendorFee||null;window.__ACCT_RAW__=r.acctData||null;window.__ACCT_META__=r.acctMeta||null;try{var vp=document.getElementById("t-vendors");if(vp&&vp.classList.contains("active")&&typeof renderVendorBoard==="function")renderVendorBoard();}catch(e){}try{var ap=document.getElementById("t-accounts");if(ap&&ap.classList.contains("active")&&typeof renderAccountBoard==="function")renderAccountBoard();}catch(e){}}window.__ddResolve(r||null);try{document.dispatchEvent(new Event("dashdata-ready"));}catch(e){}try{if(typeof loadEmbeddedSales==="function"&&typeof salesLoaded!=="undefined"&&!salesLoaded)loadEmbeddedSales();}catch(e){}try{if(typeof allData!=="undefined"&&allData.length){if(typeof render110==="function")render110();if(typeof render110sum==="function")render110sum();}}catch(e){}};
 window.__loadDashData=function(){var s=document.createElement("script");s.src=DATA+"?doc=dashdata&callback=__ddCallback&_="+Date.now()+window.__gateQ();s.onerror=function(){window.__ddResolve(null);};document.head.appendChild(s);};
 if(!window.__gateTok())window.__gateGo("no_token");else if(DOC==="dash")window.__loadDashData();
 })();</script>
@@ -497,6 +497,8 @@ body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var
       <div id="fc-yearly"></div>
       <!-- 3) 지부장 통합 표 (실적 + CRM 요약) — 행 클릭 시 상세 -->
       <div id="crm-directors"></div>
+      <!-- 4) PRM 신청현황 — 지부장별 할일 (dashdata prmTodo, 자동반영 build_prm_todo_embed.py · 2026-11-04) -->
+      <div id="crm-prm"></div>
     </div>
     <!-- 지부장 상세 모드 -->
     <div id="crm-detail" style="display:none"></div>
@@ -2901,6 +2903,7 @@ function renderCrm(){
   renderCrmDouble((crmData.team||{}).doublePath||null);
   renderFcYearly(crmData.yearly||{}, meta);
   renderCrmDirectors();
+  renderPrmTodo();
   try{ var vp=document.getElementById('t-vendors'); if(vp&&vp.classList.contains('active')) renderVendorBoard(); }catch(e){}   // [v58]
   if(crmView.mode==='dir'&&crmView.dirIdx>=0){
     document.getElementById('crm-overview').style.display='none';
@@ -2989,6 +2992,37 @@ function renderCrmDirectors(){
     +'<td>'+(sumTt?(Math.round(sumTd/sumTt*100)+'% <span style="color:var(--gray3);font-size:10px;font-weight:400">'+sumTd+'/'+sumTt+'</span>'):'-')+'</td><td>'+(sumAl||'-')+'</td><td>'+(sumIss||'-')+'</td><td></td></tr>';
   el.innerHTML='<div class="section-card"><h3>👥 지부장 성과 통합 <span style="font-size:11px;color:var(--gray3);font-weight:400">단위: 억원 · 실적=확정월까지 · 행을 클릭하면 지부장 상세로 전환</span></h3>'
     +'<div class="tbl-wrap"><table class="btbl fc-tbl crm-tbl"><thead>'+head+'</thead><tbody>'+body+sumRow+'</tbody></table></div></div>';
+}
+/* ── [2026-11-04 박본님] PRM 신청현황 — 지부장별 할일. 정의 = PRM 월간 분석 엑셀 '지부장별 할일'과 같다(빌더 build_prm_todo_embed.py 머리말)
+   PRM 누계가 오면 신청 열, 평가실적이 오면 매출현황·피드백 열이 자동으로 바뀐다(감시기). 금액 = 12개월후 MBO·실매출(백만원) ── */
+function renderPrmTodo(){
+  var el=document.getElementById('crm-prm'); if(!el)return;
+  var R=window.__PRM_TODO__, M=window.__PRM_TODO_META__||{};
+  if(!R||!R.length){el.innerHTML='';return;}
+  var n=function(v){return (Number(v)||0).toLocaleString();}, f1=function(v){return (Number(v)||0).toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1});};
+  var pc=function(a,b){return b?Math.round(a/b*100)+'%':'-';};
+  var K=['cm','cn','cnew','cso','cover','an','am','rxn','rxs','rxm','dn','dm','un','um','sn'], T={bj:'팀 계'};
+  K.forEach(function(k){T[k]=R.reduce(function(s,r){return s+(Number(r[k])||0);},0);});
+  var A='background:#e8f1fb', Y='background:#fff6bf';
+  var head='<tr><th rowspan="2" style="text-align:left">지부장</th><th colspan="5" style="'+A+'">'+fcEsc(M.curLabel||'')+' 신청건수</th>'
+    +'<th rowspan="2">누적<br>신청건수</th><th rowspan="2">누적<br>MBO</th><th colspan="4" style="'+A+'">'+fcEsc(M.evLabel||'')+' 매출현황</th>'
+    +'<th colspan="4" style="'+Y+'">'+fcEsc(M.fbLabel||'')+' 피드백 사항</th><th rowspan="2" style="color:var(--bad)">처방끊김<br>건</th></tr>'
+    +'<tr><th style="'+A+'">MBO</th><th style="'+A+'">계</th><th style="'+A+'">신규</th><th style="'+A+'">소급</th><th style="'+A+';color:var(--bad)">소급<br>초과</th>'
+    +'<th>처방건수</th><th>처방중율</th><th>매출</th><th>MBO<br>달성율</th>'
+    +'<th>도래<br>신청건수</th><th>도래신청<br>MBO</th><th style="'+Y+'">미개시<br>건</th><th style="'+Y+'">미개시<br>MBO</th></tr>';
+  var row=function(r,tot){
+    return '<tr'+(tot?' style="background:var(--gray1);font-weight:700"':'')+'><td style="text-align:left;font-weight:700">'+fcEsc(r.bj)+'</td>'
+      +'<td>'+f1(r.cm)+'</td><td>'+n(r.cn)+'</td><td>'+n(r.cnew)+'</td><td>'+n(r.cso)+'</td><td style="color:var(--bad)">'+n(r.cover)+'</td>'
+      +'<td>'+n(r.an)+'</td><td>'+f1(r.am)+'</td>'
+      +'<td>'+n(r.rxn)+'</td><td>'+pc(r.rxn,r.an)+'</td><td>'+f1(r.rxs)+'</td><td>'+pc(r.rxs,r.rxm)+'</td>'
+      +'<td>'+n(r.dn)+'</td><td>'+f1(r.dm)+'</td><td style="'+Y+'">'+n(r.un)+'</td><td style="'+Y+'">'+f1(r.um)+'</td>'
+      +'<td style="color:var(--bad)">'+n(r.sn)+'</td></tr>';
+  };
+  el.innerHTML='<div class="section-card"><h3>📋 PRM 신청현황 — 지부장별 할일 <span style="font-size:11px;color:var(--gray3);font-weight:400">'
+    +fcEsc(M.curLabel||'')+' 신청 · '+fcEsc(M.evLabel||'')+' 실적 기준 · 금액 백만원(MBO=12개월후) · 누적 '+fcEsc(M.cumLabel||'')+'</span></h3>'
+    +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead>'+head+'</thead><tbody>'+R.map(function(r){return row(r,false);}).join('')+row(T,true)+'</tbody></table></div>'
+    +'<div style="font-size:11px;color:var(--gray3);margin-top:6px">처방중율 = 처방건수 ÷ 누적 신청 · 매출·MBO 달성율 = 처방 난 블럭 기준 · 도래 = 계획월이 '+fcEsc(M.evLabel||'')+'까지 ·미개시 = 도래했는데 처방이 한 번도 없음 · 처방끊김 = 계획월 이후 처방이 나왔다가 '+fcEsc(M.evLabel||'')+'엔 없음'
+    +(M.generated?' · 생성 '+fcEsc(M.generated):'')+'</div></div>';
 }
 function crmOpenDir(i){ crmView={mode:'dir',dirIdx:i,vendorKey:'',vendorName:''}; renderCrm(); window.scrollTo({top:0,behavior:'smooth'}); }
 function crmBackAll(){ crmView={mode:'all',dirIdx:-1,vendorKey:'',vendorName:''}; renderCrm(); }
