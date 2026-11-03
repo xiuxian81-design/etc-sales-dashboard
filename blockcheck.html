@@ -236,6 +236,39 @@ function judgeLocal(b){
   else{v='가능';cls='ok';why='inactive';reason='비활성처 — 영업기획·영업관리팀 담당 ('+who(s=>s==='비활성')+')'}
   return {kind:'로컬',b,v,cls,reason,why,l,cso};
 }
+/* ── 로컬 2코드(2026-11-03 박본님 — 11월 처방분부터 로컬 노르믹스·알파본디 2코드 신청 가능) ──
+   로컬에서 요청 품목이 노르믹스(NORT)·알파본디(AFDT)일 때만, 품목마다:
+   한올 영업부 담당(HA_ — MS팀·영업기획·영업관리 제외) → 불가 / 그 품목군 최근 6개월 처방(MS팀 평가실적 — 빌더 T) → 불가
+   (알파본군 = 알파본캡슐 + 알파본디 — 서로 대체될 수 있어 한 군) / 대웅·기타 담당 → 협의필요 / 기존 CSO 업체 2곳 이상(품목 무관) → 가능(협의필요)
+   / 그 외(CSO 0~1곳) → 가능. 승인 후 3개월 처방이 없으면 블록 오픈 — 회신 문구에 안내. 다른 품목·품목 없는 로컬은 judgeLocal 그대로 */
+const TWO=[{g:'N',re:/^NORT/,lab:'노르믹스',grp:'노르믹스'},{g:'A',re:/^AFDT/,lab:'알파본디',grp:'알파본군(알파본캡슐·알파본디)'}];
+const twoOf=i=>TWO.find(t=>t.re.test(D.items[i][0]));
+const TWO_NOTE='승인 후 3개월간 처방이 없으면 블록이 오픈됩니다.';
+const twoNote=r=>r.cso.length?' '+TWO_NOTE:'';   // CSO 코드가 없는 로컬은 첫 코드라 2코드 안내를 붙이지 않는다(박본님 11-03 '일반 가능 문구')
+const R2={'가능':1,'가능(협의필요)':2,'협의필요':3,'불가':4};
+function judgeL(b,want){return want&&want.some(w=>w.idx.some(i=>twoOf(i)))?judgeTwo(b,want):judgeLocal(b)}
+function judgeTwo(b,want){
+  const base=judgeLocal(b),cm=base.l[4],cso=base.cso,T=(D.T&&D.T[b])||{};
+  const who=f=>[...new Set(cm.filter(f).map(pname))].join(', ');
+  const isSales=r=>side(r[0])==='한올'&&!/^HA_MS팀/.test(r[0]);   // 한올 영업부 — MS팀은 영업부가 아님(박본님 11-03)
+  const isDw=r=>side(r[0])==='대웅'||side(r[0])==='기타';
+  const req=[],seen=new Set();
+  want.forEach(w=>w.idx.forEach(i=>{
+    const t=twoOf(i),key=t?t.g:'i'+i;if(seen.has(key))return;seen.add(key);
+    if(!t){req.push({label:D.items[i][1],rep:D.items[i][1],v:base.v,det:base.reason+' (2코드 품목 아님 — 로컬 기본 판정)'});return}
+    const s=T[t.g];let v,det;
+    if(cm.some(isSales)){v='불가';det=`한올 영업부 거래처 (${who(isSales)}) — 2코드 진입 불가`}
+    else if(s){v='불가';det=`최근 6개월 ${t.grp} 처방 有 (${s[2]} ${won(s[0])}원 · 마지막 ${s[1].slice(0,4)}.${s[1].slice(4)}월)`}
+    else if(cm.some(isDw)){v='협의필요';det=`대웅 담당자 (${who(isDw)}) — 협의필요`}
+    else if(cso.length>=2){v='가능(협의필요)';det=`기존 CSO ${cso.length}곳 (${cso.join(', ')}) — 협의필요`}
+    else{v='가능';det=`최근 6개월 ${t.grp} 처방 없음 · `+(cso.length?`기존 CSO 1곳 (${cso[0]})`:cm.length?'CSO 코드 없음':'비거래처')}
+    req.push({label:t.lab+(cso.length?' 2코드':''),rep:t.lab,v,det,two:1});
+  }));
+  const vs=[...new Set(req.map(q=>q.v))];
+  const v=vs.length===1?vs[0]:vs.includes('불가')?'확인필요':vs.sort((a,c)=>R2[c]-R2[a])[0];
+  const cls=v==='가능'?'ok':v==='불가'?'no':v==='확인필요'?'chk':'warn';
+  return Object.assign(base,{v,cls,why:'two',req,want,reason:(v==='확인필요'?'요청 품목별 판정이 다름 — ':'')+req.map(q=>`${q.label}=${q.v}`).join(', ')});
+}
 /* PRM 블럭신청 후 6개월(신규 블럭 유예)은 매출이 안 보여도 불가 — OCS가 2개월 늦게 들어와 처방이 나와도 매출에 안 잡힐 수 있다(10-24 박본님).
    6개월이 지나도 매출이 없으면 가능(협의필요). 유예 판정은 조회하는 날 기준 */
 const GRACE_M=6;
@@ -285,9 +318,16 @@ function judgeHosp(b,want){   // want = itemIdx 결과(요청 품목) 또는 nul
   return {kind:'병원',b,v,cls,reason,per,det,g,req,want,act,cso,hy,cf:(D.C&&D.C[b])||[],l,h};
 }
 const cfText=c=>`${ymd(c[0])} · ${c[3]||'품목 미기재'} · ${c[4]||'-'}${c[5]?' (코드생성 '+c[5]+')':''} · ${c[1]}${c[2]?'/'+c[2]:''}${c[6]?' · '+c[6]:''}`;   // 영업관리 컨펌 1건 요약
-function judge(b,want){return isHosp(b)?judgeHosp(b,want):judgeLocal(b)}
+function judge(b,want){return isHosp(b)?judgeHosp(b,want):judgeL(b,want)}   // 로컬은 노르믹스·알파본디를 적었을 때만 2코드 판정(11-03)
 function replyText(r){
   const nm=nameOf(r.b),id=nm.startsWith('(')?`거래처(${fmtBiz(r.b)})`:`${nm}(${fmtBiz(r.b)})`;
+  if(r.kind==='로컬'&&r.why==='two'){   // 2코드(11-03) — 가능·협의엔 3개월 오픈 안내 1줄(박본님)
+    const its=r.req.map(q=>q.rep).join(', ');
+    if(r.v==='가능')return r.cso.length?`문의주신 ${id}의 ${its} 품목은 2코드로 거래 진행 가능합니다. ${TWO_NOTE}`:`문의주신 ${id}의 ${its} 품목은 거래 진행 가능합니다.`;
+    if(r.v==='불가')return `문의주신 ${id}의 ${its} 품목은 현재 거래가 어렵습니다.`;
+    if(r.v==='확인필요')return `문의주신 ${id}의 요청 품목은 품목별로 확인 후 다시 안내드리겠습니다.`;
+    return `문의주신 ${id}의 ${its} 품목은 협의가 필요합니다. 확인 후 다시 안내드리겠습니다.${twoNote(r)}`;
+  }
   if(r.kind==='로컬'){
     if(r.cls==='ok')return `문의주신 ${id}은(는) 한올바이오파마 ${r.why==='new'?'비거래처':'비활성 거래처'}로 확인되어 거래 진행 가능합니다.`;
     if(r.why==='cso')return `문의주신 ${id}은(는) 타 CSO 업체 코드가 이미 생성되어 있어 거래가 어렵습니다.`;
@@ -309,7 +349,9 @@ function card(r){
   const reps=staffHtml(cm,exOf(l));
   const msL=l&&l[5].length?`<dt>CSO 마스터</dt><dd>${l[5].map(m=>esc(m[0])+' — '+esc(m[1]||'-')+(csoMgr(m)?' · <b>'+esc(csoMgr(m))+'</b>':'')).join('<br>')}</dd>`:'';
   if(r.kind==='로컬'){
-    body=`<div class="reason ${r.cls}">${esc(r.reason)}</div><dl>
+    const req2=r.req?`<div class="req"><b>요청 품목</b><ul>${r.req.map(q=>`<li><span class="pill ${q.v==='가능'?'ok':q.v==='불가'?'no':'warn'}">${esc(q.v)}</span> ${esc(q.label)} — ${esc(q.det)}</li>`).join('')}</ul>${r.cso.length?`<div class="hint">2코드 — ${TWO_NOTE}</div>`:''}</div>`
+      :`<div class="hint" style="padding:4px 14px">노르믹스·알파본디는 로컬 2코드(11월~) — 품목을 함께 적으면 2코드로 판정합니다</div>`;
+    body=`${r.req?req2:`<div class="reason ${r.cls}">${esc(r.reason)}</div>`+req2}<dl>
       <dt>주소</dt><dd>${esc((l&&l[1])||'-')}</dd>
       <dt>블록</dt><dd>${esc((l&&l[2])||'-')}</dd>
       <dt>매출(6개월 평균)</dt><dd>${won(l&&l[3])}</dd>
@@ -333,7 +375,7 @@ function card(r){
   el.innerHTML=`<div class="ch"><div><h2>${esc(nm)}</h2><div class="sub">${fmtBiz(r.b)} · ${r.kind}</div></div>
     <div class="row"><span class="pill ${r.cls}">${esc(r.v)}</span><button class="sm" data-flip>${r.kind==='로컬'?'병원으로 보기':'로컬로 보기'}</button></div></div>
     ${body}<div class="ft"><span>${esc(rt)}</span><div class="row"><button class="sm" data-copycard title="거래처·판정·사유·주소·블록·매출·담당 사무소·담당자를 글로 복사 — 거래처가 겹칠 때 영업부·지부장과 소통용">카드 내용 복사</button><button class="sm" data-copy>회신 문구 복사</button></div></div>`;
-  el.querySelector('[data-flip]').onclick=()=>el.replaceWith(card(r.kind==='로컬'?judgeHosp(r.b,r.wantKeep||null):Object.assign(judgeLocal(r.b),{wantKeep:r.want})));
+  el.querySelector('[data-flip]').onclick=()=>el.replaceWith(card(r.kind==='로컬'?judgeHosp(r.b,r.wantKeep||r.want||null):Object.assign(judgeL(r.b,r.want),{wantKeep:r.want})));
   el.querySelector('[data-copy]').onclick=e=>copy(rt,e.target);
   el.querySelector('[data-copycard]').onclick=e=>copy(cardText(r),e.target);
   return el;
@@ -351,6 +393,7 @@ function cardText(r){
   L.push(`■ ${nm} · ${fmtBiz(r.b)} · ${r.kind}`);
   L.push(`판정: ${r.v}${r.kind==='로컬'?' — '+r.reason:''}`);
   if(r.kind==='로컬'){
+    if(r.req){L.push('요청 품목:');r.req.forEach(q=>L.push(`  [${q.v}] ${q.label} — ${q.det}`));if(r.cso.length)L.push('  2코드 — '+TWO_NOTE)}
     L.push(`주소: ${(l&&l[1])||'-'}`,`블록: ${(l&&l[2])||'-'}`,`매출(6개월 평균): ${won(l&&l[3])}원`);
   }else{
     if(r.req){L.push('요청 품목:');r.req.forEach(q=>L.push(`  [${q.v}] ${q.label} — ${q.det}`))}
@@ -528,6 +571,7 @@ function judgeRow(cell){
   const out={kind:r.kind,v:r.v,cls:r.cls,reason:note+r.reason,match:`${nameOf(b)} (${fmtBiz(b)})`,
     who:staffOf(cm).map(p=>p.n).concat(exOf(l).map(e=>e[1])).join(', '),office:staffOf(cm).map(p=>p.o).concat(exOf(l).map(e=>e[0]||'사무소 미기재')).join(', '),cso:csoOf(l).join(', '),reply:replyText(r),req:'',sales:'',
     cf:(D.C&&D.C[b]&&D.C[b][0])?cfText(D.C[b][0]):''};
+  if(r.kind==='로컬'&&r.req)out.req=r.req.map(q=>`${q.label}=${q.v}`+(q.v!=='가능'?` (${q.det})`:'')).join(', ');   // 2코드(11-03)
   if(r.kind==='병원'){
     out.req=r.req?r.req.map(q=>`${q.label}=${q.v}`+(q.v!=='가능'?` (${q.det})`:'')).join(', '):'';   // 가능이 아니면 품목별 사유까지(복수오픈 n/3·진행 업체 등)
     out.sales=r.g['불가'].map(i=>{const c=D.items[i][0],s=r.h.s[c],p=(r.h.p||{})[c],e=mboOf(b).filter(x=>mboMatch(x,i))[0];return `${D.items[i][1]}(${s&&(s[0]||s[1])?`DW ${won(s[0])}/HA ${won(s[1])}`:p&&graceEnd(p[1])>new Date()?`PRM ${p[0]} ${p[1]} 유예 중`:e?`CRM ${e.v} ${e.s}`:'-'})`}).join(', ');
