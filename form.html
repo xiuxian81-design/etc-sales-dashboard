@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <!-- form.html v30 — 2026-06-28 재설계: 작성자=지부장4명 / ①마감예측(월1회·잠금) / ②신약진행 자동표시3종+검색 / ③볼륨업 / 마스터 병원명 자동완성.
      기존 신약진행 보고·프레논 조회·JSONP 로딩·payload(items[]) 회귀 0. payload 키는 02_backend_notes 스펙과 일치.
+     v64 (2026-11-04): ③신약 카드·신규블럭 모달에 MBO 근거 2항목 — '경쟁품(대체타겟)'(글 1칸·쉼표) + '케파(월 처방금액, 만원 입력 → 원 저장)'.
+       선택 항목·빈칸은 기존 값 보존(GAS v64 '값 있을 때만'). payload items[].경쟁품·케파(원) · MBO÷케파 % 힌트 · 케파 자릿수 오입력은 MBO와 같이 제출 차단.
      v58 (2026-10-25): ⑤⑥ 한일/할일 행에 '재위탁 CSO'(소속 CSO 아래 실제 만난 업체)·'업체 없음(내부 일정)' 추가 — 저장 업체명 = 재위탁 || 소속, 소속CSO 키 동봉, 내부는 서버가 '(내부)'로 저장(집계 제외).
        소속/재위탁 자동완성 = getMboData.vendorRoster(업체마스터 탭) ∪ 기존 vendors. 박본님 10-25 결정(2단계 업체).
      v38 (2026-07-24): ①신규블럭 모달에 '업체 사업자번호'(nb-cbiz) 입력칸 추가 + addNB에서 RPM연락처 자동채움 → C·J열 공란 해소.
@@ -132,14 +134,14 @@ async function sendToSheets() {
   }
   // [fix6] ③④ MBO 자릿수 오입력(만원 칸에 원 단위) — 값이 저장되지 않은 상태라 그대로 보내면 '화면 숫자 ≠ 전송 값'이 된다.
   //   경고를 띄운 칸이 남아 있으면 전송을 막고 그 칸으로 데려간다(카드가 접혀 있으면 펼친다).
-  const badNd = items.filter(it => it._mboBad);
+  const badNd = items.filter(it => it._mboBad || it._capaBad);   // [v64] 케파 자릿수 오입력도 같은 차단
   const badVu = volumeUp.filter(v => v._mboBad);
   if (badNd.length || badVu.length) {
     let el = null;
-    if (badNd.length) { const c = document.getElementById('c-newdrug'); if (c) c.classList.remove('fold'); el = document.getElementById('nd-mbo-' + items.indexOf(badNd[0])); }
+    if (badNd.length) { const c = document.getElementById('c-newdrug'); if (c) c.classList.remove('fold'); const b0 = badNd[0], bi = items.indexOf(b0); if (!b0._open) toggleRI(bi); el = document.getElementById((b0._mboBad ? 'nd-mbo-' : 'nd-capa-') + bi); }
     else              { const c = document.getElementById('c-vu');      if (c) c.classList.remove('fold'); el = document.getElementById('vu-mbo-' + volumeUp.indexOf(badVu[0])); }
     if (el) { el.scrollIntoView({behavior:'smooth', block:'center'}); try{ el.focus(); }catch(e){} }
-    toast('MBO는 만원 단위로 입력하세요 — 예) 500 (5,000,000원 아님)');
+    toast(badNd.length && !badNd[0]._mboBad ? '케파는 만원 단위로 입력하세요 — 예) 2000 (20,000,000원 아님)' : 'MBO는 만원 단위로 입력하세요 — 예) 500 (5,000,000원 아님)');
     return;
   }
 
@@ -167,6 +169,8 @@ async function sendToSheets() {
       업체명:     item.업체명  || '',
       업체연락처: item.업체연락처 || '',
       MBO:        item.MBO || 0,
+      경쟁품:     item.경쟁품 || '',      // [v64] MBO 근거 — 대체타겟(글)
+      케파:       Number(item.케파) || 0, // [v64] MBO 근거 — 해당 품목군 월 처방금액(원). 0 = 서버가 기존 값 보존
       DC접수월:   item.DC접수월 || '',
       코딩예측월: item.코딩예측월 || '',
       '상정과/KOL': item.상정과KOL || '',
@@ -797,6 +801,9 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
         <div class="ig"><label>CSO 연락처</label><input type="text" id="nb-ct" placeholder="010-0000-0000"></div>
         <div class="ig"><label>MBO (만원)</label><input type="number" inputmode="numeric" id="nb-m" placeholder="예) 500" oninput="nbMboHint(this.value)">
           <div class="mbo-hint" id="nb-mboh">만원 단위 — 예) 500</div></div>
+        <div class="ig"><label>🎯 경쟁품(대체타겟) <span style="font-size:10px;color:var(--gray3);font-weight:400">여러 개면 쉼표</span></label><input type="text" id="nb-comp" placeholder="예) 넥시움, 케이캡"></div>
+        <div class="ig"><label>📊 케파 (월 처방금액·만원) <span style="font-size:10px;color:var(--gray3);font-weight:400">해당 품목군</span></label><input type="number" inputmode="numeric" id="nb-capa" placeholder="예) 2000">
+          <div class="mbo-hint">만원 단위 — 비워도 됩니다</div></div>
         <div class="ig"><label>DC접수월</label><input type="month" id="nb-ld"></div>
         <div class="ig"><label>코딩예측월</label><input type="month" id="nb-cd"></div>
         <div class="ig full"><label>상정과/KOL <span style="font-size:10px;color:var(--gray3);font-weight:400">상정과 및 담당 DR</span></label><input type="text" id="nb-kol" placeholder="예) 내과 / 홍길동 DR"></div>
@@ -1204,6 +1211,8 @@ function loadFromGAS(){
         업체명:        r['업체명']||'',
         업체연락처:    r['업체연락처']||r['업체 연락처']||'',
         MBO:           Number(r['MBO'])||0,
+        경쟁품:        String(r['경쟁품']||''),          // [v64]
+        케파:          Number(r['케파'])||0,             // [v64] 원
         DC접수월:    String(r['DC접수월']||'').slice(0,7),
         코딩예측월:    String(r['코딩예측월']||'').slice(0,7),
         상정과KOL:     r['상정과/KOL']||'',
@@ -2064,7 +2073,7 @@ function autoGroupOf(d){
 let autoTargets=[];
 /* 스냅샷 대상 = 서버로 전송되는 보고 필드 전부 */
 const DIRTY_FIELDS=['신청월','사업자번호','기준품명','RPM연락처','실납처명','is110','시군구','제품명',
-  '업체사업자번호','업체명','업체연락처','MBO','DC접수월','코딩예측월','상정과KOL','신약과정','이슈상태','진행사항','비고'];
+  '업체사업자번호','업체명','업체연락처','MBO','경쟁품','케파','DC접수월','코딩예측월','상정과KOL','신약과정','이슈상태','진행사항','비고'];
 function snapOf(it){ const o={}; DIRTY_FIELDS.forEach(k=>{ o[k]=(it[k]==null?'':it[k]); }); return JSON.stringify(o); }
 /* [fix1-M4] 신규블럭은 '전송 전'에만 무조건 dirty — 전송 성공(_sent) 후엔 스냅샷 비교로 넘어간다(중복 재전송 방지) */
 function isDirtyItem(it){
@@ -2200,6 +2209,7 @@ function renderList(){
 function buildRI(it,i){
   // [fix6] 렌더되는 MBO 칸의 값은 항상 모델(원)에서 나오므로 화면상 '자릿수 오입력' 상태는 이 순간 사라진다 → 플래그 해제
   it._mboBad=false;
+  it._capaBad=false;   // [v64] 케파 칸도 모델(원)에서 다시 그려지므로 해제
   const mbo=it.MBO?(it.MBO/10000).toLocaleString()+'만원':'-';
   const sb=it.신약과정?`<span style="background:${SC[it.신약과정]||'#e2e8f0'};color:${STC[it.신약과정]||'#475569'};border-radius:4px;font-size:10px;padding:1px 6px;font-weight:700;margin-left:4px">${it.신약과정}</span>`:'';
   const issCls=it.이슈상태?it.이슈상태.replace(/[()]/g,''):'';
@@ -2238,6 +2248,13 @@ function buildRI(it,i){
           <input type="number" inputmode="numeric" id="nd-mbo-${i}" value="${esc(numOf(it.MBO)?wonToMan(it.MBO):'')}" placeholder="예) 500" onchange="setMboMan(${i},this.value)">
           <div class="mbo-hint" id="nd-mboh-${i}">${numOf(it.MBO)?esc(manConv(it.MBO)):manHint()}</div>
         </div>`:''}
+        <div class="ig"><label>🎯 경쟁품(대체타겟) <span style="font-size:10px;color:var(--gray3);font-weight:400">여러 개면 쉼표</span></label>
+          <input type="text" placeholder="예) 넥시움, 케이캡" value="${esc(it.경쟁품||'')}" onchange="setF(${i},'경쟁품',this.value.trim())">
+        </div>
+        <div class="ig"><label>📊 케파 (월 처방금액·만원) <span style="font-size:10px;color:var(--gray3);font-weight:400">해당 품목군</span></label>
+          <input type="number" inputmode="numeric" id="nd-capa-${i}" value="${esc(numOf(it.케파)?wonToMan(it.케파):'')}" placeholder="예) 2000" onchange="setCapaMan(${i},this.value)">
+          <div class="mbo-hint" id="nd-capah-${i}">${esc(capaHint(it.케파,it.MBO))}</div>
+        </div>
         <div class="ig"><label>신약과정</label>
           <select onchange="setF(${i},'신약과정',this.value)">
             <option value="">-- 선택 --</option>
@@ -2303,6 +2320,34 @@ function setMboMan(i,v){
   const won=manToWon(v);
   it.MBO=(won===''?0:won);              // 종전 Number(this.value)||0 과 동일하게 빈값=0
   if(h) h.textContent=numOf(it.MBO)?manConv(it.MBO):manHint();
+  {const ch=document.getElementById('nd-capah-'+i); if(ch && !it._capaBad) ch.textContent=capaHint(it.케파,it.MBO);}   // [v64] MBO÷케파 % 갱신
+  refreshDirtyUI();
+}
+/* [v64] 케파(해당 품목군 월 처방금액) — 입력=만원 / 저장=원(정수). MBO와 같은 오입력 가드(_capaBad → 제출 차단).
+   빈칸 = 0 전송 → 서버(v64)가 기존 값 보존(선택 항목, 지우기 불가). */
+function capaHint(capa,mbo){
+  const c=numOf(capa), m=numOf(mbo);
+  if(!c) return '만원 단위 — 비워도 됩니다';
+  let t=manConv(c);
+  if(m) t+=' · MBO 비중 '+Math.round(m/c*100)+'%';
+  return t;
+}
+function setCapaMan(i,v){
+  const it=items[i]; if(!it) return;
+  const inp=document.getElementById('nd-capa-'+i), h=document.getElementById('nd-capah-'+i);
+  const mv=manValue(v);
+  if(mv!=null && mv>MAN_MAX){
+    it._capaBad=true;
+    if(inp) inp.classList.add('over');
+    if(h){ h.classList.add('warn'); h.textContent=manOverMsg(mv); }
+    return;
+  }
+  it._capaBad=false;
+  if(inp) inp.classList.remove('over');
+  if(h) h.classList.remove('warn');
+  const won=manToWon(v);
+  it.케파=(won===''?0:won);
+  if(h) h.textContent=capaHint(it.케파,it.MBO);
   refreshDirtyUI();
 }
 function setIssue(i,sel){items[i].이슈상태=sel.value;paintIssueSelect(sel);refreshDirtyUI();}
@@ -2389,6 +2434,8 @@ function addNB(){
   // [fix6] 만원 칸에 원 단위를 친 경우 — 5조가 저장되는 사고를 막고 그 자리에서 되돌린다
   const mboMan=manValue(V('nb-m'));
   if(mboMan!=null && mboMan>MAN_MAX){ nbMboHint(V('nb-m')); toast('MBO는 만원 단위로 입력하세요 — 예) 500 (5,000,000원 아님)'); const el=document.getElementById('nb-m'); if(el) el.focus(); return; }
+  const capaMan=manValue(V('nb-capa'));   // [v64] 케파도 같은 자릿수 가드
+  if(capaMan!=null && capaMan>MAN_MAX){ toast('케파는 만원 단위로 입력하세요 — 예) 2000 (20,000,000원 아님)'); const el=document.getElementById('nb-capa'); if(el) el.focus(); return; }
   const biz=V('nb-biz');
   const m=matchHospital(h,biz);  // 미등록 플래그 판정
   const is110=document.getElementById('nb-is110').checked;
@@ -2398,10 +2445,10 @@ function addNB(){
   const rpmTel=(data.find(x=>x.담당RPM===rpm&&x.RPM연락처)||{}).RPM연락처||'';
   items.push({_id:Date.now(),_new:true,_open:true,_미등록:(m.미등록==='미등록'),담당RPM:rpm,신청월:today().slice(0,4)+'년',
     RPM연락처:rpmTel,사업자번호:biz,실납처명:h,is110:is110,시군구:V('nb-sgg'),제품명:p,기준품명:p,
-    업체사업자번호:V('nb-cbiz'),업체명:vendorFix(V('nb-c')),업체연락처:V('nb-ct'),MBO:manToWon(V('nb-m'))||0,   // [fix6] 입력=만원 → 저장=원 · [v56] 업체 별칭 → 표준 표기
+    업체사업자번호:V('nb-cbiz'),업체명:vendorFix(V('nb-c')),업체연락처:V('nb-ct'),MBO:manToWon(V('nb-m'))||0,경쟁품:V('nb-comp'),케파:manToWon(V('nb-capa'))||0,   // [v64] 경쟁품·케파 · [fix6] 입력=만원 → 저장=원 · [v56] 업체 별칭 → 표준 표기
     DC접수월:V('nb-ld'),코딩예측월:V('nb-cd'),상정과KOL:V('nb-kol'),신약과정:document.getElementById('nb-st').value,
     이슈상태:issVal,진행사항:V('nb-n'),작성일:today(),비고:V('nb-e')});
-  ['nb-h','nb-p','nb-c','nb-cbiz','nb-ct','nb-m','nb-ld','nb-cd','nb-kol','nb-n','nb-e','nb-biz','nb-sgg'].forEach(id=>document.getElementById(id).value='');
+  ['nb-h','nb-p','nb-c','nb-cbiz','nb-ct','nb-m','nb-comp','nb-capa','nb-ld','nb-cd','nb-kol','nb-n','nb-e','nb-biz','nb-sgg'].forEach(id=>document.getElementById(id).value='');
   nbMboHint('');   // [fix6] MBO 환산 힌트·경고 초기화
   nbResetMaster();   // [v55] 품목 선택·플래그 초기화
   document.getElementById('nb-st').value='';
@@ -2616,8 +2663,8 @@ function saveExcel(){
   // 신약진행 — [v39b/fix1-H1] 이메일과 동일한 집합(dirty ∪ 이번 세션 전송분)
   const _nd=reportItems();
   if(_nd.length){
-    const hd=['담당RPM','실납처명','기준품명','제품명','업체명','MBO','DC접수월','코딩예측월','상정과/KOL','신약과정','이슈상태','진행사항','비고','작성일'];
-    const rows=_nd.map(d=>[rpm,d.실납처명,d.기준품명,d.제품명,d.업체명,d.MBO,d.DC접수월,d.코딩예측월||'',d.상정과KOL||'',d.신약과정||'',d.이슈상태||'',d.진행사항,d.비고,today()]);
+    const hd=['담당RPM','실납처명','기준품명','제품명','업체명','MBO','경쟁품','케파','DC접수월','코딩예측월','상정과/KOL','신약과정','이슈상태','진행사항','비고','작성일'];
+    const rows=_nd.map(d=>[rpm,d.실납처명,d.기준품명,d.제품명,d.업체명,d.MBO,d.경쟁품||'',Number(d.케파)||'',d.DC접수월,d.코딩예측월||'',d.상정과KOL||'',d.신약과정||'',d.이슈상태||'',d.진행사항,d.비고,today()]);
     const ws=XLSX.utils.aoa_to_sheet([hd,...rows]);XLSX.utils.book_append_sheet(wb,ws,'신약진행');
   }
   // 목표(마감예측 4칸) — [v39]
@@ -2668,6 +2715,7 @@ function buildNewDrugText(){
     const iss=d.이슈상태?`[${d.이슈상태}] `:'';
     body+=`[${i+1}] ${iss}${d.실납처명}${d._new?' [신규]':''}${d.is110?' [110대]':''}\n`;
     body+=`  ∙ 제품: ${d.기준품명} / CSO: ${d.업체명||'-'} / MBO: ${mbo} / DC접수: ${d.DC접수월||'-'}\n`;
+    if(d.경쟁품||numOf(d.케파)) body+=`  ∙ 근거: 경쟁품 ${d.경쟁품||'-'} / 케파 ${numOf(d.케파)?(d.케파/10000).toLocaleString()+'만원':'-'}${numOf(d.케파)&&numOf(d.MBO)?' (MBO 비중 '+Math.round(d.MBO/d.케파*100)+'%)':''}\n`;   // [v64]
     if(d.신약과정) body+=`  ∙ 신약과정: ${d.신약과정}\n`;
     if(d.진행사항) body+=`  ∙ 진행: ${d.진행사항}\n`;
   });

@@ -151,6 +151,8 @@ function parseGsData(rows) {
       진행사항:   toStr(r['진행사항']),
       비고:       toStr(r['비고']),
       상정과KOL:  toStr(r['상정과/KOL']),
+      경쟁품:     toStr(r['경쟁품']),          // [v64] MBO 근거
+      케파:       Number(r['케파']) || 0,      // [v64] 원
       최종업데이트일: toStr(r['최종업데이트일']),
       작성일:     toStr(r['작성일']),
       DC월_이전값: toStr(r['DC월_이전값']),
@@ -853,6 +855,8 @@ function loadMBO(file){
       진행사항:String(r['진행사항']||''),
       비고:String(r['비고']||''),
       상정과KOL:String(r['상정과/KOL']||''),
+      경쟁품:String(r['경쟁품']||''),          // [v64] MBO 근거
+      케파:Number(r['케파'])||0,               // [v64] 원
       최종업데이트일:String(r['최종업데이트일']||''),
       작성일:String(r['작성일']||''),
       DC월_이전값:String(r['DC월_이전값']||''),
@@ -1962,13 +1966,15 @@ function renderMonthlyReport(){
 function renderTable(d){
   document.getElementById('tbl-cnt').textContent=`${d.length}건`;
   document.getElementById('data-tbl').innerHTML=`
-    <thead><tr><th>RPM</th><th>병원명</th><th>지역</th><th>제품</th><th>CSO</th><th>MBO</th><th>랜딩예정</th><th>상정과/KOL</th><th>신약과정</th><th>이슈상태</th><th>진행사항</th></tr></thead>
+    <thead><tr><th>RPM</th><th>병원명</th><th>지역</th><th>제품</th><th>CSO</th><th>MBO</th><th>경쟁품</th><th title="해당 품목군 월 처방금액 · 괄호 = MBO ÷ 케파">케파(MBO%)</th><th>랜딩예정</th><th>상정과/KOL</th><th>신약과정</th><th>이슈상태</th><th>진행사항</th></tr></thead>
     <tbody>${d.map(x=>`<tr${x.DC월_이전값&&x.DC월_변경일&&(new Date()-new Date(x.DC월_변경일))<7*86400000?' style="background:#fffbeb"':''}>
       <td>${x.담당RPM}</td>
       <td><b>${x.실납처명}</b>${x.is110?' <span style="font-size:10px;color:#856404">★</span>':''}</td>
       <td style="color:var(--gray4)">${x.시군구}</td>
       <td>${x.기준품명}</td><td>${x.업체명||'-'}</td>
       <td style="text-align:right">${x.MBO?(x.MBO/10000).toLocaleString()+'만':'-'}</td>
+      <td style="color:var(--gray4);font-size:11px;max-width:140px;word-break:keep-all">${String(x.경쟁품||'-').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}</td>
+      <td style="text-align:right;white-space:nowrap">${x.케파?(x.케파/10000).toLocaleString()+'만'+(x.MBO?' <span style="font-size:10px;color:'+(x.MBO>x.케파?'var(--red)':'var(--gray3)')+'">('+Math.round(x.MBO/x.케파*100)+'%)</span>':''):'-'}</td>
       <td>${x.랜딩예정월||'-'}${dcStatus(x)}</td>
       <td style="color:var(--gray4)">${x.상정과KOL||'-'}</td>
       <td>${x.신약과정?`<span class="sb" style="background:${SC[x.신약과정]};color:${STC[x.신약과정]}">${x.신약과정}</span>`:'-'}</td>
