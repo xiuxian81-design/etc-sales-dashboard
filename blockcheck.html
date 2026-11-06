@@ -49,6 +49,7 @@ button.chip.on{border-color:currentColor}
 .ch .sub{font-size:13px;color:var(--gray4)}
 .pill{font-size:14px;font-weight:700;padding:4px 12px;border-radius:6px;white-space:nowrap}
 .reason{padding:9px 14px;font-weight:700;border-bottom:1px solid var(--gray2)}
+.reason.no{background:#f3ebe2;color:#7a4a21}   /* 사유 줄엔 담당자 이름이 들어간다 — 사람 이름에 빨강 금지(11-06 박본님, 공유할 때 불편). 판정 표시(.pill.no)는 빨강 유지 */
 dl{display:grid;grid-template-columns:max-content 1fr;gap:5px 14px;margin:0;padding:10px 14px}
 dt{color:var(--gray4);font-size:13px}dd{margin:0;min-width:0;overflow-wrap:anywhere;font-size:14px}
 .tag{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;border-radius:4px;background:var(--blue-lt);color:var(--blue);margin-right:6px}
@@ -195,7 +196,7 @@ function ready(){
   for(const [b,n] of NAMES){const k=nname(n);if(!k)continue;D.nn.push([b,n,k]);if(!idx.has(k))idx.set(k,[]);idx.get(k).push(b)}
   D.idx=idx;
   // 품목 키(제형·용량 뺀 핵심 토큰, 프레논은 계열 하나) + CRM 진행 블럭 색인 {사업자번호:[{keys,v:업체,s:단계,si,rpm,src}]}
-  D.ik=D.items.map(([,n])=>famOf(n)||pkey(n));D.ikSet=new Set(D.ik);
+  D.ik=D.items.map(([,n])=>famOf(n)||pkey(n));D.ikSet=new Set(D.ik);D.ci=new Map(D.items.map(([c],i)=>[c,i]));
   D.M={};D.MN={};(Array.isArray(D.m)?D.m:[]).forEach(([b,p,v,s,rpm,src,h,t])=>{const e={keys:prodKeys(p),p,v,s,si:STG.indexOf(s),rpm,src,h,is110:t===undefined?1:(t?1:0)};if(b)(D.M[b]||(D.M[b]=[])).push(e);else{const k=nname(h);if(k)(D.MN[k]||(D.MN[k]=[])).push(e)}});   // 사업자번호 없는 CRM 행은 병원명으로 · t(110대)는 v54부터, 없으면 110대로 간주
   const crm=Array.isArray(D.m)?` · CRM 진행 ${D.m.length}건(실시간)`:' · ⚠ CRM 진행 정보 없음(판정에 미반영)';
   $('#asof').textContent=`기준 ${D.meta['기준일']} · 로컬 ${Object.keys(D.L).length.toLocaleString()}곳 · 병원 ${Object.keys(D.H).length.toLocaleString()}곳`+crm;
@@ -342,6 +343,45 @@ function replyText(r){
   return `문의주신 ${id}의 요청 품목은 품목별로 확인 후 다시 안내드리겠습니다.`;
 }
 
+/* ── 한올 품목 엑셀(11-06 박본님 — 지부장이 병원 조회 뒤 업체에 보낼 품목표를 바로 받게) ──
+   품목 = 약가표 기준 한올 품목표(빌더 D.HP = [표시명,[약호],제형,주요]) — 약호만 있는 대웅 품목·약가표에 없는 품목 제외.
+   상태 = 카드 판정 그대로(프레논은 계열 하나 = 가장 나쁜 판정). 약호 없는 신규 품목은 매출이 없으므로 CRM 진행·담당만 본다. 사유·업체명은 파일에 넣지 않는다 */
+function hpExtra(r,n){const k=pkey(n),mb=mboOf(r.b).filter(e=>e.keys.some(x=>x===k||(!D.ikSet.has(x)&&x.length>=3&&k.includes(x))));
+  if(mb.some(e=>e.si>=3)||mb.some(e=>!e.is110)||mb.length>=3)return '불가';return mb.length||r.hy.length?'가능(협의필요)':'가능'}
+function hpRows(r){
+  const LB={'가능':'거래 가능','가능(협의필요)':'협의 필요','불가':'거래 불가'},OD={'가능':0,'가능(협의필요)':1,'불가':2};
+  return D.HP.map(([n,cs,form,main])=>{const fam=famOf(n),idx=fam?D.items.map((_,i)=>i).filter(i=>D.ik[i]===fam):cs.map(c=>D.ci.get(c)).filter(i=>i!=null);
+    const v=idx.length?idx.map(i=>r.per[i]).sort((a,b)=>RANK[b]-RANK[a])[0]:hpExtra(r,n);return {n,form,main:!!main,v,lb:LB[v],o:OD[v]}})
+    .sort((a,b)=>a.o-b.o||b.main-a.main||a.n.localeCompare(b.n,'ko'));   // 가능 → 협의 필요 → 불가, 그 안에서 주요 품목 먼저(박본님)
+}
+async function hpFile(r){
+  if(!window.ExcelJS)await loadScript(LIB_E);
+  const rows=hpRows(r),nm=nameOf(r.b),cnt=k=>rows.filter(x=>x.v===k).length,F='Malgun Gothic',today=dstr(new Date());
+  const c={ok:cnt('가능'),warn:cnt('가능(협의필요)'),no:cnt('불가'),main:rows.filter(x=>x.main).length,all:rows.length};
+  const wb=new ExcelJS.Workbook(),ws=wb.addWorksheet('거래 가능 품목',{views:[{state:'frozen',ySplit:6,showGridLines:false}],pageSetup:{paperSize:9,fitToPage:true,fitToWidth:1,fitToHeight:0}});
+  ws.columns=[{width:7},{width:40},{width:11},{width:14},{width:12}];
+  ws.getCell('A1').value=`${nm} 거래 가능 품목`;ws.getCell('A1').font={name:F,size:16,bold:true,color:{argb:'FF1F3864'}};
+  ws.getCell('A2').value=`${nm}  /  사업자등록번호 ${fmtBiz(r.b)}`;
+  ws.getCell('A3').value=`전체 ${c.all}개 품목  /  주요 ${c.main}개 품목 강조  /  거래 가능 ${c.ok} · 협의 필요 ${c.warn} · 거래 불가 ${c.no}`;
+  ws.getCell('A4').value=`기준: ${today} 조회`;['A2','A3','A4'].forEach(a=>ws.getCell(a).font={name:F,size:10,color:{argb:'FF595959'}});
+  const H=['번호','품목명·규격','제형','주요 품목 표시','거래 상태'],hr=ws.getRow(6);
+  H.forEach((t,j)=>{const x=hr.getCell(j+1);x.value=t;x.font={name:F,size:10,bold:true,color:{argb:'FFFFFFFF'}};x.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1F4E78'}};x.alignment={horizontal:'center',vertical:'middle'}});hr.height=24;
+  const line={style:'thin',color:{argb:'FFD9D9D9'}};
+  rows.forEach((x,i)=>{const w=ws.getRow(7+i);[i+1,x.n,x.form,x.main?'주요 품목':'일반 품목',x.lb].forEach((v,j)=>{const e=w.getCell(j+1);e.value=v;e.font={name:F,size:10,bold:x.main,color:{argb:x.main?'FF1E6B3A':'FF262626'}};e.alignment={horizontal:j===1?'left':'center',vertical:'middle'};e.border={bottom:line};if(x.main)e.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFE2EFDA'}}})});
+  ws.autoFilter={from:'A6',to:`E${6+rows.length}`};
+  return {buf:await wb.xlsx.writeBuffer(),name:`${nm.replace(/[\\/:*?"<>|\s]+/g,'')}_거래가능품목_${today.replace(/-/g,'').slice(2)}.xlsx`,c};
+}
+async function hpDown(r,btn){const t=btn.textContent;btn.disabled=true;btn.textContent='만드는 중…';
+  try{const f=await hpFile(r),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([f.buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5e3);btn.textContent='✓ 내려받음'}
+  catch(e){btn.textContent='⚠ 실패 — '+e.message}
+  setTimeout(()=>{btn.disabled=false;btn.textContent=t},4e3)}
+async function hpMail(r,btn,out){const t=btn.textContent;btn.disabled=true;btn.textContent='보내는 중…';out.textContent='';
+  try{const f=await hpFile(r),u=new Uint8Array(f.buf);let s='';for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray(i,i+8192));
+    const resp=await fetch(window.__DATA,{method:'POST',mode:'cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify({__act:'blockmail',__tok:window.__gateTok(),name:nameOf(r.b),biz:fmtBiz(r.b),fname:f.name,file:btoa(s),ok:f.c.ok,warn:f.c.warn,no:f.c.no,asof:D.meta['기준일']})});
+    const j=await resp.json();out.textContent=(j.success?'✓ ':'⚠ ')+(j.message||'');
+  }catch(e){out.textContent='⚠ 메일을 보내지 못했습니다 ('+e.message+') — 엑셀 받기를 써 주세요'}
+  btn.disabled=false;btn.textContent=t}
+
 /* ── 직접 조회 ── */
 function card(r){
   const el=document.createElement('article');el.className='card';
@@ -371,10 +411,11 @@ function card(r){
       <div class="grp"><span class="hint">전체 품목 ${D.items.length}개 기준 (최근 6개월 매출·담당)</span></div>
       ${grp('가능','ok',r.g['가능'])}${grp('가능(협의필요)','warn',r.g['가능(협의필요)'])}${grp('불가 (매출 有·신규 유예·CRM 진행)','no',r.g['불가'])}`;
   }
-  const rt=replyText(r);
+  const rt=replyText(r),hp=r.kind==='병원'&&Array.isArray(D.HP)&&D.HP.length;
   el.innerHTML=`<div class="ch"><div><h2>${esc(nm)}</h2><div class="sub">${fmtBiz(r.b)} · ${r.kind}</div></div>
     <div class="row"><span class="pill ${r.cls}">${esc(r.v)}</span><button class="sm" data-flip>${r.kind==='로컬'?'병원으로 보기':'로컬로 보기'}</button></div></div>
-    ${body}<div class="ft"><span>${esc(rt)}</span><div class="row"><button class="sm" data-copycard title="거래처·판정·사유·주소·블록·매출·담당 사무소·담당자를 글로 복사 — 거래처가 겹칠 때 영업부·지부장과 소통용">카드 내용 복사</button><button class="sm" data-copy>회신 문구 복사</button></div></div>`;
+    ${body}${hp?`<div class="ft"><span>한올 품목 ${D.HP.length}개를 가능 → 협의 필요 → 불가 순으로 엑셀로 만듭니다 (사유·업체명 없음)<br><b data-hpout></b></span><div class="row"><button class="sm" data-hpdown>품목 엑셀 받기</button><button class="sm" data-hpmail title="로그인한 본인 회사메일로 보냅니다">내 메일로 보내기</button></div></div>`:''}<div class="ft"><span>${esc(rt)}</span><div class="row"><button class="sm" data-copycard title="거래처·판정·사유·주소·블록·매출·담당 사무소·담당자를 글로 복사 — 거래처가 겹칠 때 영업부·지부장과 소통용">카드 내용 복사</button><button class="sm" data-copy>회신 문구 복사</button></div></div>`;
+  if(hp){el.querySelector('[data-hpdown]').onclick=e=>hpDown(r,e.target);el.querySelector('[data-hpmail]').onclick=e=>hpMail(r,e.target,el.querySelector('[data-hpout]'))}
   el.querySelector('[data-flip]').onclick=()=>el.replaceWith(card(r.kind==='로컬'?judgeHosp(r.b,r.wantKeep||r.want||null):Object.assign(judgeL(r.b,r.want),{wantKeep:r.want})));
   el.querySelector('[data-copy]').onclick=e=>copy(rt,e.target);
   el.querySelector('[data-copycard]').onclick=e=>copy(cardText(r),e.target);
