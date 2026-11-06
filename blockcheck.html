@@ -392,7 +392,7 @@ async function hpDown(r,btn){const t=btn.textContent;btn.disabled=true;btn.textC
   setTimeout(()=>{btn.disabled=false;btn.textContent=t},4e3)}
 async function hpMail(r,btn,out){const t=btn.textContent;btn.disabled=true;btn.textContent='보내는 중…';out.textContent='';
   try{const f=await hpFile(r),u=new Uint8Array(f.buf);let s='';for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray(i,i+8192));
-    const resp=await fetch(window.__DATA,{method:'POST',mode:'cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify({__act:'blockmail',__tok:window.__gateTok(),name:nameOf(r.b),biz:fmtBiz(r.b),fname:f.name,file:btoa(s),ok:f.c.ok,warn:f.c.warn,no:f.c.no,asof:D.meta['기준일']})});
+    const resp=await fetch(window.__DATA,{method:'POST',mode:'cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify({__act:'blockmail',__tok:window.__gateTok(),name:nameOf(r.b),biz:fmtBiz(r.b),fname:f.name,file:btoa(s),ok:f.c.ok,warn:f.c.warn,no:f.c.no,asof:D.meta['기준일'],reply:replyText(r),card:cardText(r)})});
     const j=await resp.json();out.textContent=(j.success?'✓ ':'⚠ ')+(j.message||'');
   }catch(e){out.textContent='⚠ 메일을 보내지 못했습니다 ('+e.message+') — 엑셀 받기를 써 주세요'}
   btn.disabled=false;btn.textContent=t}
