@@ -3029,7 +3029,7 @@ function renderPrmTodo(){
   el.innerHTML='<div class="section-card"><h3>📋 PRM 신청현황 — 지부장별 할일 <span style="font-size:11px;color:var(--gray3);font-weight:400">'
     +fcEsc(M.curLabel||'')+' 신청 · '+fcEsc(M.evLabel||'')+' 실적 기준 · 금액 백만원(MBO=12개월후) · 누적 '+fcEsc(M.cumLabel||'')+'</span></h3>'
     +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead>'+head+'</thead><tbody>'+R.map(function(r){return row(r,false);}).join('')+row(T,true)+'</tbody></table></div>'
-    +'<div style="font-size:11px;color:var(--gray3);margin-top:6px">처방중율 = 처방건수 ÷ 누적 신청 · 매출·MBO 달성율 = 처방 난 블럭 기준 · 도래 = 시작월이 '+fcEsc(M.evLabel||'')+'까지 ·미개시 = 도래했는데 처방이 한 번도 없음 · 처방끊김 = 계획월 이후 처방이 나왔다가 '+fcEsc(M.evLabel||'')+'엔 없음'
+    +'<div style="font-size:11px;color:var(--gray3);margin-top:6px">처방중율 = 처방건수 ÷ 누적 신청 · 매출·MBO 달성율 = 처방 난 블럭 기준 · 도래 = 시작월이 '+fcEsc(M.evLabel||'')+'까지 ·미개시 = 도래했는데 처방이 한 번도 없음 · 처방끊김 = 시작월 이후 처방이 나왔다가 '+fcEsc(M.evLabel||'')+'엔 없음'
     +(M.generated?' · 생성 '+fcEsc(M.generated):'')+'</div></div>';
 }
 function crmOpenDir(i){ crmView={mode:'dir',dirIdx:i,vendorKey:'',vendorName:''}; renderCrm(); window.scrollTo({top:0,behavior:'smooth'}); }
@@ -3930,7 +3930,7 @@ function acDetail(){
     h+='</tbody></table></div><div style="font-size:10.5px;color:var(--gray3);margin-top:4px">채널마다 원천·금액 기준이 달라 채널끼리 더하지 않습니다 · 영업관리 합계는 이 거래처의 전 채널 한올 품목 합(품목 없음, 참고) · 교차 = 원천이 대웅 등 타사 품목으로 표시한 행(의약 구분 DW·DWB·CGBIO, 병원 교차구분 Cross)</div>';
   }
   /* ② PRM 블럭신청 */
-  h+='<div style="font-size:12px;font-weight:700;margin-top:14px">② PRM 블럭신청 (MBO) <span style="font-size:10.5px;color:var(--gray3);font-weight:400">'+fcEsc((D.src||{}).prm||'')+' · '+c.prm.length+'건 · 판정 = 계획월~'+fcEsc(acYm(M[L-1]))+' 이 거래처×품목 MS팀 매출(업체 무관)</span></div>';
+  h+='<div style="font-size:12px;font-weight:700;margin-top:14px">② PRM 블럭신청 (MBO) <span style="font-size:10.5px;color:var(--gray3);font-weight:400">'+fcEsc((D.src||{}).prm||'')+' · '+c.prm.length+'건 · 판정 = 시작월~'+fcEsc(acYm(M[L-1]))+' 이 거래처×품목 MS팀 매출(업체 무관)</span></div>';
   if(!c.prm.length) h+='<div class="no-data" style="padding:10px">PRM 블럭신청이 없습니다</div>';
   else{
     h+='<div class="tbl-wrap"><table class="btbl fc-tbl" style="margin-top:6px"><thead><tr><th>신청일</th><th style="text-align:left">업체(CSO)</th><th style="text-align:left">품목</th><th>진료과</th><th>계획월</th><th>시작월</th><th>구분</th><th>12개월후 MBO<br><span style="font-size:9px;color:var(--gray3)">3·6·9개월후</span></th><th>시작월~최신월 매출</th><th>최신월 매출</th><th>판정</th><th>지부장</th></tr></thead><tbody>';
