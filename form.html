@@ -119,6 +119,13 @@ async function sendToSheets() {
   if (!ndItems.length && !hasClosing && !volumeUp.length && !hasDaily) { toast('목표·주요계획·신약진행·볼륨업·한일/할일/이슈 중 하나 이상 입력하세요'); return; }
   // ⑤ 한일의 상태(순항/관찰/부진)는 필수 — 대시보드 업체 칩 색의 원천
   if (doneRows.some(r => !r.상태)) { toast('오늘 한일의 상태(순항/관찰/부진)를 선택해주세요'); renderDone(); return; }
+  // [v68 박본님 11-07] 예측을 저장값보다 낮추면 사유 필수 — 빈 채로는 전송하지 않는다
+  const fcDown = fcLowered();
+  if (fcDown.length && !String(closing.하향사유 || '').trim()) {
+    toast('예측을 낮췄습니다 — 하향 사유를 적어주세요'); updateDownBox();
+    const dt_ = document.getElementById('cl-down-txt'); if (dt_) dt_.focus();
+    return;
+  }
   // [fix5-L1] ④ 볼륨업 — 서버 saveVolumeUps_는 품목 없는 행을 조용히 버린다(`if (!prod) return;`).
   //   그런데 폼은 그대로 '전송 완료'를 띄워, 지부장은 저장된 줄 안다. 병원명만 쓰고 품목이 빈 행은 전송을 막는다.
   //   (병원명·품목 모두 빈 완전 빈 행은 그대로 무시 — 추가만 하고 안 쓴 줄까지 붙잡지 않는다)
@@ -198,6 +205,7 @@ async function sendToSheets() {
     if (hasGoal)   payload.마감예측.목표       = Number(closing.목표) || 0;
     if (hasFcAmt)  payload.마감예측.마감예측액 = Number(closing.예측) || 0;
     if (hasPrevFc) { payload.마감예측.전월예측액 = Number(closing.전월예측) || 0; payload.마감예측.전월년월 = prevMonth(); }
+    if (fcDown.length) payload.마감예측.하향사유 = String(closing.하향사유).trim();   // [v68]
   }
   // ③ 볼륨업 (배열, 키: 사업자번호+품목+목표월 upsert)
   if (volumeUp.length) {
@@ -1742,7 +1750,25 @@ function renderClosing(){
     <div style="margin-top:10px"><label class="fl">근거 메모 (선택)</label>
       <input class="fi" type="text" id="cl-note" placeholder="예) 처방신약 3건 + 볼륨업 2건 반영" value="${esc(closing.비고||'')}" oninput="closing.비고=this.value;saveDaily()">
     </div>
+    <div id="cl-down" style="display:none;margin-top:10px"><label class="fl" id="cl-down-lbl"></label>
+      <input class="fi" type="text" id="cl-down-txt" placeholder="예) A병원 코딩 12월로 지연, B업체 재고 조정" value="${esc(closing.하향사유||'')}" oninput="closing.하향사유=this.value">
+    </div>
     ${closing._force?'<div style="font-size:11px;color:var(--watch);margin-top:6px">🔓 목표 정정 모드 — 제출 시 확정 목표까지 덮어씁니다.</div>':''}`;
+  updateDownBox();
+}
+/* [v68 박본님 11-07] 저장된 값보다 낮춘 예측 목록 — 전월·이번달 칸 모두. 전송되지 않는 칸(전월 확정·8일 전)은 제외 */
+function fcLowered(){
+  const f=(myDir()||{}).flow||{}, out=[];
+  const chk=(lbl,oldV,newV)=>{ const o=numOf(oldV), n=Number(newV)||0; if(o>0&&n>0&&n<o) out.push({lbl,o,n}); };
+  if(isPrevNeeded())   chk('전월('+monLbl(prevMonth())+') 예측', f.prevForecast&&f.prevForecast.value, closing.전월예측);
+  if(isForecastOpen()) chk('이번달 예측', f.forecast&&f.forecast.value, closing.예측);
+  return out;
+}
+function updateDownBox(){
+  const box=document.getElementById('cl-down'), lbl=document.getElementById('cl-down-lbl'); if(!box||!lbl) return;
+  const d=fcLowered();
+  box.style.display=d.length?'block':'none';
+  lbl.textContent=d.length?('예측 하향 사유 (필수) — '+d.map(x=>x.lbl+' '+eok(x.o)+' → '+eok(x.n)).join(' · ')):'';
 }
 function onGoalInput(field,v){
   const el=document.getElementById({전월예측:'cl-conv-prev',목표:'cl-conv-goal',예측:'cl-conv-fc'}[field]);
@@ -1754,6 +1780,7 @@ function onGoalInput(field,v){
     if(inp) inp.classList.add('over');
     if(el){ el.classList.add('warn'); el.textContent='⚠ 억 단위로 입력하세요 — 예) 8.2 (지금 값 '+ev.toLocaleString()+'억)'; }
     saveDaily();
+    updateDownBox();
     return;
   }
   if(inp) inp.classList.remove('over');
@@ -1761,6 +1788,7 @@ function onGoalInput(field,v){
   closing[field]=eokToWon(v);            // 입력=억 → 저장=원(정수). payload·시트 계약 불변
   if(el) el.textContent=(closing[field]!==''&&closing[field]!=null)?goalConv(closing[field]):goalHint(field);
   saveDaily();
+  updateDownBox();
 }
 function unlockGoal(){ closing._force=true; renderClosing(); toast('🔓 목표 정정 모드 — 값 변경 후 전송하세요'); }
 
