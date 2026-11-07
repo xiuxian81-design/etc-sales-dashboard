@@ -3029,7 +3029,7 @@ function renderPrmTodo(){
   el.innerHTML='<div class="section-card"><h3>📋 PRM 신청현황 — 지부장별 할일 <span style="font-size:11px;color:var(--gray3);font-weight:400">'
     +fcEsc(M.curLabel||'')+' 신청 · '+fcEsc(M.evLabel||'')+' 실적 기준 · 금액 백만원(MBO=12개월후) · 누적 '+fcEsc(M.cumLabel||'')+'</span></h3>'
     +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead>'+head+'</thead><tbody>'+R.map(function(r){return row(r,false);}).join('')+row(T,true)+'</tbody></table></div>'
-    +'<div style="font-size:11px;color:var(--gray3);margin-top:6px">처방중율 = 처방건수 ÷ 누적 신청 · 매출·MBO 달성율 = 처방 난 블럭 기준 · 도래 = 계획월이 '+fcEsc(M.evLabel||'')+'까지 ·미개시 = 도래했는데 처방이 한 번도 없음 · 처방끊김 = 계획월 이후 처방이 나왔다가 '+fcEsc(M.evLabel||'')+'엔 없음'
+    +'<div style="font-size:11px;color:var(--gray3);margin-top:6px">처방중율 = 처방건수 ÷ 누적 신청 · 매출·MBO 달성율 = 처방 난 블럭 기준 · 도래 = 시작월이 '+fcEsc(M.evLabel||'')+'까지 ·미개시 = 도래했는데 처방이 한 번도 없음 · 처방끊김 = 계획월 이후 처방이 나왔다가 '+fcEsc(M.evLabel||'')+'엔 없음'
     +(M.generated?' · 생성 '+fcEsc(M.generated):'')+'</div></div>';
 }
 function crmOpenDir(i){ crmView={mode:'dir',dirIdx:i,vendorKey:'',vendorName:''}; renderCrm(); window.scrollTo({top:0,behavior:'smooth'}); }
@@ -3623,7 +3623,7 @@ function renderVendorDetail(){
    1단계 데이터: dash_data.json acctData = base64(gzip(JSON)) — 월 1회 CSO블럭배정\거래처조회\scripts\build_account_embed.py(MS팀 평가실적 20개월 + PRM 누계). 탭을 처음 열 때 푼다.
    2단계(B안) 데이터: D ?doc=acctx&k=idx|00~99(GAS v61) — build_account_channels.py(한올 의약사업부·병원사업부·대웅 담당 병원·영업관리 거래처 합계, 현 담당 = 영업관리 채널매핑). 색인은 탭을 열 때, 분할 파일은 거래처를 열 때.
    병원신약 = 전체 현황과 같은 실시간 호출(allData = CRM MBO, multiOpenData = 복수오픈) — 아직 안 불렀으면 탭을 열 때 한 번 부른다.
-   판정 = 데이터지도 표준: 신규 = 신청월 − 계획월 0~2개월(3-1) · 개시 = 계획월~최신월 누적 매출 > 0, 처방중 = 최신월 > 0(3-2) · 구분 = 병원마스터 CSV(3-5) */
+   판정 = 데이터지도 표준: 신규 = 신청월 − 계획월 0~2개월(3-1) · 개시 = 시작월~최신월 누적 매출 > 0, 처방중 = 최신월 > 0(3-2) · 구분 = 병원마스터 CSV(3-5) */
 var acView={q:'',dir:'',grp:'',has:'',tag:'',prod:'',sort:'t12',asc:false,sel:'',ch:'',hideX:false,_f:[],busy:false,mboReq:false,err:'',idx:null,idxSig:'',x:''};   /* prod = 제품 필터 id(F:계열·R:대표품목·K:병원신약만, 10-28) */
 var AC_TAG={H:'한올 의약',B:'한올 병원',M:'MS팀',D:'대웅',X:'기타'};   /* 현 담당 = 영업관리 채널매핑 부서(X = 영업기획·영업관리 등) */
 var AC_SRC={M:'MS팀 — 평가실적(CSO)',H:'한올 의약사업부 — 평가실적(원본)',B:'한올 병원사업부 — 실적',D:'대웅 담당 병원 — 영업관리 DW병원',T:'영업관리 거래처 합계 — 전 채널·품목 없음(참고)'};
@@ -3859,13 +3859,13 @@ function acCalc(b){ /* 상세·엑셀 공통 계산 */
   var ly=years[years.length-1], ytd=0, pytd=0, has=false;
   M.forEach(function(m,i){ if(m.slice(0,4)!==ly) return; ytd+=tot[i]; var j=M.indexOf((Number(ly)-1)+m.slice(4)); if(j>=0){ pytd+=tot[j]; has=true; } });
   var latest=M[L-1], prm=(D.P[b]||[]).map(function(r){
-    var code=r[2], a=S[code]||null, pym=acPlanYm(r[4]), apm=String(r[0]).slice(0,7), kind='-', st='-', cum=null, lastv=a?a[L-1]:0, cut=false;
+    var code=r[2], a=S[code]||null, pym=acPlanYm(r[4]), sym=acPlanYm(r[11]||r[4]), apm=String(r[0]).slice(0,7), kind='-', st='-', cum=null, lastv=a?a[L-1]:0, cut=false;   /* 11-07: 구분은 신청서 계획월, 판정은 시작월(110대=계획월, 그 외=OCS 마감일 기준) */
     if(pym){ kind=acMonDiff(apm,pym)<=2?'신규':'예외'; }
     if(!pym) st='-';
-    else if(pym>latest) st='도래 전';
-    else{ var i0=M.indexOf(pym); if(i0<0){ i0=0; cut=true; } cum=0; if(a) for(var i=i0;i<L;i++) cum+=a[i];
+    else if(sym>latest) st='도래 전';
+    else{ var i0=M.indexOf(sym); if(i0<0){ i0=0; cut=true; } cum=0; if(a) for(var i=i0;i<L;i++) cum+=a[i];
       st=(kind==='신규')?(cum>0?(lastv>0?'개시 · 처방중':'개시 · 최신월 0'):'미개시'):(cum>0?'예외 · 매출 있음':'예외 · 매출 없음'); }
-    return {r:r,code:code,pym:pym,kind:kind,st:st,cum:cum,lastv:lastv,cut:cut,name:(D.items[code]||[r[3]])[0]||r[3]};
+    return {r:r,code:code,pym:pym,sym:sym,kind:kind,st:st,cum:cum,lastv:lastv,cut:cut,name:(D.items[code]||[r[3]])[0]||r[3]};
   });
   var mbo=acMbo().filter(function(d){return acZ(d.사업자번호)===b;}), mo=acMulti().filter(function(r){return acZ(r['사업자번호'])===b;});
   /* 채널별 품목 × 월 — 월축 = MS 축(빌더도 같게 고정, QA 10-27), 타 채널 배열은 월 이름으로 맞춘다(축이 어긋나도 MS 달이 빠지지 않게) */
@@ -3933,12 +3933,12 @@ function acDetail(){
   h+='<div style="font-size:12px;font-weight:700;margin-top:14px">② PRM 블럭신청 (MBO) <span style="font-size:10.5px;color:var(--gray3);font-weight:400">'+fcEsc((D.src||{}).prm||'')+' · '+c.prm.length+'건 · 판정 = 계획월~'+fcEsc(acYm(M[L-1]))+' 이 거래처×품목 MS팀 매출(업체 무관)</span></div>';
   if(!c.prm.length) h+='<div class="no-data" style="padding:10px">PRM 블럭신청이 없습니다</div>';
   else{
-    h+='<div class="tbl-wrap"><table class="btbl fc-tbl" style="margin-top:6px"><thead><tr><th>신청일</th><th style="text-align:left">업체(CSO)</th><th style="text-align:left">품목</th><th>진료과</th><th>계획월</th><th>구분</th><th>12개월후 MBO<br><span style="font-size:9px;color:var(--gray3)">3·6·9개월후</span></th><th>계획월~최신월 매출</th><th>최신월 매출</th><th>판정</th><th>지부장</th></tr></thead><tbody>';
+    h+='<div class="tbl-wrap"><table class="btbl fc-tbl" style="margin-top:6px"><thead><tr><th>신청일</th><th style="text-align:left">업체(CSO)</th><th style="text-align:left">품목</th><th>진료과</th><th>계획월</th><th>시작월</th><th>구분</th><th>12개월후 MBO<br><span style="font-size:9px;color:var(--gray3)">3·6·9개월후</span></th><th>시작월~최신월 매출</th><th>최신월 매출</th><th>판정</th><th>지부장</th></tr></thead><tbody>';
     c.prm.forEach(function(p){ var r=p.r;
-      h+='<tr><td style="white-space:nowrap">'+fcEsc(r[0])+'</td><td style="text-align:left">'+fcEsc(r[1]||'-')+'</td><td style="text-align:left" title="'+fcEsc(p.code)+'"><b>'+fcEsc(p.name||r[3]||p.code)+'</b></td><td>'+fcEsc(r[5]||'-')+'</td><td>'+fcEsc(p.pym?acYm(p.pym):'-')+'</td><td>'+(p.kind==='예외'?'<span class="crm-badge" style="font-size:10px;color:var(--watch)">예외</span>':fcEsc(p.kind))+'</td>'
+      h+='<tr><td style="white-space:nowrap">'+fcEsc(r[0])+'</td><td style="text-align:left">'+fcEsc(r[1]||'-')+'</td><td style="text-align:left" title="'+fcEsc(p.code)+'"><b>'+fcEsc(p.name||r[3]||p.code)+'</b></td><td>'+fcEsc(r[5]||'-')+'</td><td>'+fcEsc(p.pym?acYm(p.pym):'-')+'</td><td>'+fcEsc(p.sym?acYm(p.sym):'-')+'</td><td>'+(p.kind==='예외'?'<span class="crm-badge" style="font-size:10px;color:var(--watch)">예외</span>':fcEsc(p.kind))+'</td>'
         +'<td><b>'+(r[9]?fcMan(r[9])+'만':'-')+'</b><br><span style="font-size:9.5px;color:var(--gray3)">'+[r[6],r[7],r[8]].map(function(v){return v?fcMan(v):'-';}).join(' · ')+'</span></td>'
         +'<td>'+(p.cum==null?'-':(p.cum?crmMoney(p.cum):'0'))+(p.cut?'<br><span style="font-size:9px;color:var(--gray3)">'+fcEsc(acYm(M[0]))+'부터</span>':'')+'</td><td>'+(p.lastv?crmMoney(p.lastv):'-')+'</td><td>'+acStBadge(p.st)+'</td><td>'+fcEsc(r[10]||'-')+'</td></tr>'; });
-    h+='</tbody></table></div><div style="font-size:10.5px;color:var(--gray3);margin-top:4px">구분: 신규 = 신청월 − 계획월 0~2개월(선행 포함), 3개월 이상 = 예외 · 판정(신규만): 개시 = 계획월~최신월 누적 매출 > 0(처방중 = 최신월 > 0), 미개시 = 누적 0 이하, 도래 전 = 계획월이 최신 실적월 뒤 — 데이터지도 표준 3-1·3-2 · 품목은 PRM 제품코드 = 평가실적 자재코드로 맞춤</div>';
+    h+='</tbody></table></div><div style="font-size:10.5px;color:var(--gray3);margin-top:4px">구분: 신규 = 신청월 − 계획월 0~2개월(선행 포함), 3개월 이상 = 예외 · 판정(신규만): 개시 = 시작월~최신월 누적 매출 > 0(처방중 = 최신월 > 0), 미개시 = 누적 0 이하, 도래 전 = 시작월이 최신 실적월 뒤 · 시작월 = 110대는 계획월, 그 외는 신청일이 OCS 마감일 이전이면 전월·뒤면 해당월 — 데이터지도 표준 3-1·3-2 · 품목은 PRM 제품코드 = 평가실적 자재코드로 맞춤</div>';
   }
   /* ③ 병원신약 (CRM MBO + 복수오픈, 실시간) */
   var mboLoaded=acMbo().length>0;
@@ -3972,14 +3972,14 @@ function acExportDetail(b){
   var a1=[['채널','자재코드','품목','교차','업체(MS)'].concat(AX).concat(['합계(원천 있는 달)'])];
   c.groups.forEach(function(g){ g.rows.forEach(function(r){ var s=0; var row=[AC_CHN[g.ch],r.code,r.name,r.x?'교차':'',g.ch==='M'?r.note.join(', '):''].concat(AX.map(function(m,i){ if(!acCovered(g.cov,m)) return ''; s+=r.arr[i]||0; return r.arr[i]||0; })); row.push(s); a1.push(row); }); });
   vbSheet(wb,'채널별품목월별매출(원)',a1);
-  var a2=[['신청일','업체(CSO)','제품코드','품목','진료과','계획월','구분','3개월후 MBO','6개월후 MBO','9개월후 MBO','12개월후 MBO','계획월~최신월 매출(원)','최신월 매출(원)','판정','지부장']];
-  c.prm.forEach(function(p){ var r=p.r; a2.push([r[0],r[1],p.code,p.name,r[5],p.pym,p.kind,r[6],r[7],r[8],r[9],p.cum==null?'':p.cum,p.lastv,p.st,r[10]]); });
+  var a2=[['신청일','업체(CSO)','제품코드','품목','진료과','계획월','시작월','구분','3개월후 MBO','6개월후 MBO','9개월후 MBO','12개월후 MBO','시작월~최신월 매출(원)','최신월 매출(원)','판정','지부장']];
+  c.prm.forEach(function(p){ var r=p.r; a2.push([r[0],r[1],p.code,p.name,r[5],p.pym,p.sym,p.kind,r[6],r[7],r[8],r[9],p.cum==null?'':p.cum,p.lastv,p.st,r[10]]); });
   vbSheet(wb,'PRM블럭신청',a2);
   var a3=[['구분','품목','업체','단계','이슈','MBO','신청월','DC접수','코딩예측','담당','작성일','진행사항']];
   c.mbo.forEach(function(d){ a3.push(['MBO',d.기준품명||d.제품명,d.업체명,d.신약과정,d.이슈상태,d.MBO,d.신청월,d.DC접수월raw,d.코딩예측월,d.담당RPM,String(d.작성일||'').slice(0,10),d.진행사항]); });
   c.mo.forEach(function(r){ a3.push(['복수오픈'+(String(r['상태']||'').trim()==='종료'?'(종료)':''),r['기준품명'],r['업체명'],r['신약과정'],'',Number(r['MBO'])||'', '',String(r['DC접수월']||'').slice(0,7),String(r['코딩예측월']||'').slice(0,7),r['담당RPM'],String(r['작성일']||r['등록일']||'').slice(0,10),r['진행사항']||r['종료사유']||'']); });
   vbSheet(wb,'병원신약',a3);
-  vbSheet(wb,'정의',[['항목','정의'],['MS팀','평가실적 실매출(VAT 제외·소급 반영), 원 단위 — CSO 채널'],['한올 의약','의약사업부 평가실적 원본(매출 확정실적과 같은 기준 — 26.2~6월 합계 일치 확인) '+(c.X?(c.X.src.H||[]).join(', '):'')],['한올 병원','병원사업부 실적 '+(c.X?(c.X.src.B||[]).join(', '):'')],['대웅 병원','영업관리 CSO거래처관리데이터 DW병원(최근 6개월) — 대웅 담당 병원의 한올 품목'],['영업관리 합계','영업관리 로컬 시트 — 이 거래처의 전 채널 한올 품목 합, 품목 없음(참고)'],['빈칸','그 채널 원천이 없는 달 — 채널마다 기간이 다르므로 채널끼리 더하지 않는다'],['교차','원천이 대웅 등 타사 품목으로 표시한 행(의약 구분 DW·DWB·CGBIO, 병원 교차구분 Cross)'],['PRM 구분','신규 = 신청월 − 계획월 0~2개월(선행 포함), 3개월 이상 = 예외 (데이터지도 표준 3-1)'],['PRM 판정','신규만: 개시 = 계획월~최신월 누적 매출 > 0, 처방중 = 최신월 > 0, 미개시 = 누적 0 이하, 도래 전 = 계획월이 최신 실적월 뒤 (표준 3-2) — MS팀 평가실적 기준, 업체 무관'],['병원신약','CRM MBO(대표 1행) + 복수오픈(2·3번째 업체) — 내보낸 시점 실시간']],[14,90]);
+  vbSheet(wb,'정의',[['항목','정의'],['MS팀','평가실적 실매출(VAT 제외·소급 반영), 원 단위 — CSO 채널'],['한올 의약','의약사업부 평가실적 원본(매출 확정실적과 같은 기준 — 26.2~6월 합계 일치 확인) '+(c.X?(c.X.src.H||[]).join(', '):'')],['한올 병원','병원사업부 실적 '+(c.X?(c.X.src.B||[]).join(', '):'')],['대웅 병원','영업관리 CSO거래처관리데이터 DW병원(최근 6개월) — 대웅 담당 병원의 한올 품목'],['영업관리 합계','영업관리 로컬 시트 — 이 거래처의 전 채널 한올 품목 합, 품목 없음(참고)'],['빈칸','그 채널 원천이 없는 달 — 채널마다 기간이 다르므로 채널끼리 더하지 않는다'],['교차','원천이 대웅 등 타사 품목으로 표시한 행(의약 구분 DW·DWB·CGBIO, 병원 교차구분 Cross)'],['PRM 구분','신규 = 신청월 − 계획월 0~2개월(선행 포함), 3개월 이상 = 예외 (데이터지도 표준 3-1)'],['PRM 판정','신규만: 개시 = 시작월~최신월 누적 매출 > 0, 처방중 = 최신월 > 0, 미개시 = 누적 0 이하, 도래 전 = 계획월이 최신 실적월 뒤 (표준 3-2) — MS팀 평가실적 기준, 업체 무관'],['병원신약','CRM MBO(대표 1행) + 복수오픈(2·3번째 업체) — 내보낸 시점 실시간']],[14,90]);
   XLSX.writeFile(wb,'거래처조회_'+vbFile(x.n||b)+'_'+vbToday()+'.xlsx');
 }
 </script>
