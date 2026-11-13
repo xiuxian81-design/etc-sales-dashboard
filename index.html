@@ -13,7 +13,7 @@ window.__gateGo=function(reason){var n=0;try{n=Number(sessionStorage.getItem("ga
 window.__gateGuard=function(res){if(!res||res.auth!=="required")return false;if(res.reason==="not_allowed"){alert("이 계정은 열람 권한이 없습니다. 담당자에게 요청해 주세요.");return true;}window.__gateGo(res.reason);return true;};
 /* [v46] 대시보드 내장데이터(110대 실적·마스터·과정관리)는 공개 파일이 아니라 D ?doc=dashdata 로 받는다(dash 토큰). 수신 전엔 crm 자동로드·과정관리 초기화를 기다린다 */
 window.__dashData=new Promise(function(r){window.__ddResolve=r;window.__ddTimeout=setTimeout(function(){r(null);},20000);});
-window.__ddCallback=function(r){if(window.__gateGuard&&window.__gateGuard(r)){window.__ddResolve(null);return;}if(r&&r.embeddedSales){window.__EMBEDDED_SALES__=r.embeddedSales;window.__H110__=r.h110||[];window.__EMBEDDED_SALES_META__=r.embeddedSalesMeta||null;try{if(typeof h110ApplyMeta==="function")h110ApplyMeta(window.__EMBEDDED_SALES_META__);}catch(e){}window.MS_PROCESS=r.msProcess||null;}if(r){window.__PRM_TODO__=r.prmTodo||null;window.__PRM_TODO_META__=r.prmTodoMeta||null;try{if(typeof renderPrmTodo==="function")renderPrmTodo();}catch(e){}window.__VENDOR_SALES__=r.vendorSales||null;window.__VENDOR_FEE__=r.vendorFee||null;window.__ACCT_RAW__=r.acctData||null;window.__ACCT_META__=r.acctMeta||null;try{var vp=document.getElementById("t-vendors");if(vp&&vp.classList.contains("active")&&typeof renderVendorBoard==="function")renderVendorBoard();}catch(e){}try{var ap=document.getElementById("t-accounts");if(ap&&ap.classList.contains("active")&&typeof renderAccountBoard==="function")renderAccountBoard();}catch(e){}}window.__ddResolve(r||null);try{document.dispatchEvent(new Event("dashdata-ready"));}catch(e){}try{if(typeof loadEmbeddedSales==="function"&&typeof salesLoaded!=="undefined"&&!salesLoaded)loadEmbeddedSales();}catch(e){}try{if(typeof allData!=="undefined"&&allData.length){if(typeof render110==="function")render110();if(typeof render110sum==="function")render110sum();}}catch(e){}};
+window.__ddCallback=function(r){if(window.__gateGuard&&window.__gateGuard(r)){window.__ddResolve(null);return;}if(r&&r.embeddedSales){window.__EMBEDDED_SALES__=r.embeddedSales;window.__H110__=r.h110||[];window.__H110_ISERIP__=r.h110Iserip||null;window.__EMBEDDED_SALES_META__=r.embeddedSalesMeta||null;try{if(typeof h110ApplyMeta==="function")h110ApplyMeta(window.__EMBEDDED_SALES_META__);}catch(e){}window.MS_PROCESS=r.msProcess||null;}if(r){window.__PRM_TODO__=r.prmTodo||null;window.__PRM_TODO_META__=r.prmTodoMeta||null;try{if(typeof renderPrmTodo==="function")renderPrmTodo();}catch(e){}window.__VENDOR_SALES__=r.vendorSales||null;window.__VENDOR_FEE__=r.vendorFee||null;window.__ACCT_RAW__=r.acctData||null;window.__ACCT_META__=r.acctMeta||null;try{var vp=document.getElementById("t-vendors");if(vp&&vp.classList.contains("active")&&typeof renderVendorBoard==="function")renderVendorBoard();}catch(e){}try{var ap=document.getElementById("t-accounts");if(ap&&ap.classList.contains("active")&&typeof renderAccountBoard==="function")renderAccountBoard();}catch(e){}}window.__ddResolve(r||null);try{document.dispatchEvent(new Event("dashdata-ready"));}catch(e){}try{if(typeof loadEmbeddedSales==="function"&&typeof salesLoaded!=="undefined"&&!salesLoaded)loadEmbeddedSales();}catch(e){}try{if(typeof allData!=="undefined"&&allData.length){if(typeof render110==="function")render110();if(typeof render110sum==="function")render110sum();}}catch(e){}};
 window.__loadDashData=function(){var s=document.createElement("script");s.src=DATA+"?doc=dashdata&callback=__ddCallback&_="+Date.now()+window.__gateQ();s.onerror=function(){window.__ddResolve(null);};document.head.appendChild(s);};
 if(!window.__gateTok())window.__gateGo("no_token");else if(DOC==="dash")window.__loadDashData();
 })();</script>
@@ -522,6 +522,8 @@ body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var
       <select id="h-stage"><option value="">전체</option><option>미시작</option><option>업체확인(DC진행여부)</option><option>서류준비</option><option>DC신청</option><option>DC통과</option><option>코딩</option><option>처방</option></select>
       <label>평가</label>
       <select id="h-eval"><option value="">전체</option><option value="정상">🟢 정상</option><option value="DC지연">🟡 DC지연</option><option value="오픈블럭">⚪ 오픈블럭</option><option value="DC실패(재도전)">🟠 DC실패(재도전)</option><option value="DC실패(종결)">🔴 DC실패(종결)</option><option value="업체변경">⚫ 업체변경</option><option value="none">⬜ 미입력</option></select>
+      <label>아이세립</label>
+      <select id="h-iserip"><option value="">전체</option><option value="use">💊 사용 중</option><option value="dc">📝 DC 준비</option><option value="any">사용+DC 준비</option></select>
       <input type="text" id="h-search" placeholder="병원명 검색" style="min-width:140px">
       <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <button class="upbtn-sales">📈 MS팀 매출자료 불러오기<input type="file" id="file-sales" accept=".xlsx,.xls"></button>
@@ -1200,7 +1202,7 @@ function buildFilters(){
   const csoSel=document.getElementById('f-cso');
   if(csoSel) csoSel.innerHTML='<option value="">전체</option>'+csos.map(c=>`<option>${c}</option>`).join('');
   ['f-rpm','f-stage','f-eval','f-cso','f-search'].forEach(id=>document.getElementById(id).addEventListener('input',renderAll));
-  ['h-rpm','h-eval','h-stage','h-search'].forEach(id=>document.getElementById(id).addEventListener('input',render110));
+  ['h-rpm','h-eval','h-stage','h-search','h-iserip'].forEach(id=>document.getElementById(id).addEventListener('input',render110));
   // 110대 요약 탭 필터 연결
   const hsRpm=document.getElementById('hs-rpm');
   if(hsRpm) hsRpm.innerHTML='<option value="">전체</option>'+rpms.map(r=>`<option>${r}</option>`).join('');
@@ -1994,6 +1996,7 @@ function render110(){
   const ev=document.getElementById('h-eval').value;
   const q=document.getElementById('h-search').value.toLowerCase();
 
+  const isf=(document.getElementById('h-iserip')||{}).value||'';
   const all110=allData.filter(x=>x.is110);
 
   /* [2026-08-13] 110대 병원을 '전부' 표시한다(박본님 지시).
@@ -2037,8 +2040,37 @@ function render110(){
     for(const k of PROD_KEYS){if(x.기준품명.includes(k)){t.products[k].push(x);break;}}
   });
 
+  /* [2026-11-13 박본님 "바이오탑 아이세립 들어간 병원·DC 준비 병원 표시"] 판정(박본님 확정)
+     ① 사용 = 평가실적 아이세립(대표품목 '바이오탑아이') 최근 3개월(탭 월축과 같음) 실매출 > 0 (dash_data h110Iserip, 빌더 자동반영\build_h110_embed.py)
+              또는 MBO 기준품명 '아이세립' 행의 신약과정 코딩·처방
+     ② DC 준비 = ①이 아니고, MBO '아이세립' 행이 업체확인~DC통과(코딩 전) · 이슈상태 DC실패·업체변경 아님. 진행사항에 '코딩완료'가 있으면 '메모상 코딩완료' 표시 */
+  const ISE=window.__H110_ISERIP__||{};
+  const ISE_DC=['업체확인(DC진행여부)','서류준비','DC신청','DC통과'];
+  Object.keys(hospMap).forEach(n=>{
+    const t=hospMap[n];
+    const sm=ISE[normBizNo(t.bizNo)]||null;
+    const items=(t.products['바이오탑']||[]).filter(x=>String(x.기준품명).includes('아이세립'));
+    const live=items.filter(x=>!isCritical(x.이슈상태));
+    const sales=!!(sm&&sm.some(v=>v>0));
+    const coded=live.find(x=>x.신약과정==='코딩'||x.신약과정==='처방');
+    if(sales||coded){
+      t.iserip={st:'use',sales:sales,sm:sm,stage:coded?coded.신약과정:''};
+    } else {
+      const dc=live.filter(x=>ISE_DC.indexOf(x.신약과정)>=0);
+      if(dc.length) t.iserip={st:'dc',stage:dc.map(x=>x.신약과정).sort((a,b)=>STAGE_ORDER.indexOf(b)-STAGE_ORDER.indexOf(a))[0],memo:dc.some(x=>/코딩\s*완료/.test(x.진행사항||''))};
+    }
+  });
+  const iseUse=Object.keys(hospMap).filter(n=>hospMap[n].iserip&&hospMap[n].iserip.st==='use').sort();
+  const iseDc=Object.keys(hospMap).filter(n=>hospMap[n].iserip&&hospMap[n].iserip.st==='dc').sort();
+  window.__H110_ISERIP_LIST__={use:iseUse,dc:iseDc};
+  document.getElementById('h110-stat').insertAdjacentHTML('beforeend',`
+    <div class="sc green" style="cursor:pointer" title="${iseUse.join(', ')}" onclick="document.getElementById('h-iserip').value='use';render110()"><div class="num">${iseUse.length}</div><div class="lbl">💊 아이세립 사용 병원</div><div class="sub">최근 3개월 매출 또는 코딩·처방</div></div>
+    <div class="sc yellow" style="cursor:pointer" title="${iseDc.join(', ')}" onclick="document.getElementById('h-iserip').value='dc';render110()"><div class="num">${iseDc.length}</div><div class="lbl">📝 아이세립 DC 준비</div><div class="sub">업체확인~DC통과(코딩 전)</div></div>`);
+
   // 필터 적용
   let hospNames=Object.keys(hospMap);
+  if(isf==='use'||isf==='dc') hospNames=hospNames.filter(h=>hospMap[h].iserip&&hospMap[h].iserip.st===isf);
+  else if(isf==='any') hospNames=hospNames.filter(h=>hospMap[h].iserip);
   if(rpm) hospNames=hospNames.filter(h=>hospMap[h].담당RPM===rpm);
   if(q) hospNames=hospNames.filter(h=>h.toLowerCase().includes(q)||
     Object.values(hospMap[h].products).flat().some(x=>x.기준품명.toLowerCase().includes(q)||x.업체명.toLowerCase().includes(q)));
@@ -2122,7 +2154,12 @@ function render110(){
     const sd=getSales(info.bizNo,hosp);
     /* MBO 진행이 없는 병원은 이름 옆에 옅은 배지 — '데이터 누락'이 아니라 '아직 진행 없음'임을 구분 */
     const tag=info.noMbo?'<span style="margin-left:5px;font-size:9px;font-weight:700;color:var(--gray3);background:var(--gray1);border-radius:3px;padding:1px 4px">진행없음</span>':'';
-    let cells=`<td class="hosp-cell">🏥 ${hosp}${tag}</td>`;
+    const ie=info.iserip;
+    const k3=v=>Math.round((v||0)/1000).toLocaleString();
+    const iseTag=!ie?'':ie.st==='use'
+      ?`<span title="아이세립${ie.sales?' 최근 3개월 매출(천원) '+h110Lbl(0)+' '+k3(ie.sm[0])+' · '+h110Lbl(1)+' '+k3(ie.sm[1])+' · '+h110Lbl(2)+' '+k3(ie.sm[2]):''}${ie.stage?' · MBO '+ie.stage:''}" style="margin-left:5px;font-size:9px;font-weight:700;color:#15803d;background:#dcfce7;border:1px solid #86efac;border-radius:3px;padding:1px 4px;white-space:nowrap">💊 아이세립</span>`
+      :`<span title="아이세립 MBO ${ie.stage}${ie.memo?' · 진행사항에 코딩완료 메모(단계 미갱신)':''}" style="margin-left:5px;font-size:9px;font-weight:700;color:#92400e;background:#fef3c7;border:1px solid #fcd34d;border-radius:3px;padding:1px 4px;white-space:nowrap">📝 아이세립 DC준비 · ${ie.stage}${ie.memo?' (메모상 코딩완료)':''}</span>`;
+    let cells=`<td class="hosp-cell">🏥 ${hosp}${tag}${iseTag}</td>`;
     if(h110ShowLoc) cells+=`<td class="loc-cell"><div style="font-size:10px;color:var(--gray4)">${info.시군구||'-'}</div><div style="color:var(--blue);font-weight:700;font-size:11px">👤 ${info.담당RPM||'-'}</div></td>`;
     visibleProds.forEach(k=>{ cells+=buildProdCells(info.products[k]||[], sd?sd[k]:null); });
     return`<tr>${cells}</tr>`;
