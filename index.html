@@ -2890,6 +2890,17 @@ tr.clickable.sel td{background:var(--blue-lt)}   /* [v58] 업체 현황 선택 �
 .tb.업체{background:#f3e8ff;color:#7c3aed}
 .crm-pbar{height:7px;background:var(--gray2);border-radius:99px;overflow:hidden;margin-top:8px}
 .crm-pbar i{display:block;height:100%;background:var(--blue);border-radius:99px}
+/* [v69] 3. 목표 근거 분해표 · 성장동력 확보 묶음 */
+.crm-gb-seg{display:inline-flex;background:var(--gray1);border-radius:9px;padding:2px;gap:2px}
+.crm-gb-seg button{border:0;background:none;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--gray4);cursor:pointer;font-family:inherit}
+.crm-gb-seg button.on{background:#fff;color:var(--gray5);box-shadow:0 1px 3px rgba(0,0,0,.10)}
+.crm-gb-det{border:1px solid var(--hair);border-radius:12px;margin-bottom:6px;background:#fff}
+.crm-gb-det>summary{padding:9px 12px;font-size:12px;font-weight:700;color:var(--gray4);cursor:pointer}
+.crm-gb-det>.tbl-wrap{padding:0 8px 8px}
+.crm-sub2{font-size:11px;color:var(--gray3);margin-top:7px}
+.crm-grp{border:1px dashed var(--gray2);border-radius:18px;padding:10px 10px 2px;margin-bottom:14px}
+.crm-grp-h{font-size:14px;font-weight:800;margin:2px 4px 10px;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline}
+.crm-grp-h span{font-size:11px;font-weight:400;color:var(--gray3)}
 </style>
 <script>
 var crmData=null, crmLoaded=false, crmLoading=false;
@@ -3136,6 +3147,84 @@ function crmMonthSnap(d){
   return {month:nowM,chips:chips,st:st,issues:issues};
 }
 
+/* ── [v69] 3. 목표 근거 분해표 — d.goalBasis(경계 정본 _workspace\v69\02_backend_notes.md §4) ──
+   ①~④ 금액 · 근거 합 · 목표 · GAP · GAP 계획. ②③④는 펼치면 행 목록(금액>0·체크된 것 먼저).
+   saved 없음 = '근거 미작성' + 이번달이면 기존 월간계획 표 폴백. 대상월 = 이번달/다음달(crmGbYm).
+   예측 vs 실제 대조(compare)는 v69.1 범위 — 여기서는 그리지 않는다. 금액은 서버 계산값(원) 그대로 → 만원 반올림 표시만. */
+var crmGbYm='';
+function crmGbSet(m){ crmGbYm=m; renderCrmDirector(); }
+function crmGbHtml(d,meta,plans,planTbl){
+  var g=d.goalBasis||{};
+  var title='<h3 style="flex-wrap:wrap;gap:6px">🎯 3. 목표 근거';
+  if(g.error) return '<div class="section-card">'+title+' <span class="crm-badge wait">근거 데이터 오류</span></h3><div class="crm-note">'+fcEsc(g.error)+' — 아래는 지난 방식 주요계획입니다.</div>'+planTbl+'</div>';
+  var ms=(g.targetMonths&&g.targetMonths.length)?g.targetMonths:[meta.nowMonth||''];
+  var ym=ms.indexOf(crmGbYm)>=0?crmGbYm:ms[0], isNow=(ym===ms[0]);
+  var sv=(g.saved||{})[ym]||null, s=sv&&sv.summary, rows=(sv&&sv.rows)||[];
+  var seg='<span class="crm-gb-seg">'+ms.map(function(m,i){ return '<button class="'+(m===ym?'on':'')+'" onclick="crmGbSet(\''+fcEsc(m)+'\')">'+(i?'다음달 ':'이번달 ')+fcEsc(crmMon(m))+'</button>'; }).join('')+'</span>';
+  var h='<div class="section-card">'+title+' '+seg+(s?'':' <span class="crm-badge wait">근거 미작성</span>')+'</h3>';
+  if(!s){
+    if(isNow) h+='<div class="crm-note">'+fcEsc(crmMon(ym))+' 목표 근거가 아직 없습니다(폼 ② 이번달 목표 근거). 아래는 지난 방식 주요계획(월간계획) '+plans.length+'건 · MBO 합 '+fcMan(d.planSum)+'만원입니다.</div>'+planTbl;
+    else h+='<div class="crm-empty">'+fcEsc(crmMon(ym))+' 근거를 미리 입력하지 않았습니다.</div>';
+    return h+'</div>';
+  }
+  /* [v69 N3] 이번달 목표가 확정(잠김)됐는데 요약은 '임시'·옛 목표 → 확정 목표로 GAP 다시 계산(서버 summary.목표확정값) */
+  var tMis=!!(isNow&&s.목표불일치&&Number(s.목표확정값)>0), tgt=tMis?Number(s.목표확정값):s.목표, tKind=tMis?'확정':(s.목표구분||'');
+  var gapW=tMis?(Number(s.목표확정값)-(Number(s.근거합)||0)):(Number(s.GAP)||0);
+  var redo2=!!s.rampRedo;   // [v69 N1] 보존 ②가 옛 기반 기준 — 합계 제외(요약 ②합 0)
+  var gapMan=Math.round(gapW/1e4);
+  var gapTxt=(gapMan===0)?'0':((gapMan>0?'+':'−')+Math.abs(gapMan).toLocaleString()+'만');
+  var box=function(l,v,sub,style){ return '<div class="b"><div class="l">'+l+'</div><div class="v"'+(style?' style="'+style+'"':'')+'>'+v+'</div><div class="s">'+(sub||'')+'</div></div>'; };
+  h+='<div class="crm-stat">'
+    +box('① 기반 '+fcEsc(crmMon(s.기반월)),fcMan(s.기반액)+'만','최신 확정월 실적 · 자동')
+    +box('② 램프업',fcMan(s.램프업합)+'만',redo2?'재작성 필요 — 저장분 합계 제외':('최근 시작 PRM 블럭 증분 · 목록 '+(Number(s.목록수)||0)+'블럭'))
+    +box('③ 추가 볼륨업',fcMan(s.볼륨업합)+'만','기존 처방처 증량')
+    +box('④ 신규계획',fcMan(s.신규합)+'만','처방 단계 신약 · 새 처방')
+    +box('근거 합',crmMoney(s.근거합),fcMan(s.근거합)+'만')
+    +box(fcEsc(crmMon(ym))+' 목표 <span class="crm-badge'+(tKind==='확정'?' on':' wait')+'" style="padding:1px 7px">'+fcEsc(tKind)+'</span>',crmMoney(tgt),fcMan(tgt)+'만')
+    +box('GAP (목표 − 근거 합)',gapTxt,gapMan===0?'근거가 목표와 맞음':'아래 GAP 계획','color:'+(gapMan===0?'var(--ok)':'var(--bad)'))
+    +'</div>';
+  if(String(s.GAP계획||'').trim()) h+='<div class="crm-note" style="margin-top:9px"><b>GAP 계획</b> — '+fcEsc(s.GAP계획)+'</div>';
+  if(s.stale) h+='<div class="crm-note" style="margin-top:9px">기반 실적이 갱신됐습니다(저장 때 기반 '+fcEsc(crmMon(s.기반월))+') — 지부장이 근거를 다시 확인해야 합니다.</div>';
+  if(tMis) h+='<div class="crm-note" style="margin-top:9px">근거 작성 때 목표('+fcEsc(s.목표구분||'')+' '+crmMoney(s.목표)+') → 확정 '+crmMoney(s.목표확정값)+', 근거 재제출 필요 — GAP은 확정 목표로 다시 계산했습니다.</div>';
+  if(redo2) h+='<div class="crm-note" style="margin-top:9px">기반이 '+fcEsc(s.기반월||'')+'으로 바뀌어 ②는 새 목록이 오면 다시 적어야 합니다(지금 합계에서 제외).</div>';
+  h+='<div class="crm-sub2">작성 '+fcEsc(s.작성일||'-')+' · 갱신 '+fcEsc(s.갱신일||'-')+' · '+(Number(s.제출수)||0)+'회 제출'+(s.목록생성?(' · ② 목록 '+fcEsc(s.목록생성)):'')+' · 금액 = 실매출(VAT 제외)</div>';
+  /* ②③④ 행 목록 */
+  var rb={}, T=(g.ramp&&g.ramp.confirmedMonth)||'', T1='';
+  if(T){ var dt=new Date(+T.slice(0,4),+T.slice(5,7)-2,1); T1=dt.getFullYear()+'-'+('0'+(dt.getMonth()+1)).slice(-2); }
+  ((g.ramp&&g.ramp.blocks)||[]).forEach(function(b){ rb[b.k]=b; });
+  var rOld=!g.ramp||!!g.ramp.stale;   // [v69 QA🟡-1] ② 목록 갱신 중·없음 = 저장된 ② 행을 서버가 그대로 둔 상태 — '목록 밖' 판정은 하지 않는다(다른 달 목록과 대조하게 되므로)
+  var keepTxt=function(r){ if(rOld) return ''; var b=rb[r['블럭키']]; if(!b) return r['블럭키']?'<div style="font-size:10.5px;color:var(--gray3)">목록 밖</div>':''; var a=b.a||{};
+    if(b.start===T1) return '<div style="font-size:10.5px;color:var(--gray3)">유지 '+fcEsc(crmMon(T1))+' '+fcMan(a[T1]||0)+'만 → '+fcEsc(crmMon(T))+' '+fcMan(a[T]||0)+'만</div>';
+    if(b.start===T) return '<div style="font-size:10.5px;color:var(--gray3)">'+fcEsc(crmMon(T))+' 시작 · 다음 확정월 대기</div>'; return ''; };
+  var amtOf=function(r){ return Number(r['금액'])||0; };
+  var trs=function(list,kind){ return list.map(function(r){ var ex=!!r['제외'];
+    return '<tr'+(ex?' style="opacity:.55"':'')+'><td style="text-align:left;font-weight:600">'+fcEsc(r['거래처']||'-')+(kind==='②'?keepTxt(r):'')+'</td>'
+      +'<td style="text-align:left">'+fcEsc(r['품목']||'-')+'</td>'
+      +'<td style="text-align:left">'+fcEsc(kind==='④'?(r['카테고리']||'-'):(r['업체']||'-'))+'</td>'
+      +'<td style="font-weight:700;white-space:nowrap">'+(ex?'제외':(fcMan(r['금액'])+'만'))+'</td>'
+      +'<td style="text-align:left;color:var(--gray4)">'+fcEsc(r['근거']||'-')+'</td></tr>'; }).join(''); };
+  var det=function(lbl,list,kind){
+    var top=list.filter(function(r){ return amtOf(r)>0&&!r['제외']; }).sort(function(a,b){ return amtOf(b)-amtOf(a); });
+    var rest=list.filter(function(r){ return !(amtOf(r)>0&&!r['제외']); });
+    var exN=list.filter(function(r){ return !!r['제외']; }).length;
+    var head='<thead><tr><th style="text-align:left">거래처</th><th style="text-align:left">품목</th><th style="text-align:left">'+(kind==='④'?'카테고리':'업체')+'</th><th>금액</th><th style="text-align:left">근거</th></tr></thead>';
+    var body=top.length?trs(top,kind):'<tr><td colspan="5" style="color:var(--gray3);padding:12px">금액을 넣은 행이 없습니다</td></tr>';
+    var more='';
+    if(rest.length){
+      if(kind==='②') more='<div class="crm-sub2">나머지 '+rest.length+'블럭 = 0원(확정월 수준 유지 가정 — 늘어날 금액만 적는 칸)</div>';
+      else more='<details class="crm-gb-det" style="margin-top:6px"><summary>'+(exN?('제외 '+exN+'건(성장동력으로 표시)'):'')+((rest.length-exN)?((exN?' · ':'')+'0원 '+(rest.length-exN)+'건'):'')+'</summary><div class="tbl-wrap"><table class="btbl fc-tbl">'+head+'<tbody>'+trs(rest,kind)+'</tbody></table></div></details>';
+    }
+    var topSum=top.reduce(function(a,r){ return a+amtOf(r); },0);
+    var sumTxt=(kind==='②'&&redo2)?(top.length+'건 · 0만 (저장분 '+fcMan(topSum)+'만 합계 제외)'):(top.length+'건 · '+fcMan(topSum)+'만');   // [v69 N1]
+    return '<details class="crm-gb-det"><summary>'+lbl+' — '+sumTxt+(exN?(' · 제외 '+exN+'건'):'')+'</summary>'
+      +'<div class="tbl-wrap"><table class="btbl fc-tbl">'+head+'<tbody>'+body+'</tbody></table></div>'+more+'</details>';
+  };
+  var it=function(k){ return rows.filter(function(r){ return r['항목']===k; }); };
+  if(rOld && it('②램프업').length) h+='<div class="crm-sub2">② 목록 '+(g.ramp?'갱신 중':'준비 안 됨')+' — 저장된 ② '+it('②램프업').length+'행을 그대로 보여 줍니다</div>';
+  h+='<div style="margin-top:10px">'+det('② 램프업',it('②램프업'),'②')+det('③ 추가 볼륨업',it('③볼륨업'),'③')+det('④ 신규계획',it('④신규'),'④')+'</div>';
+  return h+'</div>';
+}
+
 /* ── 지부장 상세 9블록 ([v57] 7 할일 이행·상태 경보 추가 → 8 미팅 업체+히스토리 검색 → 9 이슈) ── */
 function renderCrmDirector(){
   var el=document.getElementById('crm-detail'), meta=crmMeta();
@@ -3187,8 +3276,14 @@ function renderCrmDirector(){
       +'<td style="text-align:left">'+fcEsc(p['품목']||'-')+'</td>'
       +'<td style="font-weight:700">'+fcMan(p['MBO'])+'만</td></tr>';
   }).join(''):'<tr><td colspan="4" style="color:var(--gray3);padding:14px">이번달 등록된 계획이 없습니다 (폼 ② 이번달 주요계획)</td></tr>';
-  h+='<div class="section-card"><h3>🎯 3. 목표 근거 <span style="font-size:11px;color:var(--gray3);font-weight:400">'+fcEsc(meta.nowMonth||'')+' · '+plans.length+'건 · MBO 합 '+fcMan(d.planSum)+'만원</span></h3>'
-    +'<div class="tbl-wrap"><table class="btbl fc-tbl"><thead><tr><th>유형</th><th style="text-align:left">거래처</th><th style="text-align:left">품목</th><th>MBO</th></tr></thead><tbody>'+pbody+'</tbody></table></div></div>';
+  /* [v69] 3번 = 목표 근거 분해표(goalBasis.saved). 저장분이 없거나 GAS v68이면 기존 월간계획 표(pbody)를 폴백으로 그대로 */
+  var planTbl='<div class="tbl-wrap"><table class="btbl fc-tbl"><thead><tr><th>유형</th><th style="text-align:left">거래처</th><th style="text-align:left">품목</th><th>MBO</th></tr></thead><tbody>'+pbody+'</tbody></table></div>';
+  if(d.goalBasis) h+=crmGbHtml(d,meta,plans,planTbl);
+  else h+='<div class="section-card"><h3>🎯 3. 목표 근거 <span style="font-size:11px;color:var(--gray3);font-weight:400">'+fcEsc(meta.nowMonth||'')+' · '+plans.length+'건 · MBO 합 '+fcMan(d.planSum)+'만원</span></h3>'
+    +planTbl+'</div>';
+
+  /* [v69] 성장동력 확보 — 4 파이프라인 · 5 진행 중인 신약 · 지연/실패 묶음(데이터·내용 무변경, 제목·안내만) */
+  h+='<div class="crm-grp"><div class="crm-grp-h">🌱 성장동력 확보 <span>병원신약 파이프라인 — 이 묶음의 MBO는 이번달 목표 근거 합계에 넣지 않습니다(처방 단계에 온 건만 3번 ④ 신규계획에서 따로 반영)</span></div>';
 
   /* 4. 신약 파이프라인 5구간 */
   var pipe=d.pipeline||{}, stages=pipe.stages||[], ptot=pipe.total||{};
@@ -3247,6 +3342,7 @@ function renderCrmDirector(){
     h+='</div>';
   }
   h+='</div>';
+  h+='</div>';   /* [v69] /성장동력 확보 묶음 */
 
   /* 6. 매출 볼륨업 */
   var vu=d.volumeUp||{}, vrows=vu.rows||[];
