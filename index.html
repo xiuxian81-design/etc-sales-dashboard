@@ -2063,9 +2063,45 @@ function render110(){
   const iseUse=Object.keys(hospMap).filter(n=>hospMap[n].iserip&&hospMap[n].iserip.st==='use').sort();
   const iseDc=Object.keys(hospMap).filter(n=>hospMap[n].iserip&&hospMap[n].iserip.st==='dc').sort();
   window.__H110_ISERIP_LIST__={use:iseUse,dc:iseDc};
-  document.getElementById('h110-stat').insertAdjacentHTML('beforeend',`
+  const iseHtml=`
     <div class="sc green" style="cursor:pointer" title="${iseUse.join(', ')}" onclick="document.getElementById('h-iserip').value='use';render110()"><div class="num">${iseUse.length}</div><div class="lbl">💊 아이세립 사용 병원</div><div class="sub">최근 3개월 매출 또는 코딩·처방</div></div>
-    <div class="sc yellow" style="cursor:pointer" title="${iseDc.join(', ')}" onclick="document.getElementById('h-iserip').value='dc';render110()"><div class="num">${iseDc.length}</div><div class="lbl">📝 아이세립 DC 준비</div><div class="sub">업체확인~DC통과(코딩 전)</div></div>`);
+    <div class="sc yellow" style="cursor:pointer" title="${iseDc.join(', ')}" onclick="document.getElementById('h-iserip').value='dc';render110()"><div class="num">${iseDc.length}</div><div class="lbl">📝 아이세립 DC 준비</div><div class="sub">업체확인~DC통과(코딩 전)</div></div>`;
+
+  /* [2026-11-13 박본님 "제품 클릭하면 제품 랜딩현황에 따라 숫자가 달라지게"] 품목 탭을 누르면 요약 카드 = 그 품목 기준(필터 무관, 병원 단위). 박본님 확정 4건:
+     처방처 = 평가실적 최근 3개월(탭 월축) 그 품목 매출 > 0 또는 MBO 코딩·처방 / 신약준비처 = 처방처가 아니고 MBO 미시작~DC통과(합계 = 둘의 합, 겹침 없음)
+     코딩완료(처방 포함) = MBO 코딩·처방 · 준비처(DC접수까지) = 미시작~DC신청 · DC통과처 = DC통과 · 신약 MBO = MBO 합
+     MBO 단계 = 병원×품목 행 중 가장 앞선 단계, 이슈상태 DC실패·업체변경 행은 빼고 센다(이슈 카드에만). '전체 보기'는 기존 카드 그대로 */
+  if(h110ProdFilter){
+    const k=h110ProdFilter, ORD=s=>STAGE_ORDER.indexOf(s), st={rx:[],prep:[],coded:[],dcin:[],dcok:[]};
+    let mboSum=0, mboCnt=0, iss=0;
+    Object.keys(hospMap).forEach(n=>{
+      const t=hospMap[n], items=t.products[k]||[];
+      iss+=items.filter(x=>isCritical(x.이슈상태)).length;
+      const live=items.filter(x=>!isCritical(x.이슈상태));
+      live.forEach(x=>{mboSum+=x.MBO;mboCnt++;});
+      const best=live.reduce((b,x)=>ORD(x.신약과정)>ORD(b)?x.신약과정:b,'');
+      const sd=getSales(t.bizNo,n), ps=sd&&sd[k];
+      const sales=!!(ps&&(ps.r1>0||ps.r2>0||ps.r3>0));
+      const coded=best==='코딩'||best==='처방';
+      if(coded) st.coded.push(n);
+      if(sales||coded) st.rx.push(n);
+      else if(ORD(best)>=1&&ORD(best)<=ORD('DC통과')) st.prep.push(n);
+      if(ORD(best)>=1&&ORD(best)<=ORD('DC신청')) st.dcin.push(n);
+      if(best==='DC통과') st.dcok.push(n);
+    });
+    Object.keys(st).forEach(x=>st[x].sort());
+    window.__H110_PROD_STAT__={prod:k,mbo:mboSum,mboCnt:mboCnt,issue:iss,...st};
+    const PL={프레논:'🔵 프레논',하노마린:'🟢 하노마린',바이오탑:'🟣 바이오탑',알파본:'🟠 알파본',엔잘루타:'🔴 엔잘루타'}[k]||k;
+    document.getElementById('h110-stat').innerHTML=`
+    <div class="sc blue" title="처방처: ${st.rx.join(', ')}&#10;신약준비처: ${st.prep.join(', ')}"><div class="num">${st.rx.length+st.prep.length}</div><div class="lbl">${PL} 처방처 + 신약준비처</div><div class="sub">처방 ${st.rx.length} + 준비 ${st.prep.length} · 110대 ${totalHosp}곳 중</div></div>
+    <div class="sc green" title="${st.coded.join(', ')}"><div class="num">${st.coded.length}</div><div class="lbl">코딩 완료(처방 포함)</div><div class="sub">MBO 코딩·처방</div></div>
+    <div class="sc purple"><div class="num">${(mboSum/100000000).toFixed(2)}<span style="font-size:12px">억원</span></div><div class="lbl">신약 MBO</div><div class="sub">${mboCnt}건 · 이슈 행 제외</div></div>
+    <div class="sc yellow" title="${st.dcin.join(', ')}"><div class="num">${st.dcin.length}</div><div class="lbl">준비처(DC접수까지)</div><div class="sub">미시작~DC신청</div></div>
+    <div class="sc" style="border-left-color:#0d9488" title="${st.dcok.join(', ')}"><div class="num">${st.dcok.length}</div><div class="lbl">DC통과처</div><div class="sub">코딩 대기</div></div>
+    <div class="sc red"><div class="num">${iss}</div><div class="lbl">🔴 이슈</div><div class="sub">실패/변경 건 — 위 숫자에서 제외</div></div>${k==='바이오탑'?iseHtml:''}`;
+  } else {
+    document.getElementById('h110-stat').insertAdjacentHTML('beforeend',iseHtml);
+  }
 
   // 필터 적용
   let hospNames=Object.keys(hospMap);
