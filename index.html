@@ -2901,6 +2901,11 @@ tr.clickable.sel td{background:var(--blue-lt)}   /* [v58] 업체 현황 선택 �
 .crm-grp{border:1px dashed var(--gray2);border-radius:18px;padding:10px 10px 2px;margin-bottom:14px}
 .crm-grp-h{font-size:14px;font-weight:800;margin:2px 4px 10px;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline}
 .crm-grp-h span{font-size:11px;font-weight:400;color:var(--gray3)}
+/* [v70] 지부장 상세 맨 위 핵심지표 4칸 */
+.crm-kpi .b .v{font-size:20px}
+.crm-kpi .b .t{font-size:11px;color:var(--gray3);margin-top:3px}
+.crm-kpi-up{color:var(--ok)} .crm-kpi-dn{color:var(--watch)}
+.crm-kpi .b .t.crm-kpi-110{border-top:1px dashed var(--gray2);padding-top:3px;font-size:10.5px}
 </style>
 <script>
 var crmData=null, crmLoaded=false, crmLoading=false;
@@ -3153,6 +3158,40 @@ function crmMonthSnap(d){
    예측 vs 실제 대조(compare)는 v69.1 범위 — 여기서는 그리지 않는다. 금액은 서버 계산값(원) 그대로 → 만원 반올림 표시만. */
 var crmGbYm='';
 function crmGbSet(m){ crmGbYm=m; renderCrmDirector(); }
+/* [v70] 핵심지표 4칸 — d.goalBasis.kpi(mine·team). kpi 없으면(v69 GAS) 그리지 않는다. 값 v = 비율(0~1)·신청만 개수, den 0 → null
+   [v70 처] 단위(11-14 추가 결정 2): 큰 값 = 그 외 병원·로컬 '처' 기준(rpb = 처당 실적 원) · 작은 줄 = 110대병원 '블럭' 기준(b110, 분자/분모 필수) */
+function crmKpiPct(v){ return (v==null||v==='')?'-':(Math.round(Number(v)*1000)/10).toFixed(1)+'%'; }
+function crmKpiHtml(k){
+  if(!k||!k.mine) return '';
+  var m=k.mine, t=k.team||{}, b=m.b110||null, tb=t.b110||{};
+  var won=function(o){ return !!(o&&o.unit==='원'); };
+  var sg=function(x){ return x>0?'+':(x<0?'−':'±'); }, cl=function(x){ return x>0?'crm-kpi-up':(x<0?'crm-kpi-dn':''); };
+  var dlt=function(o){ if(!o||o.v==null||o.prev==null) return '전달 -';
+    if(won(o)){ var dm=Math.round((Number(o.v)-Number(o.prev))/1e4); return '전달 '+fcMan(o.prev)+'만 · <span class="'+cl(dm)+'">'+sg(dm)+Math.abs(dm).toLocaleString()+'만</span>'; }
+    var p=Math.round((Number(o.v)-Number(o.prev))*1000)/10; return '전달 '+crmKpiPct(o.prev)+' · <span class="'+cl(p)+'">'+sg(p)+Math.abs(p).toFixed(1)+'%p</span>'; };
+  var nd=function(o){ return (o&&o.den!=null)?(Number(o.num||0).toLocaleString()+'/'+Number(o.den||0).toLocaleString()):'-'; };
+  var val=function(o){ return won(o)?((o&&o.v!=null)?fcMan(o.v)+'<span style="font-size:12px;font-weight:600">만</span>':'-'):crmKpiPct(o&&o.v); };
+  var box=function(l,v,s1,s2,s3){ return '<div class="b"><div class="l">'+l+'</div><div class="v">'+v+'</div><div class="s">'+s1+'</div><div class="t">'+s2+'</div>'+(s3?'<div class="t crm-kpi-110">'+s3+'</div>':'')+'</div>'; };
+  var ap=m.apply||{}, ta=t.apply||{}, ad=(ap.v!=null&&ap.prev!=null)?(Number(ap.v)-Number(ap.prev)):null;
+  var u=b?'처':'블럭', rp=m.rpb||{};
+  var b1=function(f){ if(!b) return ''; var o=b[f]||{};
+    if(f==='apply') return '110대 블럭 '+(o.v!=null?o.v:'-')+' (전달 '+(o.prev!=null?o.prev:'-')+')';
+    if(f==='rpb') return '110대 블럭당 '+crmKpiPct(o.v)+' ('+fcMan(o.num)+'/'+fcMan(o.den)+'만)';
+    return '110대 블럭 '+crmKpiPct(o.v)+' ('+nd(o)+')'; };
+  var h='<div class="section-card"><h3>🧭 핵심지표 <span style="font-size:11px;font-weight:400;color:var(--gray3)">'+(b?'처 기준(110대 외) · 110대는 블럭 기준 · ':'')+'지표 '+fcEsc(crmMon(k.month))+' 확정 실적(전달 '+fcEsc(crmMon(k.prevMonth))+') · 신청 '+fcEsc(crmMon(k.applyMonth))+' 기준'+(k.applyAsOf?(' (신청일 '+fcEsc(k.applyAsOf)+'까지)'):'')+' · '+fcEsc(k.basis||'실매출(VAT 제외)')+'</span></h3>';
+  if(k.stale) h+='<div class="crm-note">실적이 새로 들어와 지표 갱신 대기 중입니다 — 아래는 '+fcEsc(crmMon(k.month))+' 기준 값입니다.</div>';
+  h+='<div class="crm-stat crm-kpi">'
+    +box('신청 (새 PRM '+u+')',(ap.v!=null?Number(ap.v).toLocaleString():'-')+'<span style="font-size:12px;font-weight:600"> '+u+'</span>',
+         fcEsc(crmMon(k.applyMonth))+' '+(ap.v!=null?ap.v:'-')+' · 전달('+fcEsc(crmMon(k.applyPrevMonth))+') '+(ap.prev!=null?ap.prev:'-')+(ad!=null?(' · <span class="'+cl(ad)+'">'+sg(ad)+Math.abs(ad)+'</span>'):''),
+         '팀 '+(ta.v!=null?Number(ta.v).toLocaleString():'-')+' (전달 '+(ta.prev!=null?ta.prev:'-')+')', b1('apply'))
+    +box('개시율',crmKpiPct(m.open&&m.open.v),'개시 '+nd(m.open)+' · '+dlt(m.open),'팀 '+crmKpiPct(t.open&&t.open.v)+' ('+nd(t.open)+')', b1('open'))
+    +box('유지율',crmKpiPct(m.keep&&m.keep.v),'유지 '+nd(m.keep)+' · '+dlt(m.keep),'팀 '+crmKpiPct(t.keep&&t.keep.v)+' ('+nd(t.keep)+')', b1('keep'))
+    +box(won(rp)?'처당 매출 (처방 중인 처 평균)':'블럭당 매출 (실적÷MBO)',val(rp),
+         (won(rp)?(fcMan(rp.num)+'만/'+Number(rp.den||0).toLocaleString()+'처'):(rp.den!=null?(fcMan(rp.num)+'/'+fcMan(rp.den)+'만'):'-'))+' · '+dlt(rp),
+         '팀 '+(won(t.rpb)?(fcMan(t.rpb.v)+'만'):crmKpiPct(t.rpb&&t.rpb.v)), b1('rpb'))
+    +'</div><div class="crm-sub2">매출 = 처방 '+u+' 수 × '+u+'당 매출 · 처방 '+u+' = 새로 개시 + 유지'+(b?' · 처당 매출 = '+fcEsc(crmMon(k.rpbFrom||''))+' 이후 시작해 '+fcEsc(crmMon(k.month))+'에 처방이 난 처의 평균 · 110대병원은 블럭(품목) 단위로 따로':'')+'</div></div>';
+  return h;
+}
 function crmGbHtml(d,meta,plans,planTbl){
   var g=d.goalBasis||{};
   var title='<h3 style="flex-wrap:wrap;gap:6px">🎯 3. 목표 근거';
@@ -3171,12 +3210,20 @@ function crmGbHtml(d,meta,plans,planTbl){
   var tMis=!!(isNow&&s.목표불일치&&Number(s.목표확정값)>0), tgt=tMis?Number(s.목표확정값):s.목표, tKind=tMis?'확정':(s.목표구분||'');
   var gapW=tMis?(Number(s.목표확정값)-(Number(s.근거합)||0)):(Number(s.GAP)||0);
   var redo2=!!s.rampRedo;   // [v69 N1] 보존 ②가 옛 기반 기준 — 합계 제외(요약 ②합 0)
+  /* [v70] goalBasis.prm 키가 있으면(v70 GAS) ② = 'PRM 신청처 처방 개시' — 요약 "미처방 N곳 중 n곳 체크"(prm.sum·저장분 s2kind) */
+  var v70=Object.prototype.hasOwnProperty.call(g,'prm'), pm=g.prm||null, k2=s.s2kind||{}, kOpen=k2.open||{n:0,amt:0}, kOld=k2.old||{n:0,nPos:0,amt:0};
+  /* [v70 처] 미처방 = 처(110대 외, 묶음 업체 처 포함) + 110대 블럭(미도래 포함) · 체크 = 처 + 110대 블럭 · 묶음은 업체 수·예상 처 */
+  var kHosp=k2.hosp||{n:0,amt:0}, kBulk=k2.bulk||{n:0,units:0,amt:0};
+  var wN=(pm&&pm.sum)?((Number(pm.sum.hw&&pm.sum.hw.n)||0)+(Number(pm.sum.wait&&pm.sum.wait.n)||0)+(Number(pm.sum.fut&&pm.sum.fut.n)||0)):null;
+  var s2sub=(wN!=null?('미처방 '+wN.toLocaleString()+'곳 중 '):'')+((Number(kOpen.n)||0)+(Number(kHosp.n)||0))+'곳 체크'
+    +((Number(kBulk.n)||0)?(' · 묶음 '+kBulk.n+'개 업체 예상 '+(Number(kBulk.units)||0)+'처'):'')+((Number(kOld.nPos)||0)?(' · 지난 방식 '+kOld.nPos+'건 '+fcMan(kOld.amt)+'만'):'');
   var gapMan=Math.round(gapW/1e4);
   var gapTxt=(gapMan===0)?'0':((gapMan>0?'+':'−')+Math.abs(gapMan).toLocaleString()+'만');
   var box=function(l,v,sub,style){ return '<div class="b"><div class="l">'+l+'</div><div class="v"'+(style?' style="'+style+'"':'')+'>'+v+'</div><div class="s">'+(sub||'')+'</div></div>'; };
   h+='<div class="crm-stat">'
     +box('① 기반 '+fcEsc(crmMon(s.기반월)),fcMan(s.기반액)+'만','최신 확정월 실적 · 자동')
-    +box('② 램프업',fcMan(s.램프업합)+'만',redo2?'재작성 필요 — 저장분 합계 제외':('최근 시작 PRM 블럭 증분 · 목록 '+(Number(s.목록수)||0)+'블럭'))
+    +(v70?box('② PRM 신청처 처방 개시',fcMan(s.램프업합)+'만',redo2?'재작성 필요 — 저장분 합계 제외':s2sub)
+         :box('② 램프업',fcMan(s.램프업합)+'만',redo2?'재작성 필요 — 저장분 합계 제외':('최근 시작 PRM 블럭 증분 · 목록 '+(Number(s.목록수)||0)+'블럭')))
     +box('③ 추가 볼륨업',fcMan(s.볼륨업합)+'만','기존 처방처 증량')
     +box('④ 신규계획',fcMan(s.신규합)+'만','처방 단계 신약 · 새 처방')
     +box('근거 합',crmMoney(s.근거합),fcMan(s.근거합)+'만')
@@ -3192,14 +3239,18 @@ function crmGbHtml(d,meta,plans,planTbl){
   var rb={}, T=(g.ramp&&g.ramp.confirmedMonth)||'', T1='';
   if(T){ var dt=new Date(+T.slice(0,4),+T.slice(5,7)-2,1); T1=dt.getFullYear()+'-'+('0'+(dt.getMonth()+1)).slice(-2); }
   ((g.ramp&&g.ramp.blocks)||[]).forEach(function(b){ rb[b.k]=b; });
-  var rOld=!g.ramp||!!g.ramp.stale;   // [v69 QA🟡-1] ② 목록 갱신 중·없음 = 저장된 ② 행을 서버가 그대로 둔 상태 — '목록 밖' 판정은 하지 않는다(다른 달 목록과 대조하게 되므로)
-  var keepTxt=function(r){ if(rOld) return ''; var b=rb[r['블럭키']]; if(!b) return r['블럭키']?'<div style="font-size:10.5px;color:var(--gray3)">목록 밖</div>':''; var a=b.a||{};
+  var rOld=v70?(!pm||!!pm.stale):(!g.ramp||!!g.ramp.stale);   // [v70] 새 방식은 prm 목록 상태 · [v69 QA🟡-1] ② 목록 갱신 중·없음 = 저장된 ② 행을 서버가 그대로 둔 상태 — '목록 밖' 판정은 하지 않는다(다른 달 목록과 대조하게 되므로)
+  var keepTxt=function(r){
+    if(v70){ var mt=r['방식'], lb=mt==='개시'?'110대 블럭 체크':(mt==='처'?'처 체크':(mt==='묶음'?('업체 묶음 · 예상 '+(Number(r['예상처'])||0)+'처'):'지난 방식'));   // [v70] 방식별(개시 = 110대 블럭 · 처 · 묶음 · 구)
+      return '<div style="font-size:10.5px;color:var(--gray3)">'+fcEsc(lb)+'</div>'; }
+    if(rOld) return ''; var b=rb[r['블럭키']]; if(!b) return r['블럭키']?'<div style="font-size:10.5px;color:var(--gray3)">목록 밖</div>':''; var a=b.a||{};
     if(b.start===T1) return '<div style="font-size:10.5px;color:var(--gray3)">유지 '+fcEsc(crmMon(T1))+' '+fcMan(a[T1]||0)+'만 → '+fcEsc(crmMon(T))+' '+fcMan(a[T]||0)+'만</div>';
     if(b.start===T) return '<div style="font-size:10.5px;color:var(--gray3)">'+fcEsc(crmMon(T))+' 시작 · 다음 확정월 대기</div>'; return ''; };
   var amtOf=function(r){ return Number(r['금액'])||0; };
   var trs=function(list,kind){ return list.map(function(r){ var ex=!!r['제외'];
-    return '<tr'+(ex?' style="opacity:.55"':'')+'><td style="text-align:left;font-weight:600">'+fcEsc(r['거래처']||'-')+(kind==='②'?keepTxt(r):'')+'</td>'
-      +'<td style="text-align:left">'+fcEsc(r['품목']||'-')+'</td>'
+    var bk=(kind==='②'&&r['방식']==='묶음');   // [v70 묶음] 거래처 칸 = 업체명 · 예상 n처
+    return '<tr'+(ex?' style="opacity:.55"':'')+'><td style="text-align:left;font-weight:600">'+fcEsc(bk?((r['업체']||'-')+' · 예상 '+(Number(r['예상처'])||0)+'처'):(r['거래처']||'-'))+(kind==='②'?keepTxt(r):'')+'</td>'
+      +'<td style="text-align:left">'+fcEsc((kind==='②'&&(r['방식']==='처'||bk))?(bk?'업체 묶음':'처(품목 무관)'):(r['품목']||'-'))+'</td>'
       +'<td style="text-align:left">'+fcEsc(kind==='④'?(r['카테고리']||'-'):(r['업체']||'-'))+'</td>'
       +'<td style="font-weight:700;white-space:nowrap">'+(ex?'제외':(fcMan(r['금액'])+'만'))+'</td>'
       +'<td style="text-align:left;color:var(--gray4)">'+fcEsc(r['근거']||'-')+'</td></tr>'; }).join(''); };
@@ -3211,7 +3262,7 @@ function crmGbHtml(d,meta,plans,planTbl){
     var body=top.length?trs(top,kind):'<tr><td colspan="5" style="color:var(--gray3);padding:12px">금액을 넣은 행이 없습니다</td></tr>';
     var more='';
     if(rest.length){
-      if(kind==='②') more='<div class="crm-sub2">나머지 '+rest.length+'블럭 = 0원(확정월 수준 유지 가정 — 늘어날 금액만 적는 칸)</div>';
+      if(kind==='②') more='<div class="crm-sub2">'+(v70?('나머지 '+rest.length+'행 = 0원(지난 방식으로 적은 빈칸 — 새 방식으로 다시 내면 교체)'):('나머지 '+rest.length+'블럭 = 0원(확정월 수준 유지 가정 — 늘어날 금액만 적는 칸)'))+'</div>';
       else more='<details class="crm-gb-det" style="margin-top:6px"><summary>'+(exN?('제외 '+exN+'건(성장동력으로 표시)'):'')+((rest.length-exN)?((exN?' · ':'')+'0원 '+(rest.length-exN)+'건'):'')+'</summary><div class="tbl-wrap"><table class="btbl fc-tbl">'+head+'<tbody>'+trs(rest,kind)+'</tbody></table></div></details>';
     }
     var topSum=top.reduce(function(a,r){ return a+amtOf(r); },0);
@@ -3220,8 +3271,8 @@ function crmGbHtml(d,meta,plans,planTbl){
       +'<div class="tbl-wrap"><table class="btbl fc-tbl">'+head+'<tbody>'+body+'</tbody></table></div>'+more+'</details>';
   };
   var it=function(k){ return rows.filter(function(r){ return r['항목']===k; }); };
-  if(rOld && it('②램프업').length) h+='<div class="crm-sub2">② 목록 '+(g.ramp?'갱신 중':'준비 안 됨')+' — 저장된 ② '+it('②램프업').length+'행을 그대로 보여 줍니다</div>';
-  h+='<div style="margin-top:10px">'+det('② 램프업',it('②램프업'),'②')+det('③ 추가 볼륨업',it('③볼륨업'),'③')+det('④ 신규계획',it('④신규'),'④')+'</div>';
+  if(rOld && it('②램프업').length) h+='<div class="crm-sub2">② 목록 '+((v70?pm:g.ramp)?'갱신 중':'준비 안 됨')+' — 저장된 ② '+it('②램프업').length+'행을 그대로 보여 줍니다</div>';
+  h+='<div style="margin-top:10px">'+det(v70?'② PRM 신청처 처방 개시':'② 램프업',it('②램프업'),'②')+det('③ 추가 볼륨업',it('③볼륨업'),'③')+det('④ 신규계획',it('④신규'),'④')+'</div>';
   return h+'</div>';
 }
 
@@ -3237,6 +3288,8 @@ function renderCrmDirector(){
     +'<div style="font-size:19px;font-weight:800;letter-spacing:-.02em">'+fcEsc(crmDirLabel(d.name))+' 지부장</div>'
     +'<span class="crm-badge'+(meta.confirmedMonth?' on':'')+'">확정 실적 기준: '+fcEsc(crmMon(meta.confirmedMonth))+(meta.confirmedPartial?' (일부)':'')+'</span></div>';
 
+  /* [v70] 핵심지표 4칸 — 1번 위(kpi 없으면 그리지 않음) */
+  if(d.goalBasis&&d.goalBasis.kpi) h+=crmKpiHtml(d.goalBasis.kpi);
   /* 1. 평가 실적 현황 */
   var cm=meta.confirmedMonth||d.confirmedMonth||'';
   var cVal=(d.actuals&&cm)?d.actuals[cm]:null;
