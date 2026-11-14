@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <!-- form.html v30 — 2026-06-28 재설계: 작성자=지부장4명 / ①마감예측(월1회·잠금) / ②신약진행 자동표시3종+검색 / ③볼륨업 / 마스터 병원명 자동완성.
      기존 신약진행 보고·프레논 조회·JSONP 로딩·payload(items[]) 회귀 0. payload 키는 02_backend_notes 스펙과 일치.
+     v70 (2026-11-14): 목표 근거 ② → '② PRM 신청처 처방 개시'(체크 방식) — goalBasis.prm이 있으면(v70 GAS) 미처방 목록 체크(기본 MBO×35%, 수정 가능·메모 선택)
+       + 처방 중 읽기 전용 + 핵심지표 한 줄, payload 방식:'개시'·rampSent·체크 행만. prm 키가 없으면(v69 GAS) v69 카드 그대로. mode=crm 요청에 gb=1.
      v64 (2026-11-04): ③신약 카드·신규블럭 모달에 MBO 근거 2항목 — '경쟁품(대체타겟)'(글 1칸·쉼표) + '케파(월 처방금액, 만원 입력 → 원 저장)'.
        선택 항목·빈칸은 기존 값 보존(GAS v64 '값 있을 때만'). payload items[].경쟁품·케파(원) · MBO÷케파 % 힌트 · 케파 자릿수 오입력은 MBO와 같이 제출 차단.
      v58 (2026-10-25): ⑤⑥ 한일/할일 행에 '재위탁 CSO'(소속 CSO 아래 실제 만난 업체)·'업체 없음(내부 일정)' 추가 — 저장 업체명 = 재위탁 || 소속, 소속CSO 키 동봉, 내부는 서버가 '(내부)'로 저장(집계 제외).
@@ -674,6 +676,25 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
 .gb-bar-r2 b{font-size:14px;color:var(--gray5)}
 .gb-bar-r2 b.gb-gap.ok{color:var(--ok)}
 .gb-bar-r2 b.gb-gap.bad{color:var(--bad)}
+/* [v70] ② PRM 신청처 처방 개시 — 체크 행·핵심지표 한 줄·처방 중 상태(끊김 = 갈색, 빨강 금지) */
+.gb-kpi{display:flex;flex-wrap:wrap;gap:2px 10px;font-size:11px;color:var(--gray4);background:var(--gray1);border-radius:10px;padding:7px 10px;margin:2px 0 8px;line-height:1.5}
+.gb-kpi b{color:var(--gray5)}
+.gb-w .gb-cl{min-height:40px}
+.gb-w .gb-cl b{font-size:13px}
+.gb-w .gb-p{color:var(--gray4);font-size:12px}
+.gb-w .gb-r-m{display:block;margin-top:2px}
+.gb-tag.gb-fut{background:var(--yellow-lt);color:#8a5a00}
+.gb-tag.gb-rx-k{background:var(--gray1);color:var(--gray4)}
+.gb-tag.gb-rx-n{background:var(--blue-lt);color:var(--blue-dk)}
+.gb-tag.gb-rx-c{background:#f3ebe4;color:#7a4b22}
+.gb-kpi.gb-kpi2{background:transparent;border:1px dashed var(--gray2);font-size:10.5px;margin-top:-4px}   /* [v70 처] 110대 블럭 값(작게) */
+.gb-pl{margin:0 0 2px 28px;font-size:11px;color:var(--gray4);min-width:0}
+.gb-pl>summary{cursor:pointer;color:var(--gray3);min-height:24px}
+.gb-pl>div{overflow-wrap:anywhere;line-height:1.5}
+.gb-bk{border-style:solid}
+.gb-bk-i{flex-wrap:wrap;align-items:center}
+.gb-bk-i .gb-n{flex:0 0 64px}
+.gb-bk-l{font-size:12px;color:var(--gray4);white-space:nowrap}
 </style>
 </head>
 <body>
@@ -1491,7 +1512,7 @@ function loadCrm(){
     }
   };
   sc.onerror=function(){ try{document.head.removeChild(sc);}catch(e){} crmLoading=false; };
-  sc.src=GAS_URL+'?mode=crm&callback='+cb+'&t='+Date.now()+window.__gateQ();
+  sc.src=GAS_URL+'?mode=crm&gb=1&callback='+cb+'&t='+Date.now()+window.__gateQ();   // [v70] gb=1 = ② PRM 신청처 목록(wait·rx) 포함 — 대시보드는 안 붙임(응답 크기)
   document.head.appendChild(sc);
 }
 /* 업체명 자동완성 마스터 = 서버 vendors(최근 활동순) ∪ 기존 CSO 업체 datalist */
@@ -2030,11 +2051,18 @@ function gbNowM(){ return crmMeta().nowMonth||nowMonth(); }
 function gbShift(ym,k){ const d=new Date(+ym.slice(0,4), +ym.slice(5,7)-1+k, 1); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
 function gbMonths(){ const g=gbData(), tm=(g&&g.targetMonths)||[]; if(tm.length===2) return tm; const n=gbNowM(); return [n,gbShift(n,1)]; }
 function gbReset(){ GB={rpm:rpm,ym:gbNowM(),st:{},seq:0}; }
-function gbRampOk(){ const g=gbData(), r=g&&g.ramp; return !!(r && !r.stale && Array.isArray(r.blocks)); }
+/* [v70] ② PRM 신청처 처방 개시(체크 방식) — goalBasis에 prm 키가 있으면(v70 GAS) 새 카드, 없으면(v69 GAS·캐시 응답) v69 카드 그대로.
+   prm 목록 상태: ok = 최신·목록 있음 → rampSent:true(체크 0건 = ② 0원 전체 교체) / 그 외(prm null·stale·listOmitted·목록 없음) → rampSent:false(서버가 저장된 ② 보존) */
+function gbV70(){ const g=gbData(); return !!g && Object.prototype.hasOwnProperty.call(g,'prm'); }
+function gbPrm(){ const g=gbData(); return (g&&g.prm)||null; }
+function gbListM(){ const g=gbData()||{}; return gbV70()?((g.prm&&g.prm.confirmedMonth)||''):((g.ramp&&g.ramp.confirmedMonth)||''); }
+function gbRampOk(){ return gbRampState()==='ok'; }
 /* [v69 QA🟡-1] ② 목록 상태 — ok(최신) / stale(갱신 중) / none(파일 없음) / bad(최신인데 블럭 목록을 못 읽음)
    stale·none = ② 행 없이 보내면 서버가 저장된 ② 행을 보존(근거 합에 포함) → 화면도 저장분을 합계에 넣는다.
    bad = 서버는 '최신'으로 보고 ② 전체를 지우므로 전송 차단. */
-function gbRampState(){ const g=gbData(), r=g&&g.ramp; if(!r) return 'none'; if(r.stale) return 'stale'; return Array.isArray(r.blocks)?'ok':'bad'; }
+function gbRampState(){
+  if(gbV70()){ const p=gbPrm(); if(!p) return 'none'; if(p.stale) return 'stale'; return (!p.listOmitted&&Array.isArray(p.wait)&&Array.isArray(p.rx))?'ok':'none'; }   // [v70] 목록 못 받음 = none(보존 경로 — 서버 v70은 rampSent:false면 ② 보존이라 차단 불필요)
+  const g=gbData(), r=g&&g.ramp; if(!r) return 'none'; if(r.stale) return 'stale'; return Array.isArray(r.blocks)?'ok':'bad'; }
 function gbKeptSum(s){ return (s.kept||[]).reduce((a,x)=>a+(x.제외?0:Math.round(numOf(x.금액))),0); }
 /* [v69 N1] 보존 ②가 옛 기반 기준 — ② 목록 stale·none(② 행 미전송)이고, 저장된 ②의 목록월(요약 ②목록월) < 지금 기반월이면
    서버가 ②를 시트에 남기되 합계에서 뺀다(②합 0·요약 ②상태 '②재작성필요') → 화면도 같은 식. 서버 saveGoalBasis_ redo2와 같은 조건 */
@@ -2042,7 +2070,7 @@ function gbRampBehind(s){ const g=gbData()||{}, rs=gbRampState(), bm=(g.base&&g.
   return (rs==='stale'||rs==='none') && (s.kept||[]).length>0 && !!s._keptM && !!bm && s._keptM<bm; }
 /* [v69 QA🟡-5] 이중 계상 표시용 — ② 블럭키 → 거래처·품목(최신 목록, 없으면 저장분) */
 function gbRampLbl(k,s){
-  const g=gbData()||{}, b=((g.ramp&&g.ramp.blocks)||[]).filter(x=>x.k===k)[0];
+  const g=gbData()||{}, b=((g.ramp&&g.ramp.blocks)||[]).filter(x=>x.k===k)[0]||((g.prm&&g.prm.wait)||[]).filter(x=>x.k===k)[0];   // [v70] 미처방 블럭도
   if(b) return (b.hosp||'-')+'·'+(b.rep||b.prod||'');
   const x=((s&&s.kept)||[]).filter(r=>r.블럭키===k)[0]; return x?((x.거래처||'-')+'·'+(x.품목||'')):'';
 }
@@ -2065,13 +2093,31 @@ function gbBuild(ym){
   const s={ym:ym,dirty:false,target:'',ramp:[],vuC:[],vuM:[],nd:[],fb:[],m4:[],gapPlan:(sum&&sum.GAP계획)||'',q:'',onlyAmt:false,openCo:{},_gi:{}};
   // [v69 QA🟡-1] 서버에 저장된 ② 행(목록이 갱신 중·없을 때 서버가 그대로 보존하는 대상) · 상태를 만든 때의 ② 목록월
   s.kept=rows.filter(r=>r.항목==='②램프업');
-  s._rampM=gbRampOk()?g.ramp.confirmedMonth:'';
+  s._rampM=gbRampOk()?gbListM():'';
   s._keptM=(sum&&sum.목록월)||'';   // [v69 N1] 저장된 ②를 적었던 목록월
   if(ym!==gbNowM()){ const t=(g.targets&&g.targets.next&&g.targets.next.value)||(sum&&sum.목표)||0; s.target=numOf(t)>0?Math.round(numOf(t)):''; }
+  // [v70] ② PRM 신청처 처방 개시 — 아직 미처방(+미도래) 블럭에 체크. 저장분 중 방식='개시' 행은 체크 복원, 구 방식 ②는 '지난 방식' 요약만
+  s.v70=gbV70(); s.w=[]; s.bk=[];
+  if(s.v70){
+    const p=g.prm||{}, wl=Array.isArray(p.wait)?p.wait:[], hl=Array.isArray(p.hw)?p.hw:[], wk={};
+    // [v70 처] 단위 — 110대병원 = 블럭(wait, 기본 MBO12×35%) / 그 외 병원·로컬 = 처(hw, 기본 = 처당 첫 달 평균). 체크 목록 s.w = 처 먼저, 110대 블럭 뒤(같은 체크·금액 로직)
+    // [v70 묶음] 대량 신청 업체 = 업체 한 줄 '이번 달 열 처 수' → 금액 = 처 수 × 처당(amtPer), 수정 가능. 그 업체 처(bulk:true)는 체크 목록에서 빼고 '거래처 목록 보기'(읽기 전용)로만
+    (Array.isArray(p.bulk)?p.bulk:[]).forEach(x=>{ const r=byKey[x.key], has=!!(r&&r.방식==='묶음'&&numOf(r.금액)>0), n0=has?(numOf(r.예상처)||''):'';
+      s.bk.push({x:x,n:n0,amt:has?Math.round(numOf(r.금액)):'',why:has?(r.근거||''):'',ed:has&&Math.round(numOf(r.금액))!==gbN(n0)*numOf(x.amtPer),hs:hl.filter(h=>h.bulkKey===x.key)}); });
+    hl.forEach(h=>{ if(h.bulk) return; const r=byKey[h.k], on=!!(r&&r.방식==='처'&&numOf(r.금액)>0); wk[h.k]=1;
+      s.w.push({k:h.k,b:h,on:on,amt:on?Math.round(numOf(r.금액)):'',why:on?(r.근거||''):''}); });
+    wl.forEach(b=>{ const r=byKey[b.k], on=!!(r&&r.방식==='개시'&&numOf(r.금액)>0); wk[b.k]=1;
+      s.w.push({k:b.k,b:b,on:on,amt:on?Math.round(numOf(r.금액)):'',why:on?(r.근거||''):''}); });
+    const k2=(sum&&sum.s2kind)||null, oldR=s.kept.filter(x=>['개시','처','묶음'].indexOf(x.방식)<0);
+    s.old=k2&&k2.old?{n:numOf(k2.old.n),nPos:numOf(k2.old.nPos),amt:numOf(k2.old.amt)}:{n:oldR.length,nPos:oldR.filter(x=>!x.제외&&numOf(x.금액)>0).length,amt:oldR.reduce((a,x)=>a+(x.제외?0:Math.round(numOf(x.금액))),0)};
+    s.gone=s.kept.filter(x=>(x.방식==='개시'||x.방식==='처')&&numOf(x.금액)>0&&!wk[x.블럭키]);   // 지난번 체크했는데 지금 목록에 없는 처·블럭(처방 시작·묶음 전환 등) — 다시 내면 빠짐
+    const fbR=rows.filter(r=>r.항목==='④신규'&&/^FB\|/.test(String(r.행키||''))&&!r.제외);   // [QA🟡-6] v69 폼으로 적은 ④ PRM 신규블럭 — 새 방식으로 다시 내면 빠짐(전송 전 확인)
+    s.fbOld={n:fbR.length,amt:fbR.reduce((a,x)=>a+Math.max(0,Math.round(numOf(x.금액))),0)}; s.fbAck=false;
+  }
   // ② 램프업 — 목록 전 블럭(빈칸=0). 저장분은 블럭키로 매칭, 새 목록에 없는 저장분은 금액>0만 '목록 밖'으로 유지(서버도 같은 규칙)
-  const blocks=(g.ramp&&Array.isArray(g.ramp.blocks))?g.ramp.blocks:[], seen={};
+  const blocks=(!s.v70&&g.ramp&&Array.isArray(g.ramp.blocks))?g.ramp.blocks:[], seen={};
   blocks.forEach(b=>{ const r=byKey[b.k]; seen[b.k]=1; s.ramp.push({k:b.k,b:b,amt:(r&&numOf(r.금액)>0)?Math.round(numOf(r.금액)):'',why:(r&&r.근거)||''}); });
-  rows.forEach(r=>{ if(r.항목==='②램프업' && r.블럭키 && !seen[r.블럭키] && numOf(r.금액)>0){ seen[r.블럭키]=1; s.ramp.push({k:r.블럭키,b:null,co:r.업체||'',hosp:r.거래처||'',prod:r.품목||'',amt:Math.round(numOf(r.금액)),why:r.근거||''}); } });
+  if(!s.v70) rows.forEach(r=>{ if(r.항목==='②램프업' && r.블럭키 && !seen[r.블럭키] && numOf(r.금액)>0){ seen[r.블럭키]=1; s.ramp.push({k:r.블럭키,b:null,co:r.업체||'',hosp:r.거래처||'',prod:r.품목||'',amt:Math.round(numOf(r.금액)),why:r.근거||''}); } });
   // ③ 볼륨업 후보(P5 — 대상월 = 목표월만, 기본 미체크) + 직접 추가
   (g.volupCandidates||[]).filter(c=>c.목표월===ym).forEach(c=>{ const r=byKey['VU|'+c.볼륨업키];
     s.vuC.push({c:c,on:!!(r&&!r.제외),amt:r?(Math.round(numOf(r.금액))||''):(Math.round(numOf(c.증대MBO))||''),why:r?(r.근거||''):String(c.내용||'').replace(/\s+/g,' ').trim()}); });
@@ -2079,9 +2125,9 @@ function gbBuild(ym){
   // ④ 처방 단계 병원신약 후보 — 기본 체크(같은 처방 ②·P9가 있으면 해제), 금액 기본 = MBO
   //   [v69 QA🟡-4] canAmount===false(110대 여부 불명 + DC통과) = 체크 해제 고정(서버가 금액을 막음)
   (g.ndCandidates||[]).forEach(c=>{ const r=byKey['ND|'+c.신약키];
-    s.nd.push({c:c,on:(c.canAmount===false)?false:(r?!r.제외:!(c.dupRamp||c.dupFuture)),amt:(r&&numOf(r.금액)>0)?Math.round(numOf(r.금액)):(Math.round(numOf(c.MBO))||''),why:(r&&r.근거)||''}); });
-  // ④ P9 확정월 이후 시작 PRM 블럭(참고 — 골라 넣기, 금액 기본 0) + 직접 추가
-  (g.futureBlocks||[]).forEach(b=>{ const r=byKey['FB|'+b.k]; s.fb.push({b:b,on:!!r,amt:r?(Math.round(numOf(r.금액))||''):'',why:r?(r.근거||''):''}); });
+    s.nd.push({c:c,on:(c.canAmount===false)?false:(r?!r.제외:!(c.dupRamp||(!s.v70&&c.dupFuture))),amt:(r&&numOf(r.금액)>0)?Math.round(numOf(r.금액)):(Math.round(numOf(c.MBO))||''),why:(r&&r.근거)||''}); });
+  // ④ P9 확정월 이후 시작 PRM 블럭(참고 — 골라 넣기, 금액 기본 0) + 직접 추가 · [v70] 미도래 블럭은 ② 목록으로 옮김 — ④ 참고 목록 없음
+  if(!s.v70) (g.futureBlocks||[]).forEach(b=>{ const r=byKey['FB|'+b.k]; s.fb.push({b:b,on:!!r,amt:r?(Math.round(numOf(r.금액))||''):'',why:r?(r.근거||''):''}); });
   rows.forEach(r=>{ if(r.항목==='④신규' && !/^(ND|FB)\|/.test(String(r.행키||''))) s.m4.push({id:r.행키||gbMid(),cat:r.카테고리||'',거래처:r.거래처||'',사업자번호:r.사업자번호||'',품목:r.품목||'',amt:Math.round(numOf(r.금액))||'',why:r.근거||''}); });
   gbRestoreLocal(s);
   return s;
@@ -2102,6 +2148,7 @@ function gbSaveLocal(s){
     s.vuC.forEach(r=>{ o.vuC[r.c.볼륨업키]=[r.on,r.amt,r.why]; });
     s.nd.forEach(r=>{ o.nd[r.c.신약키]=[r.on,r.amt,r.why]; });
     s.fb.forEach(r=>{ if(r.on) o.fb[r.b.k]=[r.on,r.amt,r.why]; });
+    if(s.v70){ o.v70=1; o.prmM=gbListM(); o.w={}; s.w.forEach(r=>{ if(r.on) o.w[r.k]=[r.amt,r.why]; }); o.bk={}; s.bk.forEach(r=>{ if(r.n!==''||r.amt!==''||String(r.why||'')) o.bk[r.x.key]=[r.n,r.amt,r.why,r.ed?1:0]; }); }   // [v70] 체크한 블럭만 · [v70 묶음] 블럭 수·금액·메모
     localStorage.setItem(gbLsKey(s.ym),JSON.stringify(o));
   }catch(e){}
 }
@@ -2112,6 +2159,8 @@ function gbRestoreLocal(s){
     if((o.base||'')!==((g.base&&g.base.month)||'')){ localStorage.removeItem(gbLsKey(s.ym)); return; }   // 실적 갱신 → 초안 폐기(서버가 기반 불일치로 막는다)
     if(s.ym!==gbNowM() && o.target!==undefined) s.target=o.target;
     if(typeof o.gapPlan==='string') s.gapPlan=o.gapPlan;
+    if(s.v70 && o.v70 && (o.prmM||'')===gbListM()){ s.w.forEach(r=>{ const v=o.w&&o.w[r.k]; if(v){ r.on=true; r.amt=v[0]; r.why=v[1]; } else { r.on=false; r.amt=''; r.why=''; } });   // [v70] 같은 목록월 초안만
+      s.bk.forEach(r=>{ const v=o.bk&&o.bk[r.x.key]; if(v){ r.n=v[0]; r.amt=v[1]; r.why=v[2]; r.ed=!!v[3]; } else { r.n=''; r.amt=''; r.why=''; r.ed=false; } }); }   // [v70 묶음]
     if((o.rampM||'')===((g.ramp&&g.ramp.confirmedMonth)||'')) s.ramp.forEach(r=>{ const v=o.ramp&&o.ramp[r.k]; if(v){ r.amt=v[0]; r.why=v[1]; } else { r.amt=''; r.why=''; } });
     s.vuC.forEach(r=>{ const v=o.vuC&&o.vuC[r.c.볼륨업키]; if(v){ r.on=!!v[0]; r.amt=v[1]; r.why=v[2]; } });
     s.nd.forEach(r=>{ const v=o.nd&&o.nd[r.c.신약키]; if(v){ r.on=!!v[0]&&r.c.canAmount!==false; r.amt=v[1]; r.why=v[2]; } });
@@ -2126,7 +2175,7 @@ function gbRestoreLocal(s){
 function gbTotals(s){
   const g=gbData()||{}, base=Math.round(numOf(g.base&&g.base.value));
   let s2=0,s3=0,s4=0;
-  if(gbRampOk()) s.ramp.forEach(r=>{ s2+=gbN(r.amt); });
+  if(gbRampOk()){ if(s.v70){ s.w.forEach(r=>{ if(r.on) s2+=gbN(r.amt); }); (s.bk||[]).forEach(r=>{ if(gbN(r.n)>0) s2+=gbN(r.amt); }); } else s.ramp.forEach(r=>{ s2+=gbN(r.amt); }); }   // [v70] 체크한 블럭 금액 합 + [v70 묶음] 블럭 수 ≥1인 업체 금액(서버가 ② 전체를 이 값으로 교체 — 지난 방식 ②는 빠짐)
   else s2=gbRampBehind(s)?0:gbKeptSum(s);   // [v69 N1] 옛 기반 ②는 0 · [v69 QA🟡-1] 목록 갱신 중·없음 → 서버가 보존하는 저장분 ② 금액(서버 kept2 합과 같은 식: 제외 0)
   s.vuC.forEach(r=>{ if(r.on) s3+=gbN(r.amt); }); s.vuM.forEach(r=>{ s3+=gbN(r.amt); });
   s.nd.forEach(r=>{ if(r.on) s4+=gbN(r.amt); }); s.fb.forEach(r=>{ if(r.on) s4+=gbN(r.amt); }); s.m4.forEach(r=>{ s4+=gbN(r.amt); });
@@ -2144,8 +2193,18 @@ function gbValidate(s){
   // [v69 QA🟡-1] ② 목록이 '최신'인데 ② 행 없이 나가는 경로 차단 — 서버는 이 경우 저장된 ② 행을 전부 지운다
   const rs=gbRampState(), g0=gbData()||{};
   if(rs==='bad') return {msg:'② 목록을 불러오지 못했습니다 — 새로고침 후 다시 전송하세요(지금 보내면 저장된 ②가 지워질 수 있습니다)',id:'gb-body'};
-  if(rs==='ok' && s._rampM!==g0.ramp.confirmedMonth) return {msg:'② 목록이 새로 들어왔습니다 — 새로고침 후 ②를 확인해 다시 전송하세요',id:'gb-body'};
-  if(gbRampOk()){
+  if(rs==='ok' && s._rampM!==gbListM()) return {msg:'② 목록이 새로 들어왔습니다 — 새로고침 후 ②를 확인해 다시 전송하세요',id:'gb-body'};
+  if(s.v70 && s.fbOld && s.fbOld.amt>0 && !s.fbAck) return {msg:'지난 방식으로 적은 ④ PRM 신규블럭 '+s.fbOld.n+'건·'+gbMan(s.fbOld.amt)+'만은 이대로 다시 내면 빠집니다 — ②에 옮겨 적었는지 확인하고 \'확인했습니다\'를 체크해 주세요',id:'gb-fback'};   // [QA🟡-6]
+  if(gbRampOk() && s.v70){   // [v70] 체크한 블럭: 금액 자릿수·금액 0(체크했는데 비움 — 서버는 0원을 저장하지 않아 체크가 사라지므로 폼에서 먼저 알림). 근거 필수 없음
+    for(let i=0;i<(s.bk||[]).length;i++){ const r=s.bk[i], nm=(r.x.co||'')+' 업체 묶음', n=gbN(r.n);   // [v70 묶음] 처 수 0~미처방 처 정수 · 처 수 ≥1이면 금액 필수 · 금액만 있으면 처 수 필수
+      if(r._badN) return {msg:'② '+nm+': 이번 달 열 처 수는 0~'+numOf(r.x.n)+' 사이 정수로 적어 주세요',id:'gb-bn-'+i,sec:'bk'};
+      if(r._bad) return {msg:'② '+nm+': 만원 단위로 입력하세요 — 예) 30',id:'gb-a-bk-'+i,sec:'bk'};
+      if(n>0 && !(gbN(r.amt)>0)) return {msg:'② '+nm+': 처 수 '+n+'에 금액이 비어 있습니다 — 금액을 넣거나 처 수를 비우세요',id:'gb-a-bk-'+i,sec:'bk'};
+      if(!(n>0) && gbN(r.amt)>0) return {msg:'② '+nm+': 금액이 있으면 이번 달 열 처 수를 적어 주세요',id:'gb-bn-'+i,sec:'bk'}; }
+    for(let i=0;i<s.w.length;i++){ const r=s.w[i]; if(!r.on) continue; const nm=lbl(r.b.hosp)+(gbIsH(r.b)?'(처)':('·'+(r.b.rep||r.b.prod||'')));
+      if(r._bad) return {msg:'② '+nm+': 만원 단위로 입력하세요 — 예) 8',id:'gb-a-w-'+i,sec:'w',i:i};
+      if(!(gbN(r.amt)>0)) return {msg:'② '+nm+': 체크했는데 금액이 비어 있습니다 — 금액을 넣거나 체크를 빼세요',id:'gb-a-w-'+i,sec:'w',i:i}; }
+  } else if(gbRampOk()){
     for(let i=0;i<s.ramp.length;i++){ const r=s.ramp[i], nm=lbl(r.b?r.b.hosp:r.hosp);
       if(r._bad) return {msg:'②램프업 '+nm+': 만원 단위로 입력하세요 — 예) 50',id:'gb-a-ramp-'+i,sec:'ramp',i:i};
       if(gbN(r.amt)>0 && !String(r.why||'').trim()) return {msg:'②램프업 '+nm+': 반영액이 있으면 근거(한 줄) 필수',id:'gb-w-ramp-'+i,sec:'ramp',i:i}; }
@@ -2178,6 +2237,7 @@ function gbValidate(s){
    ②는 목록이 최신이면 입력값, 갱신 중·없음이면 서버가 보존하는 저장분(서버도 '②램프업(저장분)'으로 대조). 문구는 서버 차단과 같은 뜻.
    (서버는 사업자번호+품목으로 모든 칸을 대조하므로, 표시 키가 없는 ③·④ 직접 입력끼리의 중복은 서버가 최종 차단한다) */
 function gbDupErr(s){
+  if(s.v70) return gbDupErr70(s);
   const ok2=gbRampOk(), r2={}, pairs=[], seen={};
   if(ok2) s.ramp.forEach(r=>{ if(gbN(r.amt)>0) r2[r.k]={lbl:'②램프업 '+gbRampLbl(r.k,s)}; });
   else if(!gbRampBehind(s)) (s.kept||[]).forEach(x=>{ if(!x.제외 && numOf(x.금액)>0 && x.블럭키) r2[x.블럭키]={lbl:'②램프업(저장분) '+(x.거래처||'-')+'·'+(x.품목||'')}; });
@@ -2195,10 +2255,26 @@ function gbDupErr(s){
   const fbHit=/^gb-a-fb-/.test(pairs[0].id);
   return {msg:'같은 처방이 두 곳에 들어 있습니다(이중 계상) — '+pairs.slice(0,3).map(p=>p.txt).join(' / ')+(pairs.length>3?(' 외 '+(pairs.length-3)+'쌍'):'')+' — 한 곳에만 금액을 넣어 주세요',id:pairs[0].id,sec:fbHit?'fb':undefined};
 }
+/* [v70] 이중 계상 — 서버가 표시한 같은 처방 쌍(nd.dupPrm·vu.dupPrm ↔ 미처방 블럭)에 둘 다 금액이면 차단(서버 문구와 같은 꼴).
+   목록이 최신이 아니면(보존 경로) 저장된 ② 행(블럭키)과 dupPrm·dupRamp로 대조 — 서버도 '(저장분)'으로 대조. N1(옛 기반 ②)은 합계에 없어 대조 안 함 */
+function gbDupErr70(s){
+  const L2='② PRM 신청처 처방 개시', r2={}, pairs=[], seen={};
+  if(gbRampOk()) s.w.forEach(r=>{ if(r.on&&gbN(r.amt)>0) r2[r.k]={lbl:L2+' '+(r.b.hosp||'-')+(gbIsH(r.b)?'(처)':('·'+(r.b.rep||r.b.prod||'')))}; });
+  else if(!gbRampBehind(s)) (s.kept||[]).forEach(x=>{ if(!x.제외 && numOf(x.금액)>0 && x.블럭키 && x.방식!=='묶음') r2[x.블럭키]={lbl:L2+'(저장분) '+(x.거래처||'-')+(x.방식==='처'?'(처)':('·'+(x.품목||'')))}; });
+  // [v70 처] 처 ↔ ④ 신약 후보 = 같은 사업자번호(서버 dupHosp) · 처 ↔ ③은 대조 안 함 · 묶음은 대조 밖
+  const hit=(c,nd)=>(c.dupPrm&&r2[c.dupPrm])?c.dupPrm:((nd&&c.dupHosp&&r2[c.dupHosp])?c.dupHosp:((!gbRampOk()&&c.dupRamp&&r2[c.dupRamp])?c.dupRamp:''));
+  const add=(k,a,b,id)=>{ if(seen[k]) return; seen[k]=1; pairs.push({txt:a+' ↔ '+b,id:id}); };
+  s.nd.forEach((r,i)=>{ if(!r.on||!(gbN(r.amt)>0)) return; const k=hit(r.c,true); if(k) add(k+'|N|'+r.c.신약키, r2[k].lbl, '④신규(신약 후보) '+(r.c.실납처명||'-')+'·'+(r.c.기준품명||''), 'gb-a-nd-'+i); });
+  s.vuC.forEach((r,i)=>{ if(!r.on||!(gbN(r.amt)>0)) return; const k=hit(r.c,false); if(k) add(k+'|V|'+r.c.볼륨업키, r2[k].lbl, '③볼륨업 '+(r.c.병원명||'-')+'·'+(r.c.품목||''), 'gb-a-vuC-'+i); });
+  if(!pairs.length) return null;
+  return {msg:'같은 처방이 두 곳에 들어 있습니다(이중 계상) — '+pairs.slice(0,3).map(p=>p.txt).join(' / ')+(pairs.length>3?(' 외 '+(pairs.length-3)+'쌍'):'')+' — 한 곳에만 금액을 넣어 주세요',id:pairs[0].id};
+}
 /* payload.목표근거.rows — 키는 02_backend_notes §3 예시 그대로 */
 function gbRows(s){
   const out=[], tr=v=>String(v==null?'':v).trim();
-  if(gbRampOk()) s.ramp.forEach(r=>{ out.push({항목:'②램프업',행키:r.k,블럭키:r.k,금액:(r.amt===''?'':gbN(r.amt)),근거:tr(r.why)}); });   // ② 목록 전부(빈칸 포함)
+  if(gbRampOk() && s.v70){ s.w.forEach(r=>{ if(!r.on) return; const o={항목:'②램프업',블럭키:r.k,금액:gbN(r.amt)}; if(tr(r.why)) o.메모=tr(r.why); out.push(o); });   // [v70] 체크한 것만(110대 블럭키 / 처 H|…, 항목 값은 시트 저장값 그대로)
+    (s.bk||[]).forEach(r=>{ if(!(gbN(r.n)>0)) return; const o={항목:'②램프업',블럭키:r.x.key,예상처:gbN(r.n),금액:gbN(r.amt)}; if(tr(r.why)) o.메모=tr(r.why); out.push(o); }); }   // [v70 묶음] 처 수 ≥1인 업체만
+  else if(gbRampOk()) s.ramp.forEach(r=>{ out.push({항목:'②램프업',행키:r.k,블럭키:r.k,금액:(r.amt===''?'':gbN(r.amt)),근거:tr(r.why)}); });   // ② 목록 전부(빈칸 포함)
   s.vuC.forEach(r=>{ if(!r.on) return; const c=r.c;
     out.push({항목:'③볼륨업',볼륨업키:c.볼륨업키,거래처:tr(c.병원명),사업자번호:normBiz(c.사업자번호),품목:tr(c.품목),업체:tr(c.업체명),금액:gbN(r.amt),근거:tr(r.why)}); });
   s.vuM.forEach(r=>{ if(gbBlank3(r)) return;
@@ -2219,7 +2295,8 @@ function gbCollect(){
   const err=gbValidate(s); if(err){ err.ym=s.ym; return {err:err,s:s}; }
   const t=gbTotals(s);
   const p={대상월:s.ym,목표:t.target,기반월:(g.base&&g.base.month)||'',기반액:t.base,rows:gbRows(s),GAP계획:String(s.gapPlan||'').trim()};
-  if(gbRampOk()){ p.rampMonth=g.ramp.confirmedMonth; p.rampGenerated=g.ramp.generated||''; } else { p.rampMonth=(g.ramp&&g.ramp.confirmedMonth)||''; p.rampGenerated=(g.ramp&&g.ramp.generated)||''; p.rampSent=false; }   // [v69 경합] stale·none도 폼이 본 목록월(없으면 '')을 싣고 ② 행 미전송을 표시 → 서버가 최신 목록이어도 ② 보존
+  if(s.v70){ const pr=g.prm||{}; p.방식='개시'; p.rampSent=gbRampOk(); p.rampMonth=pr.confirmedMonth||''; p.rampGenerated=pr.generated||''; }   // [v70] 목록을 보여 줬으면 rampSent:true(체크 0건 = ② 0원), 아니면 false(서버가 저장된 ② 보존)
+  else if(gbRampOk()){ p.rampMonth=g.ramp.confirmedMonth; p.rampGenerated=g.ramp.generated||''; } else { p.rampMonth=(g.ramp&&g.ramp.confirmedMonth)||''; p.rampGenerated=(g.ramp&&g.ramp.generated)||''; p.rampSent=false; }   // [v69 경합] stale·none도 폼이 본 목록월(없으면 '')을 싣고 ② 행 미전송을 표시 → 서버가 최신 목록이어도 ② 보존
   return {payload:p,s:s,t:t,other:other};
 }
 function gbAfterSent(s){
@@ -2245,6 +2322,7 @@ function gbFocus(err){
   const s=gbState();
   if(err && err.sec==='ramp' && s && s.ramp[err.i]){ s.openCo[gbCo(s.ramp[err.i])]=true; s.q=''; s.onlyAmt=false; gbRender(); }
   if(err && err.sec==='fb' && s){ s._fbOpen=true; gbRender(); }
+  if(err && err.sec==='w' && s && s.w[err.i]){ s.openCo[gbWCo(s.w[err.i])]=true; s.q=''; s.onlyAmt=false; gbRender(); }   // [v70] 그 업체를 펼쳐 금액 칸으로
   if(err && err.id==='cl-goal'){ const cc=document.getElementById('c-cl'); if(cc) cc.scrollIntoView({behavior:'smooth',block:'start'}); }
   const el=err&&document.getElementById(err.id);
   if(el){ el.classList.add('over'); el.scrollIntoView({behavior:'smooth',block:'center'}); try{ el.focus(); }catch(e){} setTimeout(()=>el.classList.remove('over'),2500); }
@@ -2258,13 +2336,15 @@ function gbAmt(sec,i,el){
   if(mv!=null && mv>MAN_MAX){ r._bad=true; el.classList.add('over'); toast(manOverMsg(mv)); }
   else { r._bad=false; el.classList.remove('over'); r.amt=manToWon(el.value); }
   if(sec==='ramp'){ const row=document.getElementById('gb-rr-'+i); if(row) row.classList.toggle('on',gbN(r.amt)>0); gbGroupSum(s,i); }
+  if(sec==='w') gbWGroupHd(s,i);   // [v70] 업체 줄 체크·금액 합
   gbTouch(s);
 }
 function gbWhy(sec,i,el){ const s=gbState(); if(!s||!s[sec]||!s[sec][i]) return; s[sec][i].why=el.value; gbTouch(s); }
 function gbFld(sec,i,f,el){
   const s=gbState(); if(!s||!s[sec]||!s[sec][i]) return; const r=s[sec][i];
   r[f]=el.value;
-  if(f==='거래처'){ const m=masterByName[normHosp(el.value)]; r.사업자번호=m?m.사업자번호:''; }   // 마스터 병원명이면 사업자번호 자동(아니면 공란)
+  if(f==='거래처'){ const m=masterByName[normHosp(el.value)]; r.사업자번호=m?m.사업자번호:'';   // 마스터 병원명이면 사업자번호 자동(아니면 공란)
+    if(sec==='vuM' && s.v70){ const t=document.getElementById('gb-vt-vuM-'+i); if(t) t.innerHTML=gbVuHwTag(s,String(r.거래처||'').trim()?gbHwDup(s,r.사업자번호,r.거래처):null).replace(/^ · /,''); } }   // [QA🟡-5]
   gbTouch(s);
 }
 function gbTarget(el){
@@ -2296,8 +2376,8 @@ function gbDel(sec,i){
 function gbSetYm(m){ GB.ym=m; gbRender(); }
 /* ① 목표 칸이 바뀌면 이번달 근거의 목표·GAP도 따라 바뀐다(입력 중인 카드는 c-cl이라 c-gb 재렌더는 포커스와 무관) */
 function gbOnGoal(){ if(!rpm||!crmReady) return; if(GB.ym===gbNowM()) renderWhenIdle('c-gb',gbRender); else gbUpdateTotals(); }
-function gbSearch(v){ const s=gbState(); if(!s) return; s.q=v; const box=document.getElementById('gb-ramp-list'); if(box) box.innerHTML=gbRampList(s); }
-function gbOnlyAmt(on){ const s=gbState(); if(!s) return; s.onlyAmt=!!on; const box=document.getElementById('gb-ramp-list'); if(box) box.innerHTML=gbRampList(s); }
+function gbSearch(v){ const s=gbState(); if(!s) return; s.q=v; const box=document.getElementById('gb-ramp-list'); if(box) box.innerHTML=s.v70?gbWList(s):gbRampList(s); }
+function gbOnlyAmt(on){ const s=gbState(); if(!s) return; s.onlyAmt=!!on; const box=document.getElementById('gb-ramp-list'); if(box) box.innerHTML=s.v70?gbWList(s):gbRampList(s); }
 function gbCoToggle(gi,open){ const s=gbState(); if(!s||!s._groups) return; const co=s._groups[gi]; if(co!=null && !s.q && !s.onlyAmt) s.openCo[co]=!!open; }
 function gbGroupSum(s,i){
   const gi=s._gi[i]; if(gi==null) return; const co=s._groups[gi];
@@ -2312,13 +2392,18 @@ function gbEmailText(){
   const man=v=>Math.round((Number(v)||0)/10000).toLocaleString()+'만';
   const fmt=(tgt,base,bm,s2,s3,s4,sum,gap,plan,tag)=>{
     let b=`  ∙ 목표 ${tgt>0?((tgt/1e8).toFixed(2)+'억'):'미입력'} / 근거 합 ${(sum/1e8).toFixed(2)}억${tgt>0?(' / GAP '+gbSigned(gap)):''}${tag?(' ('+tag+')'):''}\n`;
-    b+=`  ∙ ① 기반(${monLbl(bm)}) ${man(base)} · ② 램프업 ${man(s2)} · ③ 추가 볼륨업 ${man(s3)} · ④ 신규계획 ${man(s4)}\n`;
+    b+=`  ∙ ① 기반(${monLbl(bm)}) ${man(base)} · ${gbV70()?'② PRM 신청처 처방 개시':'② 램프업'} ${man(s2)} · ③ 추가 볼륨업 ${man(s3)} · ④ 신규계획 ${man(s4)}\n`;   // [v70] 새 이름
     if(String(plan||'').trim()) b+=`  ∙ GAP 계획: ${String(plan).trim()}\n`;
     return b;
   };
   if(!g||g.error) return '  ∙ 근거 데이터 없음\n';
   const s=(GB.rpm===rpm)?GB.st[nm]:null;
-  if(s){ const t=gbTotals(s); return fmt(t.target,t.base,g.base&&g.base.month,t.s2,t.s3,t.s4,t.sum,t.gap,s.gapPlan,s.dirty?'작성 중 — 전송 전':''); }
+  if(s){ const t=gbTotals(s);
+    let x='';
+    if(s.v70&&gbRampOk()){ const on=s.w.filter(r=>r.on), bk=(s.bk||[]).filter(r=>gbN(r.n)>0);   // [v70] 처·110대 블럭 체크 + 업체 묶음
+      if(on.length) x=`  ∙ ② 이번 달 처방 낼 PRM 신청처 ${on.length}곳: `+on.slice(0,5).map(r=>(r.b.hosp||'-')+(gbIsH(r.b)?'':('·'+(r.b.rep||r.b.prod||'')))+' '+man(r.amt)).join(', ')+(on.length>5?` 외 ${on.length-5}곳`:'')+'\n';
+      if(bk.length) x+=`  ∙ ② 업체 묶음: `+bk.map(r=>(r.x.co||'')+' '+gbN(r.n)+'처 '+man(r.amt)).join(', ')+'\n'; }
+    return fmt(t.target,t.base,g.base&&g.base.month,t.s2,t.s3,t.s4,t.sum,t.gap,s.gapPlan,s.dirty?'작성 중 — 전송 전':'')+x; }
   const sv=g.saved&&g.saved[nm]&&g.saved[nm].summary;
   if(sv) return fmt(numOf(sv.목표),numOf(sv.기반액),sv.기반월,numOf(sv.램프업합),numOf(sv.볼륨업합),numOf(sv.신규합),numOf(sv.근거합),numOf(sv.GAP),sv.GAP계획,'');
   return '  ∙ 근거 미작성\n';
@@ -2374,7 +2459,177 @@ function gbRampList(s){
   if(!shown) h='<div class="row-empty">'+(q?'검색 결과가 없습니다':(s.onlyAmt?'금액을 넣은 블럭이 없습니다':'② 대상 블럭이 없습니다'))+'</div>';
   return h;
 }
+/* ════ [v70] ② PRM 신청처 처방 개시 — 업체 묶음 줄 + 미처방 처(그 외)·110대 미처방 블럭 체크(업체별 접기·지연 렌더) + 처방 중(읽기 전용) ════
+   단위(11-14 추가 결정 2): 110대병원 = 블럭(기본 MBO12×35%) / 그 외 병원·로컬 = 처(기본 = 처당 첫 달 평균, src = 업체·지부장·팀 평균) */
+function gbPct(v){ return (v==null||v==='')?'-':(Math.round(Number(v)*1000)/10).toFixed(1)+'%'; }
+function gbIsH(b){ return /^H\|/.test(String((b&&b.k)||'')); }
+/* [QA🟡-5] 처 ↔ ③ 같은 거래처 — 표시만(서버는 차단 안 함). 서버 표시(vu.dupHosp·hw.dupVol) 우선, 사업자번호 없는 ③ 행은 거래처명 정규화 완전 일치 */
+function gbP10(v){ const x=normBiz(v); return x?('0000000000'+x).slice(-10):''; }
+function gbSameHosp(biz,name,b){ const z=gbP10(biz); if(z) return z===gbP10(b.biz); const n=normHosp(name); return !!n && n===normHosp(b.hosp); }
+function gbHwDup(s,biz,name){ const r=(s.w||[]).filter(x=>gbIsH(x.b)&&gbSameHosp(biz,name,x.b))[0]; return r?r.b:null; }
+function gbVuHwTag(s,hb){ return hb?(' · <span class="gb-tag gb-tag-w">같은 거래처가 ② 미처방 처('+esc(hb.hosp||'-')+')에도 있습니다 — 한 곳에만</span>'):''; }
+function gbVolDup(s,b){
+  const c=(s.vuC||[]).filter(r=>r.c.dupHosp===b.k||(b.dupVol&&r.c.볼륨업키===b.dupVol)||(!r.c.dupHosp&&!gbP10(r.c.사업자번호)&&gbSameHosp('',r.c.병원명,b)))[0];
+  if(c) return '③ '+(c.c.품목||'볼륨업 후보');
+  const m=(s.vuM||[]).filter(r=>String(r.거래처||'').trim()&&gbSameHosp(r.사업자번호,r.거래처,b))[0];
+  return m?('③ 직접 추가 '+(m.품목||'')).trim():'';
+}
+function gbKpiLine(k){
+  const m=k&&k.mine; if(!m) return '';
+  const d=(o)=>(o&&o.v!=null&&o.prev!=null)?(' <span style="color:var(--gray3)">(전달 '+gbPct(o.prev)+')</span>'):'';
+  const nd=o=>(o&&o.den!=null)?(' '+(o.num||0)+'/'+(o.den||0)):'';
+  const b=m.b110||null, rp=m.rpb||{};
+  const won=(rp.unit==='원');   // v70 처 기준(처당 실적 원) · 이전 파일 = 블럭당 비율
+  let h=`<div class="gb-kpi"><span>핵심지표 ${esc(monLbl(k.month||''))}${b?' · 처 기준':''}</span><span>개시율 <b>${gbPct(m.open&&m.open.v)}</b>${nd(m.open)}${d(m.open)}</span><span>유지율 <b>${gbPct(m.keep&&m.keep.v)}</b>${nd(m.keep)}${d(m.keep)}</span>`
+    +(won?`<span>처당 매출(처방 중인 처 평균) <b>${rp.v!=null?gbMan(rp.v)+'만':'-'}</b>${rp.prev!=null?(' <span style="color:var(--gray3)">(전달 '+gbMan(rp.prev)+'만)</span>'):''}</span>`:`<span>블럭당 매출 <b>${gbPct(rp.v)}</b>${d(rp)}</span>`)+'</div>';
+  if(b) h+=`<div class="gb-kpi gb-kpi2"><span>110대 블럭</span><span>개시율 ${gbPct(b.open&&b.open.v)}${nd(b.open)}</span><span>유지율 ${gbPct(b.keep&&b.keep.v)}${nd(b.keep)}</span><span>블럭당 ${gbPct(b.rpb&&b.rpb.v)}</span></div>`;
+  return h;
+}
+function gbKeptTxt70(s){
+  const g=gbData()||{}, n=(s.kept||[]).length, sm=gbKeptSum(s), on=(s.kept||[]).filter(x=>!x.제외&&numOf(x.금액)>0);
+  if(!n) return ' 저장된 ②가 없어 이번 근거에서 ②는 0원입니다.';
+  const nm=x=>x.방식==='묶음'?(esc(x.업체||'-')+' 업체 묶음 · 예상 '+(numOf(x.예상처)||0)+'처'):(x.방식==='처'?(esc(x.거래처||'-')+' (처)'):(esc(x.거래처||'-')+' · '+esc(x.품목||'')));
+  return (gbRampBehind(s)?`<br><b>기반이 ${esc((g.base&&g.base.month)||'')}으로 바뀌어 ②는 새 목록이 오면 다시 적어야 합니다(지금 합계에서 제외).</b> 저장된 ② ${n}행(${esc(monLbl(s._keptM))} 목록 기준·${gbMan(sm)}만)은 시트에 남아 있습니다.`
+    :` 저장된 ② ${n}행·합계 ${gbMan(sm)}만은 그대로 유지됩니다(아래 합계·GAP에 포함).`)
+    +(on.length?`<details class="gb-old" style="margin-top:6px"><summary>저장된 ② 중 금액 있는 ${on.length}행 — 읽기 전용</summary><div>`+on.map(x=>`<div class="gb-old-r">${nm(x)} · ${gbMan(x.금액)}만${['개시','처','묶음'].indexOf(x.방식)>=0?'':' (지난 방식)'}${x.근거?(' — '+esc(x.근거)):''}</div>`).join('')+'</div></details>':'');
+}
+function gbWCo(r){ const co=(r.b&&r.b.co)||'(업체 미기재)'; return gbIsH(r.b)?co:('110대병원 · '+co); }   // 처 업체 묶음 먼저(목록 순서), 110대 블럭은 따로
+function gbWGroups(s){   // 업체 순서 = 서버 목록 순서(처 → 110대 블럭, 업체명 → 시작월 → MBO)
+  const idx={}, order=[]; s._wgi={};
+  s.w.forEach((r,i)=>{ const co=gbWCo(r); if(!idx[co]){ idx[co]=[]; order.push(co); } idx[co].push(i); s._wgi[i]=order.indexOf(co); });
+  s._wg=order; s._wgIdx=order.map(co=>idx[co]); return s._wgIdx;
+}
+function gbWVis(s,gi){
+  const q=String(s.q||'').trim().toLowerCase(), qn=normHosp(q), co=s._wg[gi];
+  return s._wgIdx[gi].filter(i=>{ const r=s.w[i], b=r.b;
+    if(s.onlyAmt && !r.on) return false;
+    if(!q) return true;
+    const hay=[co,b.hosp,b.prod,b.rep,(b.p||[]).join(' ')].join(' ').toLowerCase();
+    return hay.indexOf(q)>=0 || (!!qn && normHosp(hay).indexOf(qn)>=0); });
+}
+function gbWHdTxt(s,gi){
+  const L=s._wgIdx[gi]||[], h=L.length&&gbIsH(s.w[L[0]].b), fut=L.filter(i=>s.w[i].b.fut).length, on=L.filter(i=>s.w[i].on);
+  return `미처방 ${L.length}${h?'처':'블럭'}${fut?(' (시작 예정 '+fut+' 포함)'):''} · 체크 <b>${on.length}</b> · <b>${gbMan(on.reduce((a,i)=>a+gbN(s.w[i].amt),0))}</b>만`;
+}
+function gbWRow(s,i){
+  const r=s.w[i], b=r.b, isH=gbIsH(b);
+  const ndTag=b.dupNd?(' · <span class="gb-tag gb-tag-w">④ 병원신약 후보와 같은 '+(isH?'거래처':'처방')+'('+esc(((s.nd.filter(x=>x.c.신약키===b.dupNd)[0]||{}).c||{}).실납처명||'위 후보')+') — 한 곳에만 금액</span>'):'';
+  const st=(b.fut?`<span class="gb-tag gb-fut">시작 예정 ${esc(monLbl(b.start))}</span>`:('시작 '+esc(monLbl(b.start))));
+  const vt=isH?gbVolDup(s,b):null;   // [QA🟡-5] 같은 거래처가 ③에도 있음(표시만)
+  const volTag=vt?(' · <span class="gb-tag gb-tag-w">같은 거래처가 ③에도 있습니다('+esc(vt)+') — 한 곳에만</span>'):'';
+  const meta=isH?(`신청 ${numOf(b.n)}품목 · ${st} · MBO ${gbMan(b.m12)}만`+(r.on?'':(' · 체크 시 '+gbMan(b.amt0)+'만(새로 열린 처 첫 달 평균 · '+esc(b.src||'팀')+')'))+ndTag+volTag)
+                :(st+' · MBO '+gbMan(b.m12)+'만'+(r.on?'':(' · 체크 시 '+gbMan(b.amt0)+'만'))+ndTag);
+  const pl=(isH&&(b.p||[]).length)?`<details class="gb-pl"><summary>신청 품목 ${(b.p||[]).length}개 보기</summary><div>${(b.p||[]).map(esc).join(' · ')}</div></details>`:'';
+  return `<div class="gb-r gb-w${r.on?' on':''}" id="gb-wr-${i}"><label class="gb-cl"><input type="checkbox" ${r.on?'checked':''} onchange="gbWOn(${i},this.checked)">`
+    +`<span><b>${esc(b.hosp||'-')}</b> <span class="gb-p">${isH?'처':esc(b.rep||b.prod||'')}</span><span class="gb-r-m">${meta}</span></span></label>`+pl
+    +(r.on?gbInRow('w',i,r.amt,r.why,'메모 (선택)'):'')+'</div>';
+}
+function gbWList(s){
+  gbWGroups(s);
+  const filt=!!String(s.q||'').trim()||s.onlyAmt;
+  let h='', shown=0;
+  s._wg.forEach((co,gi)=>{
+    const vis=gbWVis(s,gi); if(!vis.length) return; shown+=vis.length;
+    const open=filt||!!s.openCo[co];
+    h+=`<details class="gb-co"${open?' open':''} ontoggle="gbWToggle(${gi},this)"><summary><span class="gb-co-n">${esc(co)}</span><span class="gb-co-m" id="gb-wh-${gi}">${gbWHdTxt(s,gi)}</span></summary>`
+      +`<div id="gb-wb-${gi}">${open?vis.map(i=>gbWRow(s,i)).join(''):''}</div></details>`;   // 접힌 업체의 행은 펼칠 때 그린다(지연 렌더)
+  });
+  if(!shown) h='<div class="row-empty">'+(String(s.q||'').trim()?'검색 결과가 없습니다':(s.onlyAmt?'체크한 곳이 없습니다':'아직 미처방인 PRM 신청처가 없습니다'))+'</div>';
+  return h;
+}
+function gbWToggle(gi,el){
+  const s=gbState(); if(!s||!s._wg) return; const co=s._wg[gi];
+  if(!String(s.q||'').trim() && !s.onlyAmt) s.openCo[co]=!!el.open;
+  if(el.open){ const body=document.getElementById('gb-wb-'+gi); if(body && !body.firstChild) body.innerHTML=gbWVis(s,gi).map(i=>gbWRow(s,i)).join(''); }
+}
+function gbWGroupHd(s,i){ if(!s._wgi) return; const gi=s._wgi[i]; const el=document.getElementById('gb-wh-'+gi); if(el) el.innerHTML=gbWHdTxt(s,gi); }
+function gbWOn(i,on){
+  const s=gbState(); if(!s||!s.w||!s.w[i]) return; const r=s.w[i];
+  r.on=!!on; r._bad=false;
+  if(r.on && !(gbN(r.amt)>0)) r.amt=Math.round(numOf(r.b.amt0))||'';   // 체크 = 기본 금액(서버 amt0, 원 — 110대 블럭 MBO12×35% / 처 = 처당 첫 달 평균)
+  const row=document.getElementById('gb-wr-'+i); if(row) row.outerHTML=gbWRow(s,i);
+  gbWGroupHd(s,i);
+  s.dirty=true; gbSaveLocal(s); gbUpdateTotals();
+}
+/* [v70 묶음] 업체 한 줄 — 이번 달 열 처 수(0~미처방 처 정수) → 금액 = 처 수 × 처당(고치기 전까지 자동), 메모 선택, 거래처 목록은 읽기 전용(펼칠 때 렌더) */
+function gbBkRow(s,i){
+  const r=s.bk[i], x=r.x, o=x.openRate||{}, on=gbN(r.n)>0;
+  return `<div class="gb-c gb-bk${on?' on':''}" id="gb-bk-${i}"><div class="gb-r-t"><b>${esc(x.co||'')}</b> <span class="gb-tag">업체 묶음</span></div>`
+    +`<div class="gb-r-m">미처방 <b>${numOf(x.n)}처</b>(${numOf(x.blocks)}품목${x.fut?(' · 시작 예정만 '+x.fut+'처'):''}) · 최근 처 개시율 ${gbPct(o.v)} (${numOf(o.num)}/${numOf(o.den)} · 최근 3개월 신청 처 기준) · 1처 ${gbMan(x.amtPer)}만(${x.src==='업체'?'이 업체 처당 평균':('이 업체 처당 평균 — 표본이 적어 '+esc(x.src||'팀')+' 값')}${x.avgN?(' '+x.avgN+'처'):''} · 극단값 제외)</div>`
+    +`<div class="gb-r-i gb-bk-i"><span class="gb-bk-l">이번 달 열 처 수</span><input class="fi gb-n" id="gb-bn-${i}" type="text" inputmode="numeric" placeholder="0" value="${esc(r.n===''?'':String(r.n))}" oninput="gbBkN(${i},this)">`
+    +`<span class="gb-bk-l">처 →</span><input class="fi gb-amt" id="gb-a-bk-${i}" type="text" inputmode="decimal" placeholder="만원" value="${esc(wonToMan(r.amt))}" oninput="gbBkAmt(${i},this)"><span class="gb-bk-l">만</span></div>`
+    +`<div class="gb-r-i"><input class="fi gb-why" id="gb-w-bk-${i}" type="text" placeholder="메모 (선택)" value="${esc(r.why||'')}" oninput="gbWhy('bk',${i},this)"></div>`
+    +`<details class="gb-old" ontoggle="gbBkList(${i},this)"><summary>거래처 목록 보기 — 미처방 ${numOf(x.n)}처 (읽기 전용)</summary><div class="gb-in" id="gb-bl-${i}"></div></details></div>`;
+}
+function gbBkList(i,el){ if(!el.open) return; const s=gbState(); if(!s||!s.bk[i]) return; const body=document.getElementById('gb-bl-'+i); if(!body||body.firstChild) return;
+  body.innerHTML=(s.bk[i].hs||[]).map(h=>`<div class="gb-old-r"><b>${esc(h.hosp||'-')}</b> · 신청 ${numOf(h.n)}품목 · ${h.fut?'시작 예정 ':'시작 '}${esc(monLbl(h.start))} · MBO ${gbMan(h.m12)}만</div>`).join('')||'<div class="gb-old-r">목록이 없습니다</div>'; }
+function gbBkN(i,el){
+  const s=gbState(); if(!s||!s.bk||!s.bk[i]) return; const r=s.bk[i], cap=numOf(r.x.n);
+  const v=String(el.value||'').replace(/[,\s]/g,''), n=v===''?'':Number(v);
+  if(v!=='' && (!isFinite(n) || n<0 || Math.round(n)!==n || n>cap)){ r._badN=true; el.classList.add('over'); toast('이번 달 열 처 수는 0~'+cap+' 사이 정수입니다(미처방 '+cap+'처)'); gbTouch(s); return; }
+  r._badN=false; el.classList.remove('over'); r.n=n;
+  if(!r.ed){ r.amt=(gbN(n)>0)?gbN(n)*numOf(r.x.amtPer):''; const a=document.getElementById('gb-a-bk-'+i); if(a){ a.value=wonToMan(r.amt); a.classList.remove('over'); r._bad=false; } }
+  const c=document.getElementById('gb-bk-'+i); if(c) c.classList.toggle('on',gbN(n)>0);
+  gbTouch(s);
+}
+function gbBkAmt(i,el){
+  const s=gbState(); if(!s||!s.bk||!s.bk[i]) return; const r=s.bk[i];
+  const mv=manValue(el.value);
+  if(mv!=null && mv>MAN_MAX){ r._bad=true; el.classList.add('over'); toast(manOverMsg(mv)); gbTouch(s); return; }
+  r._bad=false; el.classList.remove('over'); r.amt=manToWon(el.value);
+  r.ed=(String(el.value||'').trim()!=='') && gbN(r.amt)!==gbN(r.n)*numOf(r.x.amtPer);   // 비우거나 자동값과 같으면 다시 자동
+  gbTouch(s);
+}
+function gbRxRows(){
+  const p=gbPrm()||{}, T=p.confirmedMonth||'', T1=T?gbShift(T,-1):'';
+  const LB={유지:['유지','gb-rx-k'],개시:['새로 처방','gb-rx-n'],끊김:['끊김','gb-rx-c']};
+  const row=(b,isH)=>{ const t=LB[b.st]||[b.st||'',''];
+    return `<div class="gb-r"><div class="gb-r-t"><b>${esc(b.hosp||'-')}</b> <span>${isH?('처 · '+numOf(b.n)+'품목'):esc(b.rep||b.prod||'')}</span></div>`
+      +`<div class="gb-r-m"><span class="gb-tag ${t[1]}">${esc(t[0])}</span> ${isH?'':'110대 · '}${esc(b.co||'')} · ${isH?'처음 시작':'시작'} ${esc(monLbl(b.start))} · `
+      +((b.last&&!numOf(b.aT)&&!numOf(b.aP))?`마지막 처방 ${esc(monLbl(b.last))} · ${esc(monLbl(T1))}·${esc(monLbl(T))} 0`   // [QA🟡-4] 예전에 처방이 났다 끊긴 곳
+        :`${esc(monLbl(T1))} ${gbMan(b.aP)}만 → ${esc(monLbl(T))} ${gbMan(b.aT)}만`)+`</div></div>`; };
+  return ((p.hrx||[]).map(b=>row(b,true)).join('')+(p.rx||[]).map(b=>row(b,false)).join(''))||'<div class="row-empty">처방 중인 곳이 없습니다</div>';
+}
+function gbFbAck(on){ const s=gbState(); if(!s) return; s.fbAck=!!on; }   // [QA🟡-6] 전송 전 확인(로컬 초안엔 저장 안 함 — 열 때마다 다시 확인)
+function gbRxToggle(el){ if(!el.open) return; const body=document.getElementById('gb-rx-body'); if(body && !body.firstChild) body.innerHTML=gbRxRows(); }
+function gbPrmSec(s){
+  const g=gbData(), p=g.prm, rs=gbRampState();
+  let h='<div class="gb-sec"><div class="gb-h">② PRM 신청처 처방 개시 <span>이번 달 처방을 낼 곳만</span><b id="gb-v2"></b></div>';
+  h+=gbKpiLine(g.kpi);
+  if(s.fbOld && s.fbOld.n>0){   // [QA🟡-6] 전환기 — v69 폼으로 적은 ④ PRM 신규블럭(FB|)은 새 폼이 그리지 않아 다시 내면 빠진다
+    h+=`<div class="gb-warn">지난 방식으로 적은 PRM 신규블럭 ${s.fbOld.n}건·${gbMan(s.fbOld.amt)}만은 새 방식에서는 ② 처방 개시로 옮겨 적어야 합니다 — 이대로 다시 내면 빠집니다.`
+      +(s.fbOld.amt>0?`<label class="gb-chk" style="margin-top:6px"><input type="checkbox" id="gb-fback" ${s.fbAck?'checked':''} onchange="gbFbAck(this.checked)">확인했습니다</label>`:'')+'</div>';
+  }
+  if(rs!=='ok'){
+    let why;
+    if(!p) why='② PRM 신청처 목록이 아직 준비되지 않았습니다 — ②는 이번에 고칠 수 없습니다(최대 1시간 뒤 새로고침).';
+    else if(p.stale) why=`② 목록 갱신 중이라 ②는 지금 고칠 수 없습니다(목록 ${esc(monLbl(p.confirmedMonth))} · 실적 ${esc(monLbl(g.base&&g.base.month))}) — ${(p.confirmedMonth&&g.base&&g.base.month&&p.confirmedMonth<g.base.month)?'새 목록이 들어오면 열립니다':'최대 1시간 뒤 새로고침하면 열립니다'}.`;
+    else why='② 목록을 받지 못했습니다 — 새로고침해 주세요. 지금 보내도 저장된 ②는 그대로 둡니다.';
+    return h+'<div class="gb-warn">'+why+gbKeptTxt70(s)+'</div></div>';
+  }
+  const sm=p.sum||{}, hw=sm.hw||{n:0,m12:0}, wN=(sm.wait&&sm.wait.n)||0, fN=(sm.fut&&sm.fut.n)||0, rate=Math.round(numOf(p.rate)*100);
+  const av=p.avg||{}, avM=av.mine||av.team||null;
+  h+=`<div class="sec-note" style="margin-bottom:6px">PRM을 신청했는데 아직 처방이 한 번도 안 나온 곳입니다. <b>이번 달 처방을 낼 곳만 체크</b>하세요(고칠 수 있음).<br>`
+    +`· 110대병원 외 = <b>처</b> 단위 — 금액 = 새로 열린 처의 첫 달 평균(극단값 제외 — 업체 ${numOf(p.avgMinN)||10}처 이상이면 업체 값, 아니면 지부장·팀 값${avM?(', 내 평균 '+gbMan(avM.v)+'만'):''})<br>`
+    +`· 110대병원 = <b>블럭(품목)</b> 단위 — 금액 = 신청 MBO의 ${rate}%</div>`;
+  if(s.old && s.old.nPos>0) h+=`<div class="gb-info">지난 방식으로 적은 ② ${s.old.nPos}건 · ${gbMan(s.old.amt)}만 — 새 방식으로 다시 내면 교체됩니다(지금 저장된 근거 합에는 들어 있고, 아래 합계는 체크 기준).</div>`;
+  if(s.gone && s.gone.length) h+=`<div class="gb-info">지난번 체크한 ${s.gone.length}곳(${gbMan(s.gone.reduce((a,x)=>a+numOf(x.금액),0))}만)은 지금 미처방 목록에 없습니다(처방 시작 등) — 다시 내면 빠집니다.</div>`;
+  if(s.bk.length){
+    h+=`<div class="gb-meta2" style="margin-top:4px">업체 묶음 — 신청이 많은 업체는 거래처별 대신 <b>이번 달 열 처 수</b>만 적습니다. 이 업체 처방처는 ③·④에 따로 적지 않습니다.</div>`;
+    h+=s.bk.map((r,i)=>gbBkRow(s,i)).join('');
+  }
+  h+=`<div class="gb-tools"><input class="fi" id="gb-q" type="search" placeholder="거래처·품목·업체 검색" value="${esc(s.q)}" oninput="gbSearch(this.value)" autocomplete="off">`
+    +`<label class="gb-chk"><input type="checkbox" ${s.onlyAmt?'checked':''} onchange="gbOnlyAmt(this.checked)">체크한 것만 보기</label></div>`;
+  const hwN=s.w.filter(r=>gbIsH(r.b)).length;
+  h+=`<div class="gb-meta2">미처방 처 ${hwN}곳${(sm.bulk&&sm.bulk.n)?(' (묶음 업체 '+sm.bulk.n+'처 제외)'):''} · 110대 미처방 블럭 ${wN}${fN?(' · 시작 예정 '+fN):''} · 실매출(VAT 제외) 기준 · 업체를 눌러 펼칩니다</div>`;
+  h+='<div id="gb-ramp-list">'+gbWList(s)+'</div>';
+  const hr=sm.hrx||{n:(p.hrx||[]).length}, rx=sm.rx||{n:(p.rx||[]).length};
+  h+='<div class="gb-meta2" style="margin-top:10px">처방 중인 곳은 이미 ① 기반에 들어 있습니다. 품목을 더 내거나 늘어날 금액은 ③ 추가 볼륨업에 적습니다.</div>';
+  h+=`<details class="gb-old" ontoggle="gbRxToggle(this)"><summary>처방 중 처 ${hr.n||0}곳(유지 ${hr.유지||0} · 새로 처방 ${hr.개시||0} · 끊김 ${hr.끊김||0}) · 110대 블럭 ${rx.n||0} — 금액 칸 없음</summary><div class="gb-in" id="gb-rx-body"></div></details>`;
+  return h+'</div>';
+}
 function gbRampSec(s){
+  if(s.v70) return gbPrmSec(s);   // [v70]
   const g=gbData(), r=g.ramp;
   let h='<div class="gb-sec"><div class="gb-h">② 램프업 <span>최근 시작한 PRM 블럭 — 늘어날 금액만</span><b id="gb-v2"></b></div>';
   // [v69 QA🟡-1] 목록 없음·갱신 중 — ② 행을 보내지 않고, 서버가 저장된 ② 행을 그대로 둔다(합계·GAP에 저장분 포함)
@@ -2401,11 +2656,12 @@ function gbVuSec(s){
     h+=s.vuC.map((r,i)=>{ const c=r.c;
       return `<div class="gb-c${r.on?' on':''}"><label class="gb-cl"><input type="checkbox" ${r.on?'checked':''} onchange="gbOn('vuC',${i},this.checked)">`
         +`<span><b>${esc(c.병원명||'-')}</b> ${esc(c.품목||'')} <span class="gb-tag">${esc(c.상태||'진행')}</span></span></label>`
-        +`<div class="gb-r-m">${esc(c.업체명||'업체 미기재')} · 증대MBO ${gbMan(c.증대MBO)}만${c.내용?(' · '+esc(c.내용)):''}${c.dupRamp?(' · <span class="gb-tag gb-tag-w">② 램프업 블럭과 같은 처방('+esc(gbRampLbl(c.dupRamp,s))+') — 한 곳에만 금액</span>'):''}</div>`
+        +`<div class="gb-r-m">${esc(c.업체명||'업체 미기재')} · 증대MBO ${gbMan(c.증대MBO)}만${c.내용?(' · '+esc(c.내용)):''}${(c.dupRamp&&!s.v70)?(' · <span class="gb-tag gb-tag-w">② 램프업 블럭과 같은 처방('+esc(gbRampLbl(c.dupRamp,s))+') — 한 곳에만 금액</span>'):''}${(c.dupPrm&&s.v70)?(' · <span class="gb-tag gb-tag-w">② PRM 신청처(미처방)와 같은 처방('+esc(gbRampLbl(c.dupPrm,s))+') — 한 곳에만 금액</span>'):''}${s.v70?gbVuHwTag(s,c.dupHosp?((s.w.filter(x=>x.k===c.dupHosp)[0]||{}).b||null):(gbP10(c.사업자번호)?null:gbHwDup(s,'',c.병원명))):''}</div>`
         +(r.on?gbInRow('vuC',i,r.amt,r.why,'근거 한 줄 (필수)'):'')+'</div>'; }).join('');
   }
   h+=s.vuM.map((r,i)=>`<div class="rowbox"><button class="row-del" onclick="gbDel('vuM',${i})">×</button>`
       +`<input class="fi top-in" id="gb-h-vuM-${i}" type="text" list="gb-hosp-dl" placeholder="거래처 (병원명 자동완성)" value="${esc(r.거래처)}" oninput="gbFld('vuM',${i},'거래처',this)" autocomplete="off">`
+      +`<div class="gb-r-m" id="gb-vt-vuM-${i}">${s.v70?gbVuHwTag(s,String(r.거래처||'').trim()?gbHwDup(s,r.사업자번호,r.거래처):null).replace(/^ · /,''):''}</div>`   // [QA🟡-5]
       +`<input class="fi" id="gb-p-vuM-${i}" type="text" placeholder="품목" value="${esc(r.품목)}" oninput="gbFld('vuM',${i},'품목',this)">`
       +gbInRow('vuM',i,r.amt,r.why,'근거 한 줄 (필수)')+'</div>').join('');
   return h+'<div style="margin-top:8px"><button class="row-add" onclick="gbAdd(\'vuM\')">＋ 볼륨업 직접 추가 (거래처·품목·금액·근거)</button></div></div>';
@@ -2419,8 +2675,10 @@ function gbNewSec(s){
     return `<div class="gb-c${r.on?' on':''}"><label class="gb-cl"><input type="checkbox" ${r.on?'checked':''} ${noAmt?'disabled':''} onchange="gbOn('nd',${i},this.checked)">`
       +`<span><b>${esc(c.실납처명||'-')}</b> ${esc(c.기준품명||'')} <span class="gb-st">${esc(c.신약과정||'')}</span>${c.is110?' <span class="gb-tag">110대</span>':''}${c.is110Unknown?' <span class="gb-tag">110대 여부 확인 필요</span>':''}${c.needStartMonth?' <span class="gb-tag gb-tag-w">처방시작월 확인 필요 — 이미 처방 중이면 ① 기반에 포함돼 있습니다</span>':''}</span></label>`
       +`<div class="gb-r-m">${esc(c.업체명||'업체 미기재')} · MBO ${gbMan(c.MBO)}만${c.코딩예측월?(' · 코딩예측 '+esc(monLbl(c.코딩예측월))):''}${c.처방시작월?(' · 처방시작 '+esc(monLbl(c.처방시작월))):''}`
-      +(c.dupRamp?(' · <span class="gb-tag gb-tag-w">② 램프업 블럭과 같은 처방('+esc(gbRampLbl(c.dupRamp,s))+') — 한 곳에만 금액</span>'):'')
-      +(c.dupFuture?(' · <span class="gb-tag gb-tag-w">④ PRM 신규블럭과 같은 처방('+esc(fbDup?((fbDup.b.hosp||'-')+'·'+(fbDup.b.rep||fbDup.b.prod||'')):'아래 참고 목록')+') — 한 곳에만 금액</span>'):'')+'</div>'
+      +(c.dupRamp?(s.v70?(' · <span class="gb-tag gb-tag-w">처방 중 PRM 블럭과 같은 처방('+esc(gbRampLbl(c.dupRamp,s))+') — 이미 ① 기반 실적에 들어 있을 수 있습니다</span>'):(' · <span class="gb-tag gb-tag-w">② 램프업 블럭과 같은 처방('+esc(gbRampLbl(c.dupRamp,s))+') — 한 곳에만 금액</span>')):'')
+      +((s.v70&&c.dupPrm)?(' · <span class="gb-tag gb-tag-w">② PRM 신청처(미처방)와 같은 처방('+esc(gbRampLbl(c.dupPrm,s))+') — 한 곳에만 금액</span>'):'')   // [v70]
+      +((s.v70&&c.dupHosp)?(' · <span class="gb-tag gb-tag-w">② 미처방 처('+esc(((s.w.filter(x=>x.k===c.dupHosp)[0]||{}).b||{}).hosp||'같은 거래처')+')와 같은 거래처 — 한 곳에만 금액</span>'):'')   // [v70 처]
+      +((!s.v70&&c.dupFuture)?(' · <span class="gb-tag gb-tag-w">④ PRM 신규블럭과 같은 처방('+esc(fbDup?((fbDup.b.hosp||'-')+'·'+(fbDup.b.rep||fbDup.b.prod||'')):'아래 참고 목록')+') — 한 곳에만 금액</span>'):'')+'</div>'
       +(noAmt?(c.needStartMonth?'<div class="gb-r-m">처방시작월이 비어 있어 금액을 넣을 수 없습니다(이미 처방 중이면 ① 기반 실적에 들어 있음). 이번 달 새 처방이면 MBO 탭 처방시작월을 채워 달라고 관리자에게 알려 주세요.</div>':'<div class="gb-r-m">110대 여부 확인 필요 — DC통과 단계는 금액을 넣을 수 없습니다(110대면 코딩 이후만). MBO 탭 110대 여부가 채워지면 열립니다.</div>')
         :(r.on?gbInRow('nd',i,r.amt,r.why,'근거 (선택 — 비우면 후보 단계로 기록)'):'<div class="gb-r-m">제외 — 근거에 넣지 않습니다(성장동력으로 표시)</div>'))+'</div>'; }).join('')
     :'<div class="gb-r-m" style="padding:4px 2px 8px">처방 단계에 온 병원신약 후보가 없습니다</div>';
@@ -2462,7 +2720,7 @@ function gbRender(){
   else if(sum) h+=`<div class="gb-info">${esc(monLbl(s.ym))} 근거 저장됨 — 갱신 ${esc(sum.갱신일||'')} · ${numOf(sum.제출수)||1}회 제출. 고치면 이 달 근거 전체가 새 내용으로 바뀝니다.</div>`
     +(sum.stale?`<div class="gb-warn">기반 실적이 갱신됐습니다(저장 ${esc(monLbl(sum.기반월))} → 지금 ${esc(monLbl(g.base&&g.base.month))}) — 근거를 다시 확인해 전송해 주세요.</div>`:'')
     +((isNow&&sum.목표불일치&&!s.dirty)?`<div class="gb-warn">근거 작성 때 목표(${esc(sum.목표구분||'')} ${eok(numOf(sum.목표))}) → 확정 ${eok(numOf(sum.목표확정값))}, 근거 재제출 필요 — 아래 합계·GAP은 확정 목표 기준입니다. <button type="button" class="row-add" style="margin-top:6px" onclick="gbResend()">확정 목표로 근거 다시 보내기</button></div>`:'');   // [v69 N3]
-  else h+=`<div class="gb-info">${esc(monLbl(s.ym))} 근거를 아직 저장하지 않았습니다. ①은 자동이고, ②③④에 늘어날 금액을 적으면 아래에 근거 합과 GAP이 계산됩니다.</div>`;
+  else h+=`<div class="gb-info">${esc(monLbl(s.ym))} 근거를 아직 저장하지 않았습니다. ①은 자동이고, ${s.v70?'②에서 이번 달 처방을 낼 PRM 신청처를 체크하고 ③④에 늘어날 금액을 적으면':'②③④에 늘어날 금액을 적으면'} 아래에 근거 합과 GAP이 계산됩니다.</div>`;
   if(s.restored && s.dirty) h+='<div class="gb-info">이 기기에 남은 작성 중 초안을 불러왔습니다(아직 전송 전).</div>';
   // 목표
   if(isNow){
@@ -3307,9 +3565,9 @@ function saveExcel(){
   // [v69] 목표 근거 — 지금 화면의 대상월(금액 0·제외 행은 뺌)
   const _gs=(GB.rpm===rpm&&crmReady&&gbData()&&!gbData().error)?GB.st[GB.ym]:null;
   if(_gs){
-    const _bk={}; _gs.ramp.forEach(x=>{ if(x.b) _bk[x.k]=x.b; }); _gs.fb.forEach(x=>{ _bk[x.b.k]=x.b; }); _gs.nd.forEach(x=>{ _bk[x.c.신약키]={hosp:x.c.실납처명,rep:x.c.기준품명}; });
+    const _bk={}; _gs.ramp.forEach(x=>{ if(x.b) _bk[x.k]=x.b; }); (_gs.w||[]).forEach(x=>{ _bk[x.k]=gbIsH(x.b)?{hosp:x.b.hosp,rep:'(처)'}:x.b; }); (_gs.bk||[]).forEach(x=>{ _bk[x.x.key]={hosp:'(업체 묶음 '+x.x.co+' · '+gbN(x.n)+'처)',rep:''}; }); _gs.fb.forEach(x=>{ _bk[x.b.k]=x.b; }); _gs.nd.forEach(x=>{ _bk[x.c.신약키]={hosp:x.c.실납처명,rep:x.c.기준품명}; });
     const _gr=gbRows(_gs).filter(r=>!r.제외&&gbN(r.금액)>0).map(r=>{ const b=_bk[r.블럭키||r.신약키]; if(b){ r.거래처=r.거래처||b.hosp||''; r.품목=r.품목||b.rep||b.prod||''; } return r; });
-    const ws=XLSX.utils.aoa_to_sheet([['지부장','대상월','항목','키','거래처','품목','카테고리','금액(원)','근거'],..._gr.map(r=>[rpm,_gs.ym,r.항목,r.블럭키||r.신약키||r.볼륨업키||r.행키||'',r.거래처||'',r.품목||'',r.카테고리||'',gbN(r.금액),r.근거||''])]);
+    const ws=XLSX.utils.aoa_to_sheet([['지부장','대상월','항목','키','거래처','품목','카테고리','금액(원)','근거'],..._gr.map(r=>[rpm,_gs.ym,(_gs.v70&&r.항목==='②램프업')?'② PRM 신청처 처방 개시':r.항목,r.블럭키||r.신약키||r.볼륨업키||r.행키||'',r.거래처||'',r.품목||'',r.카테고리||'',gbN(r.금액),r.근거||r.메모||''])]);   // [v70] ② 표시 이름·메모
     XLSX.utils.book_append_sheet(wb,ws,'목표근거');
   }
   // 볼륨업
