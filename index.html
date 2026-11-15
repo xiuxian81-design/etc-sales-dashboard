@@ -26,6 +26,7 @@ if(!window.__gateTok())window.__gateGo("no_token");else if(DOC==="dash")window._
 @font-face{font-family:'MaruBuri';src:url('fonts/MaruBuri-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="brief_export.js"></script><!-- [v71] 전략브리핑 Word·대상 리스트 엑셀 생성기(데이터 내장 없음 — docx·ExcelJS는 버튼 누를 때만 CDN) -->
 <script>
 /* ══════════════════════════════════════════
    Google Sheets 실시간 연동
@@ -2906,6 +2907,18 @@ tr.clickable.sel td{background:var(--blue-lt)}   /* [v58] 업체 현황 선택 �
 .crm-kpi .b .t{font-size:11px;color:var(--gray3);margin-top:3px}
 .crm-kpi-up{color:var(--ok)} .crm-kpi-dn{color:var(--watch)}
 .crm-kpi .b .t.crm-kpi-110{border-top:1px dashed var(--gray2);padding-top:3px;font-size:10.5px}
+/* [v71] 핵심지표 두 줄 표(전략브리핑 1절과 같은 칸·문구) · 내려받기 버튼 · GAP 극복을 위한 할 일 */
+.crm-k2{min-width:780px}   /* 좁은 화면 = 표 안에서 가로 스크롤(칸이 세로로 찌그러지지 않게) */
+.crm-k2 td,.crm-k2 th{white-space:normal;word-break:keep-all;font-size:11.5px;line-height:1.4;vertical-align:middle}
+.crm-k2 th{font-size:10.5px}
+.crm-k2 td.l{text-align:left;font-weight:700}
+.crm-k2 tr.tm td{font-size:10.5px;color:var(--gray3);font-weight:400}
+.crm-k2 .p{color:#8B4513;font-weight:800}
+.crm-k2 tr.tm .p{color:var(--gray3);font-weight:400}
+.crm-k2 .r12{display:block;font-size:10px;color:var(--gray3);font-weight:400}
+.crm-dl{border:1px solid var(--hair);background:#fff;border-radius:50px;padding:7px 13px;font-size:12px;font-weight:700;color:var(--blue);cursor:pointer;font-family:inherit}
+.crm-dl:hover{border-color:var(--blue)} .crm-dl[disabled]{opacity:.55;cursor:wait}
+.crm-gt{margin:6px 0 0 18px;padding:0;font-size:12px;line-height:1.6;color:var(--gray5)}
 </style>
 <script>
 var crmData=null, crmLoaded=false, crmLoading=false;
@@ -3192,6 +3205,43 @@ function crmKpiHtml(k){
     +'</div><div class="crm-sub2">매출 = 처방 '+u+' 수 × '+u+'당 매출 · 처방 '+u+' = 새로 개시 + 유지'+(b?' · 처당 매출 = '+fcEsc(crmMon(k.rpbFrom||''))+' 이후 시작해 '+fcEsc(crmMon(k.month))+'에 처방이 난 처의 평균 · 110대병원은 블럭(품목) 단위로 따로':'')+'</div></div>';
   return h;
 }
+/* [v71] 핵심지표 두 줄 표 — goalBasis.kpi2(mine·team). 칸·문구 = 전략브리핑 Word 1절(BriefExport.coreRows 같은 함수). 진행율 100% 초과 줄만 12개월 후 MBO 참고치(작게) */
+function crmKpi2Html(k2,dir){
+  var BE=window.BriefExport; if(!BE||!k2||!k2.mine) return '';
+  var cmn=parseInt(String(k2.month||'').slice(5,7),10), lom=parseInt(String(k2.from||'').slice(5,7),10);
+  var cell=function(v){ var p=String(v).split(BE.SMALL_RE||'\n(12개월'); return fcEsc(p[0]).replace(/\n/g,'<br>')+p.slice(1).map(function(x){ return '<span class="r12">'+fcEsc(BE.SMALL_RE?x:('(12개월'+x))+'</span>'; }).join(''); };   /* 작은 글씨 줄 = 12개월 후 참고치 · [QA🟡-5] '그중 n처는 이전에 신청한 품목만 처방 중' */
+  var rows=BE.coreRows(k2,dir).map(function(r){
+    return '<tr'+(r.team?' class="tm"':'')+'><td class="l">'+fcEsc(r.label.trim()).replace(/\n/g,'<br>')+'</td>'+r.cells.map(function(c,i){ return '<td'+(i===3?' class="p"':'')+'>'+cell(c)+'</td>'; }).join('')+'</tr>'; }).join('');
+  var h='<div class="section-card"><h3>🧭 핵심지표 <span style="font-size:11px;font-weight:400;color:var(--gray3)">최근 3개월 PRM 신청('+lom+'~'+cmn+'월 시작 + 시작 예정) · '+cmn+'월 확정 실적 기준 · '+fcEsc(k2.basis||'실매출(VAT 제외)')+' · 작은 줄 = 팀</span></h3>';
+  if(k2.stale) h+='<div class="crm-note">실적이 새로 들어와 지표 갱신 대기 중입니다 — 아래는 '+fcEsc(crmMon(k2.month))+' 기준 값입니다.</div>';
+  h+='<div class="tbl-wrap"><table class="btbl fc-tbl crm-k2"><thead><tr>'+BE.CORE_HEADS(cmn).map(function(x){ return '<th>'+fcEsc(x).replace(/\n/g,'<br>')+'</th>'; }).join('')+'</tr></thead><tbody>'+rows+'</tbody></table></div>';
+  return h+'<div class="crm-sub2">'+fcEsc(BE.CORE_NOTE)+'</div></div>';
+}
+/* [v71] 지부장 상세 내려받기 — 누르면 mode=crm&gb=1&dir=지부장으로 그 지부장 목록·저장분을 받아 BriefExport로 생성(대상월 = 3번 표에서 보고 있는 달, 다음달은 저장분이 있을 때만) */
+function crmFetchDir(dir){
+  return new Promise(function(ok,no){
+    var url=(document.getElementById('gs-sheet-url').value||'').trim(); if(!url){ no(new Error('먼저 상단 “🔄 실시간 불러오기”를 실행해 URL을 활성화하세요')); return; }
+    var cb='__crmDir_'+Date.now().toString(36), s=document.createElement('script'), done=false;
+    var end=function(){ done=true; try{ s.remove(); }catch(e){} try{ delete window[cb]; }catch(e){ window[cb]=undefined; } };
+    var to=setTimeout(function(){ if(done) return; end(); no(new Error('응답이 늦습니다 — 잠시 뒤 다시 눌러 주세요')); },90000);
+    window[cb]=function(res){ if(window.__gateGuard&&window.__gateGuard(res)) return; if(done) return; clearTimeout(to); end();
+      var d=(res&&res.success&&Array.isArray(res.directors))?res.directors.filter(function(x){ return x&&x.name===dir; })[0]:null;
+      if(d) ok({d:d,meta:res.meta||{}}); else no(new Error((res&&res.message)||'목록을 받지 못했습니다')); };
+    s.onerror=function(){ if(done) return; clearTimeout(to); end(); no(new Error('연결 실패 — 네트워크/URL 확인')); };
+    s.src=url+'?mode=crm&gb=1&dir='+encodeURIComponent(dir)+'&callback='+cb+'&_='+Date.now()+window.__gateQ();
+    document.head.appendChild(s);
+  });
+}
+function crmBriefDl(kind,btn){
+  var d=crmDirs()[crmView.dirIdx], st=document.getElementById('crm-dl-st'); if(!d||!window.BriefExport) return;
+  var g=d.goalBasis||{}, ms=g.targetMonths||[], ym=(crmGbYm&&ms.indexOf(crmGbYm)>=0)?crmGbYm:(ms[0]||crmMeta().nowMonth);
+  if(ym!==ms[0] && !((g.saved||{})[ym])) ym=ms[0];
+  var t0=btn.textContent; btn.disabled=true; btn.textContent='만드는 중…'; if(st) st.textContent='';
+  crmFetchDir(d.name).then(function(r){ return BriefExport.download(kind,r.d,r.meta,{ym:ym}); })
+    .then(function(M){ if(st) st.textContent='내려받음 — '+BriefExport.fileName(kind,M); })
+    .catch(function(e){ if(st) st.textContent='⚠ '+String((e&&e.message)||e); })
+    .then(function(){ btn.disabled=false; btn.textContent=t0; });
+}
 function crmGbHtml(d,meta,plans,planTbl){
   var g=d.goalBasis||{};
   var title='<h3 style="flex-wrap:wrap;gap:6px">🎯 3. 목표 근거';
@@ -3224,13 +3274,15 @@ function crmGbHtml(d,meta,plans,planTbl){
     +box('① 기반 '+fcEsc(crmMon(s.기반월)),fcMan(s.기반액)+'만','최신 확정월 실적 · 자동')
     +(v70?box('② PRM 신청처 처방 개시',fcMan(s.램프업합)+'만',redo2?'재작성 필요 — 저장분 합계 제외':s2sub)
          :box('② 램프업',fcMan(s.램프업합)+'만',redo2?'재작성 필요 — 저장분 합계 제외':('최근 시작 PRM 블럭 증분 · 목록 '+(Number(s.목록수)||0)+'블럭')))
-    +box('③ 추가 볼륨업',fcMan(s.볼륨업합)+'만','기존 처방처 증량')
+    +(g.kpi2?box('③ 추가 볼륨 예측',fcMan(s.볼륨업합)+'만','업체·거래처 단위 — 더 나올 금액'):box('③ 추가 볼륨업',fcMan(s.볼륨업합)+'만','기존 처방처 증량'))   // [v71] 이름
     +box('④ 신규계획',fcMan(s.신규합)+'만','처방 단계 신약 · 새 처방')
     +box('근거 합',crmMoney(s.근거합),fcMan(s.근거합)+'만')
     +box(fcEsc(crmMon(ym))+' 목표 <span class="crm-badge'+(tKind==='확정'?' on':' wait')+'" style="padding:1px 7px">'+fcEsc(tKind)+'</span>',crmMoney(tgt),fcMan(tgt)+'만')
-    +box('GAP (목표 − 근거 합)',gapTxt,gapMan===0?'근거가 목표와 맞음':'아래 GAP 계획','color:'+(gapMan===0?'var(--ok)':'var(--bad)'))
+    +box('GAP (목표 − 근거 합)',gapTxt,gapMan===0?'근거가 목표와 맞음':'아래 GAP 극복을 위한 할 일','color:'+(gapMan===0?'var(--ok)':'var(--bad)'))
     +'</div>';
-  if(String(s.GAP계획||'').trim()) h+='<div class="crm-note" style="margin-top:9px"><b>GAP 계획</b> — '+fcEsc(s.GAP계획)+'</div>';
+  /* [v71] GAP 극복을 위한 할 일 — 저장분 줄 배열(GAP할일, 없으면 GAP계획 줄바꿈) */
+  var gtl=(Array.isArray(s.GAP할일)&&s.GAP할일.length)?s.GAP할일:String(s.GAP계획||'').split('\n').map(function(x){ return x.trim(); }).filter(Boolean);
+  if(gtl.length) h+='<div class="crm-note" style="margin-top:9px"><b>GAP 극복을 위한 할 일</b><ol class="crm-gt">'+gtl.map(function(x){ return '<li>'+fcEsc(x)+'</li>'; }).join('')+'</ol></div>';
   if(s.stale) h+='<div class="crm-note" style="margin-top:9px">기반 실적이 갱신됐습니다(저장 때 기반 '+fcEsc(crmMon(s.기반월))+') — 지부장이 근거를 다시 확인해야 합니다.</div>';
   if(tMis) h+='<div class="crm-note" style="margin-top:9px">근거 작성 때 목표('+fcEsc(s.목표구분||'')+' '+crmMoney(s.목표)+') → 확정 '+crmMoney(s.목표확정값)+', 근거 재제출 필요 — GAP은 확정 목표로 다시 계산했습니다.</div>';
   if(redo2) h+='<div class="crm-note" style="margin-top:9px">기반이 '+fcEsc(s.기반월||'')+'으로 바뀌어 ②는 새 목록이 오면 다시 적어야 합니다(지금 합계에서 제외).</div>';
@@ -3249,7 +3301,8 @@ function crmGbHtml(d,meta,plans,planTbl){
   var amtOf=function(r){ return Number(r['금액'])||0; };
   var trs=function(list,kind){ return list.map(function(r){ var ex=!!r['제외'];
     var bk=(kind==='②'&&r['방식']==='묶음');   // [v70 묶음] 거래처 칸 = 업체명 · 예상 n처
-    return '<tr'+(ex?' style="opacity:.55"':'')+'><td style="text-align:left;font-weight:600">'+fcEsc(bk?((r['업체']||'-')+' · 예상 '+(Number(r['예상처'])||0)+'처'):(r['거래처']||'-'))+(kind==='②'?keepTxt(r):'')+'</td>'
+    var up=(kind==='③'&&r['대상종류']==='업체');   // [v71] ③ 업체 단위 행 = 거래처 지정 없음
+    return '<tr'+(ex?' style="opacity:.55"':'')+'><td style="text-align:left;font-weight:600">'+fcEsc(bk?((r['업체']||'-')+' · 예상 '+(Number(r['예상처'])||0)+'처'):(up?'업체 단위(거래처 지정 없음)':(r['거래처']||'-')))+(kind==='②'?keepTxt(r):'')+'</td>'
       +'<td style="text-align:left">'+fcEsc((kind==='②'&&(r['방식']==='처'||bk))?(bk?'업체 묶음':'처(품목 무관)'):(r['품목']||'-'))+'</td>'
       +'<td style="text-align:left">'+fcEsc(kind==='④'?(r['카테고리']||'-'):(r['업체']||'-'))+'</td>'
       +'<td style="font-weight:700;white-space:nowrap">'+(ex?'제외':(fcMan(r['금액'])+'만'))+'</td>'
@@ -3272,7 +3325,7 @@ function crmGbHtml(d,meta,plans,planTbl){
   };
   var it=function(k){ return rows.filter(function(r){ return r['항목']===k; }); };
   if(rOld && it('②램프업').length) h+='<div class="crm-sub2">② 목록 '+((v70?pm:g.ramp)?'갱신 중':'준비 안 됨')+' — 저장된 ② '+it('②램프업').length+'행을 그대로 보여 줍니다</div>';
-  h+='<div style="margin-top:10px">'+det(v70?'② PRM 신청처 처방 개시':'② 램프업',it('②램프업'),'②')+det('③ 추가 볼륨업',it('③볼륨업'),'③')+det('④ 신규계획',it('④신규'),'④')+'</div>';
+  h+='<div style="margin-top:10px">'+det(v70?'② PRM 신청처 처방 개시':'② 램프업',it('②램프업'),'②')+det(g.kpi2?'③ 추가 볼륨 예측':'③ 추가 볼륨업',it('③볼륨업'),'③')+det('④ 신규계획',it('④신규'),'④')+'</div>';   // [v71] ③ 이름
   return h+'</div>';
 }
 
@@ -3286,10 +3339,13 @@ function renderCrmDirector(){
   h+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">'
     +'<button class="crm-back" onclick="crmBackAll()">‹ 전체</button>'
     +'<div style="font-size:19px;font-weight:800;letter-spacing:-.02em">'+fcEsc(crmDirLabel(d.name))+' 지부장</div>'
-    +'<span class="crm-badge'+(meta.confirmedMonth?' on':'')+'">확정 실적 기준: '+fcEsc(crmMon(meta.confirmedMonth))+(meta.confirmedPartial?' (일부)':'')+'</span></div>';
+    +'<span class="crm-badge'+(meta.confirmedMonth?' on':'')+'">확정 실적 기준: '+fcEsc(crmMon(meta.confirmedMonth))+(meta.confirmedPartial?' (일부)':'')+'</span>'
+    +((d.goalBasis&&d.goalBasis.kpi2&&window.BriefExport)?('<span style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><button class="crm-dl" onclick="crmBriefDl(\'docx\',this)">전략브리핑 자료 받기(Word)</button><button class="crm-dl" onclick="crmBriefDl(\'xlsx\',this)">대상 리스트 받기(엑셀)</button><span id="crm-dl-st" style="font-size:11px;color:var(--gray3)"></span></span>'):'')   // [v71]
+    +'</div>';
 
-  /* [v70] 핵심지표 4칸 — 1번 위(kpi 없으면 그리지 않음) */
-  if(d.goalBasis&&d.goalBasis.kpi) h+=crmKpiHtml(d.goalBasis.kpi);
+  /* [v70] 핵심지표 4칸 — 1번 위(kpi 없으면 그리지 않음) · [v71] kpi2가 있으면 두 줄 표로 교체 */
+  if(d.goalBasis&&d.goalBasis.kpi2&&window.BriefExport) h+=crmKpi2Html(d.goalBasis.kpi2,d.name);
+  else if(d.goalBasis&&d.goalBasis.kpi) h+=crmKpiHtml(d.goalBasis.kpi);
   /* 1. 평가 실적 현황 */
   var cm=meta.confirmedMonth||d.confirmedMonth||'';
   var cVal=(d.actuals&&cm)?d.actuals[cm]:null;
@@ -3297,7 +3353,7 @@ function renderCrmDirector(){
   h+='<div class="section-card"><h3>📌 1. 평가 실적 현황</h3><div class="crm-stat">'
     +'<div class="b"><div class="l">'+fcEsc(crmMon(cm))+' 확정 실적</div><div class="v">'+crmMoney(cVal)+'</div><div class="s">'+(cVal!=null&&cVal!==''?(Number(cVal).toLocaleString()+'원'):'실적 입력 대기')+'</div></div>'
     +'<div class="b"><div class="l">성장 vs 직전 3개월 평균</div><div class="v" style="color:'+crmPctColor(g3.pct)+'">'+crmPctTxt(g3.pct)+'</div><div class="s">기준 '+crmMoney(g3.ref)+' · 차이 '+((Number(g3.diff)||0)>=0?'+':'−')+crmMoney(Math.abs(Number(g3.diff)||0))+'</div></div>'
-    +'<div class="b"><div class="l">성장 vs 전년 평균</div><div class="v" style="color:'+crmPctColor(gy.pct)+'">'+crmPctTxt(gy.pct)+'</div><div class="s">'+(gy.ref==null?'전년 데이터 없음':('기준 '+crmMoney(gy.ref)))+'</div></div>'
+    +'<div class="b"><div class="l">전년 같은 달 대비</div><div class="v" style="color:'+crmPctColor(gy.pct)+'">'+crmPctTxt(gy.pct)+'</div><div class="s">'+(gy.ref==null?'전년 데이터 없음':('기준 '+crmMoney(gy.ref)))+'</div></div>'
     +'</div></div>';
 
   /* 2. 실적 흐름 스트립 */

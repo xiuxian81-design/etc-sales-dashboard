@@ -80,6 +80,8 @@ if(!window.__gateTok())window.__gateGo("no_token");else if(DOC==="dash")window._
 @font-face{font-family:'MaruBuri';src:url('fonts/MaruBuri-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="brief_export.js"></script><!-- [v71] 전략브리핑 Word·대상 리스트 엑셀 생성기(데이터 내장 없음 — docx·ExcelJS는 버튼 누를 때만 CDN) -->
+
 <script>
 /* ── GAS URL (고정) ── */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyhk2el3kwGMStCvyUr-8B-PWS-6aKwcf5EVfvpryqlj3jEeLw5pnttHMEokrpQXO33dQ/exec';
@@ -688,6 +690,30 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
 .gb-tag.gb-rx-n{background:var(--blue-lt);color:var(--blue-dk)}
 .gb-tag.gb-rx-c{background:#f3ebe4;color:#7a4b22}
 .gb-kpi.gb-kpi2{background:transparent;border:1px dashed var(--gray2);font-size:10.5px;margin-top:-4px}   /* [v70 처] 110대 블럭 값(작게) */
+/* [v71] 핵심지표 두 줄 · 내려받기 버튼 · ③ 추가 볼륨 예측(대상 자동완성·@ 후보 — 화면 안 펼침 목록, 375px 안) · GAP 극복을 위한 할 일 */
+.gb-kpi.gb-k2{display:block}
+.gb-k2-h{font-size:10.5px;color:var(--gray3);margin-bottom:3px}
+.gb-k2-r{overflow-wrap:anywhere;word-break:keep-all}
+.gb-k2-r+.gb-k2-r{margin-top:2px;padding-top:3px;border-top:1px dashed var(--gray2)}
+.gb-k2-s{font-size:10px;color:var(--gray3)}
+.gb-dl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 10px}
+.gb-dl .row-add{font-size:12px;min-height:44px;padding:8px 6px;line-height:1.3}
+.gb-dl .row-add[disabled]{opacity:.55;cursor:wait}
+.gb-kind{max-width:220px}
+.gb-kind button{min-height:36px;font-size:12px}
+.gb-ac{border:1px solid var(--gray2);border-radius:10px;background:#fff;max-height:260px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;min-width:0}
+.gb-ac-i{display:block;width:100%;text-align:left;border:none;border-bottom:1px solid var(--hair);background:#fff;padding:9px 10px;min-height:44px;font-family:inherit;font-size:13px;color:var(--gray5);cursor:pointer;overflow-wrap:anywhere;word-break:keep-all}
+.gb-ac-i:last-child{border-bottom:none}
+.gb-ac-i.sel,.gb-ac-i:hover{background:var(--blue-lt)}
+.gb-ac-i .gb-r-m{display:block}
+.gb-ac-n{padding:9px 10px;font-size:11.5px;color:var(--gray3)}
+.gb-at-t{display:flex;gap:4px;padding:6px;border-bottom:1px solid var(--hair);background:var(--gray1);position:sticky;top:0}
+.gb-at-t button{flex:1;min-height:40px;border:none;border-radius:8px;background:none;font-family:inherit;font-size:12px;font-weight:700;color:var(--gray4);cursor:pointer;white-space:normal}
+.gb-at-t button.on{background:#fff;color:var(--gray5);box-shadow:0 1px 3px rgba(0,0,0,.10)}
+.gb-gt{display:flex;align-items:center;gap:6px}
+.gb-gt+.gb-gt{margin-top:6px}
+.gb-gt b{flex:0 0 18px;font-size:13px;color:var(--gray4);text-align:right}
+.gb-gt .fi{flex:1;min-width:0}
 .gb-pl{margin:0 0 2px 28px;font-size:11px;color:var(--gray4);min-width:0}
 .gb-pl>summary{cursor:pointer;color:var(--gray3);min-height:24px}
 .gb-pl>div{overflow-wrap:anywhere;line-height:1.5}
@@ -1474,6 +1500,7 @@ function selRpm(r,btn){
   loadDaily();          // [v39] 서버 프리필(crm) + 오늘자 localStorage 임시저장 복원
   renderClosing();
   renderPlans();
+  gbListLoad(r);           // [v71] 그 지부장 ② 목록 요청(crm 요약이 아직이면 도착 때 요청)
   gbReset(); gbRender();   // [v69] ② 이번달 목표 근거
   renderDone();
   renderTodo();
@@ -1508,12 +1535,40 @@ function loadCrm(){
       //   ① 작성 중이던 계획 행의 _edit(입력칸 표시)가 날아가 고칠 수 없는 텍스트로 굳고
       //   ② 서버 월간계획이 localStorage 값으로 통째 교체돼 화면에서 사라진 채 제출되면(월 단위 전체교체) 시트에서 지워졌다.
       //   → 손대지 않은 항목만 채우고, 서버 계획은 '없는 행만' 병합하는 applyCrmLate()로 교체.
-      if(rpm) applyCrmLate();
+      if(rpm){ gbListLoad(rpm); applyCrmLate(); }   // [v71] 지부장을 먼저 골랐으면 그 지부장 목록 요청
     }
   };
   sc.onerror=function(){ try{document.head.removeChild(sc);}catch(e){} crmLoading=false; };
-  sc.src=GAS_URL+'?mode=crm&gb=1&callback='+cb+'&t='+Date.now()+window.__gateQ();   // [v70] gb=1 = ② PRM 신청처 목록(wait·rx) 포함 — 대시보드는 안 붙임(응답 크기)
+  sc.src=GAS_URL+'?mode=crm&callback='+cb+'&t='+Date.now()+window.__gateQ();   // [v71] 처음 = 4명 요약만(빠르게) · ② 목록은 지부장 선택 뒤 gbListLoad(gb=1&dir=지부장)
   document.head.appendChild(sc);
+}
+/* [v71] 그 지부장 ② 목록(미처방·처방 중·@ 후보·자동완성 이름) — mode=crm&gb=1&dir=지부장. v70 GAS는 dir을 모르고 4명 목록을 주지만 그 지부장 카드만 쓴다.
+   받는 동안 ② 카드는 '불러오는 중'(상태를 요약 데이터로 만들지 않는다) · 실패·시간 초과면 요약 데이터로 연다(목록 없음 = v70 보존 경로, rampSent:false) */
+let gbList={dir:'',st:''};
+function gbFetchDir(dir){
+  return new Promise(function(ok,no){
+    const cb='__crmDir_'+Date.now().toString(36)+Math.floor(Math.random()*1e4);
+    const sc=document.createElement('script'); let done=false;
+    const end=function(){ done=true; try{ document.head.removeChild(sc); }catch(e){} try{ delete window[cb]; }catch(e){ window[cb]=undefined; } };
+    const to=setTimeout(function(){ if(done) return; end(); no(new Error('목록 응답이 늦습니다 — 잠시 뒤 다시 시도해 주세요')); },90000);
+    window[cb]=function(res){ if(window.__gateGuard&&window.__gateGuard(res)) return; if(done) return; clearTimeout(to); end();
+      const d=(res&&res.success&&Array.isArray(res.directors))?res.directors.filter(x=>x&&x.name===dir)[0]:null;
+      d?ok({d:d,meta:res.meta||{}}):no(new Error((res&&res.message)||'목록을 받지 못했습니다')); };
+    sc.onerror=function(){ if(done) return; clearTimeout(to); end(); no(new Error('목록을 받지 못했습니다 — 네트워크를 확인해 주세요')); };
+    sc.src=GAS_URL+'?mode=crm&gb=1&dir='+encodeURIComponent(dir)+'&callback='+cb+'&t='+Date.now()+window.__gateQ();
+    document.head.appendChild(sc);
+  });
+}
+function gbListPending(){ return !!rpm && !(gbList.dir===rpm && (gbList.st==='ok'||gbList.st==='fail')); }
+function gbListLoad(dir){
+  if(!crmReady||!dir) return;
+  if(gbList.dir===dir && gbList.st) return;
+  gbList={dir:dir,st:'loading'};
+  gbFetchDir(dir).then(function(r){
+    if(crm&&Array.isArray(crm.directors)){ const i=crm.directors.findIndex(x=>x&&x.name===dir); if(i>=0) crm.directors[i]=r.d; }
+    if(gbList.dir===dir) gbList.st='ok';
+  }).catch(function(){ if(gbList.dir===dir) gbList.st='fail'; })
+    .then(function(){ if(rpm===dir){ gbReset(); renderWhenIdle('c-gb',gbRender); } });
 }
 /* 업체명 자동완성 마스터 = 서버 vendors(최근 활동순) ∪ 기존 CSO 업체 datalist */
 function buildVendorMaster(){
@@ -2081,7 +2136,7 @@ function gbMan(won){ return Math.round((Number(won)||0)/10000).toLocaleString();
 function gbSigned(won){ const m=Math.round((Number(won)||0)/10000); return (m>0?'+':(m<0?'−':''))+Math.abs(m).toLocaleString()+'만'; }
 function gbEokMan(won){ const n=Number(won)||0; return (n/1e8).toFixed(2)+'억 <span style="font-weight:400;color:var(--gray3);font-size:11px">('+gbMan(n)+'만)</span>'; }
 function gbCatVal(c){ return (c.k && c.k!==c.label) ? (c.k+' '+c.label) : c.label; }
-function gbBlank3(r){ return !String(r.거래처||'').trim() && !String(r.품목||'').trim() && !gbN(r.amt) && !String(r.why||'').trim(); }
+function gbBlank3(r){ return !String((r.대상!=null?r.대상:r.거래처)||'').trim() && !String(r.품목||'').trim() && !gbN(r.amt) && !String(r.why||'').trim(); }   // [v71] 대상 칸(업체·거래처)
 function gbBlank4(r){ return !String(r.cat||'').trim() && gbBlank3(r); }
 function gbCo(r){ return r.b ? (r.b.co||'(업체 미기재)') : (r.co||'(목록 밖)'); }
 
@@ -2091,6 +2146,9 @@ function gbBuild(ym){
   const sv=(g.saved&&g.saved[ym])||null, rows=(sv&&sv.rows)||[], sum=(sv&&sv.summary)||null;
   const byKey={}; rows.forEach(r=>{ byKey[String(r.행키||'')]=r; });
   const s={ym:ym,dirty:false,target:'',ramp:[],vuC:[],vuM:[],nd:[],fb:[],m4:[],gapPlan:(sum&&sum.GAP계획)||'',q:'',onlyAmt:false,openCo:{},_gi:{}};
+  // [v71] GAP 극복을 위한 할 일(줄 배열 — 저장분 GAP할일, 없으면 GAP계획 문자열을 줄로) · v71 = kpi2 키가 있는 응답(③ 업체/거래처 대상 1칸·@ 후보)
+  s.gapTodo=(sum&&Array.isArray(sum.GAP할일)&&sum.GAP할일.length)?sum.GAP할일.slice():String((sum&&sum.GAP계획)||'').split('\n').map(x=>x.trim()).filter(Boolean);
+  s.v71=!!(g.kpi2);
   // [v69 QA🟡-1] 서버에 저장된 ② 행(목록이 갱신 중·없을 때 서버가 그대로 보존하는 대상) · 상태를 만든 때의 ② 목록월
   s.kept=rows.filter(r=>r.항목==='②램프업');
   s._rampM=gbRampOk()?gbListM():'';
@@ -2121,7 +2179,10 @@ function gbBuild(ym){
   // ③ 볼륨업 후보(P5 — 대상월 = 목표월만, 기본 미체크) + 직접 추가
   (g.volupCandidates||[]).filter(c=>c.목표월===ym).forEach(c=>{ const r=byKey['VU|'+c.볼륨업키];
     s.vuC.push({c:c,on:!!(r&&!r.제외),amt:r?(Math.round(numOf(r.금액))||''):(Math.round(numOf(c.증대MBO))||''),why:r?(r.근거||''):String(c.내용||'').replace(/\s+/g,' ').trim()}); });
-  rows.forEach(r=>{ if(r.항목==='③볼륨업' && !/^VU\|/.test(String(r.행키||''))) s.vuM.push({id:r.행키||gbMid(),거래처:r.거래처||'',사업자번호:r.사업자번호||'',품목:r.품목||'',amt:Math.round(numOf(r.금액))||'',why:r.근거||''}); });
+  rows.forEach(r=>{ if(r.항목==='③볼륨업' && !/^VU\|/.test(String(r.행키||''))){
+    if(s.v71){ const kd=(r.대상종류==='업체')?'업체':'거래처', hm=/(?:^|;)후보=([^;]*)/.exec(String(r.참고값||''));   // [v71] 업체 행 = 대상 업체명 · 거래처 행(v70 저장분 포함) = 대상 거래처명
+      s.vuM.push({id:r.행키||gbMid(),kind:kd,대상:kd==='업체'?(r.업체||''):(r.거래처||''),업체:r.업체||'',거래처:kd==='거래처'?(r.거래처||''):'',사업자번호:r.사업자번호||'',품목:r.품목||'',amt:Math.round(numOf(r.금액))||'',why:r.근거||'',후보:hm?hm[1]:''}); }
+    else s.vuM.push({id:r.행키||gbMid(),거래처:r.거래처||'',사업자번호:r.사업자번호||'',품목:r.품목||'',amt:Math.round(numOf(r.금액))||'',why:r.근거||''}); } });
   // ④ 처방 단계 병원신약 후보 — 기본 체크(같은 처방 ②·P9가 있으면 해제), 금액 기본 = MBO
   //   [v69 QA🟡-4] canAmount===false(110대 여부 불명 + DC통과) = 체크 해제 고정(서버가 금액을 막음)
   (g.ndCandidates||[]).forEach(c=>{ const r=byKey['ND|'+c.신약키];
@@ -2133,6 +2194,7 @@ function gbBuild(ym){
   return s;
 }
 function gbState(){
+  if(gbListPending()) return null;   // [v71] 그 지부장 목록을 받는 중 — 요약 데이터로 상태를 만들지 않는다
   if(GB.rpm!==rpm) gbReset();
   const g=gbData(); if(!g||g.error) return null;
   const ms=gbMonths(); if(ms.indexOf(GB.ym)<0) GB.ym=ms[0];
@@ -2143,7 +2205,7 @@ function gbStrip(r){ const o={}; Object.keys(r).forEach(k=>{ if(k.charAt(0)!=='_
 function gbSaveLocal(s){
   try{
     const g=gbData()||{};
-    const o={base:(g.base&&g.base.month)||'',rampM:(g.ramp&&g.ramp.confirmedMonth)||'',target:s.target,gapPlan:s.gapPlan,ramp:{},vuC:{},nd:{},fb:{},vuM:s.vuM.map(gbStrip),m4:s.m4.map(gbStrip)};
+    const o={base:(g.base&&g.base.month)||'',rampM:(g.ramp&&g.ramp.confirmedMonth)||'',target:s.target,gapPlan:s.gapPlan,gapTodo:s.gapTodo||[],ramp:{},vuC:{},nd:{},fb:{},vuM:s.vuM.map(gbStrip),m4:s.m4.map(gbStrip)};   // [v71] gapTodo
     s.ramp.forEach(r=>{ if(r.amt!==''||String(r.why||'')) o.ramp[r.k]=[r.amt,r.why]; });
     s.vuC.forEach(r=>{ o.vuC[r.c.볼륨업키]=[r.on,r.amt,r.why]; });
     s.nd.forEach(r=>{ o.nd[r.c.신약키]=[r.on,r.amt,r.why]; });
@@ -2159,13 +2221,14 @@ function gbRestoreLocal(s){
     if((o.base||'')!==((g.base&&g.base.month)||'')){ localStorage.removeItem(gbLsKey(s.ym)); return; }   // 실적 갱신 → 초안 폐기(서버가 기반 불일치로 막는다)
     if(s.ym!==gbNowM() && o.target!==undefined) s.target=o.target;
     if(typeof o.gapPlan==='string') s.gapPlan=o.gapPlan;
+    if(Array.isArray(o.gapTodo)) s.gapTodo=o.gapTodo.slice(); else if(typeof o.gapPlan==='string') s.gapTodo=o.gapPlan.split('\n').map(x=>x.trim()).filter(Boolean);   // [v71] 이전 초안(문자열)은 줄로
     if(s.v70 && o.v70 && (o.prmM||'')===gbListM()){ s.w.forEach(r=>{ const v=o.w&&o.w[r.k]; if(v){ r.on=true; r.amt=v[0]; r.why=v[1]; } else { r.on=false; r.amt=''; r.why=''; } });   // [v70] 같은 목록월 초안만
       s.bk.forEach(r=>{ const v=o.bk&&o.bk[r.x.key]; if(v){ r.n=v[0]; r.amt=v[1]; r.why=v[2]; r.ed=!!v[3]; } else { r.n=''; r.amt=''; r.why=''; r.ed=false; } }); }   // [v70 묶음]
     if((o.rampM||'')===((g.ramp&&g.ramp.confirmedMonth)||'')) s.ramp.forEach(r=>{ const v=o.ramp&&o.ramp[r.k]; if(v){ r.amt=v[0]; r.why=v[1]; } else { r.amt=''; r.why=''; } });
     s.vuC.forEach(r=>{ const v=o.vuC&&o.vuC[r.c.볼륨업키]; if(v){ r.on=!!v[0]; r.amt=v[1]; r.why=v[2]; } });
     s.nd.forEach(r=>{ const v=o.nd&&o.nd[r.c.신약키]; if(v){ r.on=!!v[0]&&r.c.canAmount!==false; r.amt=v[1]; r.why=v[2]; } });
     s.fb.forEach(r=>{ const v=o.fb&&o.fb[r.b.k]; if(v){ r.on=!!v[0]; r.amt=v[1]; r.why=v[2]; } else r.on=false; });
-    if(Array.isArray(o.vuM)) s.vuM=o.vuM;
+    if(Array.isArray(o.vuM)){ s.vuM=o.vuM; if(s.v71) s.vuM.forEach(r=>{ if(r.대상==null) r.대상=r.거래처||''; if(r.kind!=='업체'&&r.kind!=='거래처') r.kind='거래처'; }); }   // [v71] v70 초안 행 = 거래처 대상
     if(Array.isArray(o.m4)) s.m4=o.m4;
     s.dirty=true; s.restored=true;
   }catch(e){}
@@ -2177,7 +2240,7 @@ function gbTotals(s){
   let s2=0,s3=0,s4=0;
   if(gbRampOk()){ if(s.v70){ s.w.forEach(r=>{ if(r.on) s2+=gbN(r.amt); }); (s.bk||[]).forEach(r=>{ if(gbN(r.n)>0) s2+=gbN(r.amt); }); } else s.ramp.forEach(r=>{ s2+=gbN(r.amt); }); }   // [v70] 체크한 블럭 금액 합 + [v70 묶음] 블럭 수 ≥1인 업체 금액(서버가 ② 전체를 이 값으로 교체 — 지난 방식 ②는 빠짐)
   else s2=gbRampBehind(s)?0:gbKeptSum(s);   // [v69 N1] 옛 기반 ②는 0 · [v69 QA🟡-1] 목록 갱신 중·없음 → 서버가 보존하는 저장분 ② 금액(서버 kept2 합과 같은 식: 제외 0)
-  s.vuC.forEach(r=>{ if(r.on) s3+=gbN(r.amt); }); s.vuM.forEach(r=>{ s3+=gbN(r.amt); });
+  s.vuC.forEach(r=>{ if(r.on) s3+=gbN(r.amt); }); s.vuM.forEach(r=>{ s3+=(r.후보==='DC통과'&&s.ym===gbNowM())?0:gbN(r.amt); });   // [QA🟡-1] 이번 달 DC 통과 행 = 0(gbVuDcNow와 같은 조건 — 하네스가 함수만 떼어 쓰므로 인라인)
   s.nd.forEach(r=>{ if(r.on) s4+=gbN(r.amt); }); s.fb.forEach(r=>{ if(r.on) s4+=gbN(r.amt); }); s.m4.forEach(r=>{ s4+=gbN(r.amt); });
   const isNow=(s.ym===gbNowM());
   const sm0=((g.saved||{})[s.ym]||{}).summary, cg0=(isNow&&sm0&&sm0.목표불일치)?Math.round(numOf(sm0.목표확정값)):0;   // [v69 N3] 확정 목표(① 칸이 비었을 때만 대신)
@@ -2214,7 +2277,13 @@ function gbValidate(s){
     if(!String(r.c.병원명||'').trim()||!String(r.c.품목||'').trim()) return {msg:'③볼륨업 '+nm+': 거래처·품목 필수(볼륨업 카드에서 보완)',id:'gb-a-vuC-'+i};
     if(!(gbN(r.amt)>0)) return {msg:'③볼륨업 '+nm+': 금액 필수',id:'gb-a-vuC-'+i};
     if(!String(r.why||'').trim()) return {msg:'③볼륨업 '+nm+': 근거 필수',id:'gb-w-vuC-'+i}; }
-  for(let i=0;i<s.vuM.length;i++){ const r=s.vuM[i]; if(gbBlank3(r)) continue; const nm=lbl(r.거래처,r.품목);
+  if(s.v71) for(let i=0;i<s.vuM.length;i++){ const r=s.vuM[i]; if(gbBlank3(r)) continue;   // [v71] ③ 추가 볼륨 예측 — 서버 규칙(대상 필수·금액 > 0이면 계획 내용 필수) + 계획 내용 없는 행은 서버가 버리므로 폼에서 먼저 알림
+    const tg=String(r.대상||'').trim(), nm=lbl(tg,r.품목);
+    if(r._bad) return {msg:'③ 추가 볼륨 예측 '+nm+': 만원 단위로 입력하세요',id:'gb-a-vuM-'+i};
+    if(!tg) return {msg:'③ 추가 볼륨 예측 '+(i+1)+'번째 줄: 대상(업체 또는 거래처)을 적어 주세요',id:'gb-h-vuM-'+i};
+    if(tg.indexOf('@')>=0) return {msg:'③ 추가 볼륨 예측 '+(i+1)+'번째 줄: @ 후보에서 고르거나 이름을 적어 주세요',id:'gb-h-vuM-'+i};
+    if(!String(r.why||'').trim()) return {msg:'③ 추가 볼륨 예측 '+nm+': 계획 내용을 적어 주세요'+(gbN(r.amt)>0?'':'(금액은 비워도 됩니다)'),id:'gb-w-vuM-'+i}; }
+  else for(let i=0;i<s.vuM.length;i++){ const r=s.vuM[i]; if(gbBlank3(r)) continue; const nm=lbl(r.거래처,r.품목);
     if(r._bad) return {msg:'③볼륨업 '+nm+': 만원 단위로 입력하세요',id:'gb-a-vuM-'+i};
     if(!String(r.거래처||'').trim()) return {msg:'③볼륨업 직접 추가: 거래처 필수',id:'gb-h-vuM-'+i};
     if(!String(r.품목||'').trim()) return {msg:'③볼륨업 '+nm+': 품목 필수',id:'gb-p-vuM-'+i};
@@ -2230,7 +2299,7 @@ function gbValidate(s){
     if(!(gbN(r.amt)>0)) return {msg:'④신규 '+nm+': 금액 필수',id:'gb-a-m4-'+i};
     if(!String(r.why||'').trim()) return {msg:'④신규 '+nm+': 근거 필수',id:'gb-w-m4-'+i}; }
   const dup=gbDupErr(s); if(dup) return dup;
-  if(t.gapMan!==0 && !String(s.gapPlan||'').trim()) return {msg:'GAP '+Math.round(t.gap/10000).toLocaleString()+'만 — GAP 계획을 적어 주세요',id:'gb-gap-plan'};
+  if(t.gapMan!==0 && !gbGapLines(s)[0]) return {msg:'GAP '+Math.round(t.gap/10000).toLocaleString()+'만 — GAP 극복을 위한 할 일 1번을 적어 주세요',id:'gb-gt-0'};   // [v71] 1번 줄 필수
   return null;
 }
 /* [v69 QA🟡-5] 이중 계상 — 서버가 표시해 준 같은 처방 쌍(nd.dupRamp·nd.dupFuture·vu.dupRamp·fb.dupNd)에 둘 다 금액이 있으면 차단.
@@ -2278,6 +2347,10 @@ function gbRows(s){
   s.vuC.forEach(r=>{ if(!r.on) return; const c=r.c;
     out.push({항목:'③볼륨업',볼륨업키:c.볼륨업키,거래처:tr(c.병원명),사업자번호:normBiz(c.사업자번호),품목:tr(c.품목),업체:tr(c.업체명),금액:gbN(r.amt),근거:tr(r.why)}); });
   s.vuM.forEach(r=>{ if(gbBlank3(r)) return;
+    if(s.v71){ const kd=(r.kind==='업체')?'업체':'거래처', tg=tr(r.대상!=null?r.대상:r.거래처);   // [v71] 대상종류 업체 = 업체명만 · 거래처 = 거래처(+업체·사업자번호), 품목 선택, 금액 0 + 계획만 허용
+      const o={항목:'③볼륨업',행키:r.id,대상종류:kd,업체:kd==='업체'?tg:tr(r.업체),품목:tr(r.품목),금액:(r.후보==='DC통과'&&s.ym===gbNowM())?0:gbN(r.amt),근거:tr(r.why)};   // [QA🟡-1] 이번 달 DC 통과 행 금액 0(gbVuDcNow와 같은 조건)
+      if(kd==='거래처'){ o.거래처=tg; o.사업자번호=normBiz(r.사업자번호); } if(r.후보) o.후보=r.후보;
+      out.push(o); return; }
     out.push({항목:'③볼륨업',행키:r.id,거래처:tr(r.거래처),사업자번호:normBiz(r.사업자번호),품목:tr(r.품목),금액:gbN(r.amt),근거:tr(r.why)}); });
   s.nd.forEach(r=>{ out.push({항목:'④신규',신약키:r.c.신약키,제외:!(r.on&&r.c.canAmount!==false),금액:gbN(r.amt),근거:tr(r.why)}); });   // 후보 전부(체크 해제·금액 불가 = 제외:true)
   s.fb.forEach(r=>{ if(!r.on) return; out.push({항목:'④신규',블럭키:r.b.k,금액:(r.amt===''?'':gbN(r.amt)),근거:tr(r.why)}); });
@@ -2294,7 +2367,8 @@ function gbCollect(){
   const other=ms.map(m=>GB.st[m]).filter(x=>x&&x.dirty&&x!==s)[0]||null;
   const err=gbValidate(s); if(err){ err.ym=s.ym; return {err:err,s:s}; }
   const t=gbTotals(s);
-  const p={대상월:s.ym,목표:t.target,기반월:(g.base&&g.base.month)||'',기반액:t.base,rows:gbRows(s),GAP계획:String(s.gapPlan||'').trim()};
+  const gl=gbGapLines(s).filter(Boolean);
+  const p={대상월:s.ym,목표:t.target,기반월:(g.base&&g.base.month)||'',기반액:t.base,rows:gbRows(s),GAP할일:gl,GAP계획:gl.join('\n')};   // [v71] GAP할일 배열(v71 GAS 우선) + GAP계획 줄바꿈 문자열(v70 GAS 호환)
   if(s.v70){ const pr=g.prm||{}; p.방식='개시'; p.rampSent=gbRampOk(); p.rampMonth=pr.confirmedMonth||''; p.rampGenerated=pr.generated||''; }   // [v70] 목록을 보여 줬으면 rampSent:true(체크 0건 = ② 0원), 아니면 false(서버가 저장된 ② 보존)
   else if(gbRampOk()){ p.rampMonth=g.ramp.confirmedMonth; p.rampGenerated=g.ramp.generated||''; } else { p.rampMonth=(g.ramp&&g.ramp.confirmedMonth)||''; p.rampGenerated=(g.ramp&&g.ramp.generated)||''; p.rampSent=false; }   // [v69 경합] stale·none도 폼이 본 목록월(없으면 '')을 싣고 ② 행 미전송을 표시 → 서버가 최신 목록이어도 ② 보존
   return {payload:p,s:s,t:t,other:other};
@@ -2359,10 +2433,17 @@ function gbTarget(el){
 /* [v69 N3] 손댈 것 없이 확정 목표로 근거만 다시 저장 — 카드를 '작성 중'으로 두면 다음 전송에 실린다 */
 function gbResend(){ const s=gbState(); if(!s) return; s.dirty=true; gbSaveLocal(s); gbRender(); toast('전송 버튼을 누르면 확정 목표 기준으로 근거가 다시 저장됩니다'); }
 function gbGapPlan(el){ const s=gbState(); if(!s) return; s.gapPlan=el.value; autoGrow(el); gbTouch(s); }
+/* [v71] GAP 극복을 위한 할 일 — 줄 배열(s.gapTodo). s.gapPlan = 줄바꿈으로 이은 값(이메일·v70 GAS 호환 GAP계획) */
+function gbGapLines(s){ return (s.gapTodo||[]).map(x=>String(x==null?'':x).replace(/\s+/g,' ').trim()); }
+function gbGapTodo(i,el){ const s=gbState(); if(!s) return; s.gapTodo=(s.gapTodo||[]).slice(); while(s.gapTodo.length<=i) s.gapTodo.push(''); s.gapTodo[i]=el.value; s.gapPlan=gbGapLines(s).filter(Boolean).join('\n'); gbTouch(s); }
+function gbGapAdd(){ const s=gbState(); if(!s) return; s.gapTodo=(s.gapTodo||[]).slice(); while(s.gapTodo.length<3) s.gapTodo.push(''); s.gapTodo.push('');
+  const box=document.getElementById('gb-gt-list'), i=s.gapTodo.length-1;
+  if(box){ box.insertAdjacentHTML('beforeend',`<div class="gb-gt"><b>${i+1}.</b><input class="fi" id="gb-gt-${i}" type="text" placeholder="(선택)" value="" oninput="gbGapTodo(${i},this)"></div>`); const el=document.getElementById('gb-gt-'+i); if(el) try{ el.focus(); }catch(e){} }
+  gbSaveLocal(s); }
 function gbOn(sec,i,on){ const s=gbState(); if(!s||!s[sec]||!s[sec][i]) return; if(sec==='nd' && s.nd[i].c.canAmount===false){ gbRender(); return; } s[sec][i].on=!!on; s.dirty=true; gbSaveLocal(s); gbRender(); }
 function gbAdd(sec){
   const s=gbState(); if(!s) return;
-  if(sec==='vuM') s.vuM.push({id:gbMid(),거래처:'',사업자번호:'',품목:'',amt:'',why:''});
+  if(sec==='vuM') s.vuM.push(s.v71?{id:gbMid(),kind:'거래처',대상:'',업체:'',거래처:'',사업자번호:'',품목:'',amt:'',why:'',후보:''}:{id:gbMid(),거래처:'',사업자번호:'',품목:'',amt:'',why:''});   // [v71] 대상 1칸
   else s.m4.push({id:gbMid(),cat:'',거래처:'',사업자번호:'',품목:'',amt:'',why:''});
   gbRender();
   const el=document.getElementById((sec==='vuM'?'gb-h-vuM-':'gb-c-m4-')+(s[sec].length-1)); if(el) try{ el.focus(); }catch(e){}
@@ -2392,8 +2473,9 @@ function gbEmailText(){
   const man=v=>Math.round((Number(v)||0)/10000).toLocaleString()+'만';
   const fmt=(tgt,base,bm,s2,s3,s4,sum,gap,plan,tag)=>{
     let b=`  ∙ 목표 ${tgt>0?((tgt/1e8).toFixed(2)+'억'):'미입력'} / 근거 합 ${(sum/1e8).toFixed(2)}억${tgt>0?(' / GAP '+gbSigned(gap)):''}${tag?(' ('+tag+')'):''}\n`;
-    b+=`  ∙ ① 기반(${monLbl(bm)}) ${man(base)} · ${gbV70()?'② PRM 신청처 처방 개시':'② 램프업'} ${man(s2)} · ③ 추가 볼륨업 ${man(s3)} · ④ 신규계획 ${man(s4)}\n`;   // [v70] 새 이름
-    if(String(plan||'').trim()) b+=`  ∙ GAP 계획: ${String(plan).trim()}\n`;
+    b+=`  ∙ ① 기반(${monLbl(bm)}) ${man(base)} · ${gbV70()?'② PRM 신청처 처방 개시':'② 램프업'} ${man(s2)} · ${(g&&g.kpi2)?'③ 추가 볼륨 예측':'③ 추가 볼륨업'} ${man(s3)} · ④ 신규계획 ${man(s4)}\n`;   // [v70] 새 이름 · [v71] ③ 이름
+    const pl=String(plan||'').split('\n').map(x=>x.trim()).filter(Boolean);
+    if(pl.length) b+=`  ∙ GAP 극복을 위한 할 일: ${pl.map((x,i)=>(i+1)+'. '+x).join(' / ')}\n`;   // [v71] 줄 배열
     return b;
   };
   if(!g||g.error) return '  ∙ 근거 데이터 없음\n';
@@ -2485,6 +2567,16 @@ function gbKpiLine(k){
   if(b) h+=`<div class="gb-kpi gb-kpi2"><span>110대 블럭</span><span>개시율 ${gbPct(b.open&&b.open.v)}${nd(b.open)}</span><span>유지율 ${gbPct(b.keep&&b.keep.v)}${nd(b.keep)}</span><span>블럭당 ${gbPct(b.rpb&&b.rpb.v)}</span></div>`;
   return h;
 }
+/* [v71] 핵심지표 두 줄 — 110대병원(품목) · 그 외 병원·로컬(처). 신청 · 처방 중 · 진행율(실적 ÷ 3개월 후 MBO, 100% 초과면 12개월 참고치 작게) · 끊김 · 미처방(+시작 예정) */
+function gbKpi2Line(k2){
+  const m=k2.mine||{}, cm=monLbl(k2.month||''), fm=monLbl(k2.from||'').replace('월','');
+  const ln=(lab,a,u)=>{ if(!a) return ''; const rx=a.rx||{}, w=a.wait||{}, n=numOf(a.n);
+    const ref=(numOf(rx.pg)>1&&rx.pg12!=null)?` <span class="gb-k2-s">(12개월 후 MBO 대비 ${gbPct(rx.pg12)})</span>`:'';
+    const old=numOf(rx.old)>0?` <span class="gb-k2-s">(그중 ${numOf(rx.old).toLocaleString()}${u}는 이전에 신청한 품목만 처방 중)</span>`:'';   // [QA🟡-5]
+    return `<div class="gb-k2-r"><b>${lab}</b> — 신청 ${n.toLocaleString()}${u} 중 처방 중 <b>${numOf(rx.n).toLocaleString()}${u}</b>${old} · 진행율 <b>${gbPct(rx.pg)}</b>${ref} · 끊김 ${numOf(a.cut).toLocaleString()}${u} · 미처방 ${numOf(w.n).toLocaleString()}${u}${numOf(a.fut)?(' · 시작 예정 '+numOf(a.fut).toLocaleString()+u):''}</div>`; };
+  return `<div class="gb-kpi gb-k2"><div class="gb-k2-h">핵심지표 — 최근 3개월 PRM 신청(${esc(fm)}~${esc(cm)} 시작 + 시작 예정) · ${esc(cm)} 실적 · 진행율 = ${esc(cm)} 실적 ÷ 3개월 후 MBO${k2.stale?' · 실적 갱신 대기 중':''}</div>`
+    +ln('110대병원',m['110'],'품목')+ln('그 외 병원·로컬',m.oth,'처')+'</div>';
+}
 function gbKeptTxt70(s){
   const g=gbData()||{}, n=(s.kept||[]).length, sm=gbKeptSum(s), on=(s.kept||[]).filter(x=>!x.제외&&numOf(x.금액)>0);
   if(!n) return ' 저장된 ②가 없어 이번 근거에서 ②는 0원입니다.';
@@ -2509,7 +2601,7 @@ function gbWVis(s,gi){
 }
 function gbWHdTxt(s,gi){
   const L=s._wgIdx[gi]||[], h=L.length&&gbIsH(s.w[L[0]].b), fut=L.filter(i=>s.w[i].b.fut).length, on=L.filter(i=>s.w[i].on);
-  return `미처방 ${L.length}${h?'처':'블럭'}${fut?(' (시작 예정 '+fut+' 포함)'):''} · 체크 <b>${on.length}</b> · <b>${gbMan(on.reduce((a,i)=>a+gbN(s.w[i].amt),0))}</b>만`;
+  return `미처방 ${L.length}${h?'처':(s.v71?'품목':'블럭')}${fut?(' (시작 예정 '+fut+' 포함)'):''} · 체크 <b>${on.length}</b> · <b>${gbMan(on.reduce((a,i)=>a+gbN(s.w[i].amt),0))}</b>만`;
 }
 function gbWRow(s,i){
   const r=s.w[i], b=r.b, isH=gbIsH(b);
@@ -2517,8 +2609,11 @@ function gbWRow(s,i){
   const st=(b.fut?`<span class="gb-tag gb-fut">시작 예정 ${esc(monLbl(b.start))}</span>`:('시작 '+esc(monLbl(b.start))));
   const vt=isH?gbVolDup(s,b):null;   // [QA🟡-5] 같은 거래처가 ③에도 있음(표시만)
   const volTag=vt?(' · <span class="gb-tag gb-tag-w">같은 거래처가 ③에도 있습니다('+esc(vt)+') — 한 곳에만</span>'):'';
-  const meta=isH?(`신청 ${numOf(b.n)}품목 · ${st} · MBO ${gbMan(b.m12)}만`+(r.on?'':(' · 체크 시 '+gbMan(b.amt0)+'만(새로 열린 처 첫 달 평균 · '+esc(b.src||'팀')+')'))+ndTag+volTag)
-                :(st+' · MBO '+gbMan(b.m12)+'만'+(r.on?'':(' · 체크 시 '+gbMan(b.amt0)+'만'))+ndTag);
+  const meta=s.v71   // [v71] MBO = 3개월 후 MBO로 통일 · 기본 금액 설명에서 내부 구분값(업체/지부장/팀) 뺌
+    ?(isH?(`신청 ${numOf(b.n)}품목 · ${st} · 3개월 후 MBO ${gbMan(b.m3!=null?b.m3:b.m12)}만`+(r.on?'':(' · 체크 시 '+gbMan(b.amt0)+'만(새로 열린 처 첫 달 평균)'))+ndTag+volTag)
+         :(st+' · 3개월 후 MBO '+gbMan(b.m3!=null?b.m3:b.m12)+'만'+(r.on?'':(' · 체크 시 '+gbMan(b.amt0)+'만(3개월 후 MBO의 '+Math.round(numOf((gbPrm()||{}).rate110||0.5)*100)+'%)'))+ndTag))
+    :(isH?(`신청 ${numOf(b.n)}품목 · ${st} · MBO ${gbMan(b.m12)}만`+(r.on?'':(' · 체크 시 '+gbMan(b.amt0)+'만(새로 열린 처 첫 달 평균 · '+esc(b.src||'팀')+')'))+ndTag+volTag)
+                :(st+' · MBO '+gbMan(b.m12)+'만'+(r.on?'':(' · 체크 시 '+gbMan(b.amt0)+'만'))+ndTag));
   const pl=(isH&&(b.p||[]).length)?`<details class="gb-pl"><summary>신청 품목 ${(b.p||[]).length}개 보기</summary><div>${(b.p||[]).map(esc).join(' · ')}</div></details>`:'';
   return `<div class="gb-r gb-w${r.on?' on':''}" id="gb-wr-${i}"><label class="gb-cl"><input type="checkbox" ${r.on?'checked':''} onchange="gbWOn(${i},this.checked)">`
     +`<span><b>${esc(b.hosp||'-')}</b> <span class="gb-p">${isH?'처':esc(b.rep||b.prod||'')}</span><span class="gb-r-m">${meta}</span></span></label>`+pl
@@ -2555,7 +2650,9 @@ function gbWOn(i,on){
 function gbBkRow(s,i){
   const r=s.bk[i], x=r.x, o=x.openRate||{}, on=gbN(r.n)>0;
   return `<div class="gb-c gb-bk${on?' on':''}" id="gb-bk-${i}"><div class="gb-r-t"><b>${esc(x.co||'')}</b> <span class="gb-tag">업체 묶음</span></div>`
-    +`<div class="gb-r-m">미처방 <b>${numOf(x.n)}처</b>(${numOf(x.blocks)}품목${x.fut?(' · 시작 예정만 '+x.fut+'처'):''}) · 최근 처 개시율 ${gbPct(o.v)} (${numOf(o.num)}/${numOf(o.den)} · 최근 3개월 신청 처 기준) · 1처 ${gbMan(x.amtPer)}만(${x.src==='업체'?'이 업체 처당 평균':('이 업체 처당 평균 — 표본이 적어 '+esc(x.src||'팀')+' 값')}${x.avgN?(' '+x.avgN+'처'):''} · 극단값 제외)</div>`
+    +(s.v71   // [v71] '분자/분모'·표본 설명 대신 풀어 쓴 말
+      ?`<div class="gb-r-m">미처방 <b>${numOf(x.n)}처</b>(${numOf(x.blocks)}품목${x.fut?(' · 시작 예정만 '+x.fut+'처'):''}) · 최근 3개월 신청 ${numOf(o.den)}처 중 ${numOf(o.num)}처 처방(${gbPct(o.v)}) · 1처 ${gbMan(x.amtPer)}만(새로 열린 처 첫 달 평균)</div>`
+      :`<div class="gb-r-m">미처방 <b>${numOf(x.n)}처</b>(${numOf(x.blocks)}품목${x.fut?(' · 시작 예정만 '+x.fut+'처'):''}) · 최근 처 개시율 ${gbPct(o.v)} (${numOf(o.num)}/${numOf(o.den)} · 최근 3개월 신청 처 기준) · 1처 ${gbMan(x.amtPer)}만(${x.src==='업체'?'이 업체 처당 평균':('이 업체 처당 평균 — 표본이 적어 '+esc(x.src||'팀')+' 값')}${x.avgN?(' '+x.avgN+'처'):''} · 극단값 제외)</div>`)
     +`<div class="gb-r-i gb-bk-i"><span class="gb-bk-l">이번 달 열 처 수</span><input class="fi gb-n" id="gb-bn-${i}" type="text" inputmode="numeric" placeholder="0" value="${esc(r.n===''?'':String(r.n))}" oninput="gbBkN(${i},this)">`
     +`<span class="gb-bk-l">처 →</span><input class="fi gb-amt" id="gb-a-bk-${i}" type="text" inputmode="decimal" placeholder="만원" value="${esc(wonToMan(r.amt))}" oninput="gbBkAmt(${i},this)"><span class="gb-bk-l">만</span></div>`
     +`<div class="gb-r-i"><input class="fi gb-why" id="gb-w-bk-${i}" type="text" placeholder="메모 (선택)" value="${esc(r.why||'')}" oninput="gbWhy('bk',${i},this)"></div>`
@@ -2580,7 +2677,20 @@ function gbBkAmt(i,el){
   r.ed=(String(el.value||'').trim()!=='') && gbN(r.amt)!==gbN(r.n)*numOf(r.x.amtPer);   // 비우거나 자동값과 같으면 다시 자동
   gbTouch(s);
 }
+/* [v71] 처방 중 목록 = 핵심지표 대상(in3 — 최근 3개월 신청)만. 행 = 확정월 실적(최근 3개월 신청 품목 실적 한 가지) · 3개월 후 MBO · 진행율 · 남은 금액(참고), 끊긴 처 = 마지막 처방월 */
+function gbRxRows71(){
+  const p=gbPrm()||{}, T=p.confirmedMonth||'';
+  const LB={유지:['유지','gb-rx-k'],개시:['새로 처방','gb-rx-n'],끊김:['끊김','gb-rx-c']};
+  const row=(b,isH)=>{ const t=LB[b.st]||[b.st||'',''];
+    const head=`<div class="gb-r"><div class="gb-r-t"><b>${esc(b.hosp||'-')}</b> <span>${isH?'처':esc(b.rep||b.prod||'')}</span></div><div class="gb-r-m"><span class="gb-tag ${t[1]}">${esc(t[0])}</span> ${isH?'':'110대 · '}${esc(b.co||'')} · `;
+    if(b.st==='끊김') return head+`마지막 처방 ${esc(monLbl(b.lastM||b.last))}${b.lastAmt!=null?(' '+gbMan(b.lastAmt)+'만'):''} · ${esc(monLbl(T))} 0</div></div>`;
+    const real=isH?numOf(b.a3):numOf(b.aT);
+    return head+`${esc(monLbl(T))} 실적 ${gbMan(real)}만 · 3개월 후 MBO ${gbMan(b.m3)}만 · 진행율 ${gbPct(b.pg)}${(numOf(b.pg)>1&&b.pg12!=null)?(' (12개월 후 MBO 대비 '+gbPct(b.pg12)+')'):''} · 남은 금액 ${gbMan(b.left)}만(참고)</div></div>`; };
+  const ord=b=>b.st==='끊김'?1:0, srt=L=>L.slice().sort((a,b)=>(ord(a)-ord(b))||String(a.co).localeCompare(String(b.co))||String(a.hosp).localeCompare(String(b.hosp)));
+  return (srt((p.hrx||[]).filter(b=>b.in3)).map(b=>row(b,true)).join('')+srt((p.rx||[]).filter(b=>b.in3)).map(b=>row(b,false)).join(''))||'<div class="row-empty">처방 중인 곳이 없습니다</div>';
+}
 function gbRxRows(){
+  if((gbData()||{}).kpi2) return gbRxRows71();   // [v71]
   const p=gbPrm()||{}, T=p.confirmedMonth||'', T1=T?gbShift(T,-1):'';
   const LB={유지:['유지','gb-rx-k'],개시:['새로 처방','gb-rx-n'],끊김:['끊김','gb-rx-c']};
   const row=(b,isH)=>{ const t=LB[b.st]||[b.st||'',''];
@@ -2595,7 +2705,7 @@ function gbRxToggle(el){ if(!el.open) return; const body=document.getElementById
 function gbPrmSec(s){
   const g=gbData(), p=g.prm, rs=gbRampState();
   let h='<div class="gb-sec"><div class="gb-h">② PRM 신청처 처방 개시 <span>이번 달 처방을 낼 곳만</span><b id="gb-v2"></b></div>';
-  h+=gbKpiLine(g.kpi);
+  h+=(g.kpi2&&g.kpi2.mine)?gbKpi2Line(g.kpi2):gbKpiLine(g.kpi);   // [v71] 핵심지표 두 줄(kpi2) — v70 응답이면 기존 한 줄
   if(s.fbOld && s.fbOld.n>0){   // [QA🟡-6] 전환기 — v69 폼으로 적은 ④ PRM 신규블럭(FB|)은 새 폼이 그리지 않아 다시 내면 빠진다
     h+=`<div class="gb-warn">지난 방식으로 적은 PRM 신규블럭 ${s.fbOld.n}건·${gbMan(s.fbOld.amt)}만은 새 방식에서는 ② 처방 개시로 옮겨 적어야 합니다 — 이대로 다시 내면 빠집니다.`
       +(s.fbOld.amt>0?`<label class="gb-chk" style="margin-top:6px"><input type="checkbox" id="gb-fback" ${s.fbAck?'checked':''} onchange="gbFbAck(this.checked)">확인했습니다</label>`:'')+'</div>';
@@ -2609,7 +2719,10 @@ function gbPrmSec(s){
   }
   const sm=p.sum||{}, hw=sm.hw||{n:0,m12:0}, wN=(sm.wait&&sm.wait.n)||0, fN=(sm.fut&&sm.fut.n)||0, rate=Math.round(numOf(p.rate)*100);
   const av=p.avg||{}, avM=av.mine||av.team||null;
-  h+=`<div class="sec-note" style="margin-bottom:6px">PRM을 신청했는데 아직 처방이 한 번도 안 나온 곳입니다. <b>이번 달 처방을 낼 곳만 체크</b>하세요(고칠 수 있음).<br>`
+  if(p.rate110!=null) h+=`<div class="sec-note" style="margin-bottom:6px">PRM을 신청했는데 아직 처방이 한 번도 안 나온 곳입니다. <b>이번 달 처방을 낼 곳만 체크</b>하세요(금액은 고칠 수 있음).<br>`   // [v71] 지부장이 읽기 쉬운 말로(기준·표본 설명 뺌)
+    +`· 110대병원 외 = <b>처</b> 단위 — 금액 = 새로 열린 처의 첫 달 평균${avM?(' (내 평균 '+gbMan(avM.v)+'만)'):''}<br>`
+    +`· 110대병원 = <b>품목</b> 단위 — 금액 = 3개월 후 MBO의 ${Math.round(numOf(p.rate110)*100)}%</div>`;
+  else h+=`<div class="sec-note" style="margin-bottom:6px">PRM을 신청했는데 아직 처방이 한 번도 안 나온 곳입니다. <b>이번 달 처방을 낼 곳만 체크</b>하세요(고칠 수 있음).<br>`
     +`· 110대병원 외 = <b>처</b> 단위 — 금액 = 새로 열린 처의 첫 달 평균(극단값 제외 — 업체 ${numOf(p.avgMinN)||10}처 이상이면 업체 값, 아니면 지부장·팀 값${avM?(', 내 평균 '+gbMan(avM.v)+'만'):''})<br>`
     +`· 110대병원 = <b>블럭(품목)</b> 단위 — 금액 = 신청 MBO의 ${rate}%</div>`;
   if(s.old && s.old.nPos>0) h+=`<div class="gb-info">지난 방식으로 적은 ② ${s.old.nPos}건 · ${gbMan(s.old.amt)}만 — 새 방식으로 다시 내면 교체됩니다(지금 저장된 근거 합에는 들어 있고, 아래 합계는 체크 기준).</div>`;
@@ -2621,11 +2734,17 @@ function gbPrmSec(s){
   h+=`<div class="gb-tools"><input class="fi" id="gb-q" type="search" placeholder="거래처·품목·업체 검색" value="${esc(s.q)}" oninput="gbSearch(this.value)" autocomplete="off">`
     +`<label class="gb-chk"><input type="checkbox" ${s.onlyAmt?'checked':''} onchange="gbOnlyAmt(this.checked)">체크한 것만 보기</label></div>`;
   const hwN=s.w.filter(r=>gbIsH(r.b)).length;
-  h+=`<div class="gb-meta2">미처방 처 ${hwN}곳${(sm.bulk&&sm.bulk.n)?(' (묶음 업체 '+sm.bulk.n+'처 제외)'):''} · 110대 미처방 블럭 ${wN}${fN?(' · 시작 예정 '+fN):''} · 실매출(VAT 제외) 기준 · 업체를 눌러 펼칩니다</div>`;
+  h+=`<div class="gb-meta2">미처방 처 ${hwN}곳${(sm.bulk&&sm.bulk.n)?(' (묶음 업체 '+sm.bulk.n+'처 제외)'):''} · 110대 미처방 ${p.rate110!=null?'품목':'블럭'} ${wN}${fN?(' · 시작 예정 '+fN):''} · 실매출(VAT 제외) 기준 · 업체를 눌러 펼칩니다</div>`;
   h+='<div id="gb-ramp-list">'+gbWList(s)+'</div>';
   const hr=sm.hrx||{n:(p.hrx||[]).length}, rx=sm.rx||{n:(p.rx||[]).length};
+  if(g.kpi2&&g.kpi2.mine){   // [v71] 핵심지표와 같은 범위(최근 3개월 신청)·같은 수
+    const km=g.kpi2.mine, o=km.oth||{}, b=km['110']||{};
+    h+='<div class="gb-meta2" style="margin-top:10px">처방 중인 곳은 이미 ① 기반에 들어 있습니다. 남은 금액은 참고입니다 — 더 나올 금액은 ③ 추가 볼륨 예측에 적습니다.</div>';
+    h+=`<details class="gb-old" ontoggle="gbRxToggle(this)"><summary>처방 중 처 ${numOf(o.rx&&o.rx.n)}곳 · 끊긴 처 ${numOf(o.cut)}곳 · 110대 처방 중 ${numOf(b.rx&&b.rx.n)}품목${numOf(b.cut)?(' · 끊김 '+numOf(b.cut)+'품목'):''} — 최근 3개월 신청 · 금액 칸 없음</summary><div class="gb-in" id="gb-rx-body"></div></details>`;
+  } else {
   h+='<div class="gb-meta2" style="margin-top:10px">처방 중인 곳은 이미 ① 기반에 들어 있습니다. 품목을 더 내거나 늘어날 금액은 ③ 추가 볼륨업에 적습니다.</div>';
   h+=`<details class="gb-old" ontoggle="gbRxToggle(this)"><summary>처방 중 처 ${hr.n||0}곳(유지 ${hr.유지||0} · 새로 처방 ${hr.개시||0} · 끊김 ${hr.끊김||0}) · 110대 블럭 ${rx.n||0} — 금액 칸 없음</summary><div class="gb-in" id="gb-rx-body"></div></details>`;
+  }
   return h+'</div>';
 }
 function gbRampSec(s){
@@ -2650,6 +2769,7 @@ function gbRampSec(s){
   return h+'<div id="gb-ramp-list">'+gbRampList(s)+'</div></div>';
 }
 function gbVuSec(s){
+  if(s.v71) return gbVuSec71(s);   // [v71] 추가 볼륨 예측(대상 1칸·자동완성·@ 후보)
   let h='<div class="gb-sec"><div class="gb-h">③ 추가 볼륨업 <span>기존 처방처 증량 — 늘어날 금액</span><b id="gb-v3"></b></div>';
   if(s.vuC.length){
     h+='<div class="gb-meta2">볼륨업 카드에 적은 '+esc(monLbl(s.ym))+' 목표 건 — 근거에 넣을 건만 체크</div>';
@@ -2665,6 +2785,157 @@ function gbVuSec(s){
       +`<input class="fi" id="gb-p-vuM-${i}" type="text" placeholder="품목" value="${esc(r.품목)}" oninput="gbFld('vuM',${i},'품목',this)">`
       +gbInRow('vuM',i,r.amt,r.why,'근거 한 줄 (필수)')+'</div>').join('');
   return h+'<div style="margin-top:8px"><button class="row-add" onclick="gbAdd(\'vuM\')">＋ 볼륨업 직접 추가 (거래처·품목·금액·근거)</button></div></div>';
+}
+/* ════ [v71] ③ 추가 볼륨 예측 — 볼륨업 후보 체크(그대로) + '＋ 추가' 행: 대상 1칸(업체 또는 거래처) · 품목(선택) · 금액(만원, 비워도 됨) · 계획 내용(필수)
+   대상 칸: 글자를 치면 업체명·거래처명 자동완성(goalBasis.names.co ∪ 업체 마스터 vendors / names.hosp ∪ 병원 마스터), 목록에 없어도 직접 입력.
+   '@'를 치면 후보 2탭(110대 DC 통과 처 = dcPass110 · 끊긴 처 = cutCands) — 고르면 대상(+품목)만 채우고 금액·계획 내용은 빈칸 그대로.
+   목록은 칸 바로 아래에 펼친다(화면 밖으로 나가지 않게 · 터치로 고름 — pointerdown 기본 동작을 막아 입력 칸 포커스 유지) */
+function gbVuNames(){
+  if(GB._nm && GB._nm.rpm===rpm) return GB._nm;
+  const g=gbData()||{}, nm=g.names||{}, co=[], hosp=[], sc={}, sh={};
+  const addC=v=>{ const n=String(v||'').trim(), k=normVendorKey(n); if(!n||!k||sc[k]) return; sc[k]=1; co.push({n:n,k:k}); };
+  const addH=(v,biz)=>{ const n=String(v||'').trim(), k=normHosp(n); if(!n||!k||sh[k]) return; sh[k]=1; hosp.push({n:n,k:k,biz:biz||''}); };
+  (nm.co||[]).forEach(addC); ((crm&&crm.vendors)||[]).forEach(addC); (vendorMaster||[]).forEach(v=>addC(v&&v.name));   // 오케스트레이터 결정 ⑤: names.co ∪ 업체 마스터
+  (hospitalMaster||[]).forEach(x=>addH(x.병원명,x.사업자번호)); (nm.hosp||[]).forEach(v=>addH(v,''));
+  GB._nm={rpm:rpm,co:co,hosp:hosp}; return GB._nm;
+}
+function gbVuMatch(q){
+  const N=gbVuNames(), qh=normHosp(q), qc=normVendorKey(q); if(!qh&&!qc) return [];
+  const pick=(L,qq)=>{ const a=[],b=[]; L.forEach(x=>{ const i=x.k.indexOf(qq); if(i===0) a.push(x); else if(i>0) b.push(x); }); return a.concat(b); };
+  const c=qc?pick(N.co,qc).slice(0,5):[], h=qh?pick(N.hosp,qh).slice(0,12-Math.min(c.length,5)):[];
+  return c.map(x=>({kind:'업체',name:x.n})).concat(h.map(x=>({kind:'거래처',name:x.n,biz:x.biz})));
+}
+function gbVuMeta(s,r){
+  const kd=r.kind==='업체'?'업체':'거래처', bits=[];
+  if(kd==='거래처' && r.업체) bits.push('업체 '+esc(r.업체));
+  if(r.후보) bits.push('<span class="gb-tag">'+(r.후보==='DC통과'?'110대 DC 통과 처':(r.후보==='끊김'?'끊긴 처':esc(r.후보)))+'</span>');
+  const dup=(kd==='거래처'&&String(r.대상||'').trim())?gbVuHwTag(s,gbHwDup(s,r.사업자번호,r.대상)).replace(/^ · /,''):'';   // [QA🟡-5] 같은 거래처가 ② 미처방 처에도 — 표시만
+  if(dup) bits.push(dup);
+  if(kd==='업체' && gbVuCo2(s,r.업체||r.대상)) bits.push('<span class="gb-tag gb-tag-w">같은 업체가 ②에도 있습니다 — 새로 여는 처(②)와 기존 처 증량(③)을 나눠 적었는지 확인</span>');   // [QA🟡-2] 표시만
+  if(gbVuDcNow(s,r)) bits.push('<span class="gb-tag gb-tag-w">DC 통과 단계는 이번 달 근거 금액에 넣지 않습니다. 다음 달 계획에서 금액을 적습니다</span>');   // [QA🟡-1]
+  return bits.join(' · ');
+}
+/* [v71 QA🟡-1] @ 후보 '110대 DC 통과 처'를 이번 달 대상월에서 고른 행 = 금액 칸 잠금(계획 내용만) · 다음 달은 허용(서버도 같은 규칙) */
+function gbVuDcNow(s,r){ return !!(s&&r&&r.후보==='DC통과'&&s.ym===gbNowM()); }
+/* [v71 QA🟡-2] ③ 업체 단위 행의 업체가 ② 묶음(열 처 수 ≥1) 또는 ② 처 체크 업체와 같은지 — 표시만(서버도 응답 꼬리에 한 줄) */
+function gbVuCo2(s,co){
+  const k=normVendorKey(String(co||'').trim()); if(!k||!s||!s.v70) return false;
+  if((s.bk||[]).some(b=>gbN(b.n)>0&&normVendorKey(b.x&&b.x.co)===k)) return true;
+  return (s.w||[]).some(w=>w.on&&w.b&&gbIsH(w.b)&&normVendorKey(w.b.co)===k);
+}
+function gbVuRow(s,i){
+  const r=s.vuM[i], kd=r.kind==='업체'?'업체':'거래처';
+  return `<div class="rowbox" id="gb-vr-${i}"><button class="row-del" onclick="gbDel('vuM',${i})">×</button>`
+    +`<input class="fi top-in" id="gb-h-vuM-${i}" type="text" placeholder="대상 — 업체 또는 거래처 이름 (@ = 후보)" value="${esc(r.대상||'')}" oninput="gbVuT(${i},this)" onkeydown="gbVuKey(${i},event)" onblur="gbVuBlur(${i})" autocomplete="off" autocapitalize="off" spellcheck="false">`
+    +`<div class="gb-ac" id="gb-ac-${i}" style="display:none" onpointerdown="event.preventDefault()" onmousedown="event.preventDefault()"></div>`
+    +`<div class="seg gb-kind"><button type="button" class="${kd==='거래처'?'on':''}" onclick="gbVuKind(${i},'거래처')">거래처</button><button type="button" class="${kd==='업체'?'on':''}" onclick="gbVuKind(${i},'업체')">업체</button></div>`
+    +`<div class="gb-r-m" id="gb-vt-vuM-${i}">${gbVuMeta(s,r)}</div>`
+    +`<input class="fi" id="gb-p-vuM-${i}" type="text" placeholder="품목 (선택)" value="${esc(r.품목||'')}" oninput="gbFld('vuM',${i},'품목',this)">`
+    +(gbVuDcNow(s,r)?gbInRow('vuM',i,'',r.why,'계획 내용 (필수)').replace('placeholder="만원"','placeholder="금액 없음" disabled title="DC 통과 단계는 이번 달 근거 금액에 넣지 않습니다. 다음 달 계획에서 금액을 적습니다"')   // [QA🟡-1] 금액 칸 잠금
+      :gbInRow('vuM',i,r.amt,r.why,'계획 내용 (필수)').replace('placeholder="만원"','placeholder="만원 (비워도 됨)"'))+'</div>';
+}
+function gbVuSec71(s){
+  let h='<div class="gb-sec"><div class="gb-h">③ 추가 볼륨 예측 <span>처방 중인 곳에서 더 나올 금액 — 업체 또는 거래처</span><b id="gb-v3"></b></div>';
+  if(s.vuC.length){
+    h+='<div class="gb-meta2">볼륨업 카드에 적은 '+esc(monLbl(s.ym))+' 목표 건 — 근거에 넣을 건만 체크</div>';
+    h+=s.vuC.map((r,i)=>{ const c=r.c;
+      return `<div class="gb-c${r.on?' on':''}"><label class="gb-cl"><input type="checkbox" ${r.on?'checked':''} onchange="gbOn('vuC',${i},this.checked)">`
+        +`<span><b>${esc(c.병원명||'-')}</b> ${esc(c.품목||'')} <span class="gb-tag">${esc(c.상태||'진행')}</span></span></label>`
+        +`<div class="gb-r-m">${esc(c.업체명||'업체 미기재')} · 늘어날 금액 ${gbMan(c.증대MBO)}만${c.내용?(' · '+esc(c.내용)):''}${c.dupPrm?(' · <span class="gb-tag gb-tag-w">② 110대 미처방 품목('+esc(gbRampLbl(c.dupPrm,s))+')과 같은 처방 — 한 곳에만 금액</span>'):''}${gbVuHwTag(s,c.dupHosp?((s.w.filter(x=>x.k===c.dupHosp)[0]||{}).b||null):(gbP10(c.사업자번호)?null:gbHwDup(s,'',c.병원명)))}</div>`
+        +(r.on?gbInRow('vuC',i,r.amt,r.why,'근거 한 줄 (필수)'):'')+'</div>'; }).join('');
+  }
+  h+='<div class="gb-meta2" style="margin-top:6px">대상 칸에 이름 몇 글자를 치면 업체·거래처 목록이 뜹니다(목록에 없어도 그대로 적으면 됩니다). <b>@</b>를 치면 후보(110대 DC 통과 처 · 끊긴 처)가 뜹니다 — 고른 뒤 금액·계획 내용은 직접 적습니다. 금액은 비워도 됩니다(계획만 적기).</div>';
+  h+=s.vuM.map((r,i)=>gbVuRow(s,i)).join('');
+  return h+'<div style="margin-top:8px"><button class="row-add" onclick="gbAdd(\'vuM\')">＋ 추가 (업체 또는 거래처 · 품목 · 금액 · 계획 내용)</button></div></div>';
+}
+function gbVuRefresh(s,i,focusId){
+  const el=document.getElementById('gb-vr-'+i); if(el) el.outerHTML=gbVuRow(s,i);
+  if(focusId){ const f=document.getElementById(focusId); if(f) try{ f.focus(); }catch(e){} }
+}
+function gbVuKind(i,k){ const s=gbState(); if(!s||!s.vuM[i]) return; const r=s.vuM[i]; r.kind=k;
+  if(k==='업체'){ r.업체=String(r.대상||'').trim(); r.거래처=''; r.사업자번호=''; } else { r.거래처=String(r.대상||'').trim(); const m=masterByName[normHosp(r.대상)]; r.사업자번호=m?m.사업자번호:''; if(r.업체===r.대상) r.업체=''; }
+  gbTouch(s); gbVuRefresh(s,i); }
+function gbVuT(i,el){
+  const s=gbState(); if(!s||!s.vuM[i]) return; const r=s.vuM[i], v=el.value;
+  r.대상=v; r.후보='';
+  if(r.kind==='업체'){ r.업체=v.trim(); r.거래처=''; r.사업자번호=''; }
+  else { r.거래처=v.trim(); const m=masterByName[normHosp(v)]; r.사업자번호=m?m.사업자번호:''; r.업체=''; }
+  const mt=document.getElementById('gb-vt-vuM-'+i); if(mt) mt.innerHTML=gbVuMeta(s,r);
+  gbVuList(i,v); gbTouch(s);
+}
+/* 목록: '@' 있으면 후보 2탭, 아니면 자동완성. s._ac[i] = 지금 보이는 항목(고를 때 씀) */
+function gbVuList(i,v){
+  const s=gbState(), box=document.getElementById('gb-ac-'+i); if(!s||!box) return;
+  s._ac=s._ac||{}; s._acSel=s._acSel||{}; s._acSel[i]=-1;
+  const at=String(v||'').indexOf('@');
+  if(at>=0){ const q=String(v).slice(at+1).trim(); s._atTab=s._atTab||'dc'; box.innerHTML=gbVuAtHtml(s,i,q); box.style.display='block'; return; }
+  const L=String(v||'').trim()?gbVuMatch(v):[];
+  s._ac[i]=L;
+  if(!L.length){ box.style.display='none'; box.innerHTML=''; return; }
+  box.innerHTML=L.map((x,j)=>`<button type="button" class="gb-ac-i" id="gb-ac-${i}-${j}" onclick="gbVuPick(${i},${j})"><span class="gb-tag">${x.kind}</span> ${esc(x.name)}</button>`).join('')
+    +'<div class="gb-ac-n">목록에 없으면 그대로 적으세요 — 업체/거래처는 아래에서 고릅니다</div>';
+  box.style.display='block';
+}
+function gbVuAtHtml(s,i,q){
+  const g=gbData()||{}, dc=Array.isArray(g.dcPass110)?g.dcPass110:null, cut=Array.isArray(g.cutCands)?g.cutCands:null, tab=s._atTab==='cut'?'cut':'dc';
+  const qn=normHosp(q);
+  const hit=(t)=>!qn||normHosp(t).indexOf(qn)>=0;
+  let L=[];
+  if(tab==='dc') L=(dc||[]).map((x,j)=>({j:j,t:x.병원+' '+x.품목+' '+x.업체,html:`<b>${esc(x.병원||'-')}</b><span class="gb-r-m">${esc(x.품목||'')} · ${esc(x.업체||'업체 미기재')} · MBO ${gbMan(x.MBO)}만</span>`}));
+  else L=(cut||[]).map((x,j)=>({j:j,t:x.hosp+' '+x.co+' '+(x.prod||''),html:`<b>${esc(x.hosp||'-')}</b><span class="gb-r-m">${x.kind==='110'?('110대 · '+esc(x.prod||'')+' · '):''}${esc(x.co||'')} · 마지막 처방 ${esc(monLbl(x.lastM))}${x.lastAmt!=null?(' '+gbMan(x.lastAmt)+'만'):''}</span>`}));
+  const F=L.filter(x=>hit(x.t)), show=F.slice(0,40);
+  s._ac[i]=show.map(x=>({at:tab,j:x.j}));
+  let h=`<div class="gb-at-t"><button type="button" class="${tab==='dc'?'on':''}" onclick="gbVuAtTab(${i},'dc')">110대 DC 통과 처 (${dc?dc.length:0})</button><button type="button" class="${tab==='cut'?'on':''}" onclick="gbVuAtTab(${i},'cut')">끊긴 처 (${cut?cut.length:0})</button><button type="button" style="flex:0 0 52px" onclick="gbVuAtClose(${i})">닫기</button></div>`;
+  if((tab==='dc'&&!dc)||(tab==='cut'&&!cut)) return h+'<div class="gb-ac-n">후보 목록을 받지 못했습니다 — 새로고침해 주세요</div>';
+  h+=show.map((x,k)=>`<button type="button" class="gb-ac-i" id="gb-ac-${i}-${k}" onclick="gbVuPick(${i},${k})">${x.html}</button>`).join('');
+  if(!F.length) h+='<div class="gb-ac-n">'+(L.length?'맞는 후보가 없습니다 — @ 뒤 글자를 바꿔 보세요':'후보가 없습니다')+'</div>';
+  else if(F.length>show.length) h+='<div class="gb-ac-n">외 '+(F.length-show.length)+'곳 — @ 뒤에 이름 몇 글자를 치면 좁혀집니다</div>';
+  else h+='<div class="gb-ac-n">고르면 대상'+(tab==='dc'?'·품목':'')+'만 채워집니다 — 금액·계획 내용은 직접 적습니다</div>';
+  return h;
+}
+function gbVuAtTab(i,t){ const s=gbState(); if(!s) return; s._atTab=t; const el=document.getElementById('gb-h-vuM-'+i); gbVuList(i,el?el.value:'@'); }
+function gbVuAtClose(i){ const s=gbState(), el=document.getElementById('gb-h-vuM-'+i); if(el && s && s.vuM[i]){ el.value=el.value.replace(/@.*$/,''); gbVuT(i,el); } const b=document.getElementById('gb-ac-'+i); if(b){ b.style.display='none'; b.innerHTML=''; } }
+function gbVuPick(i,j){
+  const s=gbState(); if(!s||!s.vuM[i]||!s._ac||!s._ac[i]||!s._ac[i][j]) return; const r=s.vuM[i], x=s._ac[i][j], g=gbData()||{};
+  if(x.at){   // @ 후보 — 대상(+품목)만. 금액·계획 내용은 건드리지 않는다
+    const c=x.at==='dc'?(g.dcPass110||[])[x.j]:(g.cutCands||[])[x.j]; if(!c) return;
+    r.kind='거래처';
+    if(x.at==='dc'){ r.대상=c.병원||''; r.업체=c.업체||''; r.사업자번호=normBiz(c.사업자번호); if(c.품목) r.품목=c.품목; r.후보='DC통과'; if(s.ym===gbNowM()){ r.amt=''; r._bad=false; } }   // [QA🟡-1] 이번 달 = 금액 비움(칸 잠금)
+    else { r.대상=c.hosp||''; r.업체=c.co||''; r.사업자번호=normBiz(c.biz); if(c.prod) r.품목=c.prod; r.후보='끊김'; }
+    r.거래처=r.대상;
+  } else {
+    r.kind=x.kind; r.대상=x.name; r.후보='';
+    if(x.kind==='업체'){ r.업체=x.name; r.거래처=''; r.사업자번호=''; }
+    else { r.거래처=x.name; r.업체=''; const m=masterByName[normHosp(x.name)]; r.사업자번호=x.biz||(m?m.사업자번호:''); }
+  }
+  gbTouch(s); gbVuRefresh(s,i,'gb-a-vuM-'+i);
+}
+function gbVuKey(i,e){
+  const s=gbState(), box=document.getElementById('gb-ac-'+i); if(!s||!box||box.style.display==='none') return;
+  const L=(s._ac&&s._ac[i])||[]; if(!L.length && e.key!=='Escape') return;
+  let k=(s._acSel&&s._acSel[i]!=null)?s._acSel[i]:-1;
+  if(e.key==='ArrowDown'){ k=Math.min(L.length-1,k+1); e.preventDefault(); }
+  else if(e.key==='ArrowUp'){ k=Math.max(0,k-1); e.preventDefault(); }
+  else if(e.key==='Enter'){ e.preventDefault(); gbVuPick(i,k<0?0:k); return; }
+  else if(e.key==='Escape'){ box.style.display='none'; return; }
+  else return;
+  s._acSel[i]=k; L.forEach((_,j)=>{ const b=document.getElementById('gb-ac-'+i+'-'+j); if(b) b.classList.toggle('sel',j===k); });
+  const b=document.getElementById('gb-ac-'+i+'-'+k); if(b) b.scrollIntoView({block:'nearest'});
+}
+function gbVuBlur(i){ setTimeout(()=>{ const a=document.activeElement, box=document.getElementById('gb-ac-'+i); if(box && !(a && a.id==='gb-h-vuM-'+i)){ box.style.display='none'; } },200); }
+/* [v71] 내려받기 — 누를 때 그 지부장 목록·저장분을 다시 받아(gb=1&dir) brief_export.js로 생성. 대상월 = 보고 있는 달(다음달은 저장된 근거가 있을 때만, 아니면 이번달) */
+function gbDl(kind,btn){
+  if(!window.BriefExport){ toast('내려받기 도구를 불러오지 못했습니다 — 새로고침해 주세요'); return; }
+  if(!rpm) return;
+  const g=gbData()||{}, s=GB.st[GB.ym];
+  let ym=GB.ym||gbNowM(); if(ym!==gbNowM() && !((g.saved||{})[ym])) ym=gbNowM();
+  const t0=btn?btn.textContent:'';
+  if(btn){ btn.disabled=true; btn.textContent='만드는 중…'; }
+  if(s && s.dirty) toast('전송 전 작성 내용은 들어가지 않습니다 — 저장된 근거 기준입니다');
+  gbFetchDir(rpm).then(r=>BriefExport.download(kind,r.d,r.meta,{ym:ym}))
+    .then(M=>toast('내려받았습니다 — '+BriefExport.fileName(kind,M)))
+    .catch(e=>{ toast(String((e&&e.message)||e)); showSendResult('⚠️ '+((kind==='docx')?'전략브리핑 자료':'대상 리스트')+' — '+String((e&&e.message)||e),false); })
+    .then(()=>{ if(btn){ btn.disabled=false; btn.textContent=t0; } });
 }
 function gbNewSec(s){
   const g=gbData();
@@ -2712,9 +2983,12 @@ function gbRender(){
   const g=gbData();
   if(!g){ body.innerHTML='<div class="gb-info">목표 근거 입력은 서버 업데이트(v69) 후 열립니다. 지금은 전송되지 않습니다.</div>'+legacy; gbSumTxt('준비 중'); return; }
   if(g.error){ body.innerHTML='<div class="gb-warn">근거 데이터 오류 — '+esc(g.error)+'<br>나머지 보고는 그대로 전송됩니다. 관리자에게 알려 주세요.</div>'+legacy; gbSumTxt('근거 데이터 오류'); return; }
+  if(gbListPending()){ gbListLoad(rpm); body.innerHTML='<div class="row-empty">'+esc(dirLabel(rpm))+' 지부장 목록(미처방·처방 중·후보)을 불러오는 중입니다…</div>'+legacy; gbSumTxt('목록 불러오는 중…'); return; }   // [v71]
   const s=gbState(), ms=gbMonths(), isNow=(s.ym===gbNowM());
   const sv=(g.saved&&g.saved[s.ym])||null, sum=sv&&sv.summary;
   let h=`<div class="seg" style="margin-bottom:10px">`+ms.map((m,i)=>`<button type="button" class="${m===s.ym?'on':''}" onclick="gbSetYm('${m}')">${i?'다음달':'이번달'} ${esc(monLbl(m))}${(GB.st[m]&&GB.st[m].dirty)?' •':''}</button>`).join('')+'</div>';
+  if(g.kpi2 && window.BriefExport) h+=`<div class="gb-dl"><button type="button" class="row-add" id="gb-dl-xlsx" onclick="gbDl('xlsx',this)">대상 리스트 받기(엑셀)</button><button type="button" class="row-add" id="gb-dl-docx" onclick="gbDl('docx',this)">전략브리핑 자료 받기(Word)</button></div>`;   // [v71] 저장된 근거·최신 목록 기준(누르면 다시 받아 생성)
+  if(gbList.dir===rpm && gbList.st==='fail') h+='<div class="gb-warn">지부장 목록을 받지 못해 ② 체크 목록·③ 후보 없이 엽니다 — 새로고침하면 다시 받습니다. 지금 보내도 저장된 ②는 그대로 둡니다.</div>';
   // 상태 줄
   if(s.sentAt) h+=`<div class="gb-info">✅ 이번 전송으로 ${esc(monLbl(s.ym))} 근거를 저장했습니다(${esc(s.sentAt)}).</div>`;
   else if(sum) h+=`<div class="gb-info">${esc(monLbl(s.ym))} 근거 저장됨 — 갱신 ${esc(sum.갱신일||'')} · ${numOf(sum.제출수)||1}회 제출. 고치면 이 달 근거 전체가 새 내용으로 바뀝니다.</div>`
@@ -2739,8 +3013,11 @@ function gbRender(){
     +`<div class="gb-sub">${bm?(esc(monLbl(bm))+' 확정 실적 '+numOf(bv).toLocaleString()+'원'):'확정 실적이 아직 없습니다(0원으로 계산)'}</div></div>`;
   h+=gbRampSec(s)+gbVuSec(s)+gbNewSec(s);
   // GAP 계획 + 합계 바
-  h+=`<div id="gb-gapbox" style="display:none;margin-top:12px"><label class="fl" id="gb-gaplbl">GAP 계획 (필수)</label>`
-    +`<textarea class="fi" id="gb-gap-plan" rows="2" placeholder="GAP을 어떻게 메울지(또는 왜 남는지) 적어 주세요" oninput="gbGapPlan(this)">${esc(s.gapPlan||'')}</textarea></div>`;
+  // [v71] GAP 극복을 위한 할 일 — 1. 2. 3. 줄(＋ 줄 추가), GAP ≠ 0이면 1번 필수. 기존 'GAP 계획' 한 칸 대체(저장분 문자열은 1번으로)
+  const gt=(s.gapTodo||[]).slice(); while(gt.length<3) gt.push('');
+  h+=`<div id="gb-gapbox" style="display:none;margin-top:12px"><label class="fl" id="gb-gaplbl">GAP 극복을 위한 할 일 (1번 필수)</label>`
+    +`<div id="gb-gt-list">`+gt.map((v,i)=>`<div class="gb-gt"><b>${i+1}.</b><input class="fi" id="gb-gt-${i}" type="text" placeholder="${i?'(선택)':'누가·언제까지·얼마 — 예) 묶음 미처방 처 순회, 셋째 주 점검'}" value="${esc(v)}" oninput="gbGapTodo(${i},this)"></div>`).join('')+`</div>`
+    +`<button type="button" class="row-add" style="margin-top:8px;min-height:40px" onclick="gbGapAdd()">＋ 줄 추가</button></div>`;
   h+=`<div class="gb-bar" id="gb-bar"><div class="gb-bar-r"><span>① <b id="gb-tb1"></b></span><span>② <b id="gb-tb2"></b></span><span>③ <b id="gb-tb3"></b></span><span>④ <b id="gb-tb4"></b></span></div>`
     +`<div class="gb-bar-r2"><span>근거 합 <b id="gb-tsum"></b></span><span>목표 <b id="gb-ttgt"></b></span><span>GAP <b id="gb-tgap" class="gb-gap"></b></span></div></div>`;
   h+='<datalist id="gb-hosp-dl">'+hospitalMaster.map(x=>`<option value="${esc(x.병원명)}"></option>`).join('')+'</datalist>';
@@ -2748,7 +3025,6 @@ function gbRender(){
   body.innerHTML=h;
   gbUpdateTotals();
   gbBarPos();
-  const ta=document.getElementById('gb-gap-plan'); if(ta) autoGrow(ta);
 }
 /* 합계 바는 하단 고정 버튼줄(.bot) 바로 위에 붙는다 — 모바일에선 버튼 글자가 줄바꿈돼 .bot 높이가 달라서 실측 */
 function gbBarPos(){ const bar=document.getElementById('gb-bar'), bot=document.getElementById('bot'); if(bar&&bot) bar.style.bottom=((bot.offsetHeight||64)+8)+'px'; }
@@ -2767,7 +3043,7 @@ function gbUpdateTotals(){
   const box=document.getElementById('gb-gapbox');
   if(box) box.style.display=(t.target>0&&t.gapMan!==0)?'block':'none';
   gbBarPos();
-  set('gb-gaplbl','GAP 계획 (필수) — 목표 − 근거 합 = '+(t.target>0?gbSigned(t.gap):'-'));
+  set('gb-gaplbl','GAP 극복을 위한 할 일 (1번 필수) — 목표 − 근거 합 = '+(t.target>0?gbSigned(t.gap):'-'));
   const sv=(g.saved&&g.saved[s.ym])||null;
   gbSumTxt(monLbl(s.ym)+' · '+(s.dirty?'작성 중':(s.sentAt||sv?'저장됨':'미작성'))+' · 근거 '+(t.sum/1e8).toFixed(2)+'억'+(t.target>0?(' · GAP '+(t.gapMan===0?'0':gbSigned(t.gap))):''));
 }
