@@ -144,6 +144,7 @@ details.rules ul{padding-left:18px;margin:6px 0 0}
       <li><b>품목</b>은 한올 약가표 품목만 판정합니다. 약가표에 없는 품목은 조회되지 않습니다.</li>
       <li><b>알파본디</b>는 알파본연질캡슐 처방이 나오는 곳이면 카니발이라 병원·로컬 모두 불가입니다.</li>
       <li><b>엘리가드</b>는 영업부 단독판매 품목이라 병원·로컬 모두 무조건 불가입니다.</li>
+      <li><b>앱시토(펙수프라잔)</b>는 그룹사 교차판매 기준(영업기획 판정 — 대웅제약 펙수클루·대웅바이오 위캡, 거래처 단위 월평균)을 함께 봅니다 — <b>자율경쟁 불가(대웅 우선)</b> → 불가 / <b>대웅 방어처·110대 병상 규모 확인</b> → 가능이면 협의 / <b>기준 미만·빈곳(대웅 거래 없음)</b> → 기존 판정 그대로. 모든 카드에 펙수클루·위캡·대웅 전체 월평균이 나옵니다(업체 회신 문구에는 금액을 넣지 않음).</li>
       <li><b>프레논</b>은 제형·용량이 달라도('프레논', '프레논OD', '프레논 50mg') 한 품목으로 봅니다 — 계열 안에 하나라도 불가면 불가.</li>
       <li>병원 여부: 병원 품목 매출·영업관리 병원 컨펌 이력이 있거나, 이름·담당 부서·채널에 '병원'이 있으면 병원으로 봅니다. 카드에서 로컬/병원 판정을 바꿔볼 수 있습니다.</li>
       <li><b>확인필요</b> — 원천에 없는 번호 중 사업자번호 형식 오류이거나 같은 이름 거래처가 따로 있는 경우, 거래처명이 여러 곳과 같거나 정확히 일치하지 않는 경우, 요청 품목명을 찾지 못했거나 요청 품목별 판정이 다른 경우. 사유 칸을 보고 다시 확인해 주세요.</li>
@@ -210,7 +211,7 @@ function ready(){
   D.ik=D.items.map(x=>famOf(x[5]||x[1])||pkey(x[5]||x[1]));D.ikSet=new Set(ikAll.concat(D.ik));
   D.M={};D.MN={};(Array.isArray(D.m)?D.m:[]).forEach(([b,p,v,s,rpm,src,h,t])=>{const e={keys:prodKeys(p),p,v,s,si:STG.indexOf(s),rpm,src,h,is110:t===undefined?1:(t?1:0)};if(b)(D.M[b]||(D.M[b]=[])).push(e);else{const k=nname(h);if(k)(D.MN[k]||(D.MN[k]=[])).push(e)}});   // 사업자번호 없는 CRM 행은 병원명으로 · t(110대)는 v54부터, 없으면 110대로 간주
   const crm=Array.isArray(D.m)?` · CRM 진행 ${D.m.length}건(실시간)`:' · ⚠ CRM 진행 정보 없음(판정에 미반영)';
-  $('#asof').textContent=`기준 ${D.meta['기준일']} · 로컬 ${Object.keys(D.L).length.toLocaleString()}곳 · 병원 ${Object.keys(D.H).length.toLocaleString()}곳`+crm;
+  $('#asof').textContent=`기준 ${D.meta['기준일']} · 로컬 ${Object.keys(D.L).length.toLocaleString()}곳 · 병원 ${Object.keys(D.H).length.toLocaleString()}곳`+crm+(D.F?` · 펙수프라잔(대웅 거래처) ${Object.keys(D.F).length.toLocaleString()}곳`:'');
   $('#go').disabled=false;$('#pickf').disabled=false;$('#st1').textContent='준비됨';
   if($('#q').value.trim()) run1();
 }
@@ -259,7 +260,21 @@ const TWO_NOTE='승인 후 3개월간 처방이 없으면 블록이 오픈됩니
 const twoNote=r=>r.cso.length?' '+TWO_NOTE:'';   // CSO 코드가 없는 로컬은 첫 코드라 2코드 안내를 붙이지 않는다(박본님 11-03 '일반 가능 문구')
 const R2={'가능':1,'가능(협의필요)':2,'협의필요':3,'불가':4};
 const SOLE='영업부 단독판매 품목';const isSole=i=>D.items[i][1].includes('엘리가드');   // 엘리가드 = 병원·로컬 모두 무조건 불가(11-06 박본님)
-function judgeL(b,want){return want&&want.some(w=>w.idx.some(i=>twoOf(i)||isSole(i)))?judgeTwo(b,want):judgeLocal(b)}
+/* ── 펙수프라잔 그룹사 교차판매 기준(11-19 박본님 — 영업기획 최두현 판정 자료, 빌더 D.F) ──
+   D.F[사업자번호] = [펙수클루 월평균, 위캡 월평균, 대웅제약 전체 월평균, 대웅바이오 전체 월평균, 종합 S|D|X|Q, 대웅 구분]. D.F에 없는 번호 = 대웅제약·대웅바이오 거래 없음(빈곳).
+   카드·카드 내용 복사·엑셀에 현황을 보이고, 앱시토(ACTT) 판정에는 더 나쁜 쪽으로 반영: X 자율경쟁 불가(대웅 우선) → 불가 / D 대웅 방어처·Q 110대 병상 규모 확인 → 가능이면 협의 / S 기준 미만·빈곳 → 그대로.
+   업체에게 가는 회신 문구에는 금액을 넣지 않는다(판정 문구만). D.F가 없는 옛 데이터면 아무것도 바꾸지 않는다 */
+const FXL={N:['빈곳 — 대웅 거래 없음','ok'],S:['기준 미만 — 스위칭 가능','ok'],D:['대웅 방어처 — 협의 후 진입','warn'],X:['자율경쟁 불가 — 대웅 우선','no'],Q:['110대 — 병상 규모 확인 필요','chk']};
+const isFexu=i=>/^ACTT/.test(D.items[i][0]||'');
+function fxOf(b){if(!D.F)return null;const f=D.F[b],c=f?f[4]:'N',[lab,cls]=FXL[c]||['판정 미상','chk'];
+  return {c,lab,cls,grp:f?f[5]:'',amt:f?`펙수클루 월 ${won(f[0])}원 · 위캡 월 ${won(f[1])}원 · 대웅제약 전체 월 ${won(f[2])}원 · 대웅바이오 전체 월 ${won(f[3])}원`:'펙수클루·위캡 처방 없음 (대웅제약·대웅바이오 거래 없음)'}}
+function fxAdj(v,det,b,kind){const f=fxOf(b);if(!f)return [v,det];const tag=`펙수프라잔(그룹사) ${f.lab} (${f.amt})`;
+  if(f.c==='X')return ['불가',(v==='불가'?det+' · ':'')+tag];
+  if((f.c==='D'||f.c==='Q')&&v==='가능')return [kind==='로컬'?'협의필요':'가능(협의필요)',tag+' — 대웅 담당과 협의'];
+  return [v,det+' · '+tag]}
+const fxText=b=>{const f=fxOf(b);return f?`${f.lab} — ${f.amt}`:''};
+const fxHtml=b=>{const f=fxOf(b);return f?`<dt>펙수프라잔(그룹사)</dt><dd><span class="pill ${f.cls}">${esc(f.lab)}</span><div class="hint">${esc(f.amt)}${f.grp?' · 대웅 구분 '+esc(f.grp):''}</div></dd>`:''};
+function judgeL(b,want){return want&&want.some(w=>w.idx.some(i=>twoOf(i)||isSole(i)||(D.F&&isFexu(i))))?judgeTwo(b,want):judgeLocal(b)}   // 앱시토는 품목별로 그룹사 기준 반영(11-19)
 function judgeTwo(b,want){
   const base=judgeLocal(b),cm=base.l[4],cso=base.cso,T=(D.T&&D.T[b])||{};
   const who=f=>[...new Set(cm.filter(f).map(pname))].join(', ');
@@ -270,7 +285,7 @@ function judgeTwo(b,want){
     if(hasD&&/^AFBT/.test(D.items[i][0]))return;
     const t=twoOf(i),key=t?t.g:'i'+i;if(seen.has(key))return;seen.add(key);
     if(isSole(i)){req.push({label:D.items[i][1],rep:D.items[i][1],v:'불가',det:SOLE});return}
-    if(!t){req.push({label:D.items[i][1],rep:D.items[i][1],v:base.v,det:base.reason+' (2코드 품목 아님 — 로컬 기본 판정)'});return}
+    if(!t){let v=base.v,det=base.reason+(isFexu(i)?' (로컬 기본 판정)':' (2코드 품목 아님 — 로컬 기본 판정)');if(isFexu(i))[v,det]=fxAdj(v,det,b,'로컬');req.push({label:D.items[i][1],rep:D.items[i][1],v,det});return}
     const s=T[t.g];let v,det;
     if(cm.some(isSales)){v='불가';det=`한올 영업부 거래처 (${who(isSales)}) — 2코드 진입 불가`}
     else if(s){v='불가';det=`최근 6개월 ${t.grp} 처방 有 (${s[2]} ${won(s[0])}원 · 마지막 ${s[1].slice(0,4)}.${s[1].slice(4)}월)`}
@@ -319,6 +334,7 @@ function judgeHosp(b,want){   // want = itemIdx 결과(요청 품목) 또는 nul
     else if(mb.length){per[i]='가능(협의필요)';det[i]=`복수오픈 ${mb.length}/3 진행 중 (${mb.map(vtxt).join(', ')}) — 지부장 확인`}
     else if(p||hy.length){per[i]='가능(협의필요)';det[i]='매출 없음 · '+[p?`PRM 신청 ${p[0]}(${p[1]}) 6개월 경과`:'',...hy].filter(Boolean).join(' · ')}
     else{per[i]='가능';det[i]='최근 6개월 매출 없음'}
+    if(isFexu(i))[per[i],det[i]]=fxAdj(per[i],det[i],b,'병원');   // 앱시토 = 펙수프라잔 그룹사 기준 반영(11-19)
   });
   FAM.forEach(f=>{const ix=D.items.map((_,i)=>i).filter(i=>D.ik[i]===f);if(new Set(ix.map(i=>per[i])).size<2)return;   // 프레논은 계열 하나 — 카드·엑셀 모두 가장 나쁜 판정
     const w=ix.slice().sort((a,b)=>RANK[per[b]]-RANK[per[a]])[0],v=per[w],t=`${D.items[w][1]} — ${det[w]}`;ix.forEach(i=>{per[i]=v;det[i]=t})});
@@ -409,7 +425,7 @@ function card(r){
     body=`${r.req?req2:`<div class="reason ${r.cls}">${esc(r.reason)}</div>`+req2}<dl>
       <dt>주소</dt><dd>${esc((l&&l[1])||'-')}</dd>
       <dt>블록</dt><dd>${esc((l&&l[2])||'-')}</dd>
-      <dt>매출(6개월 평균)</dt><dd>${won(l&&l[3])}</dd>
+      <dt>매출(6개월 평균)</dt><dd>${won(l&&l[3])}</dd>${fxHtml(r.b)}
       <dt>담당 사무소 · 담당자</dt><dd>${reps}</dd>${msL}
     </dl>`;
   }else{
@@ -420,7 +436,7 @@ function card(r){
     const req=r.req?`<div class="req"><b>요청 품목</b><ul>${r.req.map(q=>`<li><span class="pill ${q.v==='가능'?'ok':q.v==='불가'?'no':'warn'}">${esc(q.v)}</span> ${esc(q.label)} — ${esc(q.det)}</li>`).join('')}</ul></div>`
       :`<div class="reason chk">병원은 품목을 함께 입력해 주세요 — 위 '품목' 칸이나 같은 줄에 적으면 품목별로 판정합니다 (예: ${esc(fmtBiz(r.b))} 노르믹스)</div>`;
     body=`${req}<dl>
-      <dt>블록</dt><dd>${esc((l&&l[2])||'-')}</dd>
+      <dt>블록</dt><dd>${esc((l&&l[2])||'-')}</dd>${fxHtml(r.b)}
       <dt>담당 사무소 · 담당자</dt><dd>${reps}</dd>${msL}
     </dl>${cf}
       <div class="grp"><span class="hint">한올 품목 ${D.items.length}개 기준 (최근 6개월 매출·담당)</span></div>
@@ -455,6 +471,7 @@ function cardText(r){
     if(r.req){L.push('요청 품목:');r.req.forEach(q=>L.push(`  [${q.v}] ${q.label} — ${q.det}`))}
     L.push(`블록: ${(l&&l[2])||'-'}`);
   }
+  if(fxText(r.b))L.push(`펙수프라잔(그룹사): ${fxText(r.b)}`);   // 11-19 — 지부장·영업부 소통용(업체 회신 문구에는 넣지 않음)
   const ex=exOf(l);L.push('담당 사무소 · 담당자:'+(cm.length||ex.length?'':' 없음'));
   staffOf(cm).forEach(p=>{L.push(`  [${SIDE_LABEL[p.s]}] ${p.o} ${p.n}`);p.rows.forEach(c=>L.push('      '+rowTxt(c)))});
   ex.forEach(e=>L.push(`  [${SIDE_LABEL[side(e[0])]}] ${e[0]||'사무소 미기재'} ${e[1]} (${e[2]} · 참고)`));
@@ -530,7 +547,7 @@ const LIB_X='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js
 const LIB_E='https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';
 const HK={biz:['사업자번호','사업자등록번호','사업자','등록번호'],name:['거래처명','거래처','병원명','요양기관명','기관명','상호명','상호','실납처명','처방처','의원명','병의원','약국명'],addr:['주소','소재지'],item:['품목','제품']};
 const HX=/업체|대표|코드|담당/;   // 업체(CSO 자신)·대표자·코드 열은 거래처 열로 잡지 않는다
-const OUTCOLS=['블럭판정','구분','사유','요청 품목 판정','불가 품목(병원 — 매출·신규 유예)','담당자','담당 사무소','코드생성 CSO','매칭 거래처','회신 문구','영업관리 컨펌(최근)'];
+const OUTCOLS=['블럭판정','구분','사유','요청 품목 판정','불가 품목(병원 — 매출·신규 유예)','담당자','담당 사무소','코드생성 CSO','매칭 거래처','회신 문구','영업관리 컨펌(최근)','펙수프라잔(그룹사)'];
 async function onFile(f){
   if(!f)return;
   $('#st2').textContent='';$('#xres').hidden=true;$('#xmap').hidden=true;
@@ -634,7 +651,7 @@ function judgeRow(cell){
   const r=judge(b,bad?null:want),l=r.l||D.L[b],cm=l?l[4]:[];
   const out={kind:r.kind,v:r.v,cls:r.cls,reason:note+r.reason,match:`${nameOf(b)} (${fmtBiz(b)})`,
     who:staffOf(cm).map(p=>p.n).concat(exOf(l).map(e=>e[1])).join(', '),office:staffOf(cm).map(p=>p.o).concat(exOf(l).map(e=>e[0]||'사무소 미기재')).join(', '),cso:csoOf(l).join(', '),reply:replyText(r),req:'',sales:'',
-    cf:(D.C&&D.C[b]&&D.C[b][0])?cfText(D.C[b][0]):''};
+    cf:(D.C&&D.C[b]&&D.C[b][0])?cfText(D.C[b][0]):'',fx:fxText(b)};
   if(r.kind==='로컬'&&r.req)out.req=r.req.map(q=>`${q.label}=${q.v}`+(q.v!=='가능'?` (${q.det})`:'')).join(', ');   // 2코드(11-03)
   if(r.kind==='병원'){
     out.req=r.req?r.req.map(q=>`${q.label}=${q.v}`+(q.v!=='가능'?` (${q.det})`:'')).join(', '):'';   // 가능이 아니면 품목별 사유까지(복수오픈 n/3·진행 업체 등)
@@ -670,7 +687,7 @@ function draw2(){
   $('#xmore').hidden=rows.length<=XN;$('#xmore').textContent=`더 보기 (${rows.length-XN}건 남음)`;
 }
 const FILL={ok:'FFDFF3E4',no:'FFFDE8E8',warn:'FFFDF1DF',chk:'FFECECF0'},FONT={ok:'FF248A3D',no:'FFD70015',warn:'FFC76B00',chk:'FF6E6E73'};
-function outVals(r){return [r.v,r.kind,r.reason,r.req||'',r.sales||'',r.who||'',r.office||'',r.cso||'',r.match||'',r.reply||'',r.cf||'']}
+function outVals(r){return [r.v,r.kind,r.reason,r.req||'',r.sales||'',r.who||'',r.office||'',r.cso||'',r.match||'',r.reply||'',r.cf||'',r.fx||'']}
 async function download(){
   const btn=$('#xdl');btn.disabled=true;$('#st2').textContent='만드는 중…';
   try{
@@ -691,10 +708,10 @@ async function download(){
       const rr=r.i+base;
       outVals(r).forEach((v,j)=>{const c=ws.getCell(rr,c1+j);c.value=v;if(j===0){c.fill={type:'pattern',pattern:'solid',fgColor:{argb:FILL[r.cls]}};c.font={bold:true,color:{argb:FONT[r.cls]}}}if(j===2||j===9)c.alignment={wrapText:false}});
     });
-    [10,7,48,30,22,22,22,30,60,48].forEach((w,j)=>ws.getColumn(c1+j).width=w);
+    [10,7,48,30,22,22,22,30,60,48,30,60].forEach((w,j)=>ws.getColumn(c1+j).width=w);
     const sm=wb.addWorksheet('조회요약');
     const cnt=k=>XROWS.filter(r=>r.v===k).length;
-    [['CSO 블럭 조회 결과'],['원본 파일',XL.file.name],['원본 시트',sh.n],['조회 일시',new Date().toLocaleString('ko-KR')],['기준 데이터',`CSO거래처관리데이터 ${D.meta['기준일']}`],['병원 판정',D.meta['병원판정']||''],[],['구분','건수'],['전체',XROWS.length],...ORDER.map(([k])=>[k,cnt(k)]),[],['※ 로컬: 다른 CSO 코드·한올 담당 → 불가 / 대웅 담당만 → 협의필요 / 영업기획·영업관리팀만(비활성처)·담당 없음 → 가능'],['※ 병원: 요청 품목의 최근 6개월 매출 있음·PRM 블럭신청 후 6개월 이내(신규 유예)·CRM 진행 블럭에 DC접수 이상 업체 있음·110대 복수오픈 3곳·110대 아닌 병원에 진행 업체 있음 → 불가 / 110대 복수오픈 3곳 미만 → 가능(협의필요) / 그 외 매출 없음 → 가능, MS팀·한올·대웅 영업 담당이나 다른 CSO 코드가 있으면 가능(협의필요) / 품목을 안 적으면 품목 입력 필요 / 프레논은 제형이 달라도 한 품목'],['CRM 진행 블럭',Array.isArray(D.m)?D.m.length+'건(조회 시점 실시간)':'못 받음 — 판정에 미반영'],['※ 확인필요 = 사업자번호 오류·같은 이름 여러 곳·품목명 불일치·요청 품목별 판정이 다른 건 — 사유 칸 확인']].forEach(r=>sm.addRow(r));
+    [['CSO 블럭 조회 결과'],['원본 파일',XL.file.name],['원본 시트',sh.n],['조회 일시',new Date().toLocaleString('ko-KR')],['기준 데이터',`CSO거래처관리데이터 ${D.meta['기준일']}`],['병원 판정',D.meta['병원판정']||''],[],['구분','건수'],['전체',XROWS.length],...ORDER.map(([k])=>[k,cnt(k)]),[],['※ 로컬: 다른 CSO 코드·한올 담당 → 불가 / 대웅 담당만 → 협의필요 / 영업기획·영업관리팀만(비활성처)·담당 없음 → 가능'],['※ 병원: 요청 품목의 최근 6개월 매출 있음·PRM 블럭신청 후 6개월 이내(신규 유예)·CRM 진행 블럭에 DC접수 이상 업체 있음·110대 복수오픈 3곳·110대 아닌 병원에 진행 업체 있음 → 불가 / 110대 복수오픈 3곳 미만 → 가능(협의필요) / 그 외 매출 없음 → 가능, MS팀·한올·대웅 영업 담당이나 다른 CSO 코드가 있으면 가능(협의필요) / 품목을 안 적으면 품목 입력 필요 / 프레논은 제형이 달라도 한 품목'],['CRM 진행 블럭',Array.isArray(D.m)?D.m.length+'건(조회 시점 실시간)':'못 받음 — 판정에 미반영'],['펙수프라잔(그룹사)',D.F?D.meta['펙수프라잔']||'':'자료 없음 — 앱시토 판정에 미반영'],['※ 앱시토: 그룹사 기준 자율경쟁 불가(대웅 우선) → 불가 / 대웅 방어처·110대 병상 규모 확인 → 가능이면 협의 / 기준 미만·빈곳 → 기존 판정 그대로'],['※ 확인필요 = 사업자번호 오류·같은 이름 여러 곳·품목명 불일치·요청 품목별 판정이 다른 건 — 사유 칸 확인']].forEach(r=>sm.addRow(r));
     sm.getCell('A1').font={bold:true,size:14};sm.getColumn(1).width=16;sm.getColumn(2).width=60;
     const out=await wb.xlsx.writeBuffer();
     const d=new Date(),ymd6=String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
