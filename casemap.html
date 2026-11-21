@@ -117,6 +117,21 @@ button,textarea{font-family:inherit}
 .vl{display:flex;gap:8px;padding:8px 16px;background:#0D1024;flex:none;overflow-x:auto}
 .vl div{border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:4px 10px;font-size:12px;white-space:nowrap;cursor:pointer}.vl div.on{background:#fff;color:#14172E;font-weight:800}
 .msg0{padding:40px;text-align:center;color:var(--mut)}
+/* 1층 출력 단추(11-21 박본님 — 사례 맵만 / 근거 BD까지) */
+.def{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px}.def .dtx{flex:1;min-width:220px}
+.prs{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--mut);font-weight:700}
+.prs button.btn{margin-left:0;padding:4px 11px;font-size:12.5px;font-family:inherit}
+/* 2층(사례 상세) 글씨 약 2pt 키움(11-21 박본님) — 1층·3층은 그대로 */
+.dt .dh .l h1{font-size:24.5px}.dt .dh .l>div{font-size:15.5px}.dt .dh .tgl{font-size:14.5px}.dt .bdg{font-size:13.5px}.dt .tag{font-size:17px}
+.dt .dh .r{width:250px;font-size:16.5px}.dt .dh .r .t{font-size:28.5px}.dt .dh .r small{font-size:14.5px}
+.dt .cd h2{font-size:17.5px}.dt .cd h2 small{font-size:14px}
+.dt .kv{grid-template-columns:78px 1fr;font-size:15.5px}.dt .kv b{font-size:14.5px}
+.dt .dtl{font-size:15.5px}.dt .dtl b{font-size:15px}
+.dt .bdi{font-size:16px}.dt .bdi .no{width:25px;height:25px;line-height:25px;font-size:14.5px}.dt .btn{font-size:14.5px}.dt .bnote{font-size:14px;margin-left:33px}
+.dt .fq b{font-size:15.5px}.dt .fq div{font-size:15px}
+.dt .sp30{font-size:18px}.dt .spn{font-size:14px}
+@media(max-width:1000px){.dt .tag{font-size:15.5px}}
+@media(max-width:600px){.dt .dh .l h1{font-size:20.5px}.dt .dh .r{width:auto}.dt .kv{grid-template-columns:68px 1fr}.dt .sp30{font-size:17px}.dt .tag{font-size:15px}}
 #prn{display:none}
 @media print{
  @page{size:A4;margin:8mm}
@@ -239,7 +254,7 @@ function vmap(){
   <button class="ftg" onclick="$('side').classList.toggle('open')">거르기 ${nf?'('+nf+'개 적용) ':''}▾</button><div class="flt">`
   +D.filters.map(f=>`<div class="fl">${E(f.label)}</div><div class="chips"><span class="chip${st[f.key]?'':' on'}" onclick="setSt(mstate(),'${f.key}','')">전체</span>`+f.opts.map(o=>`<span class="chip${st[f.key]===o?' on':''}" data-v="${A(o)}" onclick="setSt(mstate(),'${f.key}',this.dataset.v)">${E(o)}</span>`).join('')+`</div>`).join('')
   +`</div><div class="fl">FAQ 질문하기</div><div class="fqb"><textarea id="fq" placeholder="궁금한 점을 적어 주세요"></textarea><button class="fqs" onclick="ask()">질문</button><div class="fqe">${(D.faq_examples||[]).map(x=>`<span onclick="ex(this)">${E(x)}</span>`).join('')}</div></div></div><div class="main" id="main">
-  <div class="def">${E(a)} ${b?`<b>→ ${E(b)}</b>`:''}</div>`;
+  <div class="def"><span class="dtx">${E(a)} ${b?`<b>→ ${E(b)}</b>`:''}</span>${prBtns(t)}</div>`;
   const s=D.sets.find(x=>x.key===t)||{};
   if(!cs.length)h+=`<div class="none" id="none">해당 사례 없음</div>`;
   else if(s.classes){const used=new Set();s.classes.forEach(k=>{const g=cs.filter(c=>k.comps.includes(c.comp));if(!g.length)return;g.forEach(c=>used.add(c.id));h+=`<div><span class="cls">${E(k.name)}</span></div>`+reasons(k.reasons)+g.map(c=>row(c,t)).join('')});
@@ -310,6 +325,17 @@ function printBd(key){const b=D.bd[key];if(!b)return;const el=$('prn');
   Promise.all(Array.from({length:b.pages||1},(_,j)=>bdImg(key,j+1))).then(us=>{
     el.innerHTML=us.map(u=>`<img src="${A(u)}" alt="">`).join('');
     const im=[...el.querySelectorAll('img')];return Promise.all(im.map(x=>x.complete?0:new Promise(r=>{x.onload=x.onerror=r})))}).then(()=>window.print(),()=>alert('출력할 이미지를 불러오지 못했습니다.'))}
+/* 1층 사례 맵 출력 — 사례 맵 쪽만, 또는 그 유형의 근거 BD까지 한 번에(A4). 거르기와 상관없이 그 유형 전체가 나온다 */
+function prKeys(t,withBd){const cp=(D.case_pages||{})[t];if(!cp||!D.bd[cp]||!D.bd[cp].pages)return[];const s=D.sets.find(x=>x.key===t)||{};
+  return [cp].concat(withBd?(s.bd||[]).filter(k=>D.bd[k]&&D.bd[k].pages):[])}
+function prBtns(t){const n=k=>k.reduce((a,x)=>a+(D.bd[x].pages||1),0),a=prKeys(t,0),b=prKeys(t,1);if(!a.length)return'';
+  return `<span class="prs">출력<button class="btn" data-t="${A(t)}" onclick="printMap(this,0)">사례 맵만 ${n(a)}쪽</button>${b.length>a.length?`<button class="btn f" data-t="${A(t)}" onclick="printMap(this,1)">근거 BD까지 ${n(b)}쪽</button>`:''}</span>`}
+function printMap(el,withBd){if(el.dataset.busy)return;const jobs=[];prKeys(el.dataset.t,withBd).forEach(k=>{for(let j=1;j<=(D.bd[k].pages||1);j++)jobs.push([k,j])});if(!jobs.length)return;
+  const label=el.textContent,pr=$('prn');let done=0;el.dataset.busy='1';el.textContent=`불러오는 중 0/${jobs.length}`;
+  Promise.all(jobs.map(x=>bdImg(x[0],x[1]).then(u=>{el.textContent=`불러오는 중 ${++done}/${jobs.length}`;return u})))
+    .then(us=>{pr.innerHTML=us.map(u=>`<img src="${A(u)}" alt="">`).join('');const im=[...pr.querySelectorAll('img')];return Promise.all(im.map(x=>x.complete?0:new Promise(r=>{x.onload=x.onerror=r})))})
+    .then(()=>window.print(),()=>alert('출력할 쪽을 불러오지 못했습니다. 잠시 뒤 다시 눌러 주세요.'))
+    .then(()=>{delete el.dataset.busy;el.textContent=label})}
 
 function render(){
   if(!D)return;const r=route();closePop();VB=null;
