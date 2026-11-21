@@ -6,7 +6,7 @@
      vendor/exceljs.min.js = exceljs 4.4.0 dist/exceljs.min.js (MIT) sha384-Pqp51FUN2/qzfxZxBCtF0stpc9ONI6MYZpVqmo8m20SoaQCzf+arZvACkLkirlPz
      (11-15 jsdelivr·cdnjs 원본과 바이트 동일 확인). node에서도 같은 코드로 생성(라이브러리를 인자로 넘김) — 시험 = _workspace\v71_전략브리핑\gen_brief_node.js
    API: BriefExport.model(d, meta, opt) → M · docxDoc(M, docx) → Document · xlsxBook(M, ExcelJS) → Workbook · fileName('docx'|'xlsx', M)
-        BriefExport.coreRows(kpi2, dir) → 1절 두 줄 표 행(성과보드 표도 같은 함수) · BriefExport.download(kind, d, meta, opt) → Promise(브라우저) */
+        BriefExport.basisRows72(M) → [v72] 4절 두 기간 행 · BriefExport.coreRows(kpi2, dir) → 1절 두 줄 표 행(성과보드 표도 같은 함수) · BriefExport.download(kind, d, meta, opt) → Promise(브라우저) */
 (function (root) {
   'use strict';
   var LIB = {
@@ -88,7 +88,8 @@
     return { dir: d.name, ym: ym, isNow: ym === ms[0], cm: g.kpi2.month || g.brief.month, made: String(today).slice(0, 10),
              k2: g.kpi2, brief: g.brief, base: g.base || {}, targets: g.targets || {}, summary: sv && sv.summary, rows: (sv && sv.rows) || [],
              prm: p, listOk: !g.listOmitted && Array.isArray(p.hw) && Array.isArray(p.hrx) && Array.isArray(p.wait) && Array.isArray(p.rx),
-             dcPass110: g.dcPass110 || [], cutCands: g.cutCands || [] };
+             dcPass110: g.dcPass110 || [], cutCands: g.cutCands || [],
+             v72: (g.v72 && g.v72.saved && (g.v72.saved.rows || []).length) ? g.v72 : null };   // [v72] 집중업체 연결 저장분이 있으면 4절을 두 기간으로
   }
   function fileName(kind, M) { return kind === 'docx' ? ('전략브리핑_' + M.dir + '_' + M.ym + '.docx') : ('목표근거_대상리스트_' + M.dir + '_' + M.ym + '.xlsx'); }
 
@@ -141,6 +142,49 @@
     R.push(['GAP', '목표 − 근거 합 = ' + wonTxt(gap), amt(gap), 'gap']);
     var all = (s.GAP할일 && s.GAP할일.length) ? s.GAP할일.slice() : (String(s.GAP계획 || '').trim() ? String(s.GAP계획).split(/\n/).map(function (x) { return x.trim(); }).filter(Boolean) : []);
     return { rows: R, gap: gap, sum: sum, target: tgt, lines: all.slice(0, GAP_MAX).map(function (x) { return clip(x, GAP_LINE_MAX); }), linesMore: Math.max(0, all.length - GAP_MAX), linesAll: all };
+  }
+
+  /* [v72] 4절 — 집중업체 연결 저장분(goalBasis.v72.saved). 표 = 기간 2열, ② 업체 상위 8 + '외 n개 · 합계', ③ 상위 6 + 같은 꼴.
+     근거 합(기간) = round(기반액) + ② 합(제외 아님) + ③ 합 · GAP = 목표 − 근거 합(폼·서버·성과보드와 같은 식) */
+  var ROW72_CO = 8, ROW72_O = 6;
+  function basisRows72(M) {
+    var v = M.v72; if (!v) return null;
+    var sv = v.saved || {}, rows = sv.rows || [], P = (v.periods || []).slice(0, 2), keys = P.map(function (p) { return p.key; });
+    var isEx = function (r) { var x = r.제외; return x === true || String(x == null ? '' : x).trim().toUpperCase() === 'Y'; };
+    var base = Math.round(num(v.base && v.base.value) || 0);
+    var co = {}, oth = {}, order = [], oOrder = [];
+    rows.forEach(function (r) { var k = String(r.period || ''), hk = String(r.행키 || ''), a = Math.round(num(r.금액) || 0);
+      if (r.항목 === '②집중업체') { var c = co[hk] || (co[hk] = { nm: r.업체 || '-', type: r.유형 || '', a: {}, why: '', ex: false }); if (order.indexOf(hk) < 0) order.push(hk);
+        if (isEx(r)) c.ex = true; else if (keys.indexOf(k) >= 0) c.a[k] = (c.a[k] || 0) + a; if (String(r.근거 || '').trim()) c.why = r.근거; }
+      else if (r.항목 === '③그외') { var o = oth[hk] || (oth[hk] = { nm: r.대상 || r.업체 || '-', a: {}, why: '' }); if (oOrder.indexOf(hk) < 0) oOrder.push(hk);
+        if (keys.indexOf(k) >= 0) o.a[k] = (o.a[k] || 0) + a; if (String(r.근거 || '').trim()) o.why = r.근거; } });
+    var tot = function (x) { return keys.reduce(function (s, k) { return s + (x.a[k] || 0); }, 0); };
+    var live = order.filter(function (h) { return !co[h].ex; }).map(function (h) { return co[h]; }).filter(function (c) { return tot(c) > 0 || String(c.why).trim(); });
+    var exN = order.filter(function (h) { return co[h].ex; }).length;
+    var os = oOrder.map(function (h) { return oth[h]; });
+    var T = {}; P.forEach(function (p) { var k = p.key, s2 = 0, s3 = 0;
+      order.forEach(function (h) { if (!co[h].ex) s2 += (co[h].a[k] || 0); }); os.forEach(function (o) { s3 += (o.a[k] || 0); });
+      var t = (v.targets || {})[k] || {}, tg = Math.round(num(t.value) || 0), sum = base + s2 + s3;
+      T[k] = { s2: s2, s3: s3, sum: sum, tg: tg, kind: t.kind || '', gap: tg > 0 ? (tg - sum) : null }; });
+    var why = function (x) { var t = String(x.why || '').replace(/\s+/g, ' ').trim(); return t ? (' — ' + clip(t, WHY_MAX)) : ''; };
+    var cellA = function (x, k) { return x.a[k] ? amt(x.a[k]) : '—'; };
+    var R = [];
+    var push = function (l, d, f, kind) { R.push([l, d].concat(P.map(function (p) { return f(p); })).concat([kind])); };
+    push('목표', P.map(function (p) { var x = T[p.key]; return (p.label || p.key) + (p.kind === '분기' ? (' = ' + mon(p.month) + ' 월매출') : '') + (x.kind ? ('(' + x.kind + ')') : ''); }).join(' · '), function (p) { return T[p.key].tg > 0 ? amt(T[p.key].tg) : '미입력'; }, 'real');
+    push('① 기반', mon(v.base && v.base.month) + ' 확정 실적(성장금액의 기준)', function () { return amt(base); }, 'real');
+    push('② 집중업체', '지부장이 낸 집중업체 ' + (((v.focus && v.focus.rows) || []).length || order.length) + '개 중 ' + live.length + '개 업체에 근거' + (exN ? (' · 제외 ' + exN + '개') : '') + ' — ' + mon(v.base && v.base.month) + ' 대비 성장금액', function (p) { return amt(T[p.key].s2); }, 'sum');
+    var top = function (list, n, lbl) {
+      list.sort(function (a, b) { return tot(b) - tot(a); });
+      list.slice(0, n).forEach(function (x) { push('   ' + lbl(x), x.nm + why(x), function (p) { return cellA(x, p.key); }, 'ex'); });
+      if (list.length > n) { var rest = list.slice(n); push('   외', '외 ' + rest.length + '개 · 합계', function (p) { return amt(rest.reduce(function (s, x) { return s + (x.a[p.key] || 0); }, 0)); }, 'ex'); }
+    };
+    top(live.slice(), ROW72_CO, function (x) { return x.type ? clip(x.type, 10) : '업체'; });
+    push('③ 그 외', '집중업체 밖 — 병원신약 첫 처방·다른 업체 볼륨업 등', function (p) { return amt(T[p.key].s3); }, 'sum');
+    top(os.filter(function (o) { return tot(o) > 0 || String(o.why).trim(); }), ROW72_O, function () { return '대상'; });
+    push('근거 합', '① + ② + ③ = ' + P.map(function (p) { return (p.kind === '분기' ? String(p.label || '').replace(/^\d+년\s*/, '') : (p.label || p.key)) + ' ' + wonTxt(T[p.key].sum); }).join(' / '), function (p) { return amt(T[p.key].sum); }, 'tot');
+    push('GAP', '목표 − 근거 합 = ' + P.map(function (p) { var g = T[p.key].gap; return (p.kind === '분기' ? String(p.label || '').replace(/^\d+년\s*/, '') : (p.label || p.key)) + ' ' + (g == null ? '목표 없음' : wonTxt(g)); }).join(' / '), function (p) { var g = T[p.key].gap; return g == null ? '—' : amt(g); }, 'gap');
+    var all = (sv.gapLines || []).map(function (x) { return String(x == null ? '' : x).trim(); }).filter(Boolean);
+    return { P: P, T: T, rows: R, lines: all.slice(0, GAP_MAX).map(function (x) { return clip(x, GAP_LINE_MAX); }), linesMore: Math.max(0, all.length - GAP_MAX), linesAll: all, saved: sv };
   }
 
   /* ════════ Word(2쪽) — docx 라이브러리(D)로 만든다. 기본 Heading 스타일은 쓰지 않는다(keepNext 등 0건) ════════ */
@@ -224,6 +268,31 @@
     C.push(new D.Paragraph({ children: [new D.PageBreak()], spacing: { before: 0, after: 0 } }));
 
     // 4. 목표 근거 — 저장분(일일보고 폼 ②)
+    var B72 = basisRows72(M);   // [v72] 집중업체 연결 저장분이 있으면 두 기간 표
+    if (B72) {
+      var P72 = B72.P, sh72 = function (p) { return p.kind === '분기' ? String(p.label || '').replace(/^\d+년\s*/, '') : (p.label || p.key); };
+      C.push(title('4. 목표 근거 — ' + P72.map(function (p) { return p.label || p.key; }).join(' · '), '자동(일일보고 폼 \'목표 근거\') · 저장 ' + (B72.saved.갱신일 || B72.saved.작성일 || '')));
+      var W72 = [30, 98, 28, 28];
+      var hd72 = [cell(run('구분', 7.5, { b: true }), W72[0], HEAD, 'c'), cell(run('내용', 7.5, { b: true }), W72[1], HEAD, 'c')].concat(P72.map(function (p, i) {
+        return cell(run((p.label || p.key) + (p.kind === '분기' ? ('\n(' + mon(p.month) + ' 월매출)') : ''), 7.5, { b: true }), W72[2 + i], HEAD, 'c'); }));
+      C.push(table([hd72].concat(B72.rows.map(function (r) { var kd = r[r.length - 1], ex = kd === 'ex', bold = !ex;
+        return [cell(run(r[0], ex ? 7.5 : 8, { b: bold }), W72[0], bold ? HEAD : GRAY), cell(run(r[1], ex ? 7 : 7.5), W72[1], GRAY)].concat(P72.map(function (p, i) {
+          var gp = kd === 'gap' && B72.T[p.key].gap != null && B72.T[p.key].gap > 0;
+          return cell(run(r[2 + i], ex ? 7.5 : 8, { b: bold, c: gp ? BROWN : undefined }), W72[2 + i], GRAY, 'r'); })); })), W72));
+      var gt72 = P72.map(function (p) { var g = B72.T[p.key].gap; return sh72(p) + ' ' + (g == null ? '—' : amt(g)); }).join(' · ');
+      C.push(para(run('GAP 극복을 위한 할 일 — GAP ' + gt72, 9, { b: true }).concat(run('  지부장 작성 · 누구에게·무엇을·언제까지', 6.5, { c: DIM })), { before: 4 }));
+      for (var j = 1; j <= Math.max(3, B72.lines.length); j++) {
+        var L72 = B72.lines[j - 1];
+        C.push(para(run(j + '. ', 8.5, { b: true }).concat(L72 ? run(L72 + ' ', 8).concat(run('(일일보고 폼)', 7, { c: DIM })) : []), { after: 2, line: 1.9, line_: true, shade: L72 ? GRAY : undefined }));
+      }
+      if (B72.linesMore) C.push(para(run('외 ' + B72.linesMore + '건 — 일일보고 폼 참조', 7.5, { c: DIM }), { after: 2 }));
+      C.push(para(run(TXT.check, 7.5, { b: true, c: '404040' }), { before: 6 }));
+      return new D.Document({
+        creator: 'MS팀 성과관리 CRM', title: TXT.title + ' — ' + M.dir + ' ' + M.ym,
+        styles: { default: { document: { run: { font: F, size: 16 }, paragraph: { spacing: { before: 0, after: 0 } } } } },
+        sections: [{ properties: { page: { size: { width: MM(210), height: MM(297) }, margin: { top: MM(11), bottom: MM(11), left: MM(13), right: MM(13), header: MM(6), footer: MM(6) } } }, children: C }]
+      });
+    }
     var BR = basisRows(M), s = M.summary;
     C.push(title('4. 목표 근거 — ' + tM + '월', '자동(일일보고 폼 \'' + (M.isNow ? '이번달' : '다음달') + ' 목표 근거\')' + (s ? (' · 저장 ' + (s.갱신일 || s.작성일 || '')) : '')));
     if (!BR) {
@@ -392,6 +461,6 @@
   }
 
   var API = { LIB: LIB, amt: amt, eok: eok, pct: pct, comma: comma, coreRows: coreRows, CORE_HEADS: CORE_HEADS, CORE_NOTE: CORE_NOTE, SMALL_RE: SMALL_RE,
-              model: model, basisRows: basisRows, docxDoc: docxDoc, xlsxBook: xlsxBook, fileName: fileName, loadLib: loadLib, download: download };
+              model: model, basisRows: basisRows, basisRows72: basisRows72, docxDoc: docxDoc, xlsxBook: xlsxBook, fileName: fileName, loadLib: loadLib, download: download };
   if (typeof module !== 'undefined' && module.exports) module.exports = API; else root.BriefExport = API;
 })(typeof window !== 'undefined' ? window : this);

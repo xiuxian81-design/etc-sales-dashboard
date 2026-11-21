@@ -135,7 +135,7 @@ async function sendToSheets() {
   // [v69] 목표 근거 차단 규칙(서버 saveGoalBasis_와 동일) — 걸리면 그 칸으로 데려간다. 작성분은 그대로
   if (gbc.err) { toast('② 목표 근거 — ' + gbc.err.msg); showSendResult('⚠️ ② 목표 근거 — ' + gbc.err.msg, false); gbFocus(gbc.err); return; }   // [v69] 긴 차단 문구(이중 계상 등)는 전송 결과 칸에 전문
   // [v69] 다음달 근거 제출엔 ① 마감예측을 싣지 않는다 — ① 숫자를 바꿨다면 이번달로 먼저 전송하게 한다
-  const gbNext = !!(gbc.payload && gbc.payload.대상월 !== gbNowM());
+  const gbNext = !!(gbc.payload && gbc.payload.방식 !== '집중' && gbc.payload.대상월 !== gbNowM());   // [v72] 집중 방식(두 기간 한 번에)은 다음달 근거 취급 안 함 — ① 마감예측도 평소대로 함께
   if (gbNext && hasClosing && gbClosingEdited()) {
     toast('① 목표·예측을 바꾼 내용이 있습니다 — ② 대상월을 이번달로 두고 먼저 전송한 뒤, 다음달 근거를 전송하세요');
     const cc = document.getElementById('c-cl'); if (cc) cc.scrollIntoView({behavior:'smooth', block:'start'});
@@ -721,6 +721,47 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
 .gb-bk-i{flex-wrap:wrap;align-items:center}
 .gb-bk-i .gb-n{flex:0 0 64px}
 .gb-bk-l{font-size:12px;color:var(--gray4);white-space:nowrap}
+/* [v72] 목표 근거 — 집중업체 연결(이번 달 근거 + 분기 근거). 화면 정본 = _workspace\v72_집중업체\시안_목표근거_v72.html(5판). 경고색 갈색(사람 이름 빨강 금지) */
+.g72-rule{background:var(--blue-lt);border-radius:10px;padding:8px 11px;font-size:11.5px;color:var(--blue-dk);line-height:1.5;margin-bottom:12px;overflow-wrap:anywhere}
+.g72-goal{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.g72-gc{border:1px solid var(--hair);border-radius:12px;padding:9px 10px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.g72-gc.fixed{background:var(--gray1)}
+.g72-gl{font-size:11px;font-weight:700;color:var(--gray4);overflow-wrap:anywhere}
+.g72-gv{font-size:18px;font-weight:800}
+.g72-gs{font-size:10.5px;color:var(--gray3);overflow-wrap:anywhere}
+.g72-gc input{min-width:0;width:100%;border:1px solid var(--gray2);border-radius:9px;padding:8px 9px;font-size:16px;font-weight:800;font-family:inherit;min-height:42px}
+.g72-sec{margin-top:16px}
+.g72-sh{font-size:13.5px;font-weight:800;color:var(--blue-dk);display:flex;justify-content:space-between;align-items:baseline;gap:6px;flex-wrap:wrap}
+.g72-sh small{font-size:11px;color:var(--gray3);font-weight:600}
+.g72-sd{font-size:11.5px;color:var(--gray4);margin:3px 0 8px;line-height:1.5}
+.g72-row{border:1px solid var(--hair);border-radius:12px;padding:10px 12px;margin-top:8px;position:relative;min-width:0;background:#fff}
+.g72-row.has{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue) inset}
+.g72-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding-right:34px;min-width:0}
+.g72-nm{font-weight:800;font-size:14px;overflow-wrap:anywhere}
+.g72-tb{font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap}
+.g72-t1{background:#e6f0ff;color:#0058b0}.g72-t3{background:#e7f6ea;color:#1a6b2e}.g72-tn{background:#f5f5f7;color:#6e6e73}
+.g72-info{font-size:11.5px;color:var(--gray4);margin-left:auto}
+.g72-del{position:absolute;top:4px;right:4px;width:36px;height:36px;border:none;background:none;color:var(--gray3);font-size:18px;cursor:pointer;border-radius:8px}
+.g72-del:hover{background:#fbf1e4;color:#a0521c}
+.g72-in{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.g72-in>div{min-width:0}
+.g72-row .fi{min-width:0;width:100%;padding:9px 10px;min-height:42px}
+.g72-row .fi.amt{text-align:right;font-weight:800}
+.g72-fl{font-size:10.5px;font-weight:700;color:var(--gray4);display:block;margin-bottom:3px}
+.g72-undo{font-size:12px;color:var(--gray4);margin-top:8px;overflow-wrap:anywhere}
+.g72-undo button{border:none;background:none;color:var(--blue);font-weight:700;font-family:inherit;cursor:pointer;min-height:36px}
+.g72-todo{display:flex;gap:8px;align-items:flex-start;margin-top:8px}
+.g72-todo b{width:20px;padding-top:11px;color:var(--gray4);flex:0 0 20px}
+.g72-todo .fi{flex:1;min-width:0}
+.fi.g72-need{border-color:#a0521c!important;background:#fffaf3}
+.gb-bar.g72-bar{padding:8px 12px 9px}
+.g72-sr{display:grid;grid-template-columns:52px repeat(3,minmax(0,1fr));gap:4px;align-items:center;text-align:center;padding:3px 0}
+.g72-sr.h{font-size:10.5px;color:var(--gray4);font-weight:700}
+.g72-sr .m{font-weight:800;font-size:12.5px;text-align:left;line-height:1.2}
+.g72-sr .v{font-size:14px;font-weight:800;overflow-wrap:anywhere}
+.g72-gp{color:#a0521c}.g72-ok{color:var(--ok)}
+.g72-msg{font-size:11.5px;color:#a0521c;font-weight:700;padding-bottom:4px}
+@media(max-width:400px){.g72-goal{grid-template-columns:1fr 1fr}.g72-goal .fixed{grid-column:1/-1}}
 </style>
 </head>
 <body>
@@ -768,7 +809,7 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
     <!-- ② 이번달 목표 근거 (v69 · 목표근거 탭) — 구 '② 이번달 주요계획(월간계획)' 입력을 대체. 구데이터는 카드 안 읽기 전용 요약 -->
     <div class="card fold" id="c-gb">
       <div class="card-hd foldable" onclick="toggleCard('c-gb')">
-        <span>② 이번달 목표 근거</span>
+        <span id="gb-title">② 이번달 목표 근거</span>
         <span style="display:flex;align-items:center;gap:8px;min-width:0"><span class="fold-sum" id="gb-sum">불러오는 중…</span><span class="card-caret">▾</span></span>
       </div>
       <div class="card-bd" style="padding-top:10px" id="gb-body"></div>
@@ -2361,6 +2402,7 @@ function gbRows(s){
 /* sendToSheets가 부른다 → {} (보낼 것 없음) | {err} | {payload, s, other} */
 function gbCollect(){
   const g=gbData(); if(!g||g.error||GB.rpm!==rpm) return {};
+  if(gb72On()) return gb72Collect();   // [v72]
   const ms=gbMonths();
   let s=GB.st[GB.ym]; if(!s||!s.dirty) s=ms.map(m=>GB.st[m]).filter(x=>x&&x.dirty)[0];
   if(!s) return {};
@@ -2375,6 +2417,7 @@ function gbCollect(){
 }
 function gbAfterSent(s){
   if(!s) return;
+  if(s.v72){ gb72AfterSent(s); return; }   // [v72]
   s.dirty=false; s.restored=false; s.sentAt=today();
   try{ localStorage.removeItem(gbLsKey(s.ym)); }catch(e){}
   gbRender();
@@ -2391,6 +2434,7 @@ function gbClosingEdited(){
   return false;
 }
 function gbFocus(err){
+  if(err && err.v72){ gb72Focus(err); return; }   // [v72]
   const c=document.getElementById('c-gb'); if(c) c.classList.remove('fold');
   if(err && err.ym && err.ym!==GB.ym){ GB.ym=err.ym; gbRender(); }
   const s=gbState();
@@ -2479,6 +2523,7 @@ function gbEmailText(){
     return b;
   };
   if(!g||g.error) return '  ∙ 근거 데이터 없음\n';
+  if(gb72On()) return gb72EmailText();   // [v72]
   const s=(GB.rpm===rpm)?GB.st[nm]:null;
   if(s){ const t=gbTotals(s);
     let x='';
@@ -2984,6 +3029,8 @@ function gbRender(){
   if(!g){ body.innerHTML='<div class="gb-info">목표 근거 입력은 서버 업데이트(v69) 후 열립니다. 지금은 전송되지 않습니다.</div>'+legacy; gbSumTxt('준비 중'); return; }
   if(g.error){ body.innerHTML='<div class="gb-warn">근거 데이터 오류 — '+esc(g.error)+'<br>나머지 보고는 그대로 전송됩니다. 관리자에게 알려 주세요.</div>'+legacy; gbSumTxt('근거 데이터 오류'); return; }
   if(gbListPending()){ gbListLoad(rpm); body.innerHTML='<div class="row-empty">'+esc(dirLabel(rpm))+' 지부장 목록(미처방·처방 중·후보)을 불러오는 중입니다…</div>'+legacy; gbSumTxt('목록 불러오는 중…'); return; }   // [v71]
+  if(gb72On()){ gb72Render(); return; }   // [v72] goalBasis.v72 = 집중업체 연결 카드(없으면 아래 v71 카드 그대로)
+  { const ttl=document.getElementById('gb-title'); if(ttl) ttl.textContent='② 이번달 목표 근거'; }
   const s=gbState(), ms=gbMonths(), isNow=(s.ym===gbNowM());
   const sv=(g.saved&&g.saved[s.ym])||null, sum=sv&&sv.summary;
   let h=`<div class="seg" style="margin-bottom:10px">`+ms.map((m,i)=>`<button type="button" class="${m===s.ym?'on':''}" onclick="gbSetYm('${m}')">${i?'다음달':'이번달'} ${esc(monLbl(m))}${(GB.st[m]&&GB.st[m].dirty)?' •':''}</button>`).join('')+'</div>';
@@ -3032,6 +3079,7 @@ window.addEventListener('resize',function(){ try{ gbBarPos(); }catch(e){} });
 function gbUpdateTotals(){
   if(!crmReady||!rpm) return;
   const g=gbData(); if(!g||g.error) return;
+  if(gb72On()){ if(!gbListPending()) gb72Update(); return; }   // [v72]
   const s=gbState(); if(!s) return;
   const t=gbTotals(s), set=(id,v)=>{ const e=document.getElementById(id); if(e) e.innerHTML=v; };
   set('gb-v1',gbMan(t.base)+'만'); set('gb-v2',gbMan(t.s2)+'만'+(gbRampOk()?'':' <span style="font-weight:400;color:var(--gray3);font-size:11px">'+(gbRampBehind(s)?'(저장분 합계 제외)':'(저장분)')+'</span>')); set('gb-v3',gbMan(t.s3)+'만'); set('gb-v4',gbMan(t.s4)+'만');
@@ -3046,6 +3094,266 @@ function gbUpdateTotals(){
   set('gb-gaplbl','GAP 극복을 위한 할 일 (1번 필수) — 목표 − 근거 합 = '+(t.target>0?gbSigned(t.gap):'-'));
   const sv=(g.saved&&g.saved[s.ym])||null;
   gbSumTxt(monLbl(s.ym)+' · '+(s.dirty?'작성 중':(s.sentAt||sv?'저장됨':'미작성'))+' · 근거 '+(t.sum/1e8).toFixed(2)+'억'+(t.target>0?(' · GAP '+(t.gapMan===0?'0':gbSigned(t.gap))):''));
+}
+
+/* ════════════ [v72] 목표 근거 — 집중업체 연결 (goalBasis.v72가 있을 때만 · 없으면 위 v69~v71 카드 그대로) ════════════
+   정본 = _workspace\v72_집중업체\v72_요구사항.md('GAS v72' 절 응답·payload 계약) + 화면 정본 시안_목표근거_v72.html(5판).
+   · 기간 = v72.periods 2개(이번 달 근거 + 분기 근거 — 라벨·월은 서버가 준다, 이번 11월 예외 12월·27년 1분기도 서버 값).
+   · 금액 = 마지막 평가실적(v72.base.month) 대비 성장금액. 화면 만원, 상태·payload 원 정수. 빈칸 = null(그 기간 0).
+   · 근거 합(기간별) = round(기반액) + ② 집중업체(제외 아님) 합 + ③ 그 외 합 · GAP = 목표 − 근거 합 · GAP(만원 반올림) > 0인 기간이 있으면 할 일 1번 필수.
+   · 목표 칸 읽기 전용 = targets[키].kind '확정' 또는 이번 달(기간 월 = nowMonth). 그 외 = 지부장 입력(억).
+   · 이 카드에서 고친 게 있을 때만(dirty) 전송 · 초안 localStorage cso_gb72_{지부장}_{기간키들}(기반월이 바뀌면 폐기). */
+function gb72On(){ const g=gbData(); return !!(g && !g.error && g.v72 && Array.isArray(g.v72.periods) && g.v72.periods.length===2); }
+function gb72V(){ return (gbData()||{}).v72||{}; }
+function gb72NowM(){ return gb72V().nowMonth||gbNowM(); }
+function gb72Keys(){ return gb72V().periods.map(p=>p.key); }
+function gb72Lbl(p){ return String(p.label||p.key||''); }
+function gb72Short(p){ return p.kind==='분기'?gb72Lbl(p).replace(/^\d+년\s*/,''):(p.month?monLbl(p.month):gb72Lbl(p)); }   // [QA Y7] 하단 바·업체 칸·합계 줄 = 짧게('12월'·'1분기'), 연도는 제목·목표 칸만
+function gb72TypeCls(t){ t=String(t||''); return /1억/.test(t)?'g72-t1':(/천/.test(t)?'g72-t3':'g72-tn'); }
+function gb72NormNm(v){ return String(v==null?'':v).replace(/㈜|\(\s*주\s*\)|주식회사|유한회사/g,'').replace(/[\s()（）.·,\-]/g,'').toLowerCase(); }
+function gb72Ex(v){ return v===true || String(v==null?'':v).trim().toUpperCase()==='Y' || String(v)==='true'; }
+function gb72LsKey(){ return 'cso_gb72_'+rpm+'_'+gb72Keys().join('_'); }
+function gb72Blank(){ const o={}; gb72Keys().forEach(k=>{ o[k]=''; }); return o; }
+/* 목표 칸 — 읽기 전용이면 서버 값(이번 달이고 서버 값이 없으면 ① 목표 칸 값), 아니면 입력값(원) */
+function gb72Ro(p){ const t=(gb72V().targets||{})[p.key]||{}; return t.kind==='확정' || (p.kind==='월' && p.month===gb72NowM()); }
+function gb72Tgt(s,p){
+  if(gb72Ro(p)){ const t=(gb72V().targets||{})[p.key]||{}; const v=Math.round(numOf(t.value)); return v>0?v:(p.month===gbNowM()?Math.round(numOf(closing.목표)):0); }
+  return Math.round(gbN(s.tg[p.key]));
+}
+/* 상태 만들기 — 저장분(saved) → 로컬 초안 순 */
+function gb72Build(){
+  const v=gb72V(), keys=gb72Keys(), fr=((v.focus&&v.focus.rows)||[]), sv=v.saved||null, rows=(sv&&sv.rows)||[];
+  const s={v72:true,dirty:false,tg:{},f:[],gone:[],o:[],gap:[],seq:0};
+  keys.forEach(k=>{ const t=(v.targets||{})[k]||{}; s.tg[k]=numOf(t.value)>0?Math.round(numOf(t.value)):''; });
+  const by={};   // 행키 → {r(첫 행), a:{기간:원}, ex}
+  rows.forEach(r=>{ const hk=String(r.행키||''); if(!hk) return; const x=by[hk]||(by[hk]={r:r,a:{},ex:false,why:''});
+    if(gb72Ex(r.제외)) x.ex=true;
+    if(keys.indexOf(String(r.period||''))>=0 && !gb72Ex(r.제외)){ const n=Math.round(numOf(r.금액)); if(n>0) x.a[r.period]=(x.a[r.period]||0)+n; }   // 0원 행(근거만) = 빈칸
+    if(String(r.근거||'').trim()) x.why=String(r.근거); });
+  fr.forEach((x,i)=>{ const sx=by[x.key]; const a=gb72Blank();
+    if(sx) keys.forEach(k=>{ if(sx.a[k]>0) a[k]=sx.a[k]; });
+    s.f.push({key:x.key,name:x.name||'',type:x.type||'',biz:x.biz||'',base:x.base,idx:i,add:false,a:a,why:sx?sx.why:'',gone:!!(sx&&sx.ex)});
+    if(sx&&sx.ex) s.gone.push(i); });
+  const known={}; fr.forEach(x=>{ known[x.key]=1; });
+  Object.keys(by).forEach(hk=>{ const x=by[hk], r=x.r;
+    if(r.항목==='②집중업체' && !known[hk] && !x.ex){ const a=gb72Blank(); keys.forEach(k=>{ if(x.a[k]) a[k]=x.a[k]; }); s.f.push({key:hk,name:r.업체||'',type:r.유형||'',biz:r.사업자번호||'',base:null,idx:-1,add:true,a:a,why:x.why}); }
+    if(r.항목==='③그외'){ const a=gb72Blank(); keys.forEach(k=>{ if(x.a[k]) a[k]=x.a[k]; }); s.o.push({대상:r.대상||r.업체||'',a:a,why:x.why}); } });
+  if(!s.o.length) s.o.push({대상:'',a:gb72Blank(),why:''});
+  s.gap=(sv&&Array.isArray(sv.gapLines))?sv.gapLines.map(x=>String(x==null?'':x)):[];
+  while(s.gap.length<3) s.gap.push('');
+  s.hasSaved=!!(sv && rows.length);
+  gb72Restore(s);
+  return s;
+}
+function gb72State(){ if(GB.rpm!==rpm) gbReset(); if(!GB.s72) GB.s72=gb72Build(); return GB.s72; }
+function gb72Save(s){
+  try{ localStorage.setItem(gb72LsKey(),JSON.stringify({base:(gb72V().base||{}).month||'',tg:s.tg,gap:s.gap,o:s.o,
+    f:s.f.map(r=>({key:r.key,name:r.name,add:r.add,a:r.a,why:r.why,gone:r.gone})),gone:s.gone})); }catch(e){}
+}
+function gb72Restore(s){
+  try{
+    const raw=localStorage.getItem(gb72LsKey()); if(!raw) return;
+    const o=JSON.parse(raw)||{};
+    if((o.base||'')!==((gb72V().base||{}).month||'')){ localStorage.removeItem(gb72LsKey()); return; }   // 실적 갱신 → 초안 폐기(서버가 기반 불일치로 막는다)
+    const keys=gb72Keys(), fix=a=>{ const b=gb72Blank(); keys.forEach(k=>{ if(a&&a[k]!==undefined&&a[k]!==null) b[k]=a[k]; }); return b; };
+    if(o.tg) gb72V().periods.forEach(p=>{ if(!gb72Ro(p) && o.tg[p.key]!==undefined) s.tg[p.key]=o.tg[p.key]; });
+    if(Array.isArray(o.gap)){ s.gap=o.gap.slice(); while(s.gap.length<3) s.gap.push(''); }
+    if(Array.isArray(o.o)) s.o=o.o.map(r=>({대상:r.대상||'',a:fix(r.a),why:r.why||''}));
+    if(Array.isArray(o.f)){ const m={}; o.f.forEach(r=>{ if(!r.add) m[r.key]=r; });
+      s.f.forEach(r=>{ const x=m[r.key]; if(x){ r.a=fix(x.a); r.why=x.why||''; r.gone=!!x.gone; } else { r.a=gb72Blank(); r.why=''; r.gone=false; } });
+      s.f=s.f.filter(r=>!r.add).concat(o.f.filter(r=>r.add).map(r=>({key:r.key||'',name:r.name||'',type:'',biz:'',base:null,idx:-1,add:true,a:fix(r.a),why:r.why||''})));
+      s.gone=(Array.isArray(o.gone)?o.gone:[]).filter(i=>s.f.some(r=>r.idx===i&&r.gone)); s.f.forEach(r=>{ if(r.gone&&s.gone.indexOf(r.idx)<0) s.gone.push(r.idx); }); }
+    s.dirty=true; s.restored=true;
+  }catch(e){}
+}
+/* 합계 — 서버 저장 식과 같다(기간별 · 제외·빈칸 0) */
+function gb72Totals(s){
+  const v=gb72V(), base=Math.round(numOf(v.base&&v.base.value)), out={base:base,per:{},anyGap:false,anyGoal:false};
+  v.periods.forEach(p=>{ const k=p.key;
+    const s2=s.f.reduce((a,r)=>a+(r.gone?0:gbN(r.a[k])),0), s3=s.o.reduce((a,r)=>a+gbN(r.a[k]),0);
+    const tgt=gb72Tgt(s,p), sum=base+s2+s3, gap=tgt>0?(tgt-sum):null, gapMan=gap==null?null:Math.round(gap/10000);
+    if(tgt>0) out.anyGoal=true; if(gapMan!=null && gapMan>0) out.anyGap=true;
+    out.per[k]={s2:s2,s3:s3,sum:sum,target:tgt,gap:gap,gapMan:gapMan}; });
+  return out;
+}
+function gb72GapLines(s){ return (s.gap||[]).map(x=>String(x==null?'':x).replace(/\s+/g,' ').trim()); }
+/* 클라이언트 차단 — 서버 검증(요구사항 'GAS v72' 검증 절)과 같은 조건 */
+function gb72Validate(s){
+  const v=gb72V(), t=gb72Totals(s), keys=gb72Keys();
+  for(const p of v.periods){ if(s['_tb_'+p.key]) return {msg:gb72Lbl(p)+' 목표는 억 단위로 입력하세요 — 예) 17.5',id:'g72-tg-'+p.key,v72:1}; }
+  for(let i=0;i<s.f.length;i++){ const r=s.f[i]; if(r.gone) continue; const nm=String(r.name||'').trim()||((i+1)+'번째 업체');
+    for(const k of keys) if(r['_bad_'+k]) return {msg:'② '+nm+': 만원 단위로 입력하세요 — 예) 300',id:'g72-a-f-'+i+'-'+k,v72:1};
+    if(r.add && !String(r.name||'').trim() && (keys.some(k=>gbN(r.a[k])>0)||String(r.why||'').trim())) return {msg:'② 추가한 업체의 이름을 적어 주세요',id:'g72-n-'+i,v72:1};
+    if(r.add && String(r.name||'').trim()){ const nn=gb72NormNm(r.name), dup=s.f.filter((x,j)=>j!==i && gb72NormNm(x.name)===nn)[0];
+      if(dup) return {msg:'② '+nm+': 이미 목록에 있는 업체입니다'+(dup.gone?' — 위 \'뺀 업체\'에서 되돌려 적어 주세요':' — 그 줄에 적어 주세요'),id:'g72-n-'+i,v72:1}; } }
+  for(let i=0;i<s.o.length;i++){ const r=s.o[i];
+    for(const k of keys) if(r['_bad_'+k]) return {msg:'③ 그 외 '+(i+1)+'번째 줄: 만원 단위로 입력하세요',id:'g72-a-o-'+i+'-'+k,v72:1};
+    if(!String(r.대상||'').trim() && keys.some(k=>gbN(r.a[k])>0)) return {msg:'③ 그 외 '+(i+1)+'번째 줄: 대상(업체 또는 거래처)을 적어 주세요 — 대상이 없으면 금액을 넣을 수 없습니다',id:'g72-o-'+i,v72:1}; }
+  // 목표 필수 — 서버와 같은 조건: 월 기간 = 보낼 행이 하나라도 있으면 · 분기 = 분기 금액이 하나라도 있으면 · 둘 다 아니어도 목표 하나는 있어야 GAP 계산
+  const filled=r=>keys.some(k=>!(r.a[k]===''||r.a[k]==null))||!!String(r.why||'').trim();
+  const anyRow=s.f.some(r=>r.gone?!r.add:filled(r))||s.o.some(r=>filled(r)||!!String(r.대상||'').trim());
+  const tgErr=p=>({msg:gb72Lbl(p)+' 목표를 입력해 주세요'+(gb72Ro(p)?' — ① 목표 칸에 먼저':''),id:gb72Ro(p)?'cl-goal':('g72-tg-'+p.key),v72:1});
+  for(const p of v.periods){ const k=p.key, need=(p.kind==='분기')?(s.f.some(r=>!r.gone&&!(r.a[k]===''||r.a[k]==null))||s.o.some(r=>!(r.a[k]===''||r.a[k]==null))):anyRow;
+    if(need && !(t.per[k].target>0)) return tgErr(p); }
+  if(!t.anyGoal){ const p=v.periods.filter(x=>!gb72Ro(x))[0]; return {msg:'목표를 적어 주세요 — 목표가 있어야 GAP이 계산됩니다',id:p?('g72-tg-'+p.key):'cl-goal',v72:1}; }
+  if(t.anyGap && !gb72GapLines(s)[0]){ const p=v.periods.filter(x=>(t.per[x.key].gapMan||0)>0)[0];
+    return {msg:'GAP이 남았습니다('+gb72Lbl(p)+' +'+t.per[p.key].gapMan.toLocaleString()+'만) — \'GAP 극복을 위한 할 일\' 1번을 적어야 전송됩니다',id:'g72-gt-0',v72:1}; }
+  return null;
+}
+/* payload.목표근거 — 요구사항 'GAS v72' payload 그대로 */
+function gb72Payload(s){
+  const v=gb72V(), keys=gb72Keys(), t=gb72Totals(s), tr=x=>String(x==null?'':x).trim();
+  const amt=a=>{ const o={}; keys.forEach(k=>{ o[k]=(a[k]===''||a[k]==null)?null:Math.round(gbN(a[k])); }); return o; };
+  const has=r=>keys.some(k=>!(r.a[k]===''||r.a[k]==null)) || !!tr(r.why);
+  const tgt={}; v.periods.forEach(p=>{ const x=t.per[p.key].target; if(x>0) tgt[p.key]=x; });
+  const rows=[];
+  s.f.forEach(r=>{
+    if(r.gone){ if(!r.add) rows.push({항목:'②집중업체',행키:r.key,업체:r.name,사업자번호:normBiz(r.biz),유형:r.type||'',금액:amt(gb72Blank()),근거:'',제외:true}); return; }
+    if(!has(r)) return;
+    const nm=tr(r.name); if(r.add && !nm) return;
+    rows.push({항목:'②집중업체',행키:r.add?('F|N|'+gb72NormNm(nm)):r.key,업체:nm,사업자번호:normBiz(r.biz),유형:r.type||'',금액:amt(r.a),근거:tr(r.why),제외:false}); });
+  let n=0; s.o.forEach(r=>{ if(!tr(r.대상) && !has(r)) return; n++; rows.push({항목:'③그외',행키:'O|'+n,대상:tr(r.대상),금액:amt(r.a),근거:tr(r.why)}); });
+  return {방식:'집중',지부장:rpm,기반월:(v.base&&v.base.month)||'',기반액:t.base,focusMonth:(v.focus&&v.focus.listMonth)||'',목표:tgt,rows:rows,GAP할일:gb72GapLines(s).filter(Boolean)};
+}
+function gb72Collect(){
+  if(GB.rpm!==rpm) return {};
+  const s=GB.s72; if(!s||!s.dirty) return {};
+  const err=gb72Validate(s); if(err) return {err:err,s:s};
+  return {payload:gb72Payload(s),s:s,t:gb72Totals(s)};
+}
+function gb72AfterSent(s){
+  s.dirty=false; s.restored=false; s.sentAt=today();
+  try{ localStorage.removeItem(gb72LsKey()); }catch(e){}
+  gb72Render();
+}
+function gb72Focus(err){
+  const c=document.getElementById('c-gb'); if(c) c.classList.remove('fold');
+  if(err && err.id==='cl-goal'){ const cc=document.getElementById('c-cl'); if(cc) cc.scrollIntoView({behavior:'smooth',block:'start'}); }
+  const el=err&&document.getElementById(err.id);
+  if(el){ el.classList.add('over'); el.scrollIntoView({behavior:'smooth',block:'center'}); try{ el.focus(); }catch(e){} setTimeout(()=>el.classList.remove('over'),2500); }
+}
+/* ── 입력 핸들러 — 금액·근거는 재렌더 없이 상태+합계만 ── */
+function gb72Touch(s){ s.dirty=true; gb72Save(s); gb72Update(); }
+function gb72Amt(sec,i,k,el){
+  const s=gb72State(), r=(sec==='f'?s.f:s.o)[i]; if(!r) return;
+  const mv=manValue(el.value);
+  if(mv!=null && mv>MAN_MAX){ r['_bad_'+k]=true; el.classList.add('over'); toast(manOverMsg(mv)); }
+  else { r['_bad_'+k]=false; el.classList.remove('over'); r.a[k]=manToWon(el.value); }
+  gb72Touch(s);
+}
+function gb72Txt(sec,i,f,el){ const s=gb72State(), r=(sec==='f'?s.f:s.o)[i]; if(!r) return; r[f]=el.value; gb72Touch(s); }
+function gb72Tg(k,el){
+  const s=gb72State(), ev=eokValue(el.value);
+  if(ev!=null && ev>EOK_MAX){ s['_tb_'+k]=true; el.classList.add('over'); toast('억 단위로 입력하세요 — 예) 17.5'); gb72Touch(s); return; }
+  s['_tb_'+k]=false; el.classList.remove('over'); s.tg[k]=eokToWon(el.value); gb72Touch(s);
+}
+function gb72Gap(i,el){ const s=gb72State(); while(s.gap.length<=i) s.gap.push(''); s.gap[i]=el.value; autoGrow(el); gb72Touch(s); }
+function gb72Del(i){
+  const s=gb72State(), r=s.f[i]; if(!r) return;
+  const hasAmt=gb72Keys().some(k=>gbN(r.a[k])>0||(r.a[k]!==''&&r.a[k]!=null));
+  if(hasAmt && !confirm('적은 금액이 있습니다. 이 업체를 뺄까요?')) return;
+  if(r.add){ s.f.splice(i,1); }
+  else { r.gone=true; r.a=gb72Blank(); r.why=''; s.gone.push(r.idx); }
+  s.dirty=true; gb72Save(s); gb72Render();
+}
+function gb72Undo(){
+  const s=gb72State(); const idx=s.gone.pop(); const r=s.f.filter(x=>x.idx===idx)[0]; if(r) r.gone=false;
+  s.dirty=true; gb72Save(s); gb72Render();
+}
+function gb72AddF(){ const s=gb72State(); s.f.push({key:'',name:'',type:'',biz:'',base:null,idx:-1,add:true,a:gb72Blank(),why:''}); s.dirty=true; gb72Save(s); gb72Render();
+  const el=document.getElementById('g72-n-'+(s.f.length-1)); if(el) try{ el.focus(); }catch(e){} }
+function gb72AddO(){ const s=gb72State(); s.o.push({대상:'',a:gb72Blank(),why:''}); gb72Render(); const el=document.getElementById('g72-o-'+(s.o.length-1)); if(el) try{ el.focus(); }catch(e){} }
+function gb72DelO(i){
+  const s=gb72State(), r=s.o[i]; if(!r) return;
+  const filled=String(r.대상||'').trim()||String(r.why||'').trim()||gb72Keys().some(k=>r.a[k]!==''&&r.a[k]!=null);
+  if(filled && !confirm('작성한 내용이 있습니다. 이 줄을 지울까요?')) return;
+  s.o.splice(i,1); if(!s.o.length) s.o.push({대상:'',a:gb72Blank(),why:''}); s.dirty=true; gb72Save(s); gb72Render();
+}
+/* ── 렌더 ── */
+function gb72Render(){
+  const body=document.getElementById('gb-body'); if(!body) return;
+  const v=gb72V(), s=gb72State(), P=v.periods, keys=gb72Keys(), bm=(v.base&&v.base.month)||'', bmL=monLbl(bm), nm=gb72NowM();
+  const ttl=document.getElementById('gb-title'); if(ttl) ttl.textContent='② 목표 근거 — '+P.map(gb72Lbl).join(' · ');
+  const pM=P.filter(p=>p.kind==='월')[0]||P[0], pQ=P.filter(p=>p.kind==='분기')[0]||P[1];
+  const rule=String(v.rule||'OCS 마감 후, 학습과 소통 전에 갱신').trim();
+  let h='<div style="font-size:11px;color:var(--gray3);text-align:right;margin:-2px 0 6px">작성 기준 '+esc(monLbl(nm))+'</div>';
+  h+='<div class="g72-rule"><b>언제</b> — '+esc(/갱신$/.test(rule)?rule+'합니다.':rule)+'<br><b>무엇을</b> — <b>이번 달 근거</b> + <b>분기 근거</b>. 분기의 첫째·둘째 달엔 그 분기, 셋째 달이 되면 다음 분기를 적습니다.'
+    +(pM.month!==nm?('<br><b>이번만 예외</b> — '+esc(monLbl(nm))+' 대신 <b>'+esc(gb72Lbl(pM))+' 근거</b>와 <b>'+esc(gb72Lbl(pQ))+' 근거</b>를 적습니다.'):'')
+    +'<br><b>금액</b> — 모두 <b>마지막 평가실적('+esc(bmL)+') 대비 성장금액</b>입니다. 분기는 <b>분기 마지막 달('+esc(gb72Short(pQ))+' = '+esc(monLbl(pQ.month))+')</b> 월매출 기준입니다.</div>';
+  // [QA Y6] 내려받기는 카드 맨 아래 Word 하나만(대상 리스트 엑셀 = 폼에서 뺀 PRM 미처방 목록이라 v72 카드엔 없음)
+  if(s.sentAt) h+='<div class="gb-info">✅ 이번 전송으로 목표 근거를 저장했습니다('+esc(s.sentAt)+').</div>';
+  else if(s.hasSaved){ const sv=v.saved||{}; h+='<div class="gb-info">목표 근거 저장됨 — 갱신 '+esc(sv.갱신일||sv.작성일||'')+'. 고치면 두 기간 근거 전체가 새 내용으로 바뀝니다.</div>'; }
+  if(s.restored && s.dirty) h+='<div class="gb-info">이 기기에 남은 작성 중 초안을 불러왔습니다(아직 전송 전).</div>';
+  // 목표 3칸
+  h+='<div class="g72-goal"><div class="g72-gc fixed"><span class="g72-gl">① 기반 · '+esc(bmL)+' 평가실적</span><span class="g72-gv">'+eok(numOf(v.base&&v.base.value))+'</span><span class="g72-gs">자동</span></div>';
+  P.forEach(p=>{ const ro=gb72Ro(p), lab=p.kind==='분기'?(gb72Lbl(p)+' 목표 ('+monLbl(p.month)+' 월매출, 억)'):(gb72Lbl(p)+' 목표 (억)');
+    const sub=p.kind==='분기'?'분기 근거':('이번 달 근거'+(p.month!==nm?('(이번만 '+gb72Lbl(p)+')'):''));
+    h+='<div class="g72-gc'+(ro?' fixed':'')+'"><span class="g72-gl">'+esc(lab)+'</span>'
+      +(ro?('<span class="g72-gv" id="g72-tg-'+esc(p.key)+'">'+(gb72Tgt(s,p)>0?eok(gb72Tgt(s,p)):'<span style="font-size:13px;color:#a0521c">① 목표 칸에 먼저</span>')+'</span><span class="g72-gs">'+esc(sub)+' · ① 목표 칸 값</span>')
+          :('<input id="g72-tg-'+esc(p.key)+'" inputmode="decimal" placeholder="예: '+(p.kind==='분기'?'18.0':'17.5')+'" value="'+esc(wonToEok(s.tg[p.key]))+'" oninput="gb72Tg(\''+esc(p.key)+'\',this)"><span class="g72-gs">'+esc(sub)+'</span>'))+'</div>'; });
+  h+='</div>';
+  // ② 집중업체
+  const lblIn=p=>esc(p.kind==='분기'?(gb72Short(p)+'('+monLbl(p.month)+')'):gb72Short(p))+' 성장금액(만원)';
+  const amtIn=(sec,i,r)=>'<div class="g72-in">'+P.map(p=>'<div><span class="g72-fl">'+lblIn(p)+'</span><input class="fi amt" id="g72-a-'+sec+'-'+i+'-'+esc(p.key)+'" inputmode="decimal" value="'+esc(wonToMan(r.a[p.key]))+'" oninput="gb72Amt(\''+sec+'\','+i+',\''+esc(p.key)+'\',this)"></div>').join('')+'</div>';
+  h+='<div class="g72-sec"><div class="g72-sh">② 집중업체 성장금액 <small id="g72-c2"></small></div>'
+    +'<div class="g72-sd">업체별로 <b>'+esc(bmL)+' 매출 대비</b> '+esc(gb72Short(pM))+'과 '+esc(gb72Short(pQ))+' 마지막 달('+esc(monLbl(pQ.month))+')에 얼마나 늘지 적습니다(만원). 근거는 병원·품목 한 줄. 관리하지 않을 업체는 ×로 뺍니다.<br><b>두 칸 중 하나만 적어도 됩니다</b> — 이번 달에 크게 나올 업체는 '+esc(gb72Short(pM))+'만, '+esc(monLbl(pQ.month))+'에 기대되는 업체는 '+esc(gb72Short(pQ))+'만. 빈칸은 그 기간 성장 0으로 계산합니다.</div>';
+  if(!((v.focus&&v.focus.rows)||[]).length) h+='<div class="gb-info">집중업체 목록이 아직 없습니다 — ＋ 업체 추가로 적거나 ③ 그 외에 적어 주세요.</div>';
+  s.f.forEach((r,i)=>{ if(r.gone) return;
+    h+='<div class="g72-row" id="g72-r-'+i+'"><button type="button" class="g72-del" title="이 업체 빼기" onclick="gb72Del('+i+')">×</button><div class="g72-top">'
+      +(r.add?('<input class="fi" id="g72-n-'+i+'" style="max-width:200px" placeholder="업체명" value="'+esc(r.name)+'" oninput="gb72Txt(\'f\','+i+',\'name\',this)">')
+             :('<span class="g72-nm">'+esc(r.name)+'</span>'))
+      +(r.type?('<span class="g72-tb '+gb72TypeCls(r.type)+'">'+esc(r.type)+'</span>'):'')
+      +(r.add?'':('<span class="g72-info">'+esc(bmL)+' '+(r.base==null?'—':(gbMan(r.base)+'만'))+'</span>'))+'</div>'
+      +amtIn('f',i,r)
+      +'<div style="margin-top:8px"><span class="g72-fl">근거 — 병원·품목 한 줄</span><input class="fi" id="g72-w-f-'+i+'" value="'+esc(r.why)+'" placeholder="예: ○○병원 프레논 첫 처방" oninput="gb72Txt(\'f\','+i+',\'why\',this)"></div></div>'; });
+  if(s.gone.length) h+='<div class="g72-undo">뺀 업체: '+s.gone.map(ix=>esc((s.f.filter(x=>x.idx===ix)[0]||{}).name||'')).join(', ')+' <button type="button" onclick="gb72Undo()">되돌리기</button></div>';
+  h+='<button type="button" class="row-add" style="margin-top:8px" onclick="gb72AddF()">＋ 업체 추가</button></div>';
+  // ③ 그 외
+  h+='<div class="g72-sec"><div class="g72-sh">③ 그 외 성장금액 <small id="g72-c3"></small></div><div class="g72-sd">집중업체 밖에서 늘 금액 — 병원신약 첫 처방, 다른 업체 볼륨업 등('+esc(bmL)+' 대비).</div>';
+  s.o.forEach((r,i)=>{ h+='<div class="g72-row"><button type="button" class="g72-del" title="이 줄 빼기" onclick="gb72DelO('+i+')">×</button>'
+    +'<div style="padding-right:34px"><span class="g72-fl">대상 — 업체 또는 거래처</span><input class="fi" id="g72-o-'+i+'" value="'+esc(r.대상)+'" placeholder="예: 이대목동병원(에스투엠)" oninput="gb72Txt(\'o\','+i+',\'대상\',this)"></div>'
+    +amtIn('o',i,r)
+    +'<div style="margin-top:8px"><span class="g72-fl">근거 한 줄</span><input class="fi" value="'+esc(r.why)+'" placeholder="예: 알파본디 DC 통과 → '+esc(gb72Short(pM))+' 첫 처방" oninput="gb72Txt(\'o\','+i+',\'why\',this)"></div></div>'; });
+  h+='<button type="button" class="row-add" style="margin-top:8px" onclick="gb72AddO()">＋ 줄 추가</button></div>';
+  // GAP 할 일
+  h+='<div class="g72-sec"><div class="g72-sh">GAP 극복을 위한 할 일 <small>GAP이 남으면 1번은 꼭</small></div><div class="g72-sd">근거 합이 목표에 못 미치는 만큼을 무엇으로 채울지 적습니다.</div>'
+    +s.gap.map((x,i)=>'<div class="g72-todo"><b>'+(i+1)+'</b><textarea class="fi" id="g72-gt-'+i+'" rows="1" placeholder="'+(i?'':'누구에게 · 무엇을 · 언제까지')+'" oninput="gb72Gap('+i+',this)">'+esc(x)+'</textarea></div>').join('')+'</div>';
+  if(g72DlOk()) h+='<div class="g72-sec"><button type="button" class="row-add" id="gb-dl-docx" onclick="gbDl(\'docx\',this)">전략브리핑 자료 받기(Word)</button></div>';
+  // 하단 고정 바(두 기간 × 목표·근거 합·GAP)
+  h+='<div class="gb-bar g72-bar" id="gb-bar"><div class="g72-msg" id="g72-msg"></div><div class="g72-sr h"><span></span><span>목표</span><span>근거 합</span><span>GAP</span></div>'
+    +P.map(p=>'<div class="g72-sr"><span class="m">'+(p.kind==='분기'?(esc(gb72Short(p))+'<br><small style="font-weight:600;color:var(--gray3)">'+esc(monLbl(p.month))+'</small>'):esc(gb72Short(p)))+'</span><span class="v" id="g72-sg-'+esc(p.key)+'">—</span><span class="v" id="g72-ss-'+esc(p.key)+'"></span><span class="v" id="g72-sp-'+esc(p.key)+'">—</span></div>').join('')+'</div>';
+  body.innerHTML=h;
+  body.querySelectorAll('textarea').forEach(autoGrow);
+  gb72Update(); gbBarPos();
+}
+function g72DlOk(){ const g=gbData(); return !!(g && g.kpi2 && window.BriefExport); }
+function gb72Update(){
+  const s=GB.s72; if(!s) return; const v=gb72V(), t=gb72Totals(s), keys=gb72Keys(), set=(id,x)=>{ const e=document.getElementById(id); if(e) e.textContent=x; };
+  const man=n=>Math.round(n/10000).toLocaleString(), eo=w=>(w/1e8).toFixed(2)+'억';
+  s.f.forEach((r,i)=>{ const el=document.getElementById('g72-r-'+i); if(el) el.classList.toggle('has',keys.some(k=>gbN(r.a[k])>0)); });
+  const live=s.f.filter(r=>!r.gone).length, P=v.periods;
+  set('g72-c2',live+'개 업체 · '+P.map(p=>gb72Short(p)+' +'+man(t.per[p.key].s2)).join(' · '));
+  set('g72-c3',P.map(p=>gb72Short(p)+' +'+man(t.per[p.key].s3)).join(' · '));
+  P.forEach(p=>{ const x=t.per[p.key], gp=document.getElementById('g72-sp-'+p.key);
+    set('g72-ss-'+p.key,eo(x.sum)); set('g72-sg-'+p.key,x.target>0?eo(x.target):'—');
+    if(gp){ gp.textContent=x.target>0?(x.gapMan>0?('+'+x.gapMan.toLocaleString()+'만'):'없음'):'—'; gp.className='v'+(x.target>0?(x.gapMan>0?' g72-gp':' g72-ok'):''); }
+    if(gb72Ro(p)){ const e=document.getElementById('g72-tg-'+p.key); if(e && x.target>0) e.textContent=eok(x.target); } });
+  const need=t.anyGap && !gb72GapLines(s)[0], t1=document.getElementById('g72-gt-0');
+  if(t1) t1.classList.toggle('g72-need',need);
+  set('g72-msg',!t.anyGoal?'목표를 적으면 GAP이 계산됩니다':(need?"GAP이 남았습니다 — 'GAP 극복을 위한 할 일' 1번을 적어야 전송됩니다":''));
+  gbSumTxt(P.map(p=>gb72Short(p)).join('·')+' · '+(s.dirty?'작성 중':(s.sentAt||s.hasSaved?'저장됨':'미작성'))+P.map(p=>{ const x=t.per[p.key]; return x.target>0?(' · '+gb72Short(p)+' GAP '+(x.gapMan>0?('+'+x.gapMan.toLocaleString()+'만'):'없음')):''; }).join(''));
+  gbBarPos();
+}
+/* 이메일(일일결산) 2절 — v72 */
+function gb72EmailText(){
+  const v=gb72V(), s=(GB.rpm===rpm)?GB.s72:null, man=n=>Math.round((Number(n)||0)/10000).toLocaleString()+'만';
+  if(!s){ return v.saved&&(v.saved.rows||[]).length?'  ∙ 목표 근거 저장됨(성과보드 참고)\n':'  ∙ 근거 미작성\n'; }
+  const t=gb72Totals(s);
+  let b='  ∙ 기반('+monLbl(v.base&&v.base.month)+') '+man(t.base)+(s.dirty?' (작성 중 — 전송 전)':'')+'\n';
+  v.periods.forEach(p=>{ const x=t.per[p.key], tk=((v.targets||{})[p.key]||{}).kind, tmp=(p.kind==='월' && !gb72Ro(p) && tk!=='확정')?'(임시)':'', e2=w=>(w/1e8).toFixed(2)+'억';   // [QA] 다음 달 임시 목표 표시 · 근거 합 = ① 기반 + ② + ③
+    b+='  ∙ '+gb72Lbl(p)+': 목표 '+(x.target>0?(e2(x.target)+tmp):'미입력')+' / 근거 합(기반 '+e2(t.base)+' + ② '+man(x.s2)+' + ③ '+man(x.s3)+' = '+e2(x.sum)+')'+(x.target>0?(' / GAP '+gbSigned(x.gap)):'')+'\n'; });
+  const pl=gb72GapLines(s).filter(Boolean); if(pl.length) b+='  ∙ GAP 극복을 위한 할 일: '+pl.map((x,i)=>(i+1)+'. '+x).join(' / ')+'\n';
+  return b;
 }
 
 /* ════════════ ⑤ 오늘 한일 / ⑥ 내일 할일 — 업체명 자동완성 + 상태 세그먼트 ════════════ */
