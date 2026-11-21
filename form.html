@@ -614,6 +614,9 @@ textarea.fi{min-height:44px;line-height:1.6;resize:none;overflow:hidden}
 .btn-sheets{background:var(--blue)}
 .btn-sheets:hover{background:var(--blue-dk)}
 .rpm-btn{min-height:44px;border-width:1.5px}
+/* 하단 버튼줄 — 글자 세로 쌓임 방지, 좁은 화면은 2줄(전송·백업 / 이메일 보고) */
+.bot .btn-main,.bot .btn-grn,.bot .btn-sheets{white-space:nowrap}
+@media (max-width:520px){ .bot{flex-wrap:wrap} .bot .btn-sheets,.bot .btn-grn{flex:1 1 0;padding:12px 8px} .bot .btn-main{flex:1 1 100%} .wrap{padding-bottom:150px} }
 /* 이메일 모드 토글 */
 .em-mode{display:flex;gap:3px;background:var(--gray1);border-radius:10px;padding:3px;margin-bottom:12px}
 .em-mode button{flex:1;min-height:44px;border:none;background:none;border-radius:8px;font-size:13.5px;font-weight:700;color:var(--gray4);cursor:pointer;font-family:inherit}
