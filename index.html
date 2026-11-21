@@ -2808,6 +2808,11 @@ function renderFcVolumeUp(vu, meta){
 .fc-tbl td{padding:7px 10px;border-bottom:1px solid #eef2f7;text-align:center;white-space:nowrap}
 .fc-tbl tbody tr:hover{background:#f8fafc}
 .gb-co .fc-tbl td{font-size:14px}.gb-co .fc-tbl th{font-size:13px}  /* [v72] ② 집중업체 표만 1px 더 크게(브리핑용) */
+/* [v72] 핵심지표·3. 목표 근거 카드 글씨 1px 더(브리핑용) — 아래 설명 줄·요약표 */
+.k2-sec .crm-sub2{font-size:13px}
+.gb-sec .crm-note{font-size:13.5px}
+.gb-sec > .tbl-wrap .fc-tbl td{font-size:14px}.gb-sec > .tbl-wrap .fc-tbl th{font-size:13px}
+.gb-sec > .tbl-wrap .fc-tbl td div{font-size:12.5px !important}
 .fc-tbl td.gb-why{white-space:normal;text-align:left;color:var(--gray4);min-width:320px;line-height:1.55;word-break:keep-all;vertical-align:top}  /* [v72] 목표 근거 — 근거 전문 표시(브리핑용) */
 #t-forecast .section-card{margin-bottom:14px}
 </style>
@@ -2922,13 +2927,13 @@ tr.clickable.sel td{background:var(--blue-lt)}   /* [v58] 업체 현황 선택 �
 .crm-kpi .b .t.crm-kpi-110{border-top:1px dashed var(--gray2);padding-top:3px;font-size:11.5px}
 /* [v71] 핵심지표 두 줄 표(전략브리핑 1절과 같은 칸·문구) · 내려받기 버튼 · GAP 극복을 위한 할 일 */
 .crm-k2{min-width:780px}   /* 좁은 화면 = 표 안에서 가로 스크롤(칸이 세로로 찌그러지지 않게) */
-.crm-k2 td,.crm-k2 th{white-space:normal;word-break:keep-all;font-size:12.5px;line-height:1.4;vertical-align:middle}
-.crm-k2 th{font-size:11.5px}
+.crm-k2 td,.crm-k2 th{white-space:normal;word-break:keep-all;font-size:13.5px;line-height:1.4;vertical-align:middle}
+.crm-k2 th{font-size:12.5px}
 .crm-k2 td.l{text-align:left;font-weight:700}
-.crm-k2 tr.tm td{font-size:11.5px;color:var(--gray3);font-weight:400}
+.crm-k2 tr.tm td{font-size:12.5px;color:var(--gray3);font-weight:400}
 .crm-k2 .p{color:#8B4513;font-weight:800}
 .crm-k2 tr.tm .p{color:var(--gray3);font-weight:400}
-.crm-k2 .r12{display:block;font-size:11px;color:var(--gray3);font-weight:400}
+.crm-k2 .r12{display:block;font-size:12px;color:var(--gray3);font-weight:400}
 .crm-dl{border:1px solid var(--hair);background:#fff;border-radius:50px;padding:7px 13px;font-size:13px;font-weight:700;color:var(--blue);cursor:pointer;font-family:inherit}
 .crm-dl:hover{border-color:var(--blue)} .crm-dl[disabled]{opacity:.55;cursor:wait}
 .crm-gt{margin:6px 0 0 18px;padding:0;font-size:13px;line-height:1.6;color:var(--gray5)}
@@ -3225,7 +3230,7 @@ function crmKpi2Html(k2,dir){
   var cell=function(v){ var p=String(v).split(BE.SMALL_RE||'\n(12개월'); return fcEsc(p[0]).replace(/\n/g,'<br>')+p.slice(1).map(function(x){ return '<span class="r12">'+fcEsc(BE.SMALL_RE?x:('(12개월'+x))+'</span>'; }).join(''); };   /* 작은 글씨 줄 = 12개월 후 참고치 · [QA🟡-5] '그중 n처는 이전에 신청한 품목만 처방 중' */
   var rows=BE.coreRows(k2,dir).map(function(r){
     return '<tr'+(r.team?' class="tm"':'')+'><td class="l">'+fcEsc(r.label.trim()).replace(/\n/g,'<br>')+'</td>'+r.cells.map(function(c,i){ return '<td'+(i===3?' class="p"':'')+'>'+cell(c)+'</td>'; }).join('')+'</tr>'; }).join('');
-  var h='<div class="section-card"><h3>🧭 핵심지표 <span style="font-size:12px;font-weight:400;color:var(--gray3)">최근 3개월 PRM 신청('+lom+'~'+cmn+'월 시작 + 시작 예정) · '+cmn+'월 확정 실적 기준 · '+fcEsc(k2.basis||'실매출(VAT 제외)')+' · 작은 줄 = 팀</span></h3>';
+  var h='<div class="section-card k2-sec"><h3>🧭 핵심지표 <span style="font-size:13px;font-weight:400;color:var(--gray3)">최근 3개월 PRM 신청('+lom+'~'+cmn+'월 시작 + 시작 예정) · '+cmn+'월 확정 실적 기준 · '+fcEsc(k2.basis||'실매출(VAT 제외)')+' · 작은 줄 = 팀</span></h3>';
   if(k2.stale) h+='<div class="crm-note">실적이 새로 들어와 지표 갱신 대기 중입니다 — 아래는 '+fcEsc(crmMon(k2.month))+' 기준 값입니다.</div>';
   h+='<div class="tbl-wrap"><table class="btbl fc-tbl crm-k2"><thead><tr>'+BE.CORE_HEADS(cmn).map(function(x){ return '<th>'+fcEsc(x).replace(/\n/g,'<br>')+'</th>'; }).join('')+'</tr></thead><tbody>'+rows+'</tbody></table></div>';
   return h+'<div class="crm-sub2">'+fcEsc(BE.CORE_NOTE)+'</div></div>';
@@ -3381,7 +3386,7 @@ function crmGb72Html(d){
     +tr('목표',function(x){ return x.tg>0?(crmMoney(x.tg)+(x.kind?(' <span class="crm-badge'+(x.kind==='확정'?' on':' wait')+'" style="padding:1px 7px">'+fcEsc(x.kind)+'</span>'):'')):'<span style="color:var(--gray3)">미입력</span>'; })
     +tr('GAP (목표 − 근거 합)',function(x){ return gapTxt(x); })
     +'</tbody></table></div>';
-  var h='<div class="section-card"><h3 style="flex-wrap:wrap;gap:6px">🎯 3. 목표 근거 <span style="font-size:13px;font-weight:600;color:var(--gray4)">'+P.map(function(p){ return fcEsc(p.label||p.key); }).join(' · ')+'</span></h3>';
+  var h='<div class="section-card gb-sec"><h3 style="flex-wrap:wrap;gap:6px">🎯 3. 목표 근거 <span style="font-size:14px;font-weight:600;color:var(--gray4)">'+P.map(function(p){ return fcEsc(p.label||p.key); }).join(' · ')+'</span></h3>';
   h+='<div class="crm-note">성장금액 = 마지막 평가실적('+fcEsc(crmMon(bm))+') 대비. 분기는 분기 마지막 달 월매출 기준. 지부장이 낸 집중업체 + 그 외.</div>';
   h+=tbl;
   /* ② 업체 행(펼침) */
