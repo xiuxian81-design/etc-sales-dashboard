@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<script>/* [열람게이트] 게이트가 #tok= 로 넘겨준 토큰을 보관한다 — 자료·근거 BD·문의는 D ?doc=casemap*(JSONP)로만 받는다(이 공개 파일에는 자료가 없다) */
+(function(){var GATE="https://script.google.com/macros/s/AKfycbwTXL5bRBDXXoEN06x2OSMLq1Wqh1CFJWjYAPSWjhYAZZFxJqx30bwwgdpSFT2SndDL/exec",DOC="casemap";
+window.__DATA="https://script.google.com/macros/s/AKfycbyhk2el3kwGMStCvyUr-8B-PWS-6aKwcf5EVfvpryqlj3jEeLw5pnttHMEokrpQXO33dQ/exec";window.__gateT="";
+/* 토큰(base64url·'.'·'=')에는 '%'가 없다 — '%XX'가 보이면 인코딩된 것이므로 풀어서 쓴다 */
+var norm=function(t){t=String(t||"");if(/%[0-9A-Fa-f]{2}/.test(t)){try{t=decodeURIComponent(t);}catch(e){}}return t;};
+var ss=function(k,v){try{if(v===undefined)return sessionStorage.getItem(k)||"";if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){}return "";};
+/* 토큰 속(이메일|문서|만료) — 화면 표시와 만료 미리 보기용. 진짜 확인은 서버(D)가 한다 */
+window.__gateInfo=function(t){try{var p=atob(String(t).split(".")[0].replace(/-/g,"+").replace(/_/g,"/")).split("|");if(p.length!==3)return null;return{email:p[0],doc:p[1],exp:+p[2]};}catch(e){return null;}};
+var live=function(t){var i=window.__gateInfo(t);return !!(i&&(i.doc===DOC||i.doc==="dash")&&i.exp*1000>Date.now());};
+try{var m=location.hash.match(/[#&]tok=([^&]+)/);if(m){var t=norm(m[1]);window.__gateT=t;ss("gate_tok_cm",t);var nx=ss("cm_next");ss("cm_next",null);
+  history.replaceState(null,"",location.pathname+location.search+(/^#(map|case|bd)\b/.test(nx)?nx:"#map"));}}catch(e){}
+/* 쓸 토큰: 이 화면이 받은 것 → 같은 탭의 성과보드 토큰(gate_tok). 만료됐거나 다른 문서용이면 쓰지 않는다 */
+window.__gateTok=function(){var c=[window.__gateT,ss("gate_tok_cm"),norm(ss("gate_tok"))];for(var i=0;i<c.length;i++){if(c[i]&&live(c[i]))return c[i];}return "";};
+/* 계정 확인으로 보내기 — 보던 화면(#…)을 기억해 두었다가 돌아오면 그 화면으로. 2분 안에 3번 넘게 반복되면 멈춘다 */
+window.__gateGo=function(reason){var n=Number(ss("cm_redir")||0);if(Date.now()-Number(ss("cm_redir_t")||0)>120000)n=0;ss("cm_redir",String(n+1));ss("cm_redir_t",String(Date.now()));
+  if(n>=3){window.__gateStop("계정 확인 화면으로 이동이 반복되고 있습니다("+(reason||"")+"). 잠시 뒤 다시 열거나 담당자에게 알려 주세요.");return;}
+  if(/^#(map|case|bd)\b/.test(location.hash))ss("cm_next",location.hash);ss("gate_tok_cm",null);window.__gateT="";location.replace(GATE+"?doc="+DOC);};
+window.__gateStop=function(msg){var a=document.getElementById("app");if(a){a.textContent="";var d=document.createElement("div");d.className="msg0";d.textContent=msg;a.appendChild(d);}else alert(msg);};
+/* 서버가 열람을 거절했을 때: 권한 문제는 안내만, 그 밖(만료·토큰 없음 등)은 계정 확인으로 */
+window.__gateGuard=function(res){if(!res||res.auth!=="required")return false;
+  if(res.reason==="not_allowed"){window.__gateStop("이 계정은 열람 권한이 없습니다. 담당자에게 요청해 주세요.");return true;}
+  if(res.reason==="role_denied"){window.__gateStop("이 화면은 열람 대상이 아닙니다(역할 제한). 필요하면 담당자에게 요청해 주세요.");return true;}
+  if(res.reason==="unknown_doc"){window.__gateStop("서버가 아직 준비되지 않았습니다. 담당자에게 알려 주세요.");return true;}
+  window.__gateGo(res.reason);return true;};
+})();</script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>사례 맵</title>
+<!-- 화면 틀만 둔다. 자료(사례·처방명분·스피치·FAQ·BD 제목)는 loadData()로 받는다 — 이 파일에 자료 글자를 넣지 않는다(빌드 게이트가 검사). -->
+<style>
+:root{--nv:#262C73;--nv2:#1B2058;--bg:#F3F5F9;--ln:#D5DAE3;--mut:#667181;--am:#FFE9C7;--amb:#E5B769;--amt:#5A3A00;--gr:#7B8494}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{font-family:'NanumSquare','나눔스퀘어','NanumSquareOTF','NanumGothic','나눔고딕','Malgun Gothic',sans-serif;color:#1B2430;background:var(--bg);font-size:14px;line-height:1.45;word-break:keep-all;overflow-wrap:anywhere}
+button,textarea{font-family:inherit}
+#app{height:100%}
+.hd{background:var(--nv);color:#fff;display:flex;align-items:center;gap:12px;padding:0 18px;height:52px}
+.hd b{font-size:18px;white-space:nowrap}.hd .sp{flex:1}.hd .who{font-size:12px;background:rgba(255,255,255,.16);padding:4px 10px;border-radius:999px;white-space:nowrap}
+.hd .bk{font-size:13px;background:rgba(255,255,255,.16);padding:5px 12px;border-radius:6px;cursor:pointer;white-space:nowrap;border:0;color:#fff}
+.wrap{display:flex;height:calc(100% - 52px)}
+.side{width:248px;background:#fff;border-right:1px solid var(--ln);padding:14px 12px;flex:none;overflow:auto}
+.tp{border:1.5px solid var(--ln);border-radius:10px;padding:10px 12px;margin-bottom:8px;background:#fff;cursor:pointer}
+.tp.on{border-color:var(--nv);background:#EEF0FA}
+.tp .n{float:right;background:var(--nv);color:#fff;border-radius:999px;padding:0 9px;font-weight:800;font-size:13px}
+.tp b{font-size:16px}.tp div{font-size:11.5px;color:var(--mut);margin-top:4px}
+.ftg{display:none}
+.fl{font-size:11.5px;color:var(--mut);font-weight:700;margin:14px 2px 6px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}.chip{border:1px solid var(--ln);border-radius:999px;padding:3px 10px;font-size:12px;background:#fff;cursor:pointer}.chip.on{background:var(--nv);color:#fff;border-color:var(--nv)}
+.main{flex:1;overflow:auto;padding:14px 18px;min-width:0}
+.def{background:#EEF0FA;border-radius:8px;padding:8px 14px;font-weight:700;font-size:15px;margin-bottom:10px}.def b{color:var(--nv)}
+.cls{display:inline-block;background:var(--nv);color:#fff;font-weight:800;font-size:15px;padding:3px 14px;border-radius:6px;margin:6px 0 6px}
+.rs{background:#FFF9EC;border-left:4px solid #C7791A;border-radius:6px;padding:7px 12px;font-size:12.5px;margin-bottom:7px}
+.rs>div{padding-left:23px;text-indent:-23px}
+.rs span{display:inline-block;width:17px;height:17px;border-radius:50%;background:var(--nv);color:#fff;font-size:11px;font-weight:800;text-align:center;line-height:17px;margin-right:6px;text-indent:0}
+.rs b{color:var(--nv)}
+.row{display:flex;background:#fff;border:1.2px solid var(--ln);border-radius:9px;overflow:hidden;margin-bottom:6px;min-height:64px;cursor:pointer}
+.row:hover{border-color:var(--nv)}
+.c1{width:25%;background:#F6F7FB;border-right:1px solid var(--ln);padding:8px 12px;display:flex;flex-direction:column;justify-content:center}
+.c1 b{font-size:17px}.c1 small{color:#44505E;font-size:12px;margin-top:3px}
+.c1.solo{width:33%}.c1 .who{margin:0}.c1 .who b{font-size:14.5px;color:#1B2430}
+.c1 .tg{background:#FFF3DC;border-left:4px solid #E5A93A;border-radius:4px;padding:4px 9px;margin-top:6px;font-size:15.5px;font-weight:800;color:var(--nv);line-height:1.35}
+.sit{font-size:12px;color:#44505E;margin-bottom:5px}
+.dh .tgl{font-size:12px;color:#9B5A00;font-weight:700;margin-bottom:2px}
+.bdg{display:inline-block;border:1px solid #9AA5B4;border-radius:4px;padding:0 5px;font-weight:700;font-size:11px;margin-right:4px;background:#fff}
+.c2{flex:1;padding:8px 12px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.tag{display:inline-block;background:var(--am);border:1px solid var(--amb);color:var(--amt);border-radius:999px;padding:1px 11px;font-weight:800;font-size:14.5px;margin:0 5px 3px 0}
+.one{font-size:12.5px;color:#2E3946;margin-top:3px}
+.c3{width:24%;background:var(--nv);color:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:6px}
+.c3.p{background:var(--gr)}.c3 .f{font-size:13px;opacity:.9}.c3 .t{font-size:22px;font-weight:800}.c3 small{font-size:11px;opacity:.95;margin-top:2px}
+.go{width:34px;display:flex;align-items:center;justify-content:center;color:var(--nv);font-size:20px;font-weight:800;background:#fff;flex:none}
+.none{background:#fff;border:1.2px dashed var(--ln);border-radius:9px;padding:28px;text-align:center;color:var(--mut);font-weight:700;font-size:15px}
+.lock{font-size:11.5px;color:var(--mut);margin-top:8px}
+.fqb textarea{width:100%;height:54px;border:1.5px solid var(--ln);border-radius:8px;padding:6px 8px;font-size:13px;resize:none}
+.fqs{display:block;width:100%;border:0;background:var(--nv);color:#fff;text-align:center;font-weight:800;border-radius:8px;padding:6px;margin-top:5px;cursor:pointer;font-size:14px}
+.fqe{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px}.fqe span{font-size:11.5px;border:1px dashed #9AA5B4;border-radius:999px;padding:2px 8px;color:#44505E;cursor:pointer}
+#pop{display:none;position:fixed;left:262px;bottom:18px;width:480px;max-width:calc(100% - 280px);max-height:calc(100% - 90px);overflow:auto;background:#fff;border:2px solid var(--nv);border-radius:12px;box-shadow:0 8px 28px rgba(20,23,46,.28);padding:12px 14px;z-index:9}
+.ph{display:flex;justify-content:space-between;color:var(--nv);font-size:15px;margin-bottom:6px}.ph span{font-size:12px;color:var(--mut);cursor:pointer}
+.pq{background:#EEF0F4;border-radius:10px;padding:6px 10px;font-size:13px;margin-bottom:8px}.pq:before{content:'질문  ';color:var(--mut);font-size:11px}
+.pa{border-top:1px solid var(--ln);padding:8px 0}.pa b{display:block;font-size:13.5px}.pa b:before{content:'Q ';color:#C7791A}.pa div{font-size:13px;margin-top:4px;color:#2E3946}
+.pn{font-weight:800;font-size:14px;margin:4px 0 8px}.pb2{background:var(--nv);color:#fff;text-align:center;font-weight:800;border-radius:8px;padding:8px;cursor:pointer}
+.ps{font-size:11.5px;color:var(--mut);margin-top:8px}.ps u{color:var(--nv);font-weight:700;cursor:pointer}.ok{color:var(--nv);font-weight:800}.bad{color:#8A4B00;font-weight:800}
+/* 2층 */
+.dt{padding:14px 18px;height:calc(100% - 52px);overflow:auto}
+.dh{display:flex;align-items:stretch;border-radius:10px;overflow:hidden;margin-bottom:10px}
+.dh .l{background:#fff;border:1.2px solid var(--ln);border-right:0;border-radius:10px 0 0 10px;flex:1;padding:10px 16px;min-width:0}
+.dh .l h1{margin:0;font-size:22px}.dh .l h1 em{font-style:normal;color:#C7791A}
+.dh .l>div{color:#44505E;font-size:13px;margin-top:4px}
+.dh .r{background:var(--nv);color:#fff;width:230px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px;flex:none}
+.dh .r.p{background:var(--gr)}
+.dh .r .t{font-size:26px;font-weight:800}.dh .r small{font-size:12px}
+.g2{display:grid;grid-template-columns:1.05fr 1fr;gap:10px}.g2>div{min-width:0}
+.cd{background:#fff;border:1.2px solid var(--ln);border-radius:10px;padding:10px 14px;margin-bottom:10px}
+.cd h2{margin:0 0 7px;font-size:15px;color:var(--nv);display:flex;align-items:baseline;flex-wrap:wrap;gap:6px}
+.cd h2 small{font-weight:400;color:var(--mut);font-size:11.5px}
+.kv{display:grid;grid-template-columns:64px 1fr;gap:3px 8px;font-size:13px}.kv b{color:var(--mut);font-size:12px}
+.dtl{margin-top:8px;font-size:12.8px}.dtl b{color:var(--nv);font-size:12.5px}.dtl ul,.dtl ol{margin:2px 0 0;padding-left:20px}.dtl.hl{background:#FFF9EC;border-radius:6px;padding:6px 8px}
+.bdi{display:flex;align-items:center;border:1px solid var(--ln);border-radius:8px;padding:7px 10px;margin-bottom:5px;font-weight:700;font-size:13.5px;cursor:pointer}
+.bdi .no{width:22px;height:22px;border-radius:5px;background:var(--nv);color:#fff;text-align:center;line-height:22px;font-size:12px;margin-right:8px;flex:none}
+.bdi .sp{flex:1}.btn{border:1px solid var(--nv);color:var(--nv);border-radius:6px;padding:2px 9px;font-size:12px;margin-left:5px;background:#fff;white-space:nowrap;cursor:pointer;font-weight:700}.btn.f{background:var(--nv);color:#fff}
+.bnote{font-weight:400;font-size:11.5px;color:var(--mut);margin:-2px 0 6px 30px}
+.fq{border-top:1px solid var(--ln);padding:6px 0}.fq:first-of-type{border-top:0}
+.fq b{display:block;font-size:13px}.fq b:before{content:'Q ';color:#C7791A}.fq div{font-size:12.5px;color:#2E3946;margin-top:3px}
+.sp30{font-size:15.5px;line-height:1.8;background:#F6F7FB;border-radius:10px;padding:12px 14px;white-space:pre-wrap}.spn{font-size:11.5px;color:var(--mut);margin-top:6px;text-align:right}
+/* 3층 */
+.vw{background:#14172E;height:100%;display:flex;flex-direction:column;color:#fff}
+.vt{display:flex;align-items:center;gap:10px;padding:0 16px;height:50px;background:#0D1024;flex:none}
+.vt b{font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.vt .sp{flex:1}.vt .pg{white-space:nowrap}
+.vt .b{border:1px solid rgba(255,255,255,.5);border-radius:6px;padding:4px 12px;font-size:13px;cursor:pointer;white-space:nowrap;color:#fff;text-decoration:none;background:none}.vt .b.f{background:#fff;color:#14172E;font-weight:800}
+.vb{flex:1;display:flex;align-items:center;justify-content:center;gap:18px;min-height:0;padding:10px;touch-action:pan-y}
+.vb img{height:100%;max-width:calc(100% - 140px);object-fit:contain;background:#fff;border-radius:4px;user-select:none;-webkit-user-drag:none}
+.vb .err{color:#fff;opacity:.8}
+.ar{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;flex:none;border:0;color:#fff}
+.ar[disabled]{opacity:.25;cursor:default}
+.vl{display:flex;gap:8px;padding:8px 16px;background:#0D1024;flex:none;overflow-x:auto}
+.vl div{border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:4px 10px;font-size:12px;white-space:nowrap;cursor:pointer}.vl div.on{background:#fff;color:#14172E;font-weight:800}
+.msg0{padding:40px;text-align:center;color:var(--mut)}
+#prn{display:none}
+@media print{
+ @page{size:A4;margin:8mm}
+ html,body{height:auto;background:#fff}
+ body>*:not(#prn){display:none!important}
+ #prn{display:block}
+ #prn img{display:block;margin:0 auto;max-width:100%;max-height:276mm;object-fit:contain;page-break-after:always;break-after:page}
+ #prn img:last-child{page-break-after:auto;break-after:auto}
+}
+@media(max-width:1000px){.side{width:220px}#pop{left:234px;max-width:calc(100% - 250px)}.c1 b{font-size:15.5px}.c3 .t{font-size:19px}.tag{font-size:13px;padding:1px 9px}}
+@media(max-width:900px){.g2{grid-template-columns:1fr}}
+@media(max-width:600px){
+ .hd{padding:0 10px;gap:8px}.hd b{font-size:15px}.hd .who{display:none}
+ .wrap{display:block;height:calc(100% - 52px);overflow:auto}
+ .side{width:auto;border-right:0;border-bottom:1px solid var(--ln);padding:10px;overflow:visible}
+ .tps{display:flex;gap:6px}.tp{flex:1;margin:0 0 6px;padding:7px 8px;min-width:0}.tp div{display:none}.tp b{font-size:13.5px}.tp .n{font-size:11px;padding:0 6px}
+ .ftg{display:block;width:100%;background:#fff;border:1.5px solid var(--ln);border-radius:8px;padding:6px 10px;font-weight:800;font-size:13px;color:var(--nv);text-align:left;cursor:pointer;margin:2px 0 4px}
+ .flt{display:none}.side.open .flt{display:block}
+ .fqb textarea{height:38px}.fqe{display:none}
+ #pop{left:8px;right:8px;width:auto;max-width:none;bottom:8px}
+ .main{padding:10px;overflow:visible}.def{font-size:13px}.row{flex-wrap:wrap}
+ .c1{width:100%;border-right:0;border-bottom:1px solid var(--ln);flex-direction:row;align-items:center;flex-wrap:wrap;gap:4px 8px;padding:6px 10px}.c1 small{margin:0}
+ .c2{width:64%;flex:none;padding:6px 10px}.c3{width:36%;padding:4px}.c3 .t{font-size:18px}.go{display:none}.tag{font-size:12.5px;padding:1px 8px}.one{font-size:11.5px}
+ .dt{padding:10px}.dh{flex-direction:column}.dh .l{border-right:1.2px solid var(--ln);border-radius:10px 10px 0 0}.dh .r{width:auto;padding:8px;border-radius:0 0 10px 10px}.dh .l h1{font-size:18px}
+ .kv{grid-template-columns:56px 1fr}.sp30{font-size:14.5px}
+ .vt{padding:0 8px;gap:6px}.vt b{display:none}.vb{gap:6px;padding:6px}.vb img{max-width:calc(100% - 76px)}.ar{width:32px;height:32px;font-size:18px}
+}
+</style>
+</head>
+<body>
+<div id="app"><div class="msg0">불러오는 중…</div></div>
+<div id="pop"></div>
+<div id="prn"></div>
+<script>
+'use strict';
+/* ── 자료 받는 곳은 이 구간뿐(로컬 미리보기판) — 열람 게이트판은 빌더가 [ADAPTER] 구간을 src/adapter_gate.js로 갈아 끼운다 ── */
+/*[ADAPTER:BEGIN] 열람 게이트판 */
+/* 자료 받는 곳 — 열람 게이트판(빌더가 src/index.html의 [ADAPTER] 구간 자리에 넣는다). 토큰·계정 확인은 머리(gate_head.html)의 __gateTok·__gateGo·__gateGuard */
+const LOAD_HELP='새로고침해도 같으면 담당자에게 알려 주세요.';
+const PM_NOTE='PM 문의는 담당 PM에게 메일로 전달되고 접수 기록이 남습니다.';
+let WHO_T='계정 확인 중';
+function whoText(){return WHO_T}
+let _cmN=0;
+function gcall(doc,params,ms){return new Promise((res,rej)=>{ // D에 JSONP 1번 — 열람 거절이면 머리의 안내·재로그인으로
+  const tok=window.__gateTok();
+  if(!tok){window.__gateGo('no_token');const er=new Error('계정 확인이 필요합니다');er.gate=1;return rej(er)}
+  const fn='__cm'+(++_cmN)+'_'+Date.now().toString(36),s=document.createElement('script');
+  const end=()=>{clearTimeout(to);s.remove()};
+  const to=setTimeout(()=>{end();window[fn]=function(){};rej(new Error('응답이 없습니다'))},ms||60000);
+  window[fn]=r=>{end();try{delete window[fn]}catch(e){}
+    if(r&&r.auth==='required'){window.__gateGuard(r);const er=new Error('열람 확인이 필요합니다');er.gate=1;return rej(er)} // 안내·재로그인은 머리가 한다
+    res(r)};
+  s.onerror=()=>{end();rej(new Error('서버에 연결하지 못했습니다'))};
+  s.src=window.__DATA+'?doc='+doc+'&callback='+fn+Object.keys(params||{}).map(k=>'&'+k+'='+encodeURIComponent(params[k])).join('')+'&_='+Date.now()+'&tok='+encodeURIComponent(tok);
+  document.head.appendChild(s)})}
+function b64bytes(b){const s=atob(b),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u}
+async function loadData(){
+  const r=await gcall('casemap',{},90000);
+  if(!r||r.ok!==1||!r.d)throw new Error(r&&r.err==='no_data'?'자료가 아직 올라오지 않았습니다':'자료를 읽지 못했습니다');
+  WHO_T=r.who||'';return r.d;
+}
+const _bdC=new Map(); // 받은 쪽 이미지는 이 화면이 열려 있는 동안 다시 받지 않는다
+function bdImg(key,page){ // 쪽 이미지 주소(약속) — 화면이 그 쪽을 열 때만 서버에서 받는다
+  const id=key+'|'+page;if(_bdC.has(id))return _bdC.get(id);
+  const b=(D&&D.bd[key])||{};
+  const pr=gcall('casemapbd',{k:b.fid||'',p:page},90000).then(r=>{if(!r||r.ok!==1||!r.b64)throw new Error('이미지 없음');return URL.createObjectURL(new Blob([b64bytes(r.b64)],{type:r.mime||'image/png'}))});
+  _bdC.set(id,pr);pr.catch(()=>_bdC.delete(id));return pr;
+}
+function bdPdfHref(key){return '#'}
+function bdPdf(a){ // PDF 받기 — 서버가 나눠 둔 조각을 3개씩 받아 이 기기에서 이어 붙인다. 조각 번호 이름은 i(GAS 웹앱은 c·sid가 예약어 — c로 보내면 400)
+  if(a.dataset.busy)return false;
+  const key=a.dataset.k,b=(D&&D.bd[key])||{},n=b.pdfn||0,label=a.textContent,parts=new Array(n);
+  if(!n||!b.fid){alert('이 자료는 PDF가 없습니다.');return false}
+  a.dataset.busy='1';let next=0,done=0;a.textContent='받는 중 0/'+n;
+  const one=i=>gcall('casemappdf',{k:b.fid,i:i},120000).then(r=>{if(!r||r.ok!==1||!r.b64)throw new Error('조각 '+(i+1)+' 없음');parts[i]=b64bytes(r.b64);a.textContent='받는 중 '+(++done)+'/'+n});
+  const work=()=>next<n?one(next++).then(work):Promise.resolve();
+  Promise.all([work(),work(),work()]).then(()=>{
+    const u=URL.createObjectURL(new Blob(parts,{type:'application/pdf'})),x=document.createElement('a');
+    x.href=u;x.download=(b.file||key)+'.pdf';document.body.appendChild(x);x.click();x.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)
+  }).catch(e=>alert('PDF를 받지 못했습니다 ('+e.message+'). 잠시 뒤 다시 눌러 주세요.')).then(()=>{delete a.dataset.busy;a.textContent=label});
+  return false;
+}
+function pmSend(q,ctx){ // PM 문의 — 서버가 기록 1행 + 담당 PM 메일 1통
+  return gcall('casemapask',{q:String(q).slice(0,300),ctx:ctx||''},60000).then(r=>r&&r.ok===1?{ok:1,msg:(r.dup?'':'접수됨 — ')+(r.msg||'')}:{ok:0,msg:(r&&r.msg)||'보내지 못했습니다. 잠시 뒤 다시 눌러 주세요.'});
+}
+/*[ADAPTER:END]*/
+/* ─────────────────────────────────────────────── */
+let D=null,lastMap='#map';const stack=[];
+const $=id=>document.getElementById(id);
+const E=s=>String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const A=s=>E(s); // 속성값
+function route(){const h=location.hash.slice(1)||'map';const i=h.indexOf('?');return{v:i<0?h:h.slice(0,i),p:new URLSearchParams(i<0?'':h.slice(i+1))}}
+function mk(v,o){const p=new URLSearchParams();Object.keys(o).forEach(k=>{if(o[k]!==''&&o[k]!=null)p.set(k,o[k])});const s=p.toString();return '#'+v+(s?'?'+s:'')}
+function nav(h){stack.push(location.hash||'#map');location.hash=h}
+function backTo(fb){if(stack.length)history.back();else location.hash=fb}
+function replace(h){history.replaceState(null,'',h);render()}
+addEventListener('hashchange',()=>{if(stack.length&&stack[stack.length-1]===location.hash)stack.pop();render()});
+
+const typeOf=(t,c)=>{const s=D.sets.find(x=>x.key===t);return s&&s.classes?s.classes.find(k=>k.comps.includes(c.comp)):null};
+const numTxt=v=>(/\d/.test(v)?'월 ':'')+v;
+function head(back){return `<div class="hd">${back?`<button class="bk" onclick="backTo(lastMap)">← 사례 맵</button>`:''}<b>${E(D.meta.title)}</b><span class="sp"></span><span class="who">${E(whoText())}</span></div>`}
+
+/* 1층 사례 맵 */
+function mstate(){const p=route().p,ts=Object.keys(D.types);const t=ts.includes(p.get('t'))?p.get('t'):ts[0];const st={t};D.filters.forEach(f=>{const v=p.get(f.key)||'';st[f.key]=f.opts.includes(v)?v:''});st.q=p.get('q')||'';return st}
+function pass(c,st){return D.filters.every(f=>!st[f.key]||(c.f[f.key]||[]).includes(st[f.key]))}
+function setSt(st,k,v){const o=Object.assign({},st,{[k]:v,q:''});replace(mk('map',o))}
+function row(c,t){
+  const solo=D.solo_types.includes(t);
+  // 유형 단독 묶음(solo_types)은 '과별 타겟 환자'가 중심(11-21 박본님, 출력묶음과 같은 배치): 왼쪽 = 거래처·과 + 타겟 환자, 상황은 가운데 칸 위
+  const c1=solo?`<small class="who"><span class="bdg">${E(c.cust)}</span><b>${E(c.dept)}</b></small><div class="tg">${E(c.target||c.pt||'')}</div>`:`<b>${E(c.cshort)}</b><small><span class="bdg">${E(c.cust)}</span>${E(c.dept)}</small>`;
+  return `<div class="row" data-id="${c.id}" onclick="nav('${mk('case',{id:c.id})}')"><div class="c1${solo?' solo':''}">${c1}</div><div class="c2">${solo&&c.sit?`<div class="sit">${E(c.sit)}</div>`:''}<div>${c.tags.map(g=>`<span class="tag">${E(g)}</span>`).join('')}</div><div class="one">${E(c.one)}</div></div>
+  <div class="c3${c.r_pred?' p':''}"><div>${c.r_from?`<span class="f">월 ${E(c.r_from)} → </span>`:''}<span class="t">${E(numTxt(c.r_to))}</span></div><small>${E(c.r_note)}${c.r_pred?' · '+E(D.labels.pred):''}</small></div><div class="go">→</div></div>`}
+function reasons(rs){return `<div class="rs">`+rs.map((r,i)=>{const j=r.indexOf(' — ');const x=j<0?r:r.slice(0,j),y=j<0?'':r.slice(j+3);return `<div><span>${i+1}</span><b>${E(x)}</b>${y?' — '+E(y):''}</div>`}).join('')+`</div>`}
+function vmap(){
+  const st=mstate(),t=st.t;lastMap=mk('map',Object.assign({},st,{q:''}));
+  const all=D.cases.filter(c=>c.type===t),cs=all.filter(c=>pass(c,st));
+  const td=D.types[t],j=td.indexOf(' → '),a=j<0?td:td.slice(0,j),b=j<0?'':td.slice(j+3);
+  const nf=D.filters.filter(f=>st[f.key]).length;
+  let h=head()+`<div class="wrap"><div class="side" id="side"><div class="tps">`+Object.keys(D.types).map(k=>{const n=D.cases.filter(c=>c.type===k&&pass(c,st)).length;const d=D.types[k];return `<div class="tp${k===t?' on':''}" data-t="${A(k)}" onclick="setSt(mstate(),'t',this.dataset.t)"><span class="n">${n}</span><b>${E(k)}</b><div>${E(d.split(' → ')[0])}</div></div>`}).join('')+`</div>
+  <button class="ftg" onclick="$('side').classList.toggle('open')">거르기 ${nf?'('+nf+'개 적용) ':''}▾</button><div class="flt">`
+  +D.filters.map(f=>`<div class="fl">${E(f.label)}</div><div class="chips"><span class="chip${st[f.key]?'':' on'}" onclick="setSt(mstate(),'${f.key}','')">전체</span>`+f.opts.map(o=>`<span class="chip${st[f.key]===o?' on':''}" data-v="${A(o)}" onclick="setSt(mstate(),'${f.key}',this.dataset.v)">${E(o)}</span>`).join('')+`</div>`).join('')
+  +`</div><div class="fl">FAQ 질문하기</div><div class="fqb"><textarea id="fq" placeholder="궁금한 점을 적어 주세요"></textarea><button class="fqs" onclick="ask()">질문</button><div class="fqe">${(D.faq_examples||[]).map(x=>`<span onclick="ex(this)">${E(x)}</span>`).join('')}</div></div></div><div class="main" id="main">
+  <div class="def">${E(a)} ${b?`<b>→ ${E(b)}</b>`:''}</div>`;
+  const s=D.sets.find(x=>x.key===t)||{};
+  if(!cs.length)h+=`<div class="none" id="none">해당 사례 없음</div>`;
+  else if(s.classes){const used=new Set();s.classes.forEach(k=>{const g=cs.filter(c=>k.comps.includes(c.comp));if(!g.length)return;g.forEach(c=>used.add(c.id));h+=`<div><span class="cls">${E(k.name)}</span></div>`+reasons(k.reasons)+g.map(c=>row(c,t)).join('')});
+    const rest=cs.filter(c=>!used.has(c.id));h+=rest.map(c=>row(c,t)).join('')}
+  else{if(s.reasons_top&&s.reasons_top.reasons&&s.reasons_top.reasons.length)h+=`<div><span class="cls">${E(s.reasons_top.name)}</span></div>`+reasons(s.reasons_top.reasons);h+=cs.map(c=>row(c,t)).join('')}
+  return h+`<div class="lock">사례를 누르면 상세(표준대화 · 근거 BD · FAQ)가 열립니다 — 지부장 계정만</div></div></div>`}
+
+/* FAQ 찾기 — 시안 로직 그대로(사내 FAQ에서만 답, 답은 원문 그대로) */
+const SYN=[[/같이|함께|동시|겸용|병행/g,'병용'],[/쎄레브렉스|세레브렉스|셀레콕시브|세레콕시브|콕시브|cox-?2/gi,'세레브렉스cox2'],[/타이레놀|아세트아미노펜/g,'타이레놀'],[/삭감|급여|보험|인정/g,'삭감'],[/나눠|쪼개|반알|반으로/g,'분할'],[/어린이|아이들|소아|청소년/g,'소아청소년'],[/하루두번|하루2번|1일2회/g,'bid']];
+const STOP=/(써도|해도|먹어도|줘도|처방해도)?(되나요|돼요|되나|될까요|가능한가요|가능한지|가능해요|있나요|없나요|인가요|인지|뭐예요|뭔가요|무엇인가요|어떤|어떻게|알려줘|알려주세요|궁금|한테|에게|이랑|랑|하면)/g;
+const nz=s=>{s=String(s).toLowerCase().replace(/\s/g,'');SYN.forEach(([r,v])=>s=s.replace(r,v));return s.replace(STOP,'').replace(/[^0-9a-z가-힣]/g,'')};
+const bg=s=>{const o=new Set();for(let i=0;i<s.length-1;i++)o.add(s.slice(i,i+2));return o};
+function match(q){const B=bg(nz(q));if(B.size<2)return[];return D.faq.map(f=>{const Q=bg(nz(f.q)),A2=bg(nz(f.a));let a=0,b=0;B.forEach(x=>{if(Q.has(x))a++;else if(A2.has(x))b++});return{f,s:(a+b*0.4)/B.size,a}}).filter(x=>x.s>=0.34&&x.a>=2).sort((x,y)=>y.s-x.s).slice(0,2)}
+let lastQ='';
+function ask(){const el=$('fq');if(!el)return;const q=el.value.trim();if(!q)return;lastQ=q;const m=match(q),p=$('pop');
+  p.innerHTML=`<div class="ph"><b>FAQ 답변</b><span onclick="closePop()">닫기</span></div><div class="pq">${E(q)}</div>`+(m.length?`<div id="faqhit">`+m.map(x=>`<div class="pa"><b>${E(x.f.q)}</b><div>${E(x.f.a)}</div></div>`).join('')+`</div><div class="ps">사내 FAQ에 있는 답 그대로입니다 · 찾는 답이 아니면 <u onclick="pm()">PM에게 문의</u></div>`
+  :`<div class="pn" id="faqmiss">등록된 FAQ에서 답을 찾지 못했습니다.</div><div class="pb2" onclick="pm()">PM에게 문의 보내기</div><div class="ps">${E(PM_NOTE)}</div>`);p.style.display='block'}
+function closePop(){$('pop').style.display='none'}
+function ctxLabel(){const st=mstate();return [st.t].concat(D.filters.map(f=>st[f.key]).filter(Boolean)).join(' · ')}
+function pm(){const p=$('pop');if(p.querySelector('.ok,.wait'))return;const b=p.querySelector('.bad');if(b)b.remove();
+  p.insertAdjacentHTML('beforeend',`<div class="ps wait">보내는 중…</div>`);
+  pmSend(lastQ,ctxLabel()).then(r=>r,e=>({ok:0,msg:'보내지 못했습니다 ('+e.message+'). 잠시 뒤 다시 눌러 주세요.'})).then(r=>{const w=p.querySelector('.wait');if(w)w.remove();
+    p.insertAdjacentHTML('beforeend',`<div class="ps ${r.ok?'ok':'bad'}">${E(r.msg)}</div>`)})}
+function ex(el){$('fq').value=el.textContent;ask()}
+
+/* 2층 사례 상세 */
+function bdItems(s,c){return (s.bd||[]).map((k,i)=>{const b=D.bd[k]||{title:k};return `<div class="bdi" onclick="nav('${mk('bd',{id:c.id,s:s.key,i})}')"><span class="no">${i+1}</span><span>${E(b.title)}</span><span class="sp"></span><span class="btn f">보기</span><span class="btn" onclick="event.stopPropagation();printBd(this.dataset.k)" data-k="${A(k)}">출력</span></div>`+(b.note?`<div class="bnote">${E(b.note)}</div>`:'')}).join('')}
+function vcase(id){
+  const c=D.cases.find(x=>String(x.id)===String(id));if(!c)return head(1)+`<div class="msg0">사례를 찾지 못했습니다.</div>`;
+  const t=c.type,k=typeOf(t,c),s=D.sets.find(x=>x.key===t)||{bd:[]};
+  const tk=D.talk[c.talk]||{title:'',speech:''},n=tk.speech.replace(/\s/g,'').length,sec=Math.round(n/5.6);
+  const fq=(D.faq_map[c.talk]||[]).map(i=>D.faq[i]).filter(Boolean);
+  const extra=D.sets.filter(x=>x.kind==='notes'&&x.bd&&x.bd.length);
+  const solo=D.solo_types.includes(t);
+  const kv=(solo?[['타겟 환자',c.target||c.pt],['상황',c.sit]]:[['상황',c.sit],['타겟 환자',c.target]]).concat([['한 일',c.did],['결과',c.res+(c.pred?' · '+c.pred:'')],['넓힌 방법',c.how||'-']]).filter(x=>x[1]);
+  const dtl=(c.detail||[]).map(d=>{const L=d.ol?'ol':'ul';return `<div class="dtl${d.hl?' hl':''}"><b>${E(d.h)}</b><${L}>${(d.items||[]).map(x=>`<li>${E(x)}</li>`).join('')}</${L}></div>`}).join('');
+  return head(1)+`<div class="dt" id="case" data-id="${c.id}"><div class="dh"><div class="l">${solo?'<div class="tgl">타겟 환자</div>':''}<h1>${E(solo?(c.target||c.pt||c.dept):(c.cshort||c.dept||c.cust))} <em>→ ${E(D.meta.product)}</em></h1><div><span class="bdg">${E(c.cust)}</span>${E(c.dept)}${c.dept?' · ':''}${E(t)}${k?' · '+E(k.name):''}</div>
+  <div style="margin-top:6px">${c.tags.map(g=>`<span class="tag">${E(g)}</span>`).join('')}</div></div><div class="r${c.r_pred?' p':''}"><div>${c.r_from?`월 ${E(c.r_from)} → `:''}<span class="t">${E(numTxt(c.r_to))}</span></div><small>${E(c.r_note)}${c.r_pred?' · '+E(D.labels.pred):''}</small>${c.r_extra?`<small>${E(c.r_extra)}</small>`:''}</div></div>
+  <div class="g2"><div><div class="cd"><h2>사례 상세</h2><div class="kv">${kv.map(x=>`<b>${E(x[0])}</b><div>${E(x[1])}</div>`).join('')}</div>${dtl}</div>
+  <div class="cd" id="bdlist"><h2>근거 BD <small>제목을 누르면 크게 열립니다 · 출력은 A4</small></h2>${bdItems(s,c)}</div>
+  ${extra.map(x=>`<div class="cd"><h2>${E(x.title||x.key)} <small>${E(x.desc||'')}</small></h2>${bdItems(x,c)}</div>`).join('')}</div>
+  <div><div class="cd" id="talk"><h2>표준대화 · 30초 스피치 <small>${E(tk.title)}</small></h2><div class="sp30">${E(tk.speech)}</div><div class="spn">공백 뺀 ${n}자 · 말하면 약 ${sec}초</div></div>
+  <div class="cd" id="faqs"><h2>여기서 나오는 질문(FAQ) <small>사내 FAQ 원문 그대로</small></h2>${fq.map(f=>`<div class="fq"><b>${E(f.q)}</b><div>${E(f.a)}</div></div>`).join('')}</div></div></div></div>`}
+
+/* 3층 근거 BD 보기 */
+let VB=null;
+function vbd(){
+  const p=route().p,c=D.cases.find(x=>String(x.id)===p.get('id')),s=D.sets.find(x=>x.key===p.get('s'));
+  if(!c||!s||!(s.bd||[]).length)return head(1)+`<div class="msg0">BD를 찾지 못했습니다.</div>`;
+  const keys=s.bd,i=Math.min(Math.max(+p.get('i')||0,0),keys.length-1),key=keys[i],b=D.bd[key],pages=b.pages||1,pg=Math.min(Math.max(+p.get('p')||1,1),pages);
+  VB={c,s,i,pg,keys};const first=i===0&&pg===1,last=i===keys.length-1&&pg===pages;
+  return `<div class="vw" id="viewer" data-key="${A(key)}"><div class="vt"><button class="b" onclick="backTo('${mk('case',{id:c.id})}')">← 사례로</button><b>${E(b.title)}</b><span class="sp"></span><span class="pg">${pg} / ${pages}쪽</span><button class="b" onclick="printBd(this.dataset.k)" data-k="${A(key)}">출력</button><a class="b f" href="${A(bdPdfHref(key))}" download="${A(b.file||key)}.pdf" data-k="${A(key)}" onclick="return bdPdf(this)">PDF 받기</a></div>
+  <div class="vb" id="vb"><button class="ar" onclick="step(-1)"${first?' disabled':''}>←</button><img id="bdimg" alt="${A(b.title)}" data-k="${A(key)}" data-p="${pg}" onload="this.dataset.ok='1'" onerror="bdFail(this)"><button class="ar" onclick="step(1)"${last?' disabled':''}>→</button></div>
+  <div class="vl">${keys.map((k,j)=>`<div class="${j===i?'on':''}" onclick="jump(${j})">${j+1}. ${E((D.bd[k]||{}).title||k)}</div>`).join('')}</div></div>`}
+function bdFail(el){if(el.dataset.ok==='0')return;el.dataset.ok='0';el.insertAdjacentHTML('afterend','<span class=err>이미지를 불러오지 못했습니다</span>')}
+function fillBd(){const el=$('bdimg');if(!el)return;bdImg(el.dataset.k,+el.dataset.p).then(u=>{el.src=u},()=>bdFail(el))} // 화면이 그 쪽을 열 때만 받는다
+function goBd(i,pg){replace(mk('bd',{id:VB.c.id,s:VB.s.key,i,p:pg}))}
+function step(d){if(!VB)return;let{i,pg,keys}=VB;const n=k=>(D.bd[k]||{}).pages||1;
+  if(d>0){if(pg<n(keys[i]))pg++;else if(i<keys.length-1){i++;pg=1}else return}else{if(pg>1)pg--;else if(i>0){i--;pg=n(keys[i])}else return}goBd(i,pg)}
+function jump(j){goBd(j,1)}
+addEventListener('keydown',e=>{if(route().v!=='bd'||!VB)return;if(e.key==='ArrowRight')step(1);else if(e.key==='ArrowLeft')step(-1);else if(e.key==='Escape')backTo(mk('case',{id:VB.c.id}))});
+let tx=null,ty=null;
+addEventListener('touchstart',e=>{if(route().v!=='bd')return;tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+addEventListener('touchend',e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;tx=null;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5)step(dx<0?1:-1)},{passive:true});
+
+/* 출력 — 그 BD만 A4로 */
+function printBd(key){const b=D.bd[key];if(!b)return;const el=$('prn');
+  Promise.all(Array.from({length:b.pages||1},(_,j)=>bdImg(key,j+1))).then(us=>{
+    el.innerHTML=us.map(u=>`<img src="${A(u)}" alt="">`).join('');
+    const im=[...el.querySelectorAll('img')];return Promise.all(im.map(x=>x.complete?0:new Promise(r=>{x.onload=x.onerror=r})))}).then(()=>window.print(),()=>alert('출력할 이미지를 불러오지 못했습니다.'))}
+
+function render(){
+  if(!D)return;const r=route();closePop();VB=null;
+  document.title=D.meta.title;
+  if(r.v==='case')$('app').innerHTML=vcase(r.p.get('id'));
+  else if(r.v==='bd'){$('app').innerHTML=vbd();fillBd()}
+  else{$('app').innerHTML=vmap();const q=r.p.get('q');if(q){$('fq').value=q;ask()}}
+  window.scrollTo(0,0);
+}
+if(!location.hash)history.replaceState(null,'','#map');
+loadData().then(d=>{D=d;render()}).catch(e=>{if(e&&e.gate)return;$('app').innerHTML=`<div class="msg0">자료를 불러오지 못했습니다 (${E(e.message)}). ${E(LOAD_HELP)}</div>`});
+</script>
+</body>
+</html>
