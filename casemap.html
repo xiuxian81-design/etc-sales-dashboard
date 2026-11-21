@@ -184,6 +184,12 @@ button,textarea{font-family:inherit}
 .def{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px}.def .dtx{flex:1;min-width:220px}
 .prs{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--mut);font-weight:700}
 .prs button.btn{margin-left:0;padding:4px 11px;font-size:12.5px;font-family:inherit}
+/* 11-22 박본님: 출력·PDF 받기 둘 다 · 항목 복사 · 근거 한번에 */
+.prs{flex-wrap:wrap;gap:6px 10px}.prg{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--ln);background:#fff;border-radius:8px;padding:3px 5px 3px 9px}.prg b{color:#1B2430;font-size:12.5px;margin-right:2px;white-space:nowrap}
+.prs a.btn,.pk a.btn{margin-left:0;padding:4px 11px;font-size:12.5px;text-decoration:none;display:inline-block}
+.cd h2 .cpy{margin-left:auto;font-size:12px;padding:2px 10px;font-family:inherit}
+.pk{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;background:#EEF0FA;border-color:#B9C0E4}.pkt{flex:1;min-width:180px}.pkt b{color:var(--nv);font-size:14px;display:block}.pkt small{color:var(--mut);font-size:11.5px}
+.pkb{display:flex;gap:5px}.pk .btn{margin-left:0;font-family:inherit;padding:4px 11px;font-size:12.5px}
 /* 2층(사례 상세) 글씨 약 2pt 키움(11-21 박본님) — 1층·3층은 그대로 */
 .dt .dh .l h1{font-size:24.5px}.dt .dh .l>div{font-size:15.5px}.dt .dh .tgl{font-size:14.5px}.dt .bdg{font-size:13.5px}.dt .tag{font-size:17px}
 .dt .dh .r{width:250px;font-size:16.5px}.dt .dh .r .t{font-size:28.5px}.dt .dh .r small{font-size:14.5px}
@@ -193,6 +199,7 @@ button,textarea{font-family:inherit}
 .dt .bdi{font-size:16px}.dt .bdi .no{width:25px;height:25px;line-height:25px;font-size:14.5px}.dt .btn{font-size:14.5px}.dt .bnote{font-size:14px;margin-left:33px}
 .dt .fq b{font-size:15.5px}.dt .fq div{font-size:15px}
 .dt .sp30{font-size:18px}.dt .spn{font-size:14px}
+.dt .cd h2 .cpy{font-size:13.5px}.dt .pkt b{font-size:16px}.dt .pkt small{font-size:13.5px}.dt .pk .btn{font-size:14.5px}
 @media(max-width:1000px){.dt .tag{font-size:15.5px}}
 @media(max-width:600px){.dt .dh .l h1{font-size:20.5px}.dt .dh .r{width:auto}.dt .kv{grid-template-columns:68px 1fr}.dt .sp30{font-size:17px}.dt .tag{font-size:15px}}
 #prn{display:none}
@@ -354,13 +361,30 @@ function vcase(id){
   const solo=D.solo_types.includes(t);
   const kv=(solo?[['타겟 환자',c.target||c.pt],['상황',c.sit]]:[['상황',c.sit],['타겟 환자',c.target]]).concat([['한 일',c.did],['결과',c.res+(c.pred?' · '+c.pred:'')],['넓힌 방법',c.how||'-']]).filter(x=>x[1]);
   const dtl=(c.detail||[]).map(d=>{const L=d.ol?'ol':'ul';return `<div class="dtl${d.hl?' hl':''}"><b>${E(d.h)}</b><${L}>${(d.items||[]).map(x=>`<li>${E(x)}</li>`).join('')}</${L}></div>`}).join('');
+  const pk=(D.packs||{})[t]||{},evk=(pk.ev_keys||[]).filter(k=>D.bd[k]&&D.bd[k].pages);
+  const pack=evk.length&&pk.ev?`<div class="cd pk" id="pack"><div class="pkt"><b>${['근거 BD'].concat(extra.map(x=>x.title||x.key)).map(E).join(' + ')} 한번에</b><small>${evk.length}종 · ${pgs(evk)}쪽 · A4</small></div><span class="pkb"><button class="btn" data-t="${A(t)}" onclick="printPack(this)">한번에 출력</button>${dlA(pk.ev,'한번에 PDF 받기',' f')}</span></div>`:'';
+  const cpb=w=>`<button class="btn cpy" data-w="${w}" onclick="copyCard(this)">복사</button>`;
   return head(1)+`<div class="dt" id="case" data-id="${c.id}"><div class="dh"><div class="l">${solo?'<div class="tgl">타겟 환자</div>':''}<h1>${E(solo?(c.target||c.pt||c.dept):(c.cshort||c.dept||c.cust))} <em>→ ${E(D.meta.product)}</em></h1><div><span class="bdg">${E(c.cust)}</span>${E(c.dept)}${c.dept?' · ':''}${E(t)}${k?' · '+E(k.name):''}</div>
   <div style="margin-top:6px">${c.tags.map(g=>`<span class="tag">${E(g)}</span>`).join('')}</div></div><div class="r${c.r_pred?' p':''}"><div>${c.r_from?`월 ${E(c.r_from)} → `:''}<span class="t">${E(numTxt(c.r_to))}</span></div><small>${E(c.r_note)}${c.r_pred?' · '+E(D.labels.pred):''}</small>${c.r_extra?`<small>${E(c.r_extra)}</small>`:''}</div></div>
-  <div class="g2"><div><div class="cd"><h2>사례 상세</h2><div class="kv">${kv.map(x=>`<b>${E(x[0])}</b><div>${E(x[1])}</div>`).join('')}</div>${dtl}</div>
-  <div class="cd" id="bdlist"><h2>근거 BD <small>제목을 누르면 크게 열립니다 · 출력은 A4</small></h2>${bdItems(s,c)}</div>
+  <div class="g2"><div><div class="cd" id="detail"><h2>사례 상세${cpb('detail')}</h2><div class="kv">${kv.map(x=>`<b>${E(x[0])}</b><div>${E(x[1])}</div>`).join('')}</div>${dtl}</div>
+  ${pack}<div class="cd" id="bdlist"><h2>근거 BD <small>제목을 누르면 크게 열립니다 · 출력은 A4</small></h2>${bdItems(s,c)}</div>
   ${extra.map(x=>`<div class="cd"><h2>${E(x.title||x.key)} <small>${E(x.desc||'')}</small></h2>${bdItems(x,c)}</div>`).join('')}</div>
-  <div><div class="cd" id="talk"><h2>표준대화 · 30초 스피치 <small>${E(tk.title)}</small></h2><div class="sp30">${E(tk.speech)}</div><div class="spn">공백 뺀 ${n}자 · 말하면 약 ${sec}초</div></div>
-  <div class="cd" id="faqs"><h2>여기서 나오는 질문(FAQ) <small>사내 FAQ 원문 그대로</small></h2>${fq.map(f=>`<div class="fq"><b>${E(f.q)}</b><div>${E(f.a)}</div></div>`).join('')}</div></div></div></div>`}
+  <div><div class="cd" id="talk"><h2>표준대화 · 30초 스피치 <small>${E(tk.title)}</small>${cpb('talk')}</h2><div class="sp30">${E(tk.speech)}</div><div class="spn">공백 뺀 ${n}자 · 말하면 약 ${sec}초</div></div>
+  <div class="cd" id="faqs"><h2>여기서 나오는 질문(FAQ) <small>사내 FAQ 원문 그대로</small>${cpb('faq')}</h2>${fq.map(f=>`<div class="fq"><b>${E(f.q)}</b><div>${E(f.a)}</div></div>`).join('')}</div></div></div></div>`}
+/* 11-22 박본님: 항목마다 복사(사례 상세 · 표준대화 · FAQ) — 화면에 보이는 글 그대로, 줄 나눔만 정리 */
+function copyText(c,w){const t=c.type,solo=D.solo_types.includes(t);
+  if(w==='talk')return (D.talk[c.talk]||{}).speech||'';
+  if(w==='faq')return (D.faq_map[c.talk]||[]).map(i=>D.faq[i]).filter(Boolean).map(f=>'Q. '+f.q+'\nA. '+f.a).join('\n\n');
+  const L=[(solo?(c.target||c.pt||c.dept):(c.cshort||c.dept||c.cust))+' → '+D.meta.product,[c.cust,c.dept,t].filter(Boolean).join(' · ')];
+  const kv=(solo?[['타겟 환자',c.target||c.pt],['상황',c.sit]]:[['상황',c.sit],['타겟 환자',c.target]]).concat([['한 일',c.did],['결과',c.res+(c.pred?' · '+c.pred:'')],['넓힌 방법',c.how||'-']]).filter(x=>x[1]);
+  kv.forEach(x=>L.push(x[0]+': '+x[1]));
+  (c.detail||[]).forEach(d=>{L.push('',`[${d.h}]`);(d.items||[]).forEach((x,i)=>L.push((d.ol?(i+1)+'. ':'- ')+x))});
+  return L.join('\n')}
+function copyCard(el){const c=D.cases.find(x=>String(x.id)===route().p.get('id'));if(!c)return;const s=copyText(c,el.dataset.w);
+  const ok=()=>{el.textContent='복사됨 ✓';el.classList.add('f');setTimeout(()=>{el.textContent='복사';el.classList.remove('f')},1500)};
+  const old=()=>{const ta=document.createElement('textarea');ta.value=s;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;left:-9999px;top:0';document.body.appendChild(ta);ta.select();let r=false;try{r=document.execCommand('copy')}catch(e){}ta.remove();r?ok():alert('복사하지 못했습니다. 글을 길게 눌러 직접 복사해 주세요.')};
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(s).then(ok,old);else old()}
+function printPack(el){const pk=(D.packs||{})[el.dataset.t]||{};printKeys(el,(pk.ev_keys||[]).filter(k=>D.bd[k]&&D.bd[k].pages))}
 
 /* 3층 근거 BD 보기 */
 let VB=null;
@@ -391,9 +415,14 @@ function printBd(key){const b=D.bd[key];if(!b)return;const el=$('prn');
 /* 1층 사례 맵 출력 — 사례 맵 쪽만, 또는 그 유형의 근거 BD까지 한 번에(A4). 거르기와 상관없이 그 유형 전체가 나온다 */
 function prKeys(t,withBd){const cp=(D.case_pages||{})[t];if(!cp||!D.bd[cp]||!D.bd[cp].pages)return[];const s=D.sets.find(x=>x.key===t)||{};
   return [cp].concat(withBd?(s.bd||[]).filter(k=>D.bd[k]&&D.bd[k].pages):[])}
-function prBtns(t){const n=k=>k.reduce((a,x)=>a+(D.bd[x].pages||1),0),a=prKeys(t,0),b=prKeys(t,1);if(!a.length)return'';
-  return `<span class="prs">출력<button class="btn" data-t="${A(t)}" onclick="printMap(this,0)">사례 맵만 ${n(a)}쪽</button>${b.length>a.length?`<button class="btn f" data-t="${A(t)}" onclick="printMap(this,1)">근거 BD까지 ${n(b)}쪽</button>`:''}</span>`}
-function printMap(el,withBd){if(el.dataset.busy)return;const jobs=[];prKeys(el.dataset.t,withBd).forEach(k=>{for(let j=1;j<=(D.bd[k].pages||1);j++)jobs.push([k,j])});if(!jobs.length)return;
+/* 11-22 박본님: 출력과 PDF 받기 둘 다 — 사례 맵만 / 근거 BD까지 각각 */
+const pgs=k=>k.reduce((a,x)=>a+(D.bd[x].pages||1),0);
+function dlA(key,label,cls){const b=D.bd[key];if(!b||!b.pages)return'';return `<a class="btn${cls||''}" href="${A(bdPdfHref(key))}" download="${A(b.file||key)}.pdf" data-k="${A(key)}" onclick="return bdPdf(this)">${label}</a>`}
+function prBtns(t){const a=prKeys(t,0),b=prKeys(t,1),pk=(D.packs||{})[t]||{};if(!a.length)return'';
+  const g=(lab,keys,wb,dk)=>`<span class="prg"><b>${lab} ${pgs(keys)}쪽</b><button class="btn" data-t="${A(t)}" onclick="printMap(this,${wb})">출력</button>${dlA(dk,'PDF 받기',' f')}</span>`;
+  return `<span class="prs">${g('사례 맵만',a,0,a[0])}${b.length>a.length?g('근거 BD까지',b,1,pk.mapbd):''}</span>`}
+function printMap(el,withBd){printKeys(el,prKeys(el.dataset.t,withBd))}
+function printKeys(el,keys){if(el.dataset.busy)return;const jobs=[];keys.forEach(k=>{for(let j=1;j<=(D.bd[k].pages||1);j++)jobs.push([k,j])});if(!jobs.length)return;
   const label=el.textContent,pr=$('prn');let done=0;el.dataset.busy='1';el.textContent=`불러오는 중 0/${jobs.length}`;
   Promise.all(jobs.map(x=>bdImg(x[0],x[1]).then(u=>{el.textContent=`불러오는 중 ${++done}/${jobs.length}`;return u})))
     .then(us=>{pr.innerHTML=us.map(u=>`<img src="${A(u)}" alt="">`).join('');const im=[...pr.querySelectorAll('img')];return Promise.all(im.map(x=>x.complete?0:new Promise(r=>{x.onload=x.onerror=r})))})
