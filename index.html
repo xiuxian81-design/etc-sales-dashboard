@@ -2807,6 +2807,7 @@ function renderFcVolumeUp(vu, meta){
 .fc-tbl th{padding:8px 10px;border-bottom:2px solid var(--gray2);text-align:center;white-space:nowrap;background:#f8fafc;font-weight:700;color:var(--gray4)}
 .fc-tbl td{padding:7px 10px;border-bottom:1px solid #eef2f7;text-align:center;white-space:nowrap}
 .fc-tbl tbody tr:hover{background:#f8fafc}
+.gb-co .fc-tbl td{font-size:14px}.gb-co .fc-tbl th{font-size:13px}  /* [v72] ② 집중업체 표만 1px 더 크게(브리핑용) */
 .fc-tbl td.gb-why{white-space:normal;text-align:left;color:var(--gray4);min-width:320px;line-height:1.55;word-break:keep-all;vertical-align:top}  /* [v72] 목표 근거 — 근거 전문 표시(브리핑용) */
 #t-forecast .section-card{margin-bottom:14px}
 </style>
@@ -3387,7 +3388,7 @@ function crmGb72Html(d){
   var cs=live.map(function(h0){ return co[h0]; }).sort(function(a,b){ var sa=keys.reduce(function(x,k){ return x+(a.a[k]||0); },0), sb=keys.reduce(function(x,k){ return x+(b.a[k]||0); },0); return sb-sa; });
   var cell=function(c,k){ return c.a[k]?(fcMan(c.a[k])+'만'):'<span style="color:var(--gray3)">—</span>'; };
   var dHead='<thead><tr><th style="text-align:left">업체</th><th style="text-align:left">유형</th>'+P.map(function(p){ return '<th>'+fcEsc(short(p))+'</th>'; }).join('')+'<th style="text-align:left">근거</th></tr></thead>';
-  h+='<details class="crm-gb-det" style="margin-top:10px"><summary>② 집중업체 — '+live.length+'개 업체 · '+P.map(function(p){ return fcEsc(short(p))+' '+man(T[p.key].s2); }).join(' · ')+(exN?(' · 제외 '+exN+'개'):'')+'</summary><div class="tbl-wrap"><table class="btbl fc-tbl">'+dHead+'<tbody>'
+  h+='<details class="crm-gb-det gb-co" style="margin-top:10px"><summary>② 집중업체 — '+live.length+'개 업체 · '+P.map(function(p){ return fcEsc(short(p))+' '+man(T[p.key].s2); }).join(' · ')+(exN?(' · 제외 '+exN+'개'):'')+'</summary><div class="tbl-wrap"><table class="btbl fc-tbl">'+dHead+'<tbody>'
     +(cs.length?cs.map(function(c){ return '<tr><td style="text-align:left;font-weight:600">'+fcEsc(c.nm)+'</td><td style="text-align:left">'+fcEsc(c.type||'-')+'</td>'+P.map(function(p){ return '<td style="white-space:nowrap">'+cell(c,p.key)+'</td>'; }).join('')+'<td class="gb-why">'+gbWhyHtml(c.why)+'</td></tr>'; }).join(''):'<tr><td colspan="'+(3+P.length)+'" style="color:var(--gray3);padding:12px">금액·근거를 적은 업체가 없습니다</td></tr>')
     +'</tbody></table></div>'+(exN?('<div class="crm-sub2">제외(관리 안 함): '+order.filter(function(h0){ return co[h0].ex; }).map(function(h0){ return fcEsc(co[h0].nm); }).join(', ')+'</div>'):'')+'</details>';
   if(oOrder.length) h+='<details class="crm-gb-det"><summary>③ 그 외 — '+oOrder.length+'줄 · '+P.map(function(p){ return fcEsc(short(p))+' '+man(T[p.key].s3); }).join(' · ')+'</summary><div class="tbl-wrap"><table class="btbl fc-tbl"><thead><tr><th style="text-align:left">대상</th>'+P.map(function(p){ return '<th>'+fcEsc(short(p))+'</th>'; }).join('')+'<th style="text-align:left">근거</th></tr></thead><tbody>'
