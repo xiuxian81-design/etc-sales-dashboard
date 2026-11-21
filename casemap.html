@@ -3,89 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="robots" content="noindex,nofollow">
-<style>/* 들어가기 화면(회사메일 접속 번호) */
-.lg{max-width:420px;margin:48px auto;background:#fff;border:1.2px solid #D5DAE3;border-radius:12px;padding:22px 22px 18px}
-.lg h2{margin:0 0 6px;font-size:19px;color:#262C73}.lg p{margin:0 0 12px;color:#44505E;font-size:13.5px}
-.lg input{width:100%;border:1.5px solid #D5DAE3;border-radius:8px;padding:10px 12px;font-size:16px;font-family:inherit}
-.lg button{display:block;width:100%;border:0;background:#262C73;color:#fff;font-weight:800;border-radius:8px;padding:11px;margin-top:8px;font-size:15px;cursor:pointer;font-family:inherit}
-.lg button[disabled]{opacity:.55}
-.lg .m{min-height:20px;margin-top:10px;font-size:13.5px;font-weight:700;color:#262C73}.lg .m.bad{color:#8A4B00}
-.lg .o{margin-top:14px;padding-top:12px;border-top:1px solid #E3E7EE;font-size:13px}.lg .o a{color:#262C73;font-weight:700}
-.hd .who{cursor:pointer}
-.lg small{display:block;margin-top:10px;color:#6B7684;font-size:12px}
-@media(max-width:600px){.lg{margin:18px 12px}}
-</style>
-<script>/* [열람게이트] 토큰을 보관한다 — 자료·근거 BD·문의는 D ?doc=casemap*(JSONP)로만 받는다(이 공개 파일에는 자료가 없다).
-   들어오는 길 2가지: ① 회사메일로 접속 번호(또는 메일의 링크 #ml=) → D가 주는 사례 맵 토큰(30일, 이 기기에 보관) ② 구글 계정 게이트(G)가 #tok= 로 넘겨준 토큰(이 탭에만) */
+<script>/* [열람게이트] 게이트가 #tok= 로 넘겨준 토큰을 보관한다 — 자료·근거 BD·문의는 D ?doc=casemap*(JSONP)로만 받는다(이 공개 파일에는 자료가 없다) */
 (function(){var GATE="https://script.google.com/macros/s/AKfycbwTXL5bRBDXXoEN06x2OSMLq1Wqh1CFJWjYAPSWjhYAZZFxJqx30bwwgdpSFT2SndDL/exec",DOC="casemap";
-window.__DATA="https://script.google.com/macros/s/AKfycbyhk2el3kwGMStCvyUr-8B-PWS-6aKwcf5EVfvpryqlj3jEeLw5pnttHMEokrpQXO33dQ/exec";window.__gateT="";window.__gateML="";
+window.__DATA="https://script.google.com/macros/s/AKfycbyhk2el3kwGMStCvyUr-8B-PWS-6aKwcf5EVfvpryqlj3jEeLw5pnttHMEokrpQXO33dQ/exec";window.__gateT="";
 /* 토큰(base64url·'.'·'=')에는 '%'가 없다 — '%XX'가 보이면 인코딩된 것이므로 풀어서 쓴다 */
 var norm=function(t){t=String(t||"");if(/%[0-9A-Fa-f]{2}/.test(t)){try{t=decodeURIComponent(t);}catch(e){}}return t;};
 var ss=function(k,v){try{if(v===undefined)return sessionStorage.getItem(k)||"";if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){}return "";};
-var ls=function(k,v){try{if(v===undefined)return localStorage.getItem(k)||"";if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){}return "";};
 /* 토큰 속(이메일|문서|만료) — 화면 표시와 만료 미리 보기용. 진짜 확인은 서버(D)가 한다 */
 window.__gateInfo=function(t){try{var p=atob(String(t).split(".")[0].replace(/-/g,"+").replace(/_/g,"/")).split("|");if(p.length!==3)return null;return{email:p[0],doc:p[1],exp:+p[2]};}catch(e){return null;}};
 var live=function(t){var i=window.__gateInfo(t);return !!(i&&(i.doc===DOC||i.doc==="dash")&&i.exp*1000>Date.now());};
 try{var m=location.hash.match(/[#&]tok=([^&]+)/);if(m){var t=norm(m[1]);window.__gateT=t;ss("gate_tok_cm",t);var nx=ss("cm_next");ss("cm_next",null);
-  history.replaceState(null,"",location.pathname+location.search+(/^#(map|case|bd)\b/.test(nx)?nx:"#map"));}
-  var m2=location.hash.match(/[#&]ml=([0-9a-f]{64})\b/);if(m2){window.__gateML=m2[1];history.replaceState(null,"",location.pathname+location.search+"#map");}}catch(e){}
-/* 이미 열려 있는 탭에 토큰·메일 링크 주소가 들어오면(주소만 바뀌고 새로 읽지 않는 경우) 새로 읽어서 위 처리를 탄다 */
-window.addEventListener("hashchange",function(){if(/[#&](tok|ml)=/.test(location.hash))location.reload();});
-/* 쓸 토큰: 이 화면이 받은 것 → 회사메일로 받은 것(이 기기) → 같은 탭의 성과보드 토큰(gate_tok). 만료됐거나 다른 문서용이면 쓰지 않는다 */
-window.__gateTok=function(){var c=[window.__gateT,ss("gate_tok_cm"),ls("cm_tok_ml"),norm(ss("gate_tok"))];for(var i=0;i<c.length;i++){if(c[i]&&live(c[i]))return c[i];}return "";};
-/* 토큰 없이 받는 요청(접속 번호 받기·확인) */
-var an=0,acall=function(doc,params){return new Promise(function(res,rej){var fn="__cl"+(++an)+"_"+Date.now().toString(36),s=document.createElement("script");
-  var to=setTimeout(function(){s.remove();window[fn]=function(){};rej(new Error("응답이 없습니다. 잠시 뒤 다시 눌러 주세요."));},60000);
-  window[fn]=function(r){clearTimeout(to);s.remove();try{delete window[fn];}catch(e){}res(r);};
-  s.onerror=function(){clearTimeout(to);s.remove();rej(new Error("서버에 연결하지 못했습니다."));};
-  s.src=window.__DATA+"?doc="+doc+"&callback="+fn+Object.keys(params).map(function(k){return "&"+k+"="+encodeURIComponent(params[k]);}).join("")+"&_="+Date.now();
-  document.head.appendChild(s);});};
-var enter=function(tok){ls("cm_tok_ml",tok);window.__gateML="";var nx=ss("cm_next");ss("cm_next",null);location.hash=/^#(map|case|bd)\b/.test(nx)?nx:"#map";location.reload();};
-/* 들어가기 화면 — 회사메일 주소 → 메일로 온 숫자 6자리(또는 메일의 링크). 구글 계정 길은 아래 링크로 남긴다 */
-window.__gateLogin=function(reason){var a=document.getElementById("app");if(!a)return;
-  var el=function(tg,p,x){var e=document.createElement(tg);if(p)for(var k in p)e[k]=p[k];if(x)x.appendChild(e);return e;};
-  a.textContent="";var b=el("div",{className:"lg"},a),msg=null;
-  var say=function(tx,bad){msg.textContent=tx||"";msg.className="m"+(bad?" bad":"");};
-  var busy=function(btn,on,tx){btn.disabled=!!on;if(tx)btn.textContent=tx;};
-  el("h2",{textContent:"사례 맵 들어가기"},b);
-  if(window.__gateML){
-    el("p",{textContent:"메일의 링크로 오셨습니다. 아래 단추를 누르면 이 기기에서 열립니다."},b);
-    var g=el("button",{textContent:"이 기기에서 열기",id:"lg_ml"},b);msg=el("div",{className:"m"},b);
-    g.onclick=function(){busy(g,1);say("확인하는 중…");acall("casemapredeem",{ml:window.__gateML}).then(function(r){
-      if(r&&r.ok===1&&r.tok)return enter(r.tok);window.__gateML="";say((r&&r.msg)||"이 링크는 쓸 수 없습니다.",1);setTimeout(function(){window.__gateLogin("");},2500);
-    },function(e){busy(g,0);say(e.message,1);});};
-    return;}
-  el("p",{textContent:"회사메일 주소를 넣으면 접속 번호를 메일로 보내 드립니다."},b);
-  var em=el("input",{type:"email",id:"lg_e",placeholder:"회사메일 주소",autocomplete:"email",value:ls("cm_ml_e")},b);
-  var b1=el("button",{textContent:"접속 번호 받기",id:"lg_b"},b);
-  var box=el("div",{id:"lg_2",hidden:true},b);
-  var kk=el("input",{type:"text",id:"lg_k",inputMode:"numeric",maxLength:6,placeholder:"메일로 온 숫자 6자리",autocomplete:"one-time-code"},box);kk.style.marginTop="12px";
-  var b2=el("button",{textContent:"들어가기",id:"lg_g"},box);
-  msg=el("div",{className:"m",id:"lg_m"},b);
-  var o=el("div",{className:"o"},b);el("a",{textContent:"구글 계정으로 들어가기 →",href:GATE+"?doc="+DOC,id:"lg_gg"},o);
-  el("small",{textContent:"대외비 · 등록된 주소만 열립니다. 한 번 들어가면 이 기기에서는 30일 동안 다시 묻지 않습니다."},b);
-  var addr=function(){return em.value.replace(/\s/g,"").toLowerCase();};
-  b1.onclick=function(){var v=addr();if(!/^[^@]+@[^@]+\.[^@]+$/.test(v)){say("메일 주소를 확인해 주세요.",1);return;}
-    busy(b1,1);say("보내는 중…");acall("casemaplogin",{e:v}).then(function(r){busy(b1,0,"접속 번호 다시 받기");
-      if(r&&r.ok===1){ls("cm_ml_e",v);box.hidden=false;say(r.msg);kk.focus();}else say((r&&r.msg)||"보내지 못했습니다. 잠시 뒤 다시 눌러 주세요.",1);
-    },function(e){busy(b1,0);say(e.message,1);});};
-  b2.onclick=function(){var k=kk.value.replace(/\D/g,"");if(k.length!==6){say("숫자 6자리를 넣어 주세요.",1);return;}
-    busy(b2,1);say("확인하는 중…");acall("casemapredeem",{e:addr(),k:k}).then(function(r){
-      if(r&&r.ok===1&&r.tok)return enter(r.tok);busy(b2,0);say((r&&r.msg)||"번호를 확인해 주세요.",1);
-    },function(e){busy(b2,0);say(e.message,1);});};
-  em.onkeydown=function(e){if(e.key==="Enter")b1.click();};kk.onkeydown=function(e){if(e.key==="Enter")b2.click();};
-  if(reason==="expired")say("열람 기간이 지났습니다. 다시 들어와 주세요.");};
-/* 토큰이 없거나 서버가 받지 않을 때 — 보던 화면(#…)을 기억해 두고 들어가기 화면을 띄운다(들어오면 그 화면으로) */
-window.__gateGo=function(reason){if(/^#(map|case|bd)\b/.test(location.hash))ss("cm_next",location.hash);ss("gate_tok_cm",null);ls("cm_tok_ml",null);window.__gateT="";window.__gateLogin(reason);};
+  history.replaceState(null,"",location.pathname+location.search+(/^#(map|case|bd)\b/.test(nx)?nx:"#map"));}}catch(e){}
+/* 쓸 토큰: 이 화면이 받은 것 → 같은 탭의 성과보드 토큰(gate_tok). 만료됐거나 다른 문서용이면 쓰지 않는다 */
+window.__gateTok=function(){var c=[window.__gateT,ss("gate_tok_cm"),norm(ss("gate_tok"))];for(var i=0;i<c.length;i++){if(c[i]&&live(c[i]))return c[i];}return "";};
+/* 계정 확인으로 보내기 — 보던 화면(#…)을 기억해 두었다가 돌아오면 그 화면으로. 2분 안에 3번 넘게 반복되면 멈춘다 */
+window.__gateGo=function(reason){var n=Number(ss("cm_redir")||0);if(Date.now()-Number(ss("cm_redir_t")||0)>120000)n=0;ss("cm_redir",String(n+1));ss("cm_redir_t",String(Date.now()));
+  if(n>=3){window.__gateStop("계정 확인 화면으로 이동이 반복되고 있습니다("+(reason||"")+"). 잠시 뒤 다시 열거나 담당자에게 알려 주세요.");return;}
+  if(/^#(map|case|bd)\b/.test(location.hash))ss("cm_next",location.hash);ss("gate_tok_cm",null);window.__gateT="";location.replace(GATE+"?doc="+DOC);};
 window.__gateStop=function(msg){var a=document.getElementById("app");if(a){a.textContent="";var d=document.createElement("div");d.className="msg0";d.textContent=msg;a.appendChild(d);}else alert(msg);};
-/* 이 기기에서 나가기 — 맨 위 계정 표시를 누르면 보관한 토큰을 지우고 들어가기 화면으로(같이 쓰는 PC용) */
-document.addEventListener("click",function(e){var w=e.target&&e.target.closest?e.target.closest(".hd .who"):null;if(!w)return;
-  if(confirm("이 기기에서 나갈까요? 다시 들어오려면 접속 번호를 새로 받아야 합니다.")){ss("gate_tok_cm",null);ls("cm_tok_ml",null);window.__gateT="";ss("cm_next",null);window.__gateLogin("");}});
-/* 서버가 열람을 거절했을 때: 권한 문제는 안내만, 그 밖(만료·토큰 없음 등)은 들어가기 화면으로 */
-/* 권한이 없다는 답이면 보관한 토큰도 버린다(새로 고치면 다른 주소로 들어갈 수 있게) */
-var drop=function(){ss("gate_tok_cm",null);ls("cm_tok_ml",null);window.__gateT="";};
+/* 서버가 열람을 거절했을 때: 권한 문제는 안내만, 그 밖(만료·토큰 없음 등)은 계정 확인으로 */
 window.__gateGuard=function(res){if(!res||res.auth!=="required")return false;
-  if(res.reason==="not_allowed"||res.reason==="role_denied")drop();
   if(res.reason==="not_allowed"){window.__gateStop("이 계정은 열람 권한이 없습니다. 담당자에게 요청해 주세요.");return true;}
   if(res.reason==="role_denied"){window.__gateStop("이 화면은 열람 대상이 아닙니다(역할 제한). 필요하면 담당자에게 요청해 주세요.");return true;}
   if(res.reason==="unknown_doc"){window.__gateStop("서버가 아직 준비되지 않았습니다. 담당자에게 알려 주세요.");return true;}
@@ -243,7 +180,7 @@ button,textarea{font-family:inherit}
 const LOAD_HELP='새로고침해도 같으면 담당자에게 알려 주세요.';
 const PM_NOTE='PM 문의는 담당 PM에게 메일로 전달되고 접수 기록이 남습니다.';
 let WHO_T='계정 확인 중';
-function whoText(){return WHO_T?WHO_T+' · 나가기':WHO_T}
+function whoText(){return WHO_T}
 let _cmN=0;
 function gcall(doc,params,ms){return new Promise((res,rej)=>{ // D에 JSONP 1번 — 열람 거절이면 머리의 안내·재로그인으로
   const tok=window.__gateTok();
