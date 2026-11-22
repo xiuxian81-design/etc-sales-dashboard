@@ -11,13 +11,20 @@ window.__gateQ=function(){var t=window.__gateTok();return t?("&tok="+encodeURICo
 window.__bcOpen=function(a){var t=window.__gateTok(),x=0;try{x=+atob(t.split(".")[0].replace(/-/g,"+").replace(/_/g,"/")).split("|")[2];}catch(e){}if(!t||x*1000<Date.now()+300000){window.__gateGo("expired");return false;}a.href="blockcheck.html?v=20261106c#tok="+t;setTimeout(function(){a.href="blockcheck.html";},0);return true;};
 /* [2026-11-22 박본님] 💡 앱시토 사례 맵 — 성과보드에 들어온 계정만(같은 토큰을 누르는 순간에만 붙였다 뗀다, 블럭 조회와 같은 방식). 사례 맵 화면은 이 토큰으로 자료를 받는다 */
 window.__cmOpen=function(a){var t=window.__gateTok(),x=0;try{x=+atob(t.split(".")[0].replace(/-/g,"+").replace(/_/g,"/")).split("|")[2];}catch(e){}if(!t||x*1000<Date.now()+300000){window.__gateGo("expired");return false;}a.href="casemap.html#tok="+t;setTimeout(function(){a.href="casemap.html";},0);return true;};
-window.__gateGo=function(reason){var n=0;try{n=Number(sessionStorage.getItem("gate_redir")||0);if(Date.now()-Number(sessionStorage.getItem("gate_redir_t")||0)>120000)n=0;sessionStorage.setItem("gate_redir",String(n+1));sessionStorage.setItem("gate_redir_t",String(Date.now()));}catch(e){}if(n>=3){alert("계정 확인 페이지로 이동이 반복되고 있습니다("+(reason||"")+"). 잠시 후 다시 열거나 담당자에게 알려 주세요.");return;}try{sessionStorage.removeItem("gate_tok");}catch(e){}window.__gateT="";location.replace(GATE+"?doc="+DOC);};
-window.__gateGuard=function(res){if(!res||res.auth!=="required")return false;if(res.reason==="not_allowed"){alert("이 계정은 열람 권한이 없습니다. 담당자에게 요청해 주세요.");return true;}window.__gateGo(res.reason);return true;};
-/* [v46] 대시보드 내장데이터(110대 실적·마스터·과정관리)는 공개 파일이 아니라 D ?doc=dashdata 로 받는다(dash 토큰). 수신 전엔 crm 자동로드·과정관리 초기화를 기다린다 */
-window.__dashData=new Promise(function(r){window.__ddResolve=r;window.__ddTimeout=setTimeout(function(){r(null);},20000);});
+window.__gateGo=function(reason){if(window.__gateGoing)return;window.__gateGoing=true;var n=0;try{n=Number(sessionStorage.getItem("gate_redir")||0);if(Date.now()-Number(sessionStorage.getItem("gate_redir_t")||0)>120000)n=0;sessionStorage.setItem("gate_redir",String(n+1));sessionStorage.setItem("gate_redir_t",String(Date.now()));}catch(e){}if(n>=3){alert("계정 확인 페이지로 이동이 반복되고 있습니다("+(reason||"")+"). 잠시 후 다시 열거나 담당자에게 알려 주세요.");return;}try{sessionStorage.removeItem("gate_tok");}catch(e){}window.__gateT="";location.replace(GATE+"?doc="+DOC);};
+window.__gateGuard=function(res){if(!res||res.auth!=="required")return false;if(res.reason==="not_allowed"){if(window.__gateNA)return true;window.__gateNA=true;alert("이 계정은 열람 권한이 없습니다. 담당자에게 요청해 주세요.");return true;}window.__gateGo(res.reason);return true;};
+/* [v46] 대시보드 내장데이터(110대 실적·마스터·과정관리)는 공개 파일이 아니라 D ?doc=dashdata 로 받는다(dash 토큰). [v77] crm·기본 목록은 기다리지 않고 같이 보낸다 — 받은 쪽이 먼저 그리고, dashdata가 오면(또는 끝내 안 오면) 그것에 기대는 부분(110대 실적·PRM 할 일·업체 현황·별칭)만 다시 그린다. __ddSettled = 수신 또는 포기 */
+window.__ddSettled=false;window.__dashData=new Promise(function(r){window.__ddResolve=function(v){window.__ddSettled=true;r(v);};window.__ddTimeout=setTimeout(function(){window.__ddResolve(null);},20000);});
 window.__ddCallback=function(r){if(window.__gateGuard&&window.__gateGuard(r)){window.__ddResolve(null);return;}if(r&&r.embeddedSales){window.__EMBEDDED_SALES__=r.embeddedSales;window.__H110__=r.h110||[];window.__H110_ISERIP__=r.h110Iserip||null;window.__EMBEDDED_SALES_META__=r.embeddedSalesMeta||null;try{if(typeof h110ApplyMeta==="function")h110ApplyMeta(window.__EMBEDDED_SALES_META__);}catch(e){}window.MS_PROCESS=r.msProcess||null;}if(r){window.__PRM_TODO__=r.prmTodo||null;window.__PRM_TODO_META__=r.prmTodoMeta||null;try{if(typeof renderPrmTodo==="function")renderPrmTodo();}catch(e){}window.__VENDOR_SALES__=r.vendorSales||null;window.__VENDOR_FEE__=r.vendorFee||null;window.__ACCT_RAW__=r.acctData||null;window.__ACCT_META__=r.acctMeta||null;try{var vp=document.getElementById("t-vendors");if(vp&&vp.classList.contains("active")&&typeof renderVendorBoard==="function")renderVendorBoard();}catch(e){}try{var ap=document.getElementById("t-accounts");if(ap&&ap.classList.contains("active")&&typeof renderAccountBoard==="function")renderAccountBoard();}catch(e){}}window.__ddResolve(r||null);try{document.dispatchEvent(new Event("dashdata-ready"));}catch(e){}try{if(typeof loadEmbeddedSales==="function"&&typeof salesLoaded!=="undefined"&&!salesLoaded)loadEmbeddedSales();}catch(e){}try{if(typeof allData!=="undefined"&&allData.length){if(typeof render110==="function")render110();if(typeof render110sum==="function")render110sum();}}catch(e){}};
-window.__loadDashData=function(){var s=document.createElement("script");s.src=DATA+"?doc=dashdata&callback=__ddCallback&_="+Date.now()+window.__gateQ();s.onerror=function(){window.__ddResolve(null);};document.head.appendChild(s);};
-if(!window.__gateTok())window.__gateGo("no_token");else if(DOC==="dash")window.__loadDashData();
+/* [v77 저장본] JSONP 받기 — 요청마다 다른 callback 이름(__jpN_i). 무응답이면 waits[i] 뒤 첫 요청을 둔 채 하나 더 보내 먼저 온 답을 쓴다. 마지막 요청 뒤 lastWait 지나면 onFail("timeout")(그 뒤 늦게 온 답도 받음), 보낸 요청이 모두 오류면 onFail("error"). cancel() 뒤 온 답은 버린다 */
+window.__jpSeq=0;window.__jsonp=function(base,waits,lastWait,onData,onFail){var k=++window.__jpSeq,n=0,errs=0,done=false,gave=false,timer=null;
+function fire(){var cb="__jp"+k+"_"+(n++);window[cb]=function(r){if(done)return;done=true;clearTimeout(timer);onData(r);};var s=document.createElement("script");s.src=base+(base.indexOf("?")<0?"?":"&")+"callback="+cb+"&_="+Date.now()+window.__gateQ();s.onerror=function(){s.remove();if(done||gave)return;errs++;if(n<=waits.length)fire();else if(errs>=n){done=true;clearTimeout(timer);onFail("error");}};document.head.appendChild(s);clearTimeout(timer);timer=setTimeout(function(){if(done||gave)return;if(n<=waits.length)fire();else{gave=true;onFail("timeout");}},n<=waits.length?waits[n-1]:lastWait);}
+fire();return{cancel:function(){done=true;clearTimeout(timer);}};};
+window.__loadDashData=function(){window.__jsonp(DATA+"?doc=dashdata",[7000,7000],6000,function(r){window.__ddCallback(r);},function(){window.__ddResolve(null);});};   /* [v77] 7초·14초에 하나씩 더(총 3번, 먼저 온 답), 20초 한도는 그대로 */
+/* [v77] 먼저 보내기 — 페이지가 열리자마자 dashdata와 함께 crm·기본 목록 저장본(snap=1)을 보낸다. 받은 답은 loadCrm·loadFromSheets가 첫 호출 때 __pfTake로 넘겨받는다(같은 주소일 때만, 한 번만) */
+window.__pf={};window.__prefetch=function(kind,base){var o={base:base,done:false,res:null,fail:null,used:false,subs:[]};o.race=window.__jsonp(base,[12000,12000],30000,function(r){o.done=true;o.res=r;o.subs.forEach(function(f){f("data",r);});},function(w){o.fail=w;o.subs.forEach(function(f){f("fail",w);});});window.__pf[kind]=o;};
+window.__pfTake=function(kind,base,onData,onFail){var o=window.__pf[kind];if(!o||o.used||o.base!==base)return null;o.used=true;var live=true,h=function(t,v){if(!live)return;if(t==="data")onData(v);else onFail(v);};if(o.done)setTimeout(function(){h("data",o.res);},0);else{if(o.fail)setTimeout(function(){h("fail",o.fail);},0);o.subs.push(h);}return{cancel:function(){live=false;o.race.cancel();}};};
+if(!window.__gateTok())window.__gateGo("no_token");else if(DOC==="dash"){window.__loadDashData();window.__prefetch("crm",DATA+"?mode=crm&snap=1");window.__prefetch("gs",DATA+"?snap=1");}
 })();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MS팀 성과관리 대시보드</title>
@@ -35,7 +42,47 @@ if(!window.__gateTok())window.__gateGo("no_token");else if(DOC==="dash")window._
 ══════════════════════════════════════════ */
 let autoTimer = null;
 
-function loadFromSheets() {
+/* [v77 저장본] 서버가 응답 맨 앞에 snap{at,age,stale,hit}를 붙이면(v77) 저장본으로 먼저 그리고, stale이면 뒤에서 새 계산을 받아 바꿔 끼운다.
+   그 사이 사용자가 상세를 열었거나 검색·거르기를 썼으면 자동 교체 대신 '새 자료 도착 · 눌러 갱신' 단추. snap이 없으면(v76) 지금과 같다 */
+const __snapS = { gs: {}, crm: {} };   // kind별 {hit, at, state:''|'checking'|'pend'|'fail', pend, t0}
+window.__uiTouchAt = 0;
+function __uiTouch(e){ const t = e && e.target; if (t && (t.id === 'gs-sheet-url' || t.id === 'auto-refresh')) return; window.__uiTouchAt = Date.now(); }
+document.addEventListener('input', __uiTouch, true); document.addEventListener('change', __uiTouch, true);
+function __uiBusy(t0){ try { return window.__uiTouchAt > t0 || (crmView.mode !== 'all' || !!crmView.vendorKey) || !!vbView.sel || !!acView.sel; } catch (e) { return true; } }
+function __snapSet(kind, res){ const sn = res && res.snap; __snapS[kind] = (sn && sn.hit) ? { hit: true, at: Number(sn.at) || 0, state: sn.stale ? 'checking' : '' } : {}; }
+function __snapHtml(kind){
+  const s = __snapS[kind]; if (!s || !s.hit) return '';
+  const d = new Date(s.at), hm = d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0');
+  return '<span class="snap-note">저장본 ' + hm + ' 기준' + (s.state === 'checking' ? ' · 최신 자료 확인 중…' : '') + '</span>'
+    + (s.state === 'pend' ? ' <button class="snap-btn" onclick="__snapApply()">새 자료 도착 · 눌러 갱신</button>' : '')
+    + (s.state === 'fail' ? ' <span class="snap-fail">· 최신 확인 실패</span> <button class="snap-btn snap-retry" onclick="__snapRetry(\'' + kind + '\')">다시 시도</button>' : '');   // [v77 검수 🟡-4] 낡은 저장본인데 새 계산이 끝내 실패
+}
+function __snapPaint(kind){ const el = document.getElementById(kind + '-snap'); if (el) el.innerHTML = __snapHtml(kind); }
+function __snapRetry(kind){ const s = __snapS[kind]; if (s && s.state === 'fail' && s.retry) s.retry(); }
+/* 저장본으로 그린 직후 부른다 — stale이면 새 계산 1번(40초 무응답이면 1번 더). setRace = 그 요청을 화면 쪽 취소 대상으로 등록 */
+function __snapBg(kind, gen, getGen, base, okShape, apply, setRace){
+  const s = __snapS[kind]; if (!s.hit || s.state !== 'checking') return;
+  const go = function(){
+    s.state = 'checking'; s.t0 = Date.now(); __snapPaint(kind);
+    setRace(window.__jsonp(base, [40000], 40000, function(r){
+      if (gen !== getGen()) return;
+      if (window.__gateGuard && window.__gateGuard(r)) return;
+      if (!okShape(r)) { s.state = 'fail'; __snapPaint(kind); return; }
+      if (__uiBusy(s.t0)) { s.pend = r; s.state = 'pend'; __snapPaint(kind); return; }
+      apply(r);
+    }, function(){ if (gen !== getGen()) return; if (s.state === 'checking') { s.state = 'fail'; __snapPaint(kind); } }));
+  };
+  s.retry = go; go();
+}
+function __snapApply(){
+  const g = __snapS.gs.pend, c = __snapS.crm.pend;
+  if (g) { __snapS.gs.pend = null; __gsTake(g); }
+  if (c) { __snapS.crm.pend = null; crmTake(c); }
+}
+let __gsGen = 0, __gsRace = null;
+function __gsTake(d){ __snapSet('gs', d); window.__gsCallback(d); }
+
+function loadFromSheets(fresh) {   /* [v77] fresh===true('실시간 불러오기' 단추) = 바로 새 계산, 그 밖(진입·5분 자동갱신) = 저장본 먼저 */
   const url = document.getElementById('gs-sheet-url').value.trim();
   if (!url) { alert('Apps Script 웹 앱 URL을 입력해주세요'); return; }
   if (!url.startsWith('https://script.google.com')) {
@@ -79,7 +126,8 @@ function loadFromSheets() {
     parseGsData(rows);
     const now = new Date();
     const ts  = `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
-    info.textContent = `✅ ${data.count}건 로드 완료 — 최종 갱신: ${ts}`;
+    if (__snapS.gs.hit) { info.textContent = `✅ ${data.count}건 로드 완료 — `; const sp = document.createElement('span'); sp.id = 'gs-snap'; sp.innerHTML = __snapHtml('gs'); info.appendChild(sp); }   // [v77] 저장본 HH:MM 기준
+    else info.textContent = `✅ ${data.count}건 로드 완료 — 최종 갱신: ${ts}`;
     btn.classList.remove('loading');
     btn.textContent = '🔄 실시간 불러오기';
     document.getElementById('upload-guide').style.display = 'none';
@@ -94,35 +142,36 @@ function loadFromSheets() {
     try{ var ap=document.getElementById('t-accounts'); if(ap&&ap.classList.contains('active')&&typeof renderAccountBoard==='function') renderAccountBoard(); }catch(e){}   // [2026-10-27] 거래처 조회 ④ 병원신약
   };
 
-  // JSONP 방식으로 호출 (CORS 우회)
-  const old = document.getElementById('__gs_script');
-  if (old) old.remove();
-  const s = document.createElement('script');
-  s.id  = '__gs_script';
-  // doGet에 callback 파라미터 추가
-  s.src = url + '?callback=__gsCallback&_=' + Date.now() + window.__gateQ();
-  s.onerror = () => {
+  // JSONP 방식으로 호출 (CORS 우회) — [v77] 요청마다 다른 callback·무응답 재시도(저장본 12초×3번 / 새 계산 40초 뒤 1번 더)·옛 응답 무시
+  const gen = ++__gsGen; if (__gsRace) __gsRace.cancel(); __gsRace = null; __snapS.gs = {};
+  const isFresh = (fresh === true);
+  const gsBase = url + (isFresh ? '' : '?snap=1');
+  const gsOnData = function(data){
+    if (gen !== __gsGen) return;
+    __gsTake(data);
+    if (__snapS.gs.state === 'checking') __snapBg('gs', gen, () => __gsGen, url, d => !!(d && d.status === 'ok'), __gsTake, r => { __gsRace = r; });
+  };
+  const gsOnFail = function(why){
+    if (gen !== __gsGen) return;
+    if (why === 'error') {
     // JSONP 실패 시 직접 fetch 시도
     fetch(url + '?_=' + Date.now() + window.__gateQ())
       .then(r => r.json())
-      .then(data => window.__gsCallback(data))
+      .then(data => { if (gen === __gsGen) __gsTake(data); })
       .catch(err => {
         info.textContent = '❌ 연결 실패: ' + err.message;
         btn.classList.remove('loading');
         btn.textContent = '🔄 실시간 불러오기';
       });
-    s.remove();
-  };
-  document.head.appendChild(s);
-
-  // 10초 timeout
-  setTimeout(() => {
+      return;
+    }
     if (btn.classList.contains('loading')) {
       btn.classList.remove('loading');
       btn.textContent = '🔄 실시간 불러오기';
-      info.textContent = '⚠ 응답 시간 초과(30초) — URL을 확인하거나 Excel 수동 업로드를 사용하세요';
+      info.textContent = '⚠ 응답 시간 초과 — URL을 확인하거나 Excel 수동 업로드를 사용하세요';   // [v77 검수 🟡-3] 실제 포기 시점이 54초·80초라 숫자 뺌
     }
-  }, 30000);
+  };
+  __gsRace = (!isFresh && window.__pfTake('gs', gsBase, gsOnData, gsOnFail)) || window.__jsonp(gsBase, isFresh ? [40000] : [12000, 12000], isFresh ? 40000 : 30000, gsOnData, gsOnFail);   // [v77] 페이지 열 때 먼저 보낸 저장본 요청이 있으면 그것을 씀
 }
 
 // 빈블럭 시트 데이터 저장 (실패/오픈블럭 카운트용)
@@ -358,6 +407,8 @@ body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var
 .gs-panel .btn-gs:hover{background:rgba(255,255,255,.35)}
 .gs-panel .btn-gs.loading{opacity:.6;cursor:wait}
 .gs-info{font-size:12px;opacity:.75}
+.snap-note{white-space:normal} .snap-btn{display:inline-block;margin:2px 0 2px 6px;padding:4px 11px;font-size:12px;font-weight:700;border:1.5px solid #0071e3;border-radius:8px;background:#fff;color:#0071e3;cursor:pointer;white-space:nowrap;max-width:100%;font-family:inherit}   /* [v77] 저장본 기준 · 새 자료 도착 단추 */
+.snap-fail{display:inline-block;padding:1px 8px;border-radius:7px;background:#fdf1df;color:#8B4513;font-weight:700}   /* [v77 검수 🟡-4] 최신 확인 실패 꼬리 — 갈색(빨강 아님) */
 .refresh-row{display:flex;align-items:center;gap:8px}
 .auto-chk{display:flex;align-items:center;gap:5px;font-size:12px;opacity:.8;cursor:pointer}
 .gs-panel .gs-tip{font-size:11px;opacity:.6;width:100%;margin-top:-6px}
@@ -397,7 +448,7 @@ body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var
   <label>📡 Google Sheets 연동</label>
   <input class="gs-inp" id="gs-sheet-url" type="text" value="https://script.google.com/macros/s/AKfycbyhk2el3kwGMStCvyUr-8B-PWS-6aKwcf5EVfvpryqlj3jEeLw5pnttHMEokrpQXO33dQ/exec" placeholder="Apps Script 웹 앱 URL (GAS_Script.txt 배포 후 붙여넣기)">
   <div class="refresh-row">
-    <button class="btn-gs" id="btn-gs-load" onclick="loadFromSheets()">🔄 실시간 불러오기</button>
+    <button class="btn-gs" id="btn-gs-load" onclick="loadFromSheets(true)">🔄 실시간 불러오기</button>
     <label class="auto-chk"><input type="checkbox" id="auto-refresh" onchange="toggleAutoRefresh(this.checked)"> 5분 자동갱신</label>
   </div>
   <span class="gs-info" id="gs-info">⬜ 미연결 — URL을 입력하면 Google Sheets에서 실시간 데이터를 불러옵니다</span>
@@ -774,6 +825,7 @@ function saveSalesCache(meta){
   }catch(e){console.warn('saveSalesCache fail',e);}
 }
 function tryLoadSalesCache(){
+  if(!window.__ddSettled) return false;   // [v77] dashdata(내장 실적)가 오기 전엔 캐시를 잡지 않는다 — 기본 목록이 먼저 그려져도 내장 실적이 우선
   try{
     const raw=localStorage.getItem(SALES_CACHE_KEY);
     if(!raw)return false;
@@ -2946,7 +2998,7 @@ var crmData=null, crmLoaded=false, crmLoading=false;
 var crmView={mode:'all', dirIdx:-1, vendorKey:'', vendorName:''};   /* [v57] vendorIdx(이번달 칩 번호) → vendorKey(업체 키) — 칩·검색·경보표 어디서 열어도 같은 업체 히스토리 */
 
 /* ── 로드 (loadForecast 템플릿 복제 · 콜백만 __crmCallback으로 분리) ── */
-function loadCrm(){
+function loadCrm(fresh){
   if(crmLoaded||crmLoading)return;
   crmLoading=true;
   var url=(document.getElementById('gs-sheet-url').value||'').trim();
@@ -2962,12 +3014,24 @@ function loadCrm(){
     else if(res&&res.success){st.innerHTML='<span style="color:var(--watch)">⚠ 백엔드가 <b>mode=crm</b>을 아직 지원하지 않습니다 — Apps Script v38 배포 + <b>setupCrmSheets()</b> 1회 실행 후 새로고침하세요</span>';}
     else{st.innerHTML='<span style="color:var(--bad)">성과관리 로드 실패: '+fcEsc(res&&res.message?res.message:'응답없음')+' — 백엔드 setupCrmSheets 실행/재배포 여부를 확인하세요</span>';}
   };
-  var s=document.createElement('script');s.id='__crm_script';
-  s.src=url+'?mode=crm&callback=__crmCallback&_='+Date.now()+window.__gateQ();
-  s.onerror=function(){crmLoading=false;st.innerHTML='<span style="color:var(--bad)">연결 실패 — 네트워크/URL 확인</span>';s.remove();};
-  document.head.appendChild(s);
+  /* [v77] 저장본 먼저(snap=1, 12초 무응답이면 하나 더·총 3번) → stale이면 뒤에서 새 계산. fresh===true(새로고침) = 바로 새 계산(40초 뒤 1번 더). 요청마다 다른 callback·옛 응답 무시 */
+  var gen=++crmGen; if(crmRace)crmRace.cancel(); crmRace=null; __snapS.crm={};
+  var isFresh=(fresh===true);
+  var crmBase=url+'?mode=crm'+(isFresh?'':'&snap=1');
+  var onData=function(res){
+    if(gen!==crmGen)return;
+    crmTake(res);
+    if(__snapS.crm.state==='checking'&&crmLoaded) __snapBg('crm', gen, function(){return crmGen;}, url+'?mode=crm', function(r){return !!(r&&r.success&&r.meta&&Array.isArray(r.directors));}, crmTake, function(r){crmRace=r;});
+  };
+  var onFail=function(why){
+    if(gen!==crmGen)return; crmLoading=false;
+    st.innerHTML=(why==='error')?'<span style="color:var(--bad)">연결 실패 — 네트워크/URL 확인</span>':'<span style="color:var(--bad)">응답 시간 초과 — 잠시 뒤 다시 시도하세요</span> <button class="snap-btn" onclick="refreshCrm()">🔄 다시 시도</button>';
+  };
+  crmRace=(!isFresh&&window.__pfTake('crm',crmBase,onData,onFail))||window.__jsonp(crmBase, isFresh?[40000]:[12000,12000], isFresh?40000:30000, onData, onFail);   // [v77] 페이지 열 때 먼저 보낸 저장본 요청이 있으면 그것을 씀
 }
-function refreshCrm(){crmLoaded=false;crmLoading=false;crmView={mode:'all',dirIdx:-1,vendorKey:'',vendorName:''};loadCrm();}
+var crmGen=0, crmRace=null;
+function crmTake(res){ __snapSet('crm',res); window.__crmCallback(res); }
+function refreshCrm(){crmLoaded=false;crmLoading=false;crmView={mode:'all',dirIdx:-1,vendorKey:'',vendorName:''};loadCrm(true);}
 
 /* ── 공통 유틸 ── */
 function crmMeta(){return (crmData&&crmData.meta)||{};}
@@ -3027,7 +3091,8 @@ function renderCrm(){
     +(meta.confirmedMonth?' · 확정 실적 기준 <b>'+fcEsc(crmMon(meta.confirmedMonth))+'</b>'+(meta.confirmedPartial?' <span style="color:var(--watch)">(일부 미입력)</span>':''):'')
     +' · 단위 원(표시 환산: 억/만원) '
     +'<button onclick="refreshCrm()" style="margin-left:10px;padding:5px 13px;font-size:12px;font-weight:700;border:none;border-radius:8px;background:var(--blue);color:#fff;cursor:pointer">🔄 새로고침</button>'
-    +(meta.generatedAt?'<span style="margin-left:10px;color:var(--gray3);font-size:12px">생성 '+fcEsc(meta.generatedAt)+'</span>':'');
+    +(meta.generatedAt?'<span style="margin-left:10px;color:var(--gray3);font-size:12px">생성 '+fcEsc(meta.generatedAt)+'</span>':'')
+    +'<span id="crm-snap" style="margin-left:10px;font-size:12px;color:var(--gray4)">'+__snapHtml('crm')+'</span>';   // [v77] 저장본 HH:MM 기준 · 새 자료 도착 단추(저장본이 아니면 빈칸)
   // CRM 탭은 MBO Excel 없이도 독립 동작 → 로드되면 탭 바를 바로 노출(기존 노출 지점은 그대로 유지)
   var nav=document.getElementById('tab-nav'); if(nav&&nav.style.display==='none') nav.style.display='flex';
   renderFcHQ(crmHqShape(crmData.team||{}), meta);
@@ -3706,7 +3771,9 @@ function renderCrmVendor(d){
     var el=document.getElementById('gs-sheet-url');
     if(el&&String(el.value||'').trim()){ loadCrm(); loadFromSheets(); }   /* [2026-10-31 박본님] 진입 즉시 MBO 실시간도 — 버튼 없이 탭 메뉴·전체 현황까지 */
   }
-  function bootCrmReady(){ if(window.__dashData) window.__dashData.then(bootCrm); else bootCrm(); }   // [v46] 내장데이터(dashdata) 수신 후 crm 로드(110대 마스터 병합 순서 보장)
+  function bootCrmReady(){ bootCrm(); }   // [v77] dashdata를 기다리지 않는다(요청은 머리에서 이미 출발) — 110대 순서 보장은 tryLoadSalesCache 대기 + 아래 __dashData.then 다시 그리기로
+  /* [v77] dashdata가 오거나 끝내 안 온 뒤: 매출 캐시(localStorage)는 이때부터 쓴다(내장 실적보다 먼저 잡혀 버리지 않게) · 110대 다시 그림 · 열려 있는 업체 히스토리(별칭 MS_PROCESS) 다시 그림 */
+  if(window.__dashData) window.__dashData.then(function(){ setTimeout(function(){ try{ if(typeof allData!=='undefined'&&allData.length&&!salesLoaded&&tryLoadSalesCache()){ render110(); if(typeof render110sum==='function') render110sum(); } }catch(e){} try{ if(crmLoaded&&crmView.mode==='dir'&&crmView.vendorKey) renderCrmDirector(); }catch(e){} },0); });
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bootCrmReady);
   else bootCrmReady();
 })();
