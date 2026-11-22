@@ -230,8 +230,11 @@ function bdPdf(a){ // PDF 받기 — 서버가 나눠 둔 조각을 3개씩 받�
     if(!b.sha||!(window.crypto&&crypto.subtle))return Promise.resolve();const all=new Uint8Array(len);let o=0;parts.forEach(p=>{all.set(p,o);o+=p.length});
     return crypto.subtle.digest('SHA-256',all).then(h=>{const hx=Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join('');if(hx!==b.sha)throw new Error(STALE)})};
   Promise.all([work(),work(),work()]).then(check).then(()=>{
-    const u=URL.createObjectURL(new Blob(parts,{type:'application/pdf'})),x=document.createElement('a');
-    x.href=u;x.download=(b.file||key)+'.pdf';document.body.appendChild(x);x.click();x.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)
+    // 11-22 박본님 '계속 다운로드 실패': 받은 파일 주소(blob)를 60초 뒤 지우면, 크롬이 '저장 위치 묻기'로 저장 창을 띄운 사이에 주소가 사라져 '실패'가 된다.
+    //   → 이 화면이 열려 있는 동안 남겨 두고, 다음 PDF를 받을 때 앞의 것만 지운다.
+    if(window.__cmBlob)URL.revokeObjectURL(window.__cmBlob);
+    const u=window.__cmBlob=URL.createObjectURL(new Blob(parts,{type:'application/pdf'})),x=document.createElement('a');
+    x.href=u;x.download=(b.file||key)+'.pdf';document.body.appendChild(x);x.click();setTimeout(()=>x.remove(),1000)
   }).catch(e=>alert(e.message===STALE?STALE+'.':'PDF를 받지 못했습니다 ('+e.message+'). 잠시 뒤 다시 눌러 주세요.')).then(()=>{delete a.dataset.busy;a.textContent=label});
   return false;
 }
