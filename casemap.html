@@ -326,6 +326,7 @@ function vcase(id){
 function copyText(c,w){const t=c.type,solo=D.solo_types.includes(t);
   if(w==='talk')return (D.talk[c.talk]||{}).speech||'';
   if(w==='faq')return (D.faq_map[c.talk]||[]).map(i=>D.faq[i]).filter(Boolean).map(f=>'Q. '+f.q+'\nA. '+f.a).join('\n\n');
+  if(c.copy)return c.copy; // 빌더가 안쪽 표현을 고쳐 둔 복사용 글(11-22 박본님 — 카톡 페이지와 같은 기준). 없으면 아래(화면 글 그대로)
   const L=[(solo?(c.target||c.pt||c.dept):(c.cshort||c.dept||c.cust))+' → '+D.meta.product,[c.cust,c.dept,t].filter(Boolean).join(' · ')];
   const kv=(solo?[['타겟 환자',c.target||c.pt],['상황',c.sit]]:[['상황',c.sit],['타겟 환자',c.target]]).concat([['한 일',c.did],['결과',c.res+(c.pred?' · '+c.pred:'')],['넓힌 방법',c.how||'-']]).filter(x=>x[1]);
   kv.forEach(x=>L.push(x[0]+': '+x[1]));
