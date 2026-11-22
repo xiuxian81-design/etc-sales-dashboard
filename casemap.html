@@ -209,11 +209,12 @@ async function loadData(){
   if(!r||r.ok!==1||!r.d)throw new Error(r&&r.err==='no_data'?'자료가 아직 올라오지 않았습니다':'자료를 읽지 못했습니다');
   WHO_T=r.who||'';return r.d;
 }
+const STALE='자료가 막 갱신되었거나 갱신 중입니다. 화면을 새로고침한 뒤 다시 받아 주세요'; // 옛 화면이 지난 판 파일을 찾을 때(서버 no_file)·받은 PDF가 자료와 다를 때 같은 안내
 const _bdC=new Map(); // 받은 쪽 이미지는 이 화면이 열려 있는 동안 다시 받지 않는다
 function bdImg(key,page){ // 쪽 이미지 주소(약속) — 화면이 그 쪽을 열 때만 서버에서 받는다
   const id=key+'|'+page;if(_bdC.has(id))return _bdC.get(id);
   const b=(D&&D.bd[key])||{};
-  const pr=gcall('casemapbd',{k:b.fid||'',p:page},90000).then(r=>{if(!r||r.ok!==1||!r.b64)throw new Error('이미지 없음');return URL.createObjectURL(new Blob([b64bytes(r.b64)],{type:r.mime||'image/png'}))});
+  const pr=gcall('casemapbd',{k:b.fid||'',p:page},90000).then(r=>{if(r&&r.err==='no_file'){const er=new Error(STALE);er.stale=1;throw er}if(!r||r.ok!==1||!r.b64)throw new Error('이미지 없음');return URL.createObjectURL(new Blob([b64bytes(r.b64)],{type:r.mime||'image/png'}))});
   _bdC.set(id,pr);pr.catch(()=>_bdC.delete(id));return pr;
 }
 function bdPdfHref(key){return '#'}
@@ -222,12 +223,11 @@ function bdPdf(a){ // PDF 받기 — 서버가 나눠 둔 조각을 3개씩 받�
   const key=a.dataset.k,b=(D&&D.bd[key])||{},n=b.pdfn||0,label=a.textContent,parts=new Array(n);
   if(!n||!b.fid){alert('이 자료는 PDF가 없습니다.');return false}
   a.dataset.busy='1';let next=0,done=0;a.textContent='받는 중 0/'+n;
-  const STALE='자료가 막 갱신되었거나 갱신 중입니다. 화면을 새로고침한 뒤 다시 받아 주세요';
   const one=i=>gcall('casemappdf',{k:b.fid,i:i},120000).then(r=>{if(r&&r.err==='no_file')throw new Error(STALE);if(!r||r.ok!==1||!r.b64)throw new Error('조각 '+(i+1)+' 없음');parts[i]=b64bytes(r.b64);a.textContent='받는 중 '+(++done)+'/'+n});
   const work=()=>next<n?one(next++).then(work):Promise.resolve();
   // 11-22 검토관 🔴: 이어 붙인 PDF를 자료의 sha256과 대조 — 옛·새 조각이 섞이면 저장하지 않고 새로고침 안내
-  const check=()=>{if(!b.sha||!(window.crypto&&crypto.subtle))return Promise.resolve();let len=0;parts.forEach(p=>len+=p.length);
-    if(b.size&&len!==b.size)return Promise.reject(new Error(STALE));const all=new Uint8Array(len);let o=0;parts.forEach(p=>{all.set(p,o);o+=p.length});
+  const check=()=>{let len=0;parts.forEach(p=>len+=p.length);if(b.size&&len!==b.size)return Promise.reject(new Error(STALE)); // 크기는 늘 대조, 해시는 가능한 곳에서
+    if(!b.sha||!(window.crypto&&crypto.subtle))return Promise.resolve();const all=new Uint8Array(len);let o=0;parts.forEach(p=>{all.set(p,o);o+=p.length});
     return crypto.subtle.digest('SHA-256',all).then(h=>{const hx=Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join('');if(hx!==b.sha)throw new Error(STALE)})};
   Promise.all([work(),work(),work()]).then(check).then(()=>{
     const u=URL.createObjectURL(new Blob(parts,{type:'application/pdf'})),x=document.createElement('a');
@@ -348,8 +348,8 @@ function vbd(){
   <div class="vb" id="vb"><button class="ar" onclick="step(-1)"${first?' disabled':''}>←</button><div class="ld" id="bdld"><i></i>근거 BD를 불러오는 중…<small>보안 확인 뒤 받아 오느라 몇 초 걸립니다</small></div><img id="bdimg" alt="${A(b.title)}" data-k="${A(key)}" data-p="${pg}" onload="this.dataset.ok='1';bdDone()" onerror="bdFail(this)"><button class="ar" onclick="step(1)"${last?' disabled':''}>→</button></div>
   <div class="vl">${keys.map((k,j)=>`<div class="${j===i?'on':''}" onclick="jump(${j})">${j+1}. ${E((D.bd[k]||{}).title||k)}</div>`).join('')}</div></div>`}
 function bdDone(){const l=$('bdld');if(l)l.remove()}
-function bdFail(el){if(el.dataset.ok==='0')return;el.dataset.ok='0';bdDone();el.insertAdjacentHTML('afterend','<span class=err>이미지를 불러오지 못했습니다</span>')}
-function fillBd(){const el=$('bdimg');if(!el)return;bdImg(el.dataset.k,+el.dataset.p).then(u=>{el.src=u},()=>bdFail(el))} // 화면이 그 쪽을 열 때만 받는다
+function bdFail(el,e){if(el.dataset.ok==='0')return;el.dataset.ok='0';bdDone();el.insertAdjacentHTML('afterend','<span class=err>'+E(e&&e.stale?e.message:'이미지를 불러오지 못했습니다')+'</span>')} // e.stale = 자료가 갱신돼 옛 화면이 지난 판을 찾음(게이트판)
+function fillBd(){const el=$('bdimg');if(!el)return;bdImg(el.dataset.k,+el.dataset.p).then(u=>{el.src=u},e=>bdFail(el,e))} // 화면이 그 쪽을 열 때만 받는다
 function goBd(i,pg){replace(mk('bd',{id:VB.c.id,s:VB.s.key,i,p:pg}))}
 function step(d){if(!VB)return;let{i,pg,keys}=VB;const n=k=>(D.bd[k]||{}).pages||1;
   if(d>0){if(pg<n(keys[i]))pg++;else if(i<keys.length-1){i++;pg=1}else return}else{if(pg>1)pg--;else if(i>0){i--;pg=n(keys[i])}else return}goBd(i,pg)}
@@ -363,7 +363,7 @@ addEventListener('touchend',e=>{if(tx==null)return;const dx=e.changedTouches[0].
 function printBd(key){const b=D.bd[key];if(!b)return;const el=$('prn');
   Promise.all(Array.from({length:b.pages||1},(_,j)=>bdImg(key,j+1))).then(us=>{
     el.innerHTML=us.map(u=>`<img src="${A(u)}" alt="">`).join('');
-    const im=[...el.querySelectorAll('img')];return Promise.all(im.map(x=>x.complete?0:new Promise(r=>{x.onload=x.onerror=r})))}).then(()=>window.print(),()=>alert('출력할 이미지를 불러오지 못했습니다.'))}
+    const im=[...el.querySelectorAll('img')];return Promise.all(im.map(x=>x.complete?0:new Promise(r=>{x.onload=x.onerror=r})))}).then(()=>window.print(),e=>alert(e&&e.stale?e.message+'.':'출력할 이미지를 불러오지 못했습니다.'))}
 /* 1층 사례 맵 출력 — 사례 맵 쪽만, 또는 그 유형의 근거 BD까지 한 번에(A4). 거르기와 상관없이 그 유형 전체가 나온다 */
 function prKeys(t,withBd){const cp=(D.case_pages||{})[t];if(!cp||!D.bd[cp]||!D.bd[cp].pages)return[];const s=D.sets.find(x=>x.key===t)||{};
   return [cp].concat(withBd?(s.bd||[]).filter(k=>D.bd[k]&&D.bd[k].pages):[])}
@@ -380,7 +380,7 @@ function printKeys(el,keys){if(el.dataset.busy)return;const jobs=[];keys.forEach
   const wk=()=>nx<jobs.length?(j=>bdImg(jobs[j][0],jobs[j][1]).then(u=>{us[j]=u;el.textContent=`불러오는 중 ${++done}/${jobs.length}`}))(nx++).then(wk):Promise.resolve();
   Promise.all([wk(),wk(),wk()]).then(()=>us)
     .then(us=>{pr.innerHTML=us.map(u=>`<img src="${A(u)}" alt="">`).join('');const im=[...pr.querySelectorAll('img')];return Promise.all(im.map(x=>x.complete?0:new Promise(r=>{x.onload=x.onerror=r})))})
-    .then(()=>window.print(),()=>alert('출력할 쪽을 불러오지 못했습니다. 잠시 뒤 다시 눌러 주세요.'))
+    .then(()=>window.print(),e=>alert(e&&e.stale?e.message+'.':'출력할 쪽을 불러오지 못했습니다. 잠시 뒤 다시 눌러 주세요.'))
     .then(()=>{delete el.dataset.busy;el.textContent=label})}
 
 function render(){
