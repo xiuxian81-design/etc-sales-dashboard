@@ -145,6 +145,9 @@ button,textarea{font-family:inherit}
 .dt .cd h2 .cpy{font-size:13.5px}.dt .pkt b{font-size:16px}.dt .pkt small{font-size:13.5px}.dt .pk .btn{font-size:14.5px}
 @media(max-width:1000px){.dt .tag{font-size:15.5px}}
 @media(max-width:600px){.dt .dh .l h1{font-size:20.5px}.dt .dh .r{width:auto}.dt .kv{grid-template-columns:68px 1fr}.dt .sp30{font-size:17px}.dt .tag{font-size:15px}}
+/* 11-22 박본님: 1층(사례 맵 첫 화면) 글씨 10% 키움 — 왼쪽 칸·목록·FAQ 답변 창을 통째로 1.1배(칸 너비 안에서 다시 줄바꿈). 머리줄·2층·3층은 그대로 */
+.wrap>.side,.wrap>.main,#pop{zoom:1.1}
+#pop{left:256px;bottom:16px;max-width:calc((100% - 280px)/1.1);max-height:calc((100% - 90px)/1.1)}
 #prn{display:none}
 @media print{
  @page{size:A4;margin:8mm}
