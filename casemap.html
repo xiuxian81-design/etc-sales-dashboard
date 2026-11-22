@@ -191,33 +191,38 @@ const PM_NOTE='PM 문의는 담당 PM에게 메일로 전달되고 접수 기록
 let WHO_T='계정 확인 중';
 function whoText(){return WHO_T}
 let _cmN=0;window.__cmRetrying=0;
-function gcall1(doc,params,ms){return new Promise((res,rej)=>{ // D에 JSONP 1번 — 열람 거절이면 머리의 안내·재로그인으로
+function gcall1(doc,params,ms,quiet){return new Promise((res,rej)=>{ // D에 JSONP 1번 — 열람 거절이면 머리의 안내·재로그인으로(quiet = 미리 받기: 안내·이동 없이 실패만)
   const tok=window.__gateTok();
-  if(!tok){window.__gateGo('no_token');const er=new Error('계정 확인이 필요합니다');er.gate=1;return rej(er)}
+  if(!tok){if(!quiet)window.__gateGo('no_token');const er=new Error('계정 확인이 필요합니다');er.gate=1;return rej(er)}
   const fn='__cm'+(++_cmN)+'_'+Date.now().toString(36),s=document.createElement('script');let got=0;
   const end=()=>{clearTimeout(to);s.remove()};
   const to=setTimeout(()=>{end();window[fn]=function(){};rej(new Error('응답이 없습니다'))},ms||60000); // 늦게 온 옛 응답은 빈 함수가 받는다(무시)
   window[fn]=r=>{got=1;end();try{delete window[fn]}catch(e){}
-    if(r&&r.auth==='required'){window.__gateGuard(r);const er=new Error('열람 확인이 필요합니다');er.gate=1;return rej(er)} // 안내·재로그인은 머리가 한다
+    if(r&&r.auth==='required'){if(!quiet)window.__gateGuard(r);const er=new Error('열람 확인이 필요합니다');er.gate=1;return rej(er)} // 안내·재로그인은 머리가 한다
     res(r)};
   s.onload=()=>{if(got)return;end();window[fn]=function(){};rej(new Error('응답이 비었습니다'))}; // 응답이 왔는데 자료가 아님(서버 오류 화면 등) — 기다리지 않고 바로 다시
   s.onerror=()=>{end();window[fn]=function(){};rej(new Error('서버에 연결하지 못했습니다'))};
   s.src=window.__DATA+'?doc='+doc+'&callback='+fn+Object.keys(params||{}).map(k=>'&'+k+'='+encodeURIComponent(params[k])).join('')+'&_='+Date.now()+'&tok='+encodeURIComponent(tok);
   document.head.appendChild(s)})}
-/* 11-22 박본님 '받기·출력이 계속 안 됨': 서버(D)가 요청의 10~20%에 응답하지 않는다(라이브 실측 — D 웹앱 시작 단계, 다른 웹앱은 0%).
-   → 응답이 없으면 그 요청을 버리고 새 이름으로 다시 보낸다(최대 4번, 사이 1·2·3초, 기다림 20·20·30·45초 — 느린 망에서 큰 조각이 잘리지 않게 뒤로 갈수록 길게).
+/* 11-22 박본님 '받기·출력이 계속 안 됨': 서버(D)가 요청의 7~20%에 응답하지 않는다(라이브 실측 — D 웹앱 시작 단계, 다른 웹앱은 0%).
+   → 응답이 없으면 새 이름으로 다시 보낸다(모두 4번, 기다림 20·20·30·45초, 사이 1·2·3초 — 느린 망에서 큰 조각이 잘리지 않게 뒤로 갈수록 길게).
+   11-22 13:13 박본님 '너무 느려' → 겹쳐 보내기: 첫 요청이 9초 안에 안 오면 첫 요청은 둔 채 두 번째를 보내고 먼저 온 답을 쓴다(정상 응답 2.9~7.0초 — 끊긴 판 20초 기다림을 9초로).
    열람 거절·서버의 분명한 답(no_file·bad_req 등)은 다시 보내지 않는다. PM 문의는 메일이 두 번 갈 수 있어 다시 보내지 않는다. */
-const RETRY_T=[20000,20000,30000,45000],RETRY_GAP=[1000,2000,3000];
+const RETRY_T=[20000,20000,30000,45000],RETRY_GAP=[1000,2000,3000],HEDGE=9000;
 function cmTick(){document.querySelectorAll('[data-busy]').forEach(e=>e.__show&&e.__show())} // 받는 중인 단추 글 다시 쓰기('다시 받는 중')
-function gcall(doc,params,ms){
+function gcall(doc,params,ms,quiet){
   if(doc==='casemapask')return gcall1(doc,params,ms);
-  const T=window.__cmRT||RETRY_T;let k=0,rt=0; // __cmRT = 시험용 기다림(verify_casemap_gate.py)
-  const off=()=>{if(rt){rt=0;window.__cmRetrying--;cmTick()}};
-  const go=()=>gcall1(doc,params,T[k]).catch(e=>{
-    if(e.gate||++k>=T.length)throw e;
-    if(!rt){rt=1;window.__cmRetrying++;cmTick()}
-    return new Promise(r=>setTimeout(r,RETRY_GAP[k-1]||3000)).then(go)});
-  return go().then(r=>{off();return r},e=>{off();throw e})}
+  const T=window.__cmRT||RETRY_T,H=window.__cmHedge||HEDGE; // __cmRT·__cmHedge = 시험용 기다림(verify_casemap_gate.py)
+  return new Promise((res,rej)=>{let k=0,live=0,done=0,rt=0,ht=0;
+    const fin=(f,v)=>{if(done)return;done=1;clearTimeout(ht);if(rt){rt=0;window.__cmRetrying--;cmTick()}f(v)};
+    const send=()=>{const i=k++;live++;
+      if(i>0&&!rt){rt=1;window.__cmRetrying++;cmTick()}
+      gcall1(doc,params,T[i],quiet).then(r=>fin(res,r),e=>{live--;if(done)return;
+        if(e.gate)return fin(rej,e);
+        if(k>=T.length){if(!live)fin(rej,e);return}
+        if(!live){clearTimeout(ht);setTimeout(()=>{if(!done)send()},RETRY_GAP[k-1]||3000)}}); // 겹쳐 보낸 다른 요청이 아직 살아 있으면 그 답을 기다린다
+      if(i===0)ht=setTimeout(()=>{if(!done&&k===1)send()},H)};
+    send()})}
 function b64bytes(b){const s=atob(b),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u}
 async function loadData(){
   const r=await gcall('casemap',{});
@@ -226,10 +231,10 @@ async function loadData(){
 }
 const STALE='자료가 막 갱신되었거나 갱신 중입니다. 화면을 새로고침한 뒤 다시 받아 주세요'; // 옛 화면이 지난 판 파일을 찾을 때(서버 no_file)·받은 PDF가 자료와 다를 때 같은 안내
 const _bdC=new Map(); // 받은 쪽 이미지는 이 화면이 열려 있는 동안 다시 받지 않는다
-function bdImg(key,page){ // 쪽 이미지 주소(약속) — 화면이 그 쪽을 열 때만 서버에서 받는다
+function bdImg(key,page,quiet){ // 쪽 이미지 주소(약속) — 화면이 그 쪽을 열 때, 또는 미리 받기(quiet)로 서버에서 받는다
   const id=key+'|'+page;if(_bdC.has(id))return _bdC.get(id);
   const b=(D&&D.bd[key])||{};
-  const pr=gcall('casemapbd',{k:b.fid||'',p:page}).then(r=>{if(r&&r.err==='no_file'){const er=new Error(STALE);er.stale=1;throw er}if(!r||r.ok!==1||!r.b64)throw new Error('이미지 없음');return URL.createObjectURL(new Blob([b64bytes(r.b64)],{type:r.mime||'image/png'}))});
+  const pr=gcall('casemapbd',{k:b.fid||'',p:page},0,quiet).then(r=>{if(r&&r.err==='no_file'){const er=new Error(STALE);er.stale=1;throw er}if(!r||r.ok!==1||!r.b64)throw new Error('이미지 없음');return URL.createObjectURL(new Blob([b64bytes(r.b64)],{type:r.mime||'image/png'}))});
   _bdC.set(id,pr);pr.catch(()=>_bdC.delete(id));return pr;
 }
 function bdPdfHref(key){return '#'}
@@ -370,7 +375,15 @@ function vbd(){
   <div class="vl">${keys.map((k,j)=>`<div class="${j===i?'on':''}" onclick="jump(${j})">${j+1}. ${E((D.bd[k]||{}).title||k)}</div>`).join('')}</div></div>`}
 function bdDone(){const l=$('bdld');if(l)l.remove()}
 function bdFail(el,e){if(el.dataset.ok==='0')return;el.dataset.ok='0';bdDone();el.insertAdjacentHTML('afterend','<span class=err>'+E(e&&e.stale?e.message:'이미지를 불러오지 못했습니다')+'</span>')} // e.stale = 자료가 갱신돼 옛 화면이 지난 판을 찾음(게이트판)
-function fillBd(){const el=$('bdimg');if(!el)return;bdImg(el.dataset.k,+el.dataset.p).then(u=>{el.src=u},e=>bdFail(el,e))} // 화면이 그 쪽을 열 때만 받는다
+function fillBd(){const el=$('bdimg');if(!el)return;const g=PF;bdImg(el.dataset.k,+el.dataset.p).then(u=>{el.src=u;pfNext(g)},e=>bdFail(el,e))} // 화면이 그 쪽을 열 때 받고, 다 받으면 다음 쪽 1장을 미리
+/* 11-22 13:13 박본님 '너무 느려 — 인쇄는 더 느려': 미리 받기. 2층(사례 상세)에 2초 머물면 그 유형 '한번에 출력'에 쓰는 쪽 이미지(근거 BD+보조 근거)를 뒤에서 2개씩,
+   3층(BD 보기)은 다음 쪽 1장. 화면을 바꾸면(PF가 바뀌면) 아직 안 보낸 것은 보내지 않는다. 받은 것은 _bdC(게이트판)에 남아 같은 유형 사례끼리 같이 쓴다.
+   실패해도 알리지 않는다(누르면 다시 받음). PDF는 미리 받지 않는다(열람로그 '받음'의 뜻 유지). ★열람로그 casemapbd 줄에 '실제로 안 본 쪽'이 섞인다 */
+let PF=0;
+function pfRun(g,jobs,n){if(window.__cmNoPF)return;let nx=0;const wk=()=>{if(g!==PF||nx>=jobs.length)return;const j=jobs[nx++];bdImg(j[0],j[1],1).then(wk,wk)};for(let i=0;i<n;i++)wk()}
+function pfCase(g,id){if(g!==PF)return;const c=D.cases.find(x=>String(x.id)===String(id)),pk=c&&(D.packs||{})[c.type];if(!pk)return;const jobs=[];
+  (pk.ev_keys||[]).filter(k=>D.bd[k]&&D.bd[k].pages).forEach(k=>{for(let j=1;j<=D.bd[k].pages;j++)jobs.push([k,j])});pfRun(g,jobs,2)}
+function pfNext(g){if(!VB)return;let{i,pg,keys}=VB;const n=k=>(D.bd[k]||{}).pages||1;if(pg<n(keys[i]))pg++;else if(i<keys.length-1){i++;pg=1}else return;pfRun(g,[[keys[i],pg]],1)}
 function goBd(i,pg){replace(mk('bd',{id:VB.c.id,s:VB.s.key,i,p:pg}))}
 function step(d){if(!VB)return;let{i,pg,keys}=VB;const n=k=>(D.bd[k]||{}).pages||1;
   if(d>0){if(pg<n(keys[i]))pg++;else if(i<keys.length-1){i++;pg=1}else return}else{if(pg>1)pg--;else if(i>0){i--;pg=n(keys[i])}else return}goBd(i,pg)}
@@ -402,9 +415,9 @@ function printKeys(el,keys){if(el.dataset.busy)return;const jobs=[];keys.forEach
     .then(()=>{delete el.dataset.busy;el.__show=null;el.textContent=label})}
 
 function render(){
-  if(!D)return;const r=route();closePop();VB=null;
+  if(!D)return;const r=route();closePop();VB=null;const g=++PF; // 미리 받기 세대 — 화면이 바뀌면 남은 미리 받기를 멈춘다
   document.title=D.meta.title;
-  if(r.v==='case')$('app').innerHTML=vcase(r.p.get('id'));
+  if(r.v==='case'){$('app').innerHTML=vcase(r.p.get('id'));setTimeout(()=>pfCase(g,r.p.get('id')),2000)}
   else if(r.v==='bd'){$('app').innerHTML=vbd();fillBd()}
   else{$('app').innerHTML=vmap();const q=r.p.get('q');if(q){$('fq').value=q;ask()}}
   window.scrollTo(0,0);
