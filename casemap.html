@@ -210,18 +210,18 @@ function gcall1(doc,params,ms,quiet){return new Promise((res,rej)=>{ // D에 JSO
    열람 거절·서버의 분명한 답(no_file·bad_req 등)은 다시 보내지 않는다. PM 문의는 메일이 두 번 갈 수 있어 다시 보내지 않는다. */
 const RETRY_T=[20000,20000,30000,45000],RETRY_GAP=[1000,2000,3000],HEDGE=9000;
 function cmTick(){document.querySelectorAll('[data-busy]').forEach(e=>e.__show&&e.__show())} // 받는 중인 단추 글 다시 쓰기('다시 받는 중')
-function gcall(doc,params,ms,quiet){
+function gcall(doc,params,ms,quiet){ // quiet = 미리 받기 — 알림·이동 없이, 겹쳐 보내지 않고, quiet()가 false(화면을 떠남)면 다시 보내지 않는다
   if(doc==='casemapask')return gcall1(doc,params,ms);
-  const T=window.__cmRT||RETRY_T,H=window.__cmHedge||HEDGE; // __cmRT·__cmHedge = 시험용 기다림(verify_casemap_gate.py)
+  const T=window.__cmRT||RETRY_T,H=quiet?0:(window.__cmHedge||HEDGE),want=typeof quiet==='function'?quiet:()=>true; // __cmRT·__cmHedge = 시험용 기다림(verify_casemap_gate.py)
   return new Promise((res,rej)=>{let k=0,live=0,done=0,rt=0,ht=0;
     const fin=(f,v)=>{if(done)return;done=1;clearTimeout(ht);if(rt){rt=0;window.__cmRetrying--;cmTick()}f(v)};
-    const send=()=>{const i=k++;live++;
-      if(i>0&&!rt){rt=1;window.__cmRetrying++;cmTick()}
-      gcall1(doc,params,T[i],quiet).then(r=>fin(res,r),e=>{live--;if(done)return;
+    const send=()=>{if(k>0&&!want())return fin(rej,new Error('미리 받기 멈춤'));const i=k++;live++;
+      if(i>0&&!rt&&!quiet){rt=1;window.__cmRetrying++;cmTick()}
+      gcall1(doc,params,T[i],!!quiet).then(r=>fin(res,r),e=>{live--;if(done)return;
         if(e.gate)return fin(rej,e);
         if(k>=T.length){if(!live)fin(rej,e);return}
         if(!live){clearTimeout(ht);setTimeout(()=>{if(!done)send()},RETRY_GAP[k-1]||3000)}}); // 겹쳐 보낸 다른 요청이 아직 살아 있으면 그 답을 기다린다
-      if(i===0)ht=setTimeout(()=>{if(!done&&k===1)send()},H)};
+      if(i===0&&H)ht=setTimeout(()=>{if(!done&&k===1)send()},H)};
     send()})}
 function b64bytes(b){const s=atob(b),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u}
 async function loadData(){
@@ -232,10 +232,12 @@ async function loadData(){
 const STALE='자료가 막 갱신되었거나 갱신 중입니다. 화면을 새로고침한 뒤 다시 받아 주세요'; // 옛 화면이 지난 판 파일을 찾을 때(서버 no_file)·받은 PDF가 자료와 다를 때 같은 안내
 const _bdC=new Map(); // 받은 쪽 이미지는 이 화면이 열려 있는 동안 다시 받지 않는다
 function bdImg(key,page,quiet){ // 쪽 이미지 주소(약속) — 화면이 그 쪽을 열 때, 또는 미리 받기(quiet)로 서버에서 받는다
-  const id=key+'|'+page;if(_bdC.has(id))return _bdC.get(id);
+  const id=key+'|'+page,c=_bdC.get(id);
+  if(c&&(c.done||!c.q||quiet))return c.pr; // 받았거나 받는 중이면 그대로 — 단 미리 받는 중인 쪽을 지금 누르면 아래에서 보통 요청을 같이 보내 먼저 온 답을 쓴다
   const b=(D&&D.bd[key])||{};
-  const pr=gcall('casemapbd',{k:b.fid||'',p:page},0,quiet).then(r=>{if(r&&r.err==='no_file'){const er=new Error(STALE);er.stale=1;throw er}if(!r||r.ok!==1||!r.b64)throw new Error('이미지 없음');return URL.createObjectURL(new Blob([b64bytes(r.b64)],{type:r.mime||'image/png'}))});
-  _bdC.set(id,pr);pr.catch(()=>_bdC.delete(id));return pr;
+  const one=gcall('casemapbd',{k:b.fid||'',p:page},0,quiet).then(r=>{if(r&&r.err==='no_file'){const er=new Error(STALE);er.stale=1;throw er}if(!r||r.ok!==1||!r.b64)throw new Error('이미지 없음');return URL.createObjectURL(new Blob([b64bytes(r.b64)],{type:r.mime||'image/png'}))});
+  let pr=one;if(c){const old=c.pr;pr=new Promise((res,rej)=>{let n=0;const f=e=>{if(++n===2)rej(e)};old.then(res,f);one.then(res,f)})}
+  const ent={pr,q:!!quiet,done:0};_bdC.set(id,ent);pr.then(()=>{ent.done=1},()=>{if(_bdC.get(id)===ent)_bdC.delete(id)});return pr;
 }
 function bdPdfHref(key){return '#'}
 const _pdfC=new Map(); // fid → 받아 이어 붙인 PDF 주소(blob). 11-22 박본님 '계속 다운로드 실패': 저장 창이 떠 있는 사이 주소를 지우면 실패 → 화면이 열려 있는 동안 남겨 두고, 같은 PDF를 다시 누르면 받지 않고 바로 저장
@@ -380,7 +382,7 @@ function fillBd(){const el=$('bdimg');if(!el)return;const g=PF;bdImg(el.dataset.
    3층(BD 보기)은 다음 쪽 1장. 화면을 바꾸면(PF가 바뀌면) 아직 안 보낸 것은 보내지 않는다. 받은 것은 _bdC(게이트판)에 남아 같은 유형 사례끼리 같이 쓴다.
    실패해도 알리지 않는다(누르면 다시 받음). PDF는 미리 받지 않는다(열람로그 '받음'의 뜻 유지). ★열람로그 casemapbd 줄에 '실제로 안 본 쪽'이 섞인다 */
 let PF=0;
-function pfRun(g,jobs,n){if(window.__cmNoPF)return;let nx=0;const wk=()=>{if(g!==PF||nx>=jobs.length)return;const j=jobs[nx++];bdImg(j[0],j[1],1).then(wk,wk)};for(let i=0;i<n;i++)wk()}
+function pfRun(g,jobs,n){if(window.__cmNoPF)return;let nx=0;const wk=()=>{if(g!==PF||nx>=jobs.length)return;const j=jobs[nx++];bdImg(j[0],j[1],()=>g===PF).then(wk,wk)};for(let i=0;i<n;i++)wk()}
 function pfCase(g,id){if(g!==PF)return;const c=D.cases.find(x=>String(x.id)===String(id)),pk=c&&(D.packs||{})[c.type];if(!pk)return;const jobs=[];
   (pk.ev_keys||[]).filter(k=>D.bd[k]&&D.bd[k].pages).forEach(k=>{for(let j=1;j<=D.bd[k].pages;j++)jobs.push([k,j])});pfRun(g,jobs,2)}
 function pfNext(g){if(!VB)return;let{i,pg,keys}=VB;const n=k=>(D.bd[k]||{}).pages||1;if(pg<n(keys[i]))pg++;else if(i<keys.length-1){i++;pg=1}else return;pfRun(g,[[keys[i],pg]],1)}
