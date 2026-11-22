@@ -219,12 +219,17 @@ function bdPdf(a){ // PDF 받기 — 서버가 나눠 둔 조각을 3개씩 받�
   const key=a.dataset.k,b=(D&&D.bd[key])||{},n=b.pdfn||0,label=a.textContent,parts=new Array(n);
   if(!n||!b.fid){alert('이 자료는 PDF가 없습니다.');return false}
   a.dataset.busy='1';let next=0,done=0;a.textContent='받는 중 0/'+n;
-  const one=i=>gcall('casemappdf',{k:b.fid,i:i},120000).then(r=>{if(!r||r.ok!==1||!r.b64)throw new Error('조각 '+(i+1)+' 없음');parts[i]=b64bytes(r.b64);a.textContent='받는 중 '+(++done)+'/'+n});
+  const STALE='자료가 막 갱신되었거나 갱신 중입니다. 화면을 새로고침한 뒤 다시 받아 주세요';
+  const one=i=>gcall('casemappdf',{k:b.fid,i:i},120000).then(r=>{if(r&&r.err==='no_file')throw new Error(STALE);if(!r||r.ok!==1||!r.b64)throw new Error('조각 '+(i+1)+' 없음');parts[i]=b64bytes(r.b64);a.textContent='받는 중 '+(++done)+'/'+n});
   const work=()=>next<n?one(next++).then(work):Promise.resolve();
-  Promise.all([work(),work(),work()]).then(()=>{
+  // 11-22 검토관 🔴: 이어 붙인 PDF를 자료의 sha256과 대조 — 옛·새 조각이 섞이면 저장하지 않고 새로고침 안내
+  const check=()=>{if(!b.sha||!(window.crypto&&crypto.subtle))return Promise.resolve();let len=0;parts.forEach(p=>len+=p.length);
+    if(b.size&&len!==b.size)return Promise.reject(new Error(STALE));const all=new Uint8Array(len);let o=0;parts.forEach(p=>{all.set(p,o);o+=p.length});
+    return crypto.subtle.digest('SHA-256',all).then(h=>{const hx=Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join('');if(hx!==b.sha)throw new Error(STALE)})};
+  Promise.all([work(),work(),work()]).then(check).then(()=>{
     const u=URL.createObjectURL(new Blob(parts,{type:'application/pdf'})),x=document.createElement('a');
     x.href=u;x.download=(b.file||key)+'.pdf';document.body.appendChild(x);x.click();x.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)
-  }).catch(e=>alert('PDF를 받지 못했습니다 ('+e.message+'). 잠시 뒤 다시 눌러 주세요.')).then(()=>{delete a.dataset.busy;a.textContent=label});
+  }).catch(e=>alert(e.message===STALE?STALE+'.':'PDF를 받지 못했습니다 ('+e.message+'). 잠시 뒤 다시 눌러 주세요.')).then(()=>{delete a.dataset.busy;a.textContent=label});
   return false;
 }
 function pmSend(q,ctx){ // PM 문의 — 서버가 기록 1행 + 담당 PM 메일 1통
@@ -368,7 +373,9 @@ function prBtns(t){const a=prKeys(t,0),b=prKeys(t,1),pk=(D.packs||{})[t]||{};if(
 function printMap(el,withBd){printKeys(el,prKeys(el.dataset.t,withBd))}
 function printKeys(el,keys){if(el.dataset.busy)return;const jobs=[];keys.forEach(k=>{for(let j=1;j<=(D.bd[k].pages||1);j++)jobs.push([k,j])});if(!jobs.length)return;
   const label=el.textContent,pr=$('prn');let done=0;el.dataset.busy='1';el.textContent=`불러오는 중 0/${jobs.length}`;
-  Promise.all(jobs.map(x=>bdImg(x[0],x[1]).then(u=>{el.textContent=`불러오는 중 ${++done}/${jobs.length}`;return u})))
+  const us=new Array(jobs.length);let nx=0; // 11-22 검토관 🟡: 서버 요청은 3개씩(PDF 받기와 같은 방식 — 동시 실행 한도 보호)
+  const wk=()=>nx<jobs.length?(j=>bdImg(jobs[j][0],jobs[j][1]).then(u=>{us[j]=u;el.textContent=`불러오는 중 ${++done}/${jobs.length}`}))(nx++).then(wk):Promise.resolve();
+  Promise.all([wk(),wk(),wk()]).then(()=>us)
     .then(us=>{pr.innerHTML=us.map(u=>`<img src="${A(u)}" alt="">`).join('');const im=[...pr.querySelectorAll('img')];return Promise.all(im.map(x=>x.complete?0:new Promise(r=>{x.onload=x.onerror=r})))})
     .then(()=>window.print(),()=>alert('출력할 쪽을 불러오지 못했습니다. 잠시 뒤 다시 눌러 주세요.'))
     .then(()=>{delete el.dataset.busy;el.textContent=label})}
