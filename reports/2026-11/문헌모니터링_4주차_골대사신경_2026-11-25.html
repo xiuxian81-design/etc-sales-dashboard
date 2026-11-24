@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[문헌모니터링] 4주차 골대사·신경 (2026.11.25)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; font-size: 15px; line-height: 1.7; color: #1a1a2e; background: #f0f2f5; padding: 20px 0; }
+  .container { max-width: 820px; margin: 0 auto; padding: 0 16px; }
+  .info-box { background: #fff3e0; border: 2px solid #FF9800; border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+  .info-box h2 { color: #E65100; font-size: 18px; margin-bottom: 12px; }
+  .copy-btn { background: #FF9800; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; }
+  .mail-body { background: #fff; border-radius: 10px; padding: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px; }
+  .report-header { background: linear-gradient(135deg,#003366 0%,#1a5276 100%); color: #fff; border-radius: 14px; padding: 28px 32px; margin-bottom: 24px; }
+  .report-header h1 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+  .stat-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+  .stat-pill { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 16px; font-size: 13px; }
+  .stat-pill span { font-size: 20px; font-weight: 800; color: #1A5276; }
+  .exec-box { background: #fff; border-left: 5px solid #003366; border-radius: 0 10px 10px 0; padding: 18px 22px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .exec-box h3 { font-size: 13px; color: #003366; margin-bottom: 10px; font-weight: 700; }
+  .paper { background: #fff; border-radius: 14px; margin-bottom: 28px; box-shadow: 0 3px 12px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #e8eaf0; }
+  .paper-header { padding: 16px 22px; display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #f0f2f5; }
+  .paper-num { background: #003366; color: #fff; font-size: 12px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+  .stars-high { color: #c0392b; font-size: 16px; }
+  .stars-mid { color: #e67e22; font-size: 16px; }
+  .stars-low { color: #95a5a6; font-size: 16px; }
+  .tag-direct { background: #e8f4fd; color: #1a5276; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+  .tag-open { background: #e8f8e8; color: #1e8449; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+  .tag-wall { background: #fdf2f8; color: #7d3c98; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+  .paper-body { padding: 20px 22px; }
+  .paper-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; line-height: 1.5; }
+  .paper-url { font-size: 12px; color: #1a5276; margin-bottom: 14px; display: block; }
+  .design-badge { display: inline-block; background: #eaf2ff; color: #1a5276; font-size: 12px; font-weight: bold; padding: 3px 12px; border-radius: 6px; margin-bottom: 14px; }
+  .summary-grid { background: #fafbfc; border-radius: 10px; padding: 16px; margin-bottom: 14px; border: 1px solid #e8eaf0; }
+  .summary-grid h4 { font-size: 12px; color: #888; margin-bottom: 10px; }
+  .s-row { display: grid; grid-template-columns: 80px 1fr; gap: 6px 12px; margin-bottom: 8px; font-size: 13.5px; }
+  .s-label { font-weight: 700; color: #003366; }
+  .s-val { color: #333; line-height: 1.8; }
+  .s-val em { background: #fff3cd; padding: 0 4px; border-radius: 3px; font-style: normal; font-weight: bold; }
+  .key-nums { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+  .knum { background: #003366; color: #fff; border-radius: 10px; padding: 12px 16px; flex: 1; min-width: 140px; text-align: center; }
+  .knum .val { font-size: 22px; font-weight: 900; color: #1A5276; display: block; }
+  .knum .desc { font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 2px; }
+  .viz-section { border: 2px solid #e8eaf0; border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+  .viz-section h4 { font-size: 13px; font-weight: 700; color: #003366; margin-bottom: 4px; }
+  .chart-wrap { position: relative; height: 200px; }
+  .paywall-notice { background: #fdf2f8; border: 1px solid #d7bde2; border-radius: 8px; padding: 14px 18px; font-size: 13px; color: #7d3c98; }
+  .usage { background: linear-gradient(135deg,#fff8f0,#fff3e0); border-left: 4px solid #1A5276; border-radius: 0 10px 10px 0; padding: 14px 18px; font-size: 13.5px; line-height: 1.8; }
+  .usage h4 { font-size: 12px; color: #1A5276; font-weight: 700; margin-bottom: 6px; }
+  .usage li { margin-bottom: 4px; }
+  .legend { background: #fff; border-radius: 10px; padding: 18px 22px; margin-top: 8px; border: 1px solid #e8eaf0; font-size: 13px; }
+  .legend h4 { color: #003366; margin-bottom: 10px; }
+  .legend table { width: 100%; border-collapse: collapse; }
+  .legend td { padding: 6px 8px; border-bottom: 1px solid #f0f0f0; }
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>/*BR_EXTRA_CSS*/
+.papers{max-width:920px;margin:0 auto;padding:0 8px}
+.paper{border:1px solid #e3e7ee;border-radius:14px;margin:0 auto 26px;box-shadow:0 3px 12px rgba(0,0,0,.07);overflow:hidden;background:#fff}
+.paper-header{background:linear-gradient(135deg,#1A5276,#003366);color:#fff;padding:18px 22px}
+.paper-header .paper-title{color:#fff;font-size:16px;font-weight:800;line-height:1.5;margin:0 0 12px}
+.paper-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:#e3ecf6}
+.paper-meta-item{display:flex;align-items:center;gap:4px}
+.paper-meta-item strong{color:#fff;font-weight:600}
+.importance-badge{padding:3px 11px;border-radius:20px;font-weight:800;color:#1a1a2e}
+.importance-high{background:#FFD54F}.importance-mid{background:#90CAF9;color:#0d2b45}.importance-low{background:#cfd8dc;color:#37474f}
+.evidence-tag{padding:3px 11px;border-radius:20px;font-weight:700;color:#fff;background:#2E8B72}
+.evidence-ref{background:#8896a5}
+.bd-request-btn{background:#fff;color:#003366;border:none;padding:7px 16px;border-radius:7px;font-size:12.5px;font-weight:800;cursor:pointer;margin-left:auto;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.bd-request-btn:hover{background:#ffe9b3}.bd-request-btn:disabled{background:#b9c2cc;color:#fff;cursor:not-allowed}
+.paper-header a,.paper-url{color:#cfe0f5 !important;font-size:11px;word-break:break-all}
+.paper-content{padding:18px 22px}
+.content-section{border-left:4px solid #d3dce6;padding:6px 0 6px 16px;margin:0 0 12px}
+.content-section-title{font-size:13px;font-weight:800;color:#1A5276;margin-bottom:4px;letter-spacing:.2px}
+.content-section-text{font-size:13.5px;line-height:1.7;color:#2b2b38}
+.content-section-text strong{color:#003366}
+.content-section.cs-key{border-left-color:#003366;background:#f3f8fd;border-radius:8px;padding:11px 16px}
+.content-section.cs-key .content-section-title{color:#003366}
+.key-numbers{background:#fff8e6;border:1px solid #f1dea0;border-radius:10px;padding:13px 18px;margin:14px 0}
+.key-numbers h4{margin:0 0 8px;color:#8a6a00;font-size:13.5px}
+.key-numbers ul{margin:0;padding-left:20px}.key-numbers li{font-size:13px;line-height:1.55;margin:4px 0;color:#5a4600}
+.viz-section{background:#f5f9fd;border:1px solid #d9e6f2;border-radius:10px;padding:15px 18px;margin:14px 0}
+.viz-section h4{margin:0 0 10px;color:#003366;font-size:13.5px}
+.usage-box{background:#ecf7f3;border:1px solid #bfe2d7;border-left:5px solid #2E8B72;border-radius:10px;padding:14px 18px;margin:14px 0}
+.usage-box h4{margin:0 0 8px;color:#1d6b59;font-size:13.5px}
+.usage-head{font-weight:800;color:#135344;font-size:13.5px;line-height:1.55;margin-bottom:7px;padding-bottom:7px;border-bottom:1px dashed #bfe2d7}
+.usage-box ul{margin:0;padding-left:20px}.usage-box li{font-size:13px;line-height:1.6;margin:5px 0;color:#244b43}
+</style>
+
+</head>
+<body>
+<div class="container">
+<div class="info-box">
+  <h2>📧 메일 발송 안내</h2>
+  <div style="margin: 8px 0;"><strong>수신자:</strong> aaaa81@hanall.co.kr</div>
+  <div style="margin: 8px 0;"><strong>제목:</strong> <span id="mailSubject">[문헌모니터링] 4주차 골대사·신경 (2026.11.25)</span></div>
+  <button class="copy-btn" onclick="copyText()">본문 복사</button>
+</div>
+
+<div class="mail-body">
+  <div id="mailContent">
+    <div class="report-header">
+      <span style="display:inline-block; background: #1A5276; color: #fff; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px;">4주차 골대사·신경</span>
+      <h1>알파본D + 프레논OD 월간 업데이트</h1>
+      <div style="font-size: 13px; color: rgba(255,255,255,0.75); margin-top: 12px; display: flex; gap: 16px; flex-wrap: wrap;">
+        <span>📅 2026.11.25</span>
+        <span>🏥 신경병증성 통증·골대사</span>
+      </div>
+      <div class="stat-row">
+        <div class="stat-pill">논문 <span>8</span>건</div>
+        <div class="stat-pill">★★★ <span>2</span>건</div>
+        <div class="stat-pill">직접근거 <span>4</span>건</div>
+        <div class="stat-pill">오픈액세스 <span>4</span>건</div>
+      </div>
+    </div>
+
+    <div class="exec-box">
+      <h3>EXECUTIVE SUMMARY</h3>
+      <p>2025~2026년 alfacalcidol 및 pregabalin 관련 주요 문헌을 검토한 결과, <strong>pregabalin 영역에서 활발한 연구 성과</strong>가 발표되었다. Lancet Neurology에 게재된 NeuPSIG 가이드라인 업데이트(313개 RCT, 48,789명)에서 α2δ-리간드(pregabalin 포함)가 신경병증성 통증 1차 치료제로 강력 권고되었고, pregabalin이 gabapentin 대비 우월한 진통 효과를 보인 메타분석, 요통 및 당뇨병성 신경병증에서의 효능·안전성 데이터가 축적되고 있다.</p>
+    </div>
+        <div class="papers">
+
+            <!-- ━━━ 논문 #1 (골대사·신경) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Comparative Effectiveness of Pregabalin With Duloxetine Versus Pregabalin With Amitriptyline in Chronic Low Back Pain With Radiculopathy: A Prospective Comparative Study</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Health Science Reports</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-09-13</div>
+                        <button class="bd-request-btn" data-title="Comparative Effectiveness of Pregabalin With Duloxetine Versus Pregabalin With Amitriptyline in Chronic Low Back Pain With Radiculopathy: A Prospective Comparative Study" data-session="골대사·신경" data-num="1" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42741512/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">전향적 비무작위 비교연구</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">신경뿌리병증(radiculopathy)을 동반한 만성 요통(CLBP)은 신경병증성 성격이 강해 일반 요통보다 통증·기능장애가 크고, 단독요법으로 의미 있는 통증 완화를 얻는 환자는 절반에 못 미친다. 프레가발린은 α2δ 서브유닛 결합으로 중추감작을 줄이지만 단독 효과가 제한적이어서, 하행억제 경로를 강화하는 항우울제(SNRI·TCA)와의 병용이 실제 처방에서 널리 쓰인다. 그러나 &#x27;프레가발린+둘록세틴&#x27;과 &#x27;프레가발린+아미트립틸린&#x27;을 신경뿌리병증 요통에서 직접 비교한 연구는 거의 없어, 방글라데시 3차병원에서 두 병용 전략을 비교했다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">단일기관(다카의대병원) 전향적·비무작위·공개 준실험 비교연구(2024.7~2025.12, 임상시험 미등록). 18~65세, 요통 3개월 이상, NPRS ≥4, 임상기준으로 진단한 신경뿌리병증 환자 76명을 등록 순서대로 교대 배정: Group I 프레가발린+둘록세틴 38명, Group II 프레가발린+아미트립틸린 38명. 프레가발린은 25mg 1일1회(1~4주)→50mg(~8주)→75mg(~12주)→75mg 1일2회(~24주)로 저용량 점증, 둘록세틴 20mg→30mg, 아미트립틸린 10mg→25mg. 추적 4·8·12·24주. 주 평가변수 NPRS(통증), 주요 2차 ODI(기능장애). 기저 불균형(기저 NPRS 9.03 vs 9.50, ODI 73.45 vs 82.63; 둘록세틴군이 경증)이 있어 기저값 보정 ANCOVA를 1차 군간 분석으로, 비보정 t-test·반응자·MCID 분석은 2차·탐색적으로 두었다. 탈락·결측 0명.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">비보정 비교에서 24주(4차 추적) NPRS는 프레가발린+둘록세틴군 3.54 vs 프레가발린+아미트립틸린군 5.09(차이 −1.54, 95% CI −2.72 to −0.37; p=0.01), ODI는 41.49% vs 48.95%(차이 −7.46, 95% CI −13.40 to −1.52; p=0.01)였고, Holm 보정 후에도 8개 비교 모두 유의했다.<br/>
+24주 NPRS 감소폭은 5.48점(95% CI 4.84–6.13; 61.3% 개선) vs 4.41점(95% CI 3.59–5.23; 47.6%)으로 두 군 모두 MCID(약 2점)를 넘었다.<br/>
+통증 ≥30% 감소 반응률은 100%(38/38) vs 78.9%(30/38)(RD 21.1%, p=0.005), ≥50% 감소는 60.5% vs 34.2%(RD 26.3%, 95% CI 4.7–48.0; p=0.04).<br/>
+그러나 기저값 보정 ANCOVA에서는 군간 차이가 사라졌다(24주 NPRS 보정차 −0.11, 95% CI −1.08 to 0.87; p=0.83, NPRS 전 시점 p&gt;0.55·ODI 전 시점 p&gt;0.46).<br/>
+즉 두 프레가발린 병용 모두 통증·기능을 크게 개선했으나, 병용 상대약 간 효능 우열은 입증되지 않았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">참가자당 &#x27;가장 불편한 이상반응 1건&#x27;만 개방형 문진으로 기록한 한계가 있다. 진정(sedation)은 아미트립틸린 병용군 31.6%(12/38) vs 둘록세틴 병용군 7.9%(3/38)(RD −23.7%, p=0.02), 졸림(drowsiness) 39.5% vs 13.2%(p=0.02), 어지럼(vertigo) 26.3% vs 10.5%(p=0.14, 비유의). 이상반응 무보고는 둘록세틴 병용군 68.4% vs 아미트립틸린 병용군 2.6%(p&lt;0.001). 중대 이상반응·중단율은 수집하지 않았다. 프레가발린은 양 군 공통이라 프레가발린 자체의 이상반응 차이는 평가 대상이 아니다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자 결론: 두 프레가발린 병용 모두 24주간 통증·장애가 MCID 이상 개선됐으나, 기저 불균형 보정 후 둘록세틴 병용의 효능 우위는 유의하지 않아 우월성을 주장할 수 없고, 진정·졸림이 적은 내약성 신호만 탐색적으로 관찰됐다. 한계: 비무작위·공개·미등록, 단일기관 76명(사후검정력 약 74%), 서구 권장량보다 낮은 용량, 여성 약 80%, 위약 대조 없음(평균회귀 가능). 프레논OD 관점: 저용량 점증 프레가발린(최대 150mg/일)을 기반으로 한 병용 전략에서 큰 폭의 통증 감소가 관찰돼, 신경병증성 요통에서 &#x27;프레가발린 기반 병용 + 진정 부담이 적은 병용약 선택&#x27; 대화 소재가 된다(일반정 연구이므로 OD 제형 효과는 별도).</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>24주 NPRS 감소 5.48점(61.3%) vs 4.41점(47.6%) — 두 프레가발린 병용 모두 MCID 초과</li>
+                            <li>통증 ≥50% 감소 60.5% vs 34.2%(p=0.04, 비보정)</li>
+                            <li>기저 보정 ANCOVA 24주 NPRS 차이 −0.11(p=0.83) — 병용약 간 우열 없음</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 24주 NPRS 감소폭(점) — 두 프레가발린 병용 모두 MCID(약 2점) 초과 (비보정, 비무작위)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart1"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart1"), {
+                            type: "bar",
+                            data: { labels: ["24주 NPRS 감소(점)", "통증 개선률(%)"], datasets: [
+                              { label: "프레가발린+둘록세틴", data: [5.48, 61.3], backgroundColor: "#1A5276" },
+                              { label: "프레가발린+아미트립틸린", data: [4.41, 47.6], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 신경뿌리병증 요통에서 프레가발린 기반 병용(둘록세틴 vs 아미트립틸린) 24주 비교 — 두 병용 모두 통증 MCID 초과 개선, 병용약 간 효능 우열은 보정 후 없음</div><ul><li>디테일링: &#x27;프레가발린을 기본축으로 두고 병용약을 고르는&#x27; 처방 흐름 설명 시, 두 병용 모두 24주 NPRS 4~5점 이상 감소(61.3%·47.6% 개선)했다는 수치를 근거로 활용 — 단 비무작위 연구임을 함께 언급</li><li>내약성 대화: 아미트립틸린 병용에서 진정·졸림이 더 많았다는 관찰(탐색적)을 근거로, 고령·주간 활동이 많은 환자에서 병용약 선택 시 진정 부담을 고려하자는 메시지로 사용(프레가발린 자체 비교 아님 명시)</li><li>주의: 요통 신경뿌리병증은 국내 허가 적응증(신경병증성 통증) 범위 내 표현으로 한정하고, 일반정 연구이므로 OD 제형 우월성 주장 금지</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #2 (골대사·신경) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Pharmacological Interventions for Osteoporosis in Kidney Transplant Recipients: A Systematic Review and Meta-analysis</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Kidney Medicine</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-09-17</div>
+                        <button class="bd-request-btn" data-title="Pharmacological Interventions for Osteoporosis in Kidney Transplant Recipients: A Systematic Review and Meta-analysis" data-session="골대사·신경" data-num="2" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42965180/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">체계적문헌고찰·메타분석(RCT 33편)</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">신장이식 수혜자(KTR)의 골다공증 유병률은 부위에 따라 15~34%이며, 이식 후 6~18개월에 고용량 스테로이드·지속성 부갑상선기능항진증(CKD-MBD)·칼시뉴린억제제 영향으로 골소실과 골절 위험이 가장 크다. KDIGO는 이식 1년 내 저골밀도·eGFR&gt;30 환자에게 활성형/비활성형 비타민D와 골흡수억제제를 우선 권고하지만, 약제군별 효과를 비교한 근거는 부족해 약물 중재 전반을 RCT 메타분석으로 정리했다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">PRISMA 준수, PROSPERO 등록(CRD420251271837). PubMed·Scopus·Cochrane에서 2024.12.31까지 검색해 성인 KTR 대상 약물 중재 vs 위약/활성대조 RCT 33편을 포함. 중재: 비스포스포네이트(파미드로네이트·알렌드로네이트·졸레드론산 등), 활성형 비타민D(알파칼시돌 RCT 3편[El-Agroudy 2003·2005, Trabulus 2008], 칼시트리올 2편, 파리칼시톨 2편, 1-hydroxy vitamin D 1편), 천연 비타민D, 칼시토닌, 데노수맙, 테리파라타이드 등. 결과: iPTH·혈청 칼슘·인·골표지자·비타민D 대사체, 요추·대퇴경부·고관절·요골 BMD, 골절. 무작위효과모형, 연속형은 WMD(95% CI), 이분형은 RR. 추적은 대부분 6~12개월. RoB2: 저위험 12편(36.4%), 일부 우려 15편, 고위험 6편.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">총 33편 RCT. iPTH는 전체 중재에서 유의 변화가 없었으나(31편, n=2,271; WMD −4.73 pg/mL, 95% CI −11.78 to 2.32; P=0.19), 활성형 비타민D 하위군만 유의하게 낮췄다(WMD −25.18 pg/mL, 95% CI −32.59 to −17.78; P&lt;0.001; I²=0%).<br/>
+대퇴경부 BMD는 전체적으로 개선됐고(27편, n=1,442; WMD 0.05 g/cm², 95% CI 0.03–0.07; P&lt;0.001), 활성형 비타민D 하위군(WMD 0.05 g/cm², 95% CI 0.03–0.08; P&lt;0.001; I²=53.78%)이 비스포스포네이트 하위군(WMD 0.05 g/cm², 95% CI 0.03–0.08; P&lt;0.001)과 같은 크기의 개선을 보였다.<br/>
+요추 BMD는 전체 소폭 증가(30편, n=1,749; WMD 0.04 g/cm², P=0.04)했으며 주로 비스포스포네이트(15편; WMD 0.05 g/cm², P=0.002)가 견인했다.<br/>
+혈청 칼슘은 전체 소폭 상승(WMD 0.38 mg/dL, 95% CI 0.03–0.72; P=0.03)했고 주로 활성형 비타민D가 기여했다.<br/>
+골절은 3편(750명)만 보고돼 감소 경향이었으나 경계적 비유의(RR 0.38, 95% CI 0.14–1.01; P=0.05).</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">이상반응 보고가 표준화되지 않아 통합 안전성 분석은 수행되지 않았다(저자 명시 한계). 대사 지표상 혈청 칼슘의 전체 소폭 상승(WMD 0.38 mg/dL)이 주로 활성형 비타민D 군에서 비롯됐다 — [정독관 해석] 활성형 투여 시 고칼슘혈증 모니터링이 필요함을 시사한다. 저자 논의(선행문헌 인용)에 따르면 비스포스포네이트는 혈청 칼슘을 안정적으로 유지했고, 데노수맙은 칼슘·비타민D 병용 시 일시적·무증상 저칼슘혈증이 드물었다. 칼시토닌은 안전성 우려로 현재 임상 사용이 제한적이라고 언급됐다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자 결론: KTR에서 약물 중재는 단기적으로 BMD를 보존·개선하며 비스포스포네이트 근거가 가장 일관적이고, 활성형 비타민D는 약물군 중 유일하게 iPTH를 유의하게 낮췄다(저자: 활성형 비타민D 유사체가 PTH 과잉을 줄이는 데 도움될 수 있음). 저자 명시 한계: 이질성 매우 큼(I² 80~99%), 대부분 1년 이하 추적, 골절 자료 3편뿐, 일부 약제군은 소수·소규모 시험, 이상반응 보고 비표준. [정독관 추론] 활성형 비타민D 하위군이 알파칼시돌·칼시트리올·파리칼시톨을 통합해 성분별 효과를 분리할 수 없다. 알파본D 관점: 알파칼시돌 RCT를 포함한 활성형 비타민D 계열이 이식 후 &#x27;부갑상선호르몬 억제 + 대퇴경부 BMD 개선&#x27;을 동시에 보인 메타분석 근거로, CKD-MBD·이식 환자에서 활성형의 이점을 설명할 참고근거다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>활성형 비타민D: iPTH WMD −25.18 pg/mL(P&lt;0.001) — 약물군 중 유일한 유의 감소</li>
+                            <li>활성형 비타민D: 대퇴경부 BMD WMD +0.05 g/cm²(P&lt;0.001) — 비스포스포네이트와 동일 크기</li>
+                            <li>골절 RR 0.38(95% CI 0.14–1.01; P=0.05, 3편) — 경계적 비유의</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 신장이식 후 대퇴경부 BMD 하위군 효과(WMD, g/cm²) — 활성형 비타민D가 비스포스포네이트와 같은 폭 개선(둘 다 P&lt;0.001)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart2"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart2"), {
+                            type: "bar",
+                            data: { labels: ["대퇴경부 BMD (g/cm²)"], datasets: [
+                              { label: "활성형 비타민D", data: [0.05], backgroundColor: "#1A5276" },
+                              { label: "비스포스포네이트", data: [0.05], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 신장이식 후 골다공증 RCT 33편 메타분석 — 활성형 비타민D가 약물군 중 유일하게 iPTH를 낮추고(−25.18 pg/mL) 대퇴경부 BMD를 비스포스포네이트와 같은 폭(+0.05 g/cm²)으로 개선</div><ul><li>신장내과·이식외과 디테일링: KDIGO가 이식 1년 내 활성형/비활성형 비타민D를 우선 권고한다는 맥락과 함께, 활성형이 &#x27;이식 후 지속성 부갑상선기능항진증 교정 + 골밀도&#x27;를 동시에 다룬다는 근거로 제시</li><li>근거 수위: 활성형 하위군은 알파칼시돌·칼시트리올·파리칼시톨 통합이므로 &#x27;활성형 비타민D 계열 근거(알파칼시돌 RCT 포함)&#x27;로 표현하고 알파본D 단독 효능으로 등치하지 않는다</li><li>안전성 멘트: 활성형 투여 시 혈청 칼슘 상승 경향이 있어 정기 칼슘 모니터링을 함께 안내</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #3 (골대사·신경) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Calcium and Phosphate Homeostasis and Bone Mineral Density Changes after Withdrawal of Oral Calcium Carbonate in Hypoparathyroidism: A Seven-Year Follow-up</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Indian Journal of Endocrinology and Metabolism</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-10-26</div>
+                        <button class="bd-request-btn" data-title="Calcium and Phosphate Homeostasis and Bone Mineral Density Changes after Withdrawal of Oral Calcium Carbonate in Hypoparathyroidism: A Seven-Year Follow-up" data-session="골대사·신경" data-num="3" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/43054982/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">전향적 코호트(7년 추적)</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">만성 부갑상선기능저하증(cHypoPT)의 표준 치료는 활성형 비타민D와 경구 칼슘 병용이다. PTH 결핍으로 신장의 1α-수산화가 줄어 칼시트리올 합성이 감소하므로 활성형 비타민D가 장 칼슘 흡수를 담당하고, 탄산칼슘(CaCO₃)은 식이 인을 결합해 고인산혈증을 줄인다고 여겨져 왔다. 그러나 경구 칼슘의 독립적 역할과, 칼슘을 끊었을 때 인 대사·골밀도·신석회화에 미치는 장기 영향은 체계적으로 연구된 적이 없다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">인도 AIIMS(뉴델리) 비수술성 cHypoPT 코호트 중 2017~2018년 단계적 칼슘 감량 프로토콜(주당 원소칼슘 500mg씩 감량, 혈청 총칼슘이 8.0mg/dL까지 떨어지면 직전 용량으로 복귀)에 참여하고 이후 순응도가 좋았던 39명을 2024~2025년 재평가(평균 49.4세, 남녀 17:22, 유병기간 22.8년). Group 1(n=17): 알파칼시돌 단독(중앙값 1.5µg/일, 경구 칼슘 0), Group 2(n=12): 알파칼시돌 1.5µg+칼슘 1.0g/일로 감량, Group 3(n=10): 알파칼시돌 1.75µg+칼슘 2.0g/일 유지. 비교변수: 혈청 총칼슘·인, 24시간 요칼슘/크레아티닌비, 인 분획배설률(FEPh), FGF-23, DXA BMD(요추·고관절·대퇴경부·전완), 신석회화(초음파·X선), eGFR. 군내 전후 비교는 paired t-test, 군간 비교는 ANOVA·카이제곱.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">알파칼시돌 단독군(Group 1, 17명)은 중앙값 1.5µg/일만으로 7년간 최적 칼슘을 유지했다 — 혈청 총칼슘 8.71→8.87 mg/dL(P=0.37), 추가 경구 칼슘이 필요한 환자 0명, 알파칼시돌 요구량 증가 없음.<br/>
+7년 시점 혈청 칼슘은 세 군 모두 목표범위로 비슷했다(8.87 vs 8.94 vs 8.68 mg/dL; P=0.53).<br/>
+혈청 인도 군간 차이가 없었으나(4.55 vs 4.61 vs 4.58 mg/dL; P=0.98), 칼슘 중단군에서 인 배설이 늘었다(FEPh 10.85%→17.87%, P=0.004; FEPh&gt;20% 비율 6.2%→35.3%, P=0.03).<br/>
+골밀도는 칼슘 2.0g 유지군에서 요추(1.213→1.271 g/cm², P=0.003)·고관절에서 유의하게 증가(부갑상선기능저하증 특유의 과도한 BMD 상승)했지만 알파칼시돌 단독군에서는 어느 부위도 유의한 증가가 없었다.<br/>
+새 신석회화는 본문 기준 알파칼시돌 단독군 23.5% vs 8.3%(Group 2) vs 10%(Group 3)였으나, Table 1에는 Group 1 신규 신석회화가 3명(17명 중)으로 기재돼 원문 안에서 수치가 서로 맞지 않는다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">7년 추적 중 eGFR은 세 군 모두 유지됐다(Group 1 80.1→80.1, Group 2 86.4→83.8, Group 3 92.3→92.4 mL/min/1.73m²; 모두 비유의). 고칼슘뇨(요칼슘/크레아티닌&gt;0.2)는 알파칼시돌 단독군에서 58.8%→64.7%(P=0.99)로 칼슘을 끊어도 줄지 않았다. 신석회화 신규 발생은 Table 1 기준 Group 1 3명, Group 2 1명, Group 3 1명으로 Group 1에서 많았으나, 본문·초록은 Group 1을 23.5%로 적어 Table 1(3명)과 불일치한다. 저자는 증가한 인뇨가 신석회화에 기여했을 가능성을 제기했다. 알파칼시돌 단독군에서 추가 경구 칼슘이 필요했던 환자는 없었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자 결론: cHypoPT 환자의 일부는 경구 탄산칼슘 없이 활성형 비타민D(알파칼시돌)만으로 장기간 최적 칼슘을 유지할 수 있으며, 칼슘 중단은 혈청 인을 올리지 않았으나 인뇨 증가·신석회화 가능성이 있어 완전 중단보다 중등도 칼슘 용량이 BMD 과상승과 인뇨를 함께 줄이는 대안일 수 있다. 한계: 단일기관·소규모(39명)·비무작위 군 배정(감량 반응에 따른 분류), 신석회화 사건 수가 적고 비수술성 환자만 포함. 알파본D 관점: 부갑상선기능저하증(알파본D 적응 영역)에서 알파칼시돌이 칼슘 조절의 핵심축이며 7년간 용량 증가 없이 효과가 유지된다는 직접근거로, 칼슘 알약 부담 감소 대화에 활용할 수 있다(신장 모니터링 병행).</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>알파칼시돌 단독(1.5µg/일) 7년: 혈청 칼슘 8.71→8.87 mg/dL, 칼슘 재개 0명</li>
+                            <li>칼슘 중단 시 FEPh 10.85%→17.87%(P=0.004) — 인뇨 증가</li>
+                            <li>새 신석회화: 본문 기준 알파칼시돌 단독군 23.5% vs 8.3%·10% (Table 1은 3명으로 기재 — 원문 내 불일치)</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 부갑상선기능저하증 7년 — 혈청 총칼슘(mg/dL), 알파칼시돌 단독군도 목표범위 유지</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart3"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart3"), {
+                            type: "bar",
+                            data: { labels: ["알파칼시돌 단독", "알파칼시돌+칼슘 1.0g", "알파칼시돌+칼슘 2.0g"], datasets: [
+                              { label: "칼슘 감량 전(2017~18)", data: [8.71, 8.51, 8.62], backgroundColor: "#1A5276" },
+                              { label: "7년 후(2024~25)", data: [8.87, 8.94, 8.68], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 부갑상선기능저하증 7년 추적 — 알파칼시돌 단독(중앙값 1.5µg/일)으로 경구 칼슘 없이 최적 칼슘 유지(8.71→8.87 mg/dL), 용량 증가·칼슘 재개 0</div><ul><li>내분비내과 디테일링: &#x27;부갑상선기능저하증 칼슘 조절의 핵심은 활성형 비타민D&#x27;라는 메시지 — 칼슘 알약을 줄여도 알파칼시돌로 칼슘이 유지된 장기 직접근거로 복약 부담(pill burden) 감소 대화에 활용</li><li>균형 메시지: 칼슘 완전 중단군에서 인뇨·신석회화가 늘었으므로 &#x27;알파칼시돌 + 적정(중등도) 칼슘&#x27;과 정기 요칼슘·신장 영상 모니터링을 함께 권하는 방향으로 사용</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #4 (골대사·신경) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Comparative Effectiveness of Tricyclic Antidepressants, Serotonin–Norepinephrine Reuptake Inhibitors, and Anticonvulsants for Diabetic Painful Neuropathy: A Systematic Review and Meta-Analysis</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Medical Sciences (Basel)</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-10-08</div>
+                        <button class="bd-request-btn" data-title="Comparative Effectiveness of Tricyclic Antidepressants, Serotonin–Norepinephrine Reuptake Inhibitors, and Anticonvulsants for Diabetic Painful Neuropathy: A Systematic Review and Meta-Analysis" data-session="골대사·신경" data-num="4" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42930568/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">체계적문헌고찰·네트워크 메타분석</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">당뇨병성 통증성 신경병증(DPN)은 장기 당뇨 환자의 최대 50%에서 발생하며 질환조절 치료가 없어 증상 조절이 유일한 선택지다. 아미트립틸린(TCA)·둘록세틴(SNRI)·가바펜틴·프레가발린(항경련제)이 1차 비마약성 약제로 쓰이지만 기존 대형 비교연구·Finnerup 메타분석은 약제 간 차이가 뚜렷하지 않다고 보고해, 2010년 이후 근거로 네 약제를 직·간접 비교했다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">PubMed·Google Scholar(2010.1~2025.9) 검색, PRISMA 준수(프로토콜 미등록). 성인 DPN에서 네 약제 중 하나를 단독요법으로 쓰고 NRS·VAS·BPI로 통증 변화를 보고한 임상시험 11편(1,397명; 아미트립틸린 3개 군 201명, 둘록세틴 6개 군 665명, 가바펜틴 5개 군 224명, 프레가발린 3개 군 307명) 포함. 통증척도를 0~100으로 통일, 1차 결과는 기저 대비 통증 평균변화(MC). 약제별 무작위효과 메타분석(REML·Hartung-Knapp) 후 빈도주의 네트워크 메타분석(netmeta, DerSimonian-Laird), 상관계수 0.1/0.9 민감도분석, 가바펜틴 ≥900mg/일 한정·단일척도(VAS/NRS) 한정 민감도분석, SIDE node-splitting. RoB2 평가.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">약제별 기저 대비 통증 감소(0~100 척도)는 프레가발린 MC 19.7(95% CI 8.9–30.5), 둘록세틴 27.8(95% CI 18.5–37.1), 가바펜틴 34.8(95% CI 9.3–60.3)로 유의했고, 아미트립틸린은 38.6(95% CI −11.8–89.0)으로 비유의였다.<br/>
+네트워크 메타분석에서 프레가발린 대비 아미트립틸린 5.76점(95% CI 1.66–9.85; p=0.0059), 둘록세틴 4.98점(95% CI 4.40–5.55; p&lt;0.0001), 가바펜틴 6.82점(95% CI 2.55–11.08; p=0.0017) 더 감소해 프레가발린이 수치상 최하위였고, 나머지 세 약제 간 차이는 비유의(모두 p&gt;0.05)였다.<br/>
+가바펜틴 권장 유지용량(≥900mg/일) 시험만으로 한정한 민감도분석에서는 가바펜틴의 프레가발린 대비 우위만 4.69로 줄어 비유의(p=0.089)가 됐고, 둘록세틴(MD 4.98, p&lt;0.0001)·아미트립틸린(MD 4.91, p=0.025)의 프레가발린 대비 우위는 유지됐다 — 즉 용량에 따라 불안정한 것은 가바펜틴 우위뿐이다.<br/>
+단일척도(VAS/NRS)만 쓴 분석(k=4)에서는 모든 비교가 비유의였지만(둘록세틴 p=0.3314, 가바펜틴 p=0.1288, 아미트립틸린 p=0.1250) 순위 방향은 주 분석과 같았고, 저자는 이를 자료 부족으로 설명하며 순위 방향이 견고하다고 판단했다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">이 메타분석은 통증 감소만 1차 결과로 보았고 이상반응·중단율은 통합 분석하지 않았다(안전성 비교 근거 아님). 저자는 약제 선택 시 동반질환·이상반응 프로파일·금기·내약성을 환자별로 고려해야 한다고 강조했다. 포함 연구의 위험편향은 무작위화 절차 보고 미흡·공개설계·결측·주관적 통증 결과에서 우려가 있었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자 결론: DPN의 비마약성 1차 약제들은 전반적으로 비슷한 진통 효과(broadly comparable)를 보이며 일관되게 더 나은 단일 약제는 없으므로, 동반질환·이상반응·금기·내약성에 따른 환자 맞춤 선택을 권고한다. 한계: 11편·소규모, 프로토콜 미등록, 서로 다른 통증척도(BPI 포함)의 선형 통합, 단일군 전후 자료 활용, 가바펜틴 시험 간 용량 불균형, 당뇨 유형 보고가 불완전·비일관(3편만 1형/2형 분포 보고). 프레논OD 관점: 프레가발린은 단독으로 유의한 통증 감소를 보였으나 네트워크 추정에서는 수치상 최하위였고 둘록세틴·아미트립틸린 우위는 민감도분석에서도 유지됐다 — 경쟁약 우위 주장에는 근거 질의 한계와 저자의 &#x27;효과는 대체로 비슷, 개별화&#x27; 권고로만 대응해야 한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>프레가발린 단독 통증 감소 MC 19.7(95% CI 8.9–30.5) — 유의</li>
+                            <li>NMA: 둘록세틴·가바펜틴·아미트립틸린이 프레가발린 대비 4.98~6.82점 우위(0~100 척도)</li>
+                            <li>가바펜틴 권장용량(≥900mg/일) 한정 시 가바펜틴 우위만 비유의(p=0.089) — 둘록세틴·아미트립틸린 우위는 유지</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: DPN 1차 비마약성 약제 4종 네트워크 메타분석 — 프레가발린 단독도 유의한 통증 감소(MC 19.7)를 보였으나 네트워크에서는 수치상 최하위(둘록세틴·아미트립틸린 우위는 민감도분석에서도 유지), 저자 결론은 &#x27;효과는 대체로 비슷, 환자 맞춤 선택&#x27;</div><ul><li>방어 디테일링: 경쟁사(둘록세틴 등)가 &#x27;프레가발린 최하위&#x27; 수치를 인용할 경우, 우위 자체를 부정하지 말고 근거 질의 한계(11편·프로토콜 미등록·척도 혼합·단일군 전후 자료)와 저자의 &#x27;broadly comparable, 개별화&#x27; 권고로만 대응 — 민감도분석으로 우위가 사라졌다고 말하지 않는다(가바펜틴만 해당)</li><li>포지셔닝: 효능이 비슷하다면 선택 기준은 내약성·동반질환·복약 편의라는 저자 권고를 연결해, 프레가발린의 1차 권고 지위와 복약 편의 논의로 이어가기(OD 제형 우월성 주장은 비교 데이터 없이 금지)</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #5 (골대사·신경) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Age-stratified signals and early onset of adverse events with pregabalin: a disproportionality analysis of the FDA adverse event reporting system</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Frontiers in Medicine</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-10-01</div>
+                        <button class="bd-request-btn" data-title="Age-stratified signals and early onset of adverse events with pregabalin: a disproportionality analysis of the FDA adverse event reporting system" data-session="골대사·신경" data-num="5" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42889226/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">약물감시 불균형분석(FAERS)</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">프레가발린은 신경병증성 통증·범불안장애에 널리 쓰이지만, 실사용 환경에서 신경정신계 안전성과 연령별 위험 차이·발현 시점을 다중 알고리즘으로 종합 평가한 근거는 부족했다. 이전 약물감시 연구는 자살행동·정신병적 장애 신호를 다뤘으나 발현시간(TTO)·연령 층화를 함께 보지 않아, 미국 FDA 이상사례보고시스템(FAERS)으로 이를 분석했다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">READUS-PV 준수. FAERS 2005년 1분기~2025년 1분기 중복 제거 보고 중 프레가발린(제품명 Lyrica 포함)이 1차 의심약인 보고를 추출하고, 가바펜틴·트라마돌·옥시코돈·둘록세틴·아미트립틸린·알프라졸람 등 CNS 작용약이 2차 의심/병용약으로 기록된 보고, 고의 오남용·과량·투약오류·허가외 사용 보고를 제외. MedDRA 28.0 PT/SOC 코딩. ROR·PRR·BCPNN·EBGM 4개 알고리즘이 모두 기준을 충족할 때만 신호로 판정. 연령 층화(18~64.9세 vs ≥65세) OR 비교, Weibull 분포·Kaplan-Meier로 발현시간 분석, 의사 보고 한정 등 민감도분석.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">최종 98,196건 보고(295,395 이상사례 기록)를 분석했다.<br/>
+가장 흔한 이상사례는 어지럼(n=5929, ROR 2.56), 체중 증가(n=5515, ROR 5.48), 졸림(n=5045, ROR 5.48)이었고, 신호 강도 상위는 금단증후군(ROR 15.05), 졸림, 체중 증가, 시야흐림(ROR 4.76), 청력저하(hypoacusis, ROR 4.51) 순이었다.<br/>
+연령 비교에서 ≥65세는 낙상(OR=2.26, P&lt;0.001)·균형장애(OR=1.91)·혼돈(OR=1.81) 보고가 많았고, 18~64.9세는 금단증후군(OR=0.54)·약물의존(OR=0.46)·자살사고(OR=0.38) 보고가 상대적으로 많았다(모두 P&lt;0.001).<br/>
+발현시간 분석(8,538건)에서 이상사례의 54.53%가 투여 시작 30일 이내에 발생했고, 중앙값은 고령자 16일 vs 성인 30일로 고령자에서 더 빨랐다(Weibull β 0.46·0.48, 조기 고장형; log-rank P&lt;0.001).</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">본 연구 자체가 안전성 연구다. 중대 결과 중 기타 중요 의학적 사건 85.9%, 입원 9.0%, 사망 2.9%, 생명위협 1.2%, 장애 1.0%. 대부분의 신호는 허가사항과 일치했으나 청력저하·서자장애(dysgraphia)·다변증(logorrhoea)·절망감 등 예상 외 신호와, 허가사항상 드문 혼수·운동이상증의 보고 증가가 확인됐다. 저자는 고령자 낙상 위험(일본 JADER 자료·골절 위험 연구와 일치)과 첫 1개월 집중 모니터링을 강조했다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자 결론: 프레가발린 이상사례는 대부분 허가사항과 일치하며, 고령자는 낙상·균형장애 위험이 상대적으로 높고 발현이 더 빠르며, 성인은 금단·의존·자살사고 보고가 많다 — 투여 첫 1개월, 특히 고령자에서 모니터링 강화를 권고. 한계: 자발보고(과소·자극 보고), 노출 분모 부재로 발생률·인과 추정 불가, 병용약 제외에 따른 선택편향, 소비자 보고 57.3%. 프레논OD 관점: 처방 확대 시 &#x27;저용량 시작·점증 + 첫 달 어지럼·졸림·낙상 점검&#x27;이라는 안전 처방 가이드를 함께 제공하면 고령 환자 처방 신뢰를 높일 수 있다(인과 근거 아님).</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>이상사례 54.53%가 투여 30일 이내 발생 — 고령자 중앙값 16일 vs 성인 30일</li>
+                            <li>≥65세 낙상 OR=2.26(P&lt;0.001)</li>
+                            <li>주요 신호: 어지럼 ROR 2.56·졸림 ROR 5.48·체중증가 ROR 5.48·금단 ROR 15.05</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: FAERS 98,196건 프레가발린 약물감시 — 이상사례 54.53%가 첫 30일 내 발생, 고령자는 발현이 빠르고(중앙값 16일) 낙상 보고 OR 2.26</div><ul><li>안전 처방 가이드 소재: 고령 신경병증성 통증 환자에서 &#x27;저용량 시작·천천히 증량 + 첫 달 어지럼·졸림·낙상 확인&#x27; 체크리스트를 디테일링에 함께 제공해 처방 장벽(부작용 우려)을 낮춘다</li><li>응대 포인트: 금단·의존 신호는 비고령 성인에서 상대적으로 많았다는 점을 근거로 중단 시 점진 감량을 안내 — 자발보고 신호이므로 발생률·인과로 표현하지 않는다</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #6 (골대사·신경) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Site-Specific Responses to SERM Treatment in Postmenopausal Osteoporosis: No Clear Age Attenuation in a Real-World Study</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Medicina (Kaunas)</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-06-23</div>
+                        <button class="bd-request-btn" data-title="Site-Specific Responses to SERM Treatment in Postmenopausal Osteoporosis: No Clear Age Attenuation in a Real-World Study" data-session="골대사·신경" data-num="6" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42512763/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">후향적 관찰연구</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">SERM(랄록시펜·바제독시펜)은 폐경 후 골다공증에 쓰이지만 에스트로겐 수용체 발현이 나이에 따라 줄어 고령에서 효과가 약해질 수 있다는 의문이 있었고, 실사용에서 연령별 효과는 충분히 확인되지 않았다. 이 연구의 목적은 SERM 치료 시 연령·부위별 골밀도와 골표지자 반응 차이를 보는 것이며, 일본 실사용에서 흔한 활성형 비타민D3(알파칼시돌 또는 엘데칼시톨) 병용은 다변량 모형의 보정 공변량으로 들어갔다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">일본 쇼와대 단일기관 후향적 코호트(2017~2021, STROBE 준수). SERM을 1년 이상 사용한 50세 이상 폐경 후 원발성 골다공증 여성 269명(50~64세 85명, 65~74세 112명, ≥75세 72명; 평균 68.8세). 병용: 엘데칼시톨 202명(75%), 알파칼시돌 41명(15%, 신기능 저하 환자에게 우선 처방), SERM 단독 26명(10%). 1차 평가변수 1년 요추(L2-4) BMD 변화, 2차 대퇴경부 BMD·요중 NTX·혈청 BAP. 연령·eGFR·기저 BMD·활성형 비타민D 병용 종류(단독 기준 더미변수)로 다변량 선형회귀(n=249), 선형혼합모형.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">1년 후 요추 BMD는 전체 0.776→0.797 g/cm²(p&lt;0.001)로 모든 연령군에서 유의하게 증가했고, 대퇴경부 BMD는 전체 0.561→0.571 g/cm²(p&lt;0.01)였으나 군내 유의 증가는 50~64세에서만 관찰됐다.<br/>
+연령군 간 BMD 변화율 차이는 없었고(3원 상호작용 p=0.887), 골표지자(NTX·BAP)는 전 연령에서 유의하게 감소했다.<br/>
+다변량분석에서 대퇴경부 BMD 반응은 엘데칼시톨 병용(vs SERM 단독)과 독립적으로 연관됐으나(p=0.04254), 알파칼시돌 병용은 유의한 연관이 없었다(p=0.86571).<br/>
+요추에서는 두 활성형 모두 연관이 없었다(알파칼시돌 p=0.97582, 엘데칼시톨 p=0.24590).<br/>
+저자는 이 차이를 먼저 약리적 차이(선행연구에서 엘데칼시톨의 골절예방 효과가 알파칼시돌보다 강함)로 설명했고, 대안으로 알파칼시돌이 신기능 저하 환자에게 우선 처방된 적응증 교란 가능성(eGFR의 경계적 연관, p≈0.06)을 제시했다.<br/>
+1년 신규 척추골절은 4.5%였다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">1년 관찰 동안 정맥혈전색전증·뇌경색·턱뼈괴사·비정형 대퇴골절은 0건이었다. 다만 단일기관 1년 관찰연구로 드문 이상반응 평가에는 검정력이 없고, SERM의 확립된 VTE 위험을 부정하는 근거는 아니라고 저자가 명시했다. 활성형 비타민D 병용에 따른 고칼슘혈증 등 이상반응은 별도 보고되지 않았다(기저 혈청 칼슘 중앙값 9.4 mg/dL).</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자 결론: 실사용에서 SERM 골밀도 반응은 연령보다 부위(요추&gt;대퇴경부)에 좌우되며 고령에서도 요추 BMD가 개선돼 선택된 고령 환자에 실용적 옵션이다. 엘데칼시톨만 대퇴경부 반응과 연관된 점에 대해 저자는 ① 활성형 비타민D 유사체 간 약리 효능·골절예방 근거 차이(엘데칼시톨 우위 선행연구)와 ② 알파칼시돌의 신기능 저하 환자 편중(적응증 교란)이라는 두 설명을 모두 제시했고, 인과 해석은 삼가라고 했다. 한계: 후향적·비무작위, 단일기관, 골절 검정력 부족, 알파칼시돌군 41명 소규모, 평균회귀 가능. 알파본D 관점: 경쟁 성분 우위 해석으로 쓰일 수 있는 자료이며 저자도 약리적 차이를 첫 설명으로 들었으므로 부정하지 말고, 교란 가능성과 관찰연구 한계를 함께 제시하는 수준으로 대응한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>SERM 1년 요추 BMD 0.776→0.797 g/cm²(p&lt;0.001)</li>
+                            <li>대퇴경부 반응: 엘데칼시톨 병용 p=0.04254 vs 알파칼시돌 병용 p=0.86571(비유의)</li>
+                            <li>알파칼시돌 41명(15%) — 저자 설명: 엘데칼시톨 약리 우위 또는 신기능 저하 편중(교란)</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 폐경 후 골다공증 SERM 실사용 269명 — 활성형 비타민D 병용 중 대퇴경부 BMD 반응은 엘데칼시톨만 유의, 알파칼시돌은 비유의(신기능 저하 환자 편중 교란 가능)</div><ul><li>방어 포인트: 경쟁 성분(엘데칼시톨) 우위 자료로 인용될 경우, 저자가 약리적 차이와 함께 &#x27;알파칼시돌군이 신기능 저하 환자에게 우선 배정된 41명 소규모 후향 자료(적응증 교란)&#x27;라는 대안 설명을 명시했다는 점으로 응대 — 약리 차이 자체를 부정하지 않는다</li><li>포지셔닝: 신기능 저하 고령 골다공증 환자에서 알파칼시돌을 선택하는 실제 처방 관행을 보여주는 자료로, &#x27;CKD 동반 환자의 활성형 비타민D&#x27;(알파본D 핵심 클레임 ③) 대화의 맥락 자료로만 사용</li></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+      <h4>근거 분류 기준</h4>
+      <table>
+        <tr><td><span class="tag-direct">직접근거</span></td><td>자사 제품과 동일 성분(alfacalcidol, pregabalin) 사용 연구</td></tr>
+        <tr><td>참고근거</td><td>동일 계열이나 다른 제품 사용 연구. 직접 적용 시 주의 필요</td></tr>
+      </table>
+    </div>
+
+    <div class="legend" style="margin-top: 12px;">
+      <h4>중요도 기준</h4>
+      <table>
+        <tr><td><span class="stars-high">★★★</span></td><td>즉시 활용 — RCT, 메타분석, Phase 3-4. PM팀 디테일링 반영 가능</td></tr>
+        <tr><td><span class="stars-mid">★★☆</span></td><td>참고 활용 — 전임상, 소규모 임상. KOL 심포지엄·학술강연 소재</td></tr>
+        <tr><td><span class="stars-low">★☆☆</span></td><td>모니터링 — 동향 파악. 후속 연구 결과 확인 필요</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+  var h=decodeURIComponent(location.hash.slice(1)); if(!h) return;
+  var papers=document.querySelectorAll('.paper'),found=null;
+  for(var i=0;i<papers.length;i++){var t=papers[i].querySelector('.paper-title');var txt=t?t.textContent.trim().toLowerCase():'';if(txt.indexOf(h.toLowerCase())!==-1){found=papers[i];break;}}
+  if(!found) return;
+  for(var j=0;j<papers.length;j++){if(papers[j]!==found)papers[j].style.display='none';}
+  found.style.outline='3px solid #1A5276';found.style.borderRadius='10px';found.scrollIntoView({behavior:'smooth',block:'start'});
+  var btn=document.createElement('button');btn.textContent='📋 모든 논문 보기';
+  btn.style.cssText='position:fixed;bottom:24px;right:24px;z-index:999;padding:10px 20px;background:#003366;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3);';
+  btn.onclick=function(){for(var k=0;k<papers.length;k++)papers[k].style.display='';found.style.outline='';btn.remove();window.scrollTo(0,0);};
+  document.body.appendChild(btn);
+})();
+</script>
+
+<!-- BD_REQUEST_MODAL_v2 -->
+<style>
+  #bd-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;align-items:center;justify-content:center}
+  #bd-modal{background:#fff;border-radius:8px;padding:24px;min-width:420px;max-width:520px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-family:'Malgun Gothic',sans-serif}
+  #bd-modal h3{margin:0 0 16px;color:#003366;border-bottom:2px solid #1A5276;padding-bottom:8px}
+  #bd-modal .field{margin:12px 0}
+  #bd-modal label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:4px}
+  #bd-modal input,#bd-modal textarea{width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;font-size:13px;box-sizing:border-box;font-family:inherit}
+  #bd-modal textarea{min-height:60px;resize:vertical}
+  #bd-modal .radio-row label{display:inline-block;font-weight:400;margin-right:16px;cursor:pointer}
+  #bd-modal .actions{margin-top:20px;text-align:right}
+  #bd-modal button{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:13px;margin-left:8px}
+  #bd-modal .submit{background:#003366;color:#fff;font-weight:600}#bd-modal .cancel{background:#ddd;color:#333}
+  #bd-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#003366;color:#fff;padding:12px 24px;border-radius:6px;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:9999;opacity:0;transition:opacity .3s}
+  #bd-toast.show{opacity:1}#bd-toast.error{background:#c0392b}
+</style>
+<div id="bd-modal-overlay" onclick="if(event.target.id==='bd-modal-overlay') closeBDModal()">
+  <div id="bd-modal">
+    <h3>📌 BD 제작 요청</h3>
+    <div class="field"><label>논문</label><div id="bd-modal-title" style="font-size:13px;color:#555;line-height:1.4"></div></div>
+    <div class="field"><label>세션</label><div id="bd-modal-session" style="font-size:13px;color:#555"></div></div>
+    <div class="field"><label>BD 포맷</label><div class="radio-row">
+      <label><input type="radio" name="bd-format" value="CLB" checked> CLB (학술브리프)</label>
+      <label><input type="radio" name="bd-format" value="BT"> BT (바이오톡)</label></div></div>
+    <div class="field"><label>요청자 이메일 *</label><input type="email" id="bd-modal-requester" placeholder="example@hanall.co.kr" required></div>
+    <div class="field"><label>메모 (선택)</label><textarea id="bd-modal-memo" placeholder="특별 요청사항"></textarea></div>
+    <div class="actions"><button class="cancel" onclick="closeBDModal()">취소</button><button class="submit" onclick="submitBDRequest()">요청 제출</button></div>
+  </div>
+</div>
+<div id="bd-toast"></div>
+<script>
+const BD_WEBHOOK_URL='https://script.google.com/macros/s/AKfycbynF7P1576GbRlzdIjBaxrOvjTU4HDP8F9jY4flxduhSqYR15Hr4AmhImuaS0wPJoOC/exec';let bdCurrentBtn=null;
+function openBDModal(b){bdCurrentBtn=b;document.getElementById('bd-modal-title').textContent=b.dataset.title;document.getElementById('bd-modal-session').textContent=b.dataset.session;document.getElementById('bd-modal-requester').value=localStorage.getItem('bd-requester')||'';document.getElementById('bd-modal-memo').value='';document.querySelector('input[name=bd-format][value=CLB]').checked=true;document.getElementById('bd-modal-overlay').style.display='flex';}
+function closeBDModal(){document.getElementById('bd-modal-overlay').style.display='none';bdCurrentBtn=null;}
+function showToast(m,e){var t=document.getElementById('bd-toast');t.textContent=m;t.className=e?'show error':'show';setTimeout(function(){t.className='';},3500);}
+function submitBDRequest(){if(!bdCurrentBtn)return;var title=bdCurrentBtn.dataset.title,session=bdCurrentBtn.dataset.session,format=document.querySelector('input[name=bd-format]:checked').value,requester=document.getElementById('bd-modal-requester').value.trim(),memo=document.getElementById('bd-modal-memo').value.trim();if(!requester){showToast('요청자 이메일은 필수입니다',true);return;}localStorage.setItem('bd-requester',requester);var cb='bdcb_'+Date.now();window[cb]=function(data){delete window[cb];document.head.removeChild(s);if(data.status==='ok'){showToast('✅ BD 요청 접수: '+format+' / '+title.slice(0,40)+'…');bdCurrentBtn.disabled=true;bdCurrentBtn.textContent='✓ 요청됨';closeBDModal();}else if(data.status==='duplicate'){showToast('⚠️ 동일 요청이 이미 대기 중입니다',true);closeBDModal();}else{showToast('❌ 오류: '+(data.message||'알 수 없음'),true);}};var params=new URLSearchParams({action:'requestBDQueue',title:title,session:session,format:format,requester:requester,memo:memo,callback:cb});var s=document.createElement('script');s.src=BD_WEBHOOK_URL+'?'+params.toString();s.onerror=function(){delete window[cb];showToast('❌ 네트워크 오류 — 잠시 후 다시 시도',true);};document.head.appendChild(s);}
+</script>
+
+</body>
+</html>
