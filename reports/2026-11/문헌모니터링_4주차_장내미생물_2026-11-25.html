@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[문헌모니터링] 4주차 장내미생물 (2026.11.25)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; font-size: 15px; line-height: 1.7; color: #1a1a2e; background: #f0f2f5; }
+.container { max-width: 820px; margin: 0 auto; padding: 24px 16px; }
+.report-header { background: linear-gradient(135deg,#003366 0%,#1a5276 100%); color: #fff; border-radius: 14px; padding: 28px 32px; margin-bottom: 24px; }
+.report-header .badge { display: inline-block; background: #1A5276; color: #fff; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+.report-header h1 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+.report-header .meta { font-size: 13px; color: rgba(255,255,255,0.75); display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
+.stat-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+.stat-pill { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 16px; font-size: 13px; }
+.stat-pill span { font-size: 20px; font-weight: 800; display: block; }
+.exec-box { background: #fff; border-left: 5px solid #003366; border-radius: 0 10px 10px 0; padding: 18px 22px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.exec-box h3 { font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: #003366; margin-bottom: 10px; }
+.exec-box p { font-size: 14px; line-height: 1.9; color: #333; }
+.paper { background: #fff; border-radius: 14px; margin-bottom: 28px; box-shadow: 0 3px 12px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #e8eaf0; }
+.paper-header { padding: 16px 22px 12px; display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #f0f2f5; }
+.paper-num { background: #003366; color: #fff; font-size: 12px; font-weight: bold; padding: 3px 10px; border-radius: 20px; white-space: nowrap; margin-top: 2px; }
+.stars-high { color: #c0392b; font-size: 16px; font-weight: 900; }
+.stars-mid  { color: #e67e22; font-size: 16px; font-weight: 900; }
+.stars-low  { color: #95a5a6; font-size: 16px; font-weight: 900; }
+.tag-direct { background: #e8f4fd; color: #1a5276; border: 1px solid #aed6f1; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+.tag-ref    { background: #f0f0f0; color: #666; border: 1px solid #ccc; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+.tag-open   { background: #e8f8e8; color: #1e8449; border: 1px solid #a9dfbf; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+.tag-wall   { background: #fdf2f8; color: #7d3c98; border: 1px solid #d7bde2; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+.journal-meta { font-size: 12px; color: #888; margin-top: 2px; }
+.paper-body { padding: 20px 22px; }
+.paper-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; line-height: 1.5; }
+.paper-title-ko { font-size: 13px; color: #555; margin-bottom: 6px; font-style: italic; }
+.paper-url { font-size: 12px; color: #1a5276; margin-bottom: 14px; display: block; word-break: break-all; }
+.design-badge { display: inline-block; background: #eaf2ff; color: #1a5276; font-size: 12px; font-weight: bold; padding: 3px 12px; border-radius: 6px; margin-bottom: 14px; }
+.summary-grid { background: #fafbfc; border-radius: 10px; padding: 16px; margin-bottom: 14px; border: 1px solid #e8eaf0; }
+.summary-grid h4 { font-size: 12px; letter-spacing: 1px; color: #888; text-transform: uppercase; margin-bottom: 10px; }
+.s-row { display: grid; grid-template-columns: 80px 1fr; gap: 6px 12px; margin-bottom: 8px; align-items: baseline; font-size: 13.5px; }
+.s-label { font-weight: 700; color: #003366; white-space: nowrap; }
+.s-val { color: #333; line-height: 1.8; }
+.s-val em { background: #fff3cd; padding: 0 4px; border-radius: 3px; font-style: normal; font-weight: bold; color: #664d03; }
+.key-nums { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.knum { background: #003366; color: #fff; border-radius: 10px; padding: 12px 16px; flex: 1; min-width: 140px; text-align: center; }
+.knum .val { font-size: 22px; font-weight: 900; color: #1A5276; display: block; }
+.knum .desc { font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 2px; line-height: 1.4; }
+.knum .pval { font-size: 10px; color: #aed6f1; margin-top: 3px; }
+.viz-section { border: 2px solid #e8eaf0; border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+.viz-section h4 { font-size: 13px; font-weight: 700; color: #003366; margin-bottom: 4px; }
+.viz-subtitle { font-size: 12px; color: #888; margin-bottom: 14px; }
+.chart-wrap { position: relative; height: 200px; }
+.paywall-notice { background: #fdf2f8; border: 1px solid #d7bde2; border-radius: 8px; padding: 14px 18px; font-size: 13px; color: #7d3c98; }
+.usage { background: linear-gradient(135deg,#fff8f0,#fff3e0); border-left: 4px solid #1A5276; border-radius: 0 10px 10px 0; padding: 14px 18px; font-size: 13.5px; line-height: 1.8; }
+.usage h4 { font-size: 12px; color: #1A5276; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+.usage ul { margin-left: 16px; }
+.usage li { margin-bottom: 4px; }
+.legend { background: #fff; border-radius: 10px; padding: 18px 22px; margin-top: 8px; border: 1px solid #e8eaf0; font-size: 13px; }
+.legend h4 { color: #003366; margin-bottom: 10px; font-size: 14px; }
+.legend-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+.legend-row span { padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+  </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>/*BR_EXTRA_CSS*/
+.papers{max-width:920px;margin:0 auto;padding:0 8px}
+.paper{border:1px solid #e3e7ee;border-radius:14px;margin:0 auto 26px;box-shadow:0 3px 12px rgba(0,0,0,.07);overflow:hidden;background:#fff}
+.paper-header{background:linear-gradient(135deg,#1A5276,#003366);color:#fff;padding:18px 22px}
+.paper-header .paper-title{color:#fff;font-size:16px;font-weight:800;line-height:1.5;margin:0 0 12px}
+.paper-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:#e3ecf6}
+.paper-meta-item{display:flex;align-items:center;gap:4px}
+.paper-meta-item strong{color:#fff;font-weight:600}
+.importance-badge{padding:3px 11px;border-radius:20px;font-weight:800;color:#1a1a2e}
+.importance-high{background:#FFD54F}.importance-mid{background:#90CAF9;color:#0d2b45}.importance-low{background:#cfd8dc;color:#37474f}
+.evidence-tag{padding:3px 11px;border-radius:20px;font-weight:700;color:#fff;background:#2E8B72}
+.evidence-ref{background:#8896a5}
+.bd-request-btn{background:#fff;color:#003366;border:none;padding:7px 16px;border-radius:7px;font-size:12.5px;font-weight:800;cursor:pointer;margin-left:auto;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.bd-request-btn:hover{background:#ffe9b3}.bd-request-btn:disabled{background:#b9c2cc;color:#fff;cursor:not-allowed}
+.paper-header a,.paper-url{color:#cfe0f5 !important;font-size:11px;word-break:break-all}
+.paper-content{padding:18px 22px}
+.content-section{border-left:4px solid #d3dce6;padding:6px 0 6px 16px;margin:0 0 12px}
+.content-section-title{font-size:13px;font-weight:800;color:#1A5276;margin-bottom:4px;letter-spacing:.2px}
+.content-section-text{font-size:13.5px;line-height:1.7;color:#2b2b38}
+.content-section-text strong{color:#003366}
+.content-section.cs-key{border-left-color:#003366;background:#f3f8fd;border-radius:8px;padding:11px 16px}
+.content-section.cs-key .content-section-title{color:#003366}
+.key-numbers{background:#fff8e6;border:1px solid #f1dea0;border-radius:10px;padding:13px 18px;margin:14px 0}
+.key-numbers h4{margin:0 0 8px;color:#8a6a00;font-size:13.5px}
+.key-numbers ul{margin:0;padding-left:20px}.key-numbers li{font-size:13px;line-height:1.55;margin:4px 0;color:#5a4600}
+.viz-section{background:#f5f9fd;border:1px solid #d9e6f2;border-radius:10px;padding:15px 18px;margin:14px 0}
+.viz-section h4{margin:0 0 10px;color:#003366;font-size:13.5px}
+.usage-box{background:#ecf7f3;border:1px solid #bfe2d7;border-left:5px solid #2E8B72;border-radius:10px;padding:14px 18px;margin:14px 0}
+.usage-box h4{margin:0 0 8px;color:#1d6b59;font-size:13.5px}
+.usage-head{font-weight:800;color:#135344;font-size:13.5px;line-height:1.55;margin-bottom:7px;padding-bottom:7px;border-bottom:1px dashed #bfe2d7}
+.usage-box ul{margin:0;padding-left:20px}.usage-box li{font-size:13px;line-height:1.6;margin:5px 0;color:#244b43}
+</style>
+
+</head>
+<body>
+<div class="container">
+  <!-- ━━━ 헤더 ━━━ -->
+  <div class="report-header">
+    <span class="badge">장내미생물 세션 | 2026년 4주차</span>
+    <h1>월간 문헌 모니터링 리포트</h1>
+    <div class="meta">
+      <div>보고일: 2026.11.25</div>
+      <div>세션: 바이오탑 (C. butyricum, S. boulardii)</div>
+      <div>담당PM: 임범성 팀장, 박지현 PM</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-pill">
+        <span>6</span>
+        신규 논문
+      </div>
+      <div class="stat-pill">
+        <span>4</span>
+        ★★★ 우수
+      </div>
+      <div class="stat-pill">
+        <span>4</span>
+        직접근거
+      </div>
+      <div class="stat-pill">
+        <span>5</span>
+        오픈액세스
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━ Executive Summary ━━━ -->
+  <div class="exec-box">
+    <h3>Executive Summary</h3>
+    <p>
+      <strong>① 바이오탑 낙산균(CBTOA) 기전 최초 규명</strong> — 2025년 3월 IJMS에 C. butyricum TO-A가 장내 락테이트·아세테이트를 기질로 낙산을 효율 생성하는 분자 경로가 첫 규명되었다. 경쟁 제품 대비 균주 차별화 근거 즉시 활용 가능.<br><br>
+      <strong>② TIPS 후 간성뇌증 예방 RCT</strong> — C. butyricum 투여가 오현성 간성뇌증 발생률을 3분의 1 수준으로 저하(26.5%→8.2%, p=0.016). 간 전문의 대상 고품질 임상근거.<br><br>
+      <strong>③ S. boulardii 다중 임상근거</strong> — H. pylori 박멸 11% 향상(19 RCT), 항생제 연관 설사 50% 감소 등 소화기 전역에서 효능 입증.
+    </p>
+  </div>
+
+    <!-- ━━━ 논문 #1 (장내미생물) ━━━ -->
+        <div class="papers">
+
+            <!-- ━━━ 논문 #1 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Safety and Exploratory Pre–Post Changes Associated with an Orally Disintegrating Three-Strain Probiotic Tablet in Older Adults with Functional Constipation: A Single-Center, Open-Label, Single-Arm Study</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-mid">★★☆</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-direct">직접근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Diseases (Basel)</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-08-31</div>
+                        <button class="bd-request-btn" data-title="Safety and Exploratory Pre–Post Changes Associated with an Orally Disintegrating Three-Strain Probiotic Tablet in Older Adults with Functional Constipation: A Single-Center, Open-Label, Single-Arm Study" data-session="장내미생물" data-num="1" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42783210/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">단일군 공개 전후비교 임상(파일럿)</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">고령자의 만성 기능성 변비는 배변 습관뿐 아니라 삶의 질·일상 기능을 떨어뜨리고, 노쇠·다중질환·다약제 복용과 겹쳐 안전하고 내약성 좋은 치료 선택지가 필요하다. 프로바이오틱스는 임상에서 널리 쓰이지만 균주·제형·투여기간에 따라 효과가 달라 고령자 대상 근거와 기전 자료가 부족하다. 이에 C. butyricum TO-A·Enterococcus faecium T-110·Bacillus subtilis TO-A 3균주 구강붕해정(BIO-THREE OD)의 8주 안전성과 탐색적 전후 변화를 평가했다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">일본 준텐도대 단일기관 공개 단일군 전후비교 연구(jRCTs031210344, 2021.11~2022.5 등록). Rome IV 기능성 변비 기준을 만족하는 65~90세 50명이 동의했고 49명이 FAS, 45명이 8주를 완료했다. 중재는 BIO-THREE 구강붕해정(1정당 B. subtilis TO-A 10mg, E. faecium T-110 2mg, C. butyricum TO-A 10mg) 1회 2정 1일 3회 식후 8주(복약순응도 90%). 1차 평가변수는 수정 Bristol 변형태척도 기반 배변점수(일별 BSFS−4를 7일 합산, 무배변일 −4, 0에 가까울수록 정상) 0→8주 변화(Wilcoxon). 2차 평가변수는 자발배변 횟수, 힘주기, JPAC-QOL, 수정 변비점수(mCSS), Izumo 척도, 식품다양성점수(DVS), HbA1c·CPR 등 대사지표, 16S rRNA 장내미생물. 기저 PPI/P-CAB 사용 여부(사용 26명 vs 비사용 23명)로 탐색적 하위분석을 했고 2차 변수는 다중성 보정을 하지 않았다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">FAS 49명 중 45명이 8주 투여를 완료해 1차 평가변수 짝비교 분석에 포함되었다.<br/>
+1차 평가변수인 배변점수(0에 가까울수록 정상)는 기저 중앙값 −9.5(IQR −15.7, −3.0)에서 8주 −8.0(IQR −12.0, −2.0)으로 정상화 방향 변화를 보였다(변화량 중앙값 2.0, 95% CI 0.0~3.8, p=0.024).<br/>
+탐색적 하위분석에서 PPI/P-CAB 비사용군은 −10→−7.5(변화량 4, 95% CI 0.8~5.6, p=0.004)로 개선 폭이 컸고, 사용군은 −9→−8(변화량 0, p=0.775)로 유의한 변화가 없었다.<br/>
+자발배변 횟수는 유의한 변화가 없었고 힘주기 점수는 개선 경향에 그쳤다(p=0.057).<br/>
+2차 변수에서 변비 특이 삶의 질 JPAC-QOL 총점(변화 중앙값 −0.30, 95% CI −0.42~−0.08, p&lt;0.001), 변비 중증도 mCSS 총점(−1.5, 95% CI −2.6~−0.6, p&lt;0.01), HbA1c(−0.10%, 95% CI −0.15~−0.01, p&lt;0.05)가 명목상 유의하게 감소했다(다중성 보정 없음).<br/>
+장내미생물 α·β 다양성은 유의한 변화가 없었으나, PPI/P-CAB 비사용군에서 낙산 생성균을 포함하는 Clostridium sensu stricto 1 속이 8주에 명목상 증가했다(LDA 2.338, p=0.0222).</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">이상반응은 3명(6.1%)에서 3건 발생했다: 복통 1명(2.0%), 속쓰림/명치 작열감·위통 1명(2.0%), 예기치 않은 사고에 의한 사망 1명(2.0%). 세 명 모두 연구에서 탈락했다. 중대 이상반응은 사고사 1건으로 연구약과의 인과관계는 확인되지 않았고, 연구약과의 관련성을 배제할 수 없는 경도 이상반응은 복통 1건·속쓰림/위통 1건이었다. 탈락 4명 중 3명은 이상반응, 1명은 복약 불량이었으며 그 외 임상적으로 중요한 안전성 신호(검사치·활력징후)는 없었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 3균주 구강붕해정이 고령 기능성 변비 환자에서 8주간 대체로 안전하고 내약성이 좋았으며, 변 형태와 변비 관련 증상 부담의 변화와 연관되었다고 결론지었다. 다만 대조군 없는 단일기관 공개 단일군 설계, 소표본(검정력 계산 없음), 식이·수분·동반약물 미통제, 2차 변수 다중성 미보정, 8주 이후 추적 부재로 인과적 효능은 주장할 수 없고 가설 생성 수준이다. 바이오탑 관점: 바이오탑과 동일한 C. butyricum TO-A 균주가 든 제제의 고령자 8주 안전성 자료이자 &#x27;변 형태 정상화·삶의 질&#x27; 탐색 신호로, 단 제제 구성(E. faecium T-110 포함, S. boulardii 미포함)이 달라 효능 등치는 금지하고 안전성·내약성 근거로 활용하는 것이 적절하다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>배변점수 −9.5 → −8.0 (8주, p=0.024)</li>
+                            <li>PPI/P-CAB 비사용군 변화량 4 (95% CI 0.8~5.6, p=0.004)</li>
+                            <li>JPAC-QOL 총점 −0.30 (95% CI −0.42~−0.08, p&lt;0.001)</li>
+                            <li>이상반응 3명(6.1%), 약 관련 가능 경도 2건</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 배변점수 기저 vs 8주 (중앙값, 0에 가까울수록 정상 변 형태)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart1"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart1"), {
+                            type: "bar",
+                            data: { labels: ["전체", "PPI/P-CAB 비사용", "PPI/P-CAB 사용"], datasets: [
+                              { label: "8주", data: [-8.0, -7.5, -8.0], backgroundColor: "#1A5276" },
+                              { label: "기저(0주)", data: [-9.5, -10.0, -9.0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: 바이오탑과 같은 C. butyricum TO-A 균주 함유 제제 — 고령 기능성 변비 8주 안전성·내약성과 변 형태 정상화 탐색 신호</div><ul><li>고령·다약제 복용 환자에서 TO-A 균주 제제를 8주 복용해도 약 관련 가능 이상반응은 경도 2건(복통·속쓰림)뿐이었다는 점을 장기 복용 안전성 디테일링에 활용(단일군·소표본임을 함께 언급).</li><li>PPI/P-CAB 비사용군에서 개선 폭이 컸고 낙산 생성균 포함 Clostridium sensu stricto 1 속이 늘었다는 탐색 결과를 &#x27;낙산 생성 균주&#x27; 기전 대화 소재로 사용하되, 효능 입증이 아닌 가설 생성 자료로 소개.</li><li>제제 구성이 바이오탑과 다르므로(E. faecium T-110 포함, S. boulardii 미포함) &#x27;동일 균주의 안전성 경험&#x27;까지만 말하고 &#x27;바이오탑 변비 효능 입증&#x27;으로 표현하지 않는다.</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #2 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Efficacy and safety of Saccharomyces boulardii CNCM I-745 for the treatment of pediatric acute diarrhea in China: a systematic review and meta-analysis</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Frontiers in Cellular and Infection Microbiology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-06-04</div>
+                        <button class="bd-request-btn" data-title="Efficacy and safety of Saccharomyces boulardii CNCM I-745 for the treatment of pediatric acute diarrhea in China: a systematic review and meta-analysis" data-session="장내미생물" data-num="2" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/40535538/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">체계적 문헌고찰·메타분석(RCT 10편)</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">소아 급성 위장관염(PAGE)은 5세 미만 소아의 주요 이환·사망 원인으로 입원·탈수 위험을 높인다. 경구수액요법이 기본이지만 설사 기간·중증도를 줄이는 보조요법으로 특정 프로바이오틱스가 권고되며, 여러 균주를 섞어 분석한 기존 메타분석은 이질성이 커 균주별 결론이 어렵다. 또한 중국에서 수행된 다수의 S. boulardii 임상이 영어권 메타분석에 포함되지 않아, 단일 균주(CNCM I-745)에 한정한 중국 RCT 통합 분석이 필요했다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">PRISMA 2020 준수 체계적 문헌고찰·메타분석(PROSPERO CRD42024567537). PubMed·Google Scholar·Embase·Cochrane·CNKI·CBMdisc를 2024년 6월 30일까지 검색해 중국 소아(18세 이하) 급성 설사(15일 미만)에서 S. boulardii CNCM I-745 vs 비프로바이오틱스 대조(공개 대조)를 비교한 병행 RCT를 포함했다. 아연·몬모릴로나이트·라세카도트릴·타 프로바이오틱스 병용 시험은 제외. 851건 선별 후 RCT 10편(1,125명, 1개월 미만~6세, 90% 입원)이 포함되었고 시험당 84~188명, 투여 3~7일, 용량 125~500mg/일(7편은 연령별 조정)이었다. 1차 평가변수는 설사 지속기간(SMD), 총 유효율, 완치율, 일일 배변 횟수; 2차는 이상반응, 사이토카인(TNF-α, IL-8), 재원기간, 상부위장관 증상. 이질성 I²&gt;50%면 무작위효과, 아니면 고정효과 모형을 썼고 RoB 2.0·GRADE로 질을 평가했다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">10개 RCT(1,125명)가 포함되었다.<br/>
+S. boulardii CNCM I-745군은 대조군보다 설사 지속기간이 평균 1.6일 짧았다(6개 RCT, SMD −1.63일, 95% CI −2.08~−1.18, p&lt;0.0001, I²=84.8%).<br/>
+로타바이러스 설사에서는 단축 효과가 더 컸다(SMD −2.10일, 95% CI −2.78~−1.42, p=0.04).<br/>
+용량별로는 연령 조정 용량에서 SMD −2.11일(95% CI −2.40~−1.83), 500mg/일 고정 용량에서 SMD −1.02일(95% CI −1.32~−0.73)이었다.<br/>
+총 유효율은 S. boulardii군에서 유의하게 높았고(10개 RCT, RR 1.22, 95% CI 1.16~1.28, p&lt;0.001, I²=0%), 완치율도 높았다(RR 1.47, 95% CI 1.30~1.67, p&lt;0.0001, I²=30.9%).<br/>
+염증 지표인 TNF-α는 대조군 대비 유의하게 감소했다(3개 RCT, SMD −2.76, 95% CI −3.09~−2.43, p&lt;0.0001).</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">10편 중 8편(80%)이 안전성 자료를 보고했고 2편은 보고하지 않았다. 이상반응 위험은 S. boulardii군에서 대조군보다 유의하게 낮았다(RR 0.19, 95% CI 0.07~0.50, p=0.001, I²=0%). 보고된 이상반응은 대부분 발진·복부 불편감·구강건조·오심·구토·발열·변비 등 경도의 자연 소실 증상이었고, 중대한 이상반응은 보고되지 않았다. 다만 5편은 &#x27;이상반응 없음&#x27;이라는 서술만 제시해 세부 자료는 3편에 한정된다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 S. boulardii CNCM I-745가 중국 소아 급성 위장관염에서 설사 기간을 줄이고 증상 개선·완치율을 높이며 내약성이 좋은 치료라고 결론지었다. 한계로 모든 시험이 공개 대조(위약·맹검 없음)이고 무작위 방법 미기재가 많아 9편이 &#x27;일부 우려&#x27;, 1편이 &#x27;고위험&#x27; 비뚤림이었으며, 출판 비뚤림(p=0.016)과 설사기간의 높은 이질성, 중국 단일 국가 시험이라는 일반화 제한이 있다. 바이오탑 관점: 바이오탑 성분 S. boulardii는 DBVPG 6763 균주로 본 연구의 CNCM I-745와 다르므로 &#x27;동일 종 S. boulardii의 소아 급성 설사 근거&#x27;로 소개하는 참고근거이며 바이오탑 효능으로 등치하지 않는다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>설사기간 SMD −1.63일 (95% CI −2.08~−1.18, p&lt;0.0001)</li>
+                            <li>총 유효율 RR 1.22 (95% CI 1.16~1.28)</li>
+                            <li>완치율 RR 1.47 (95% CI 1.30~1.67)</li>
+                            <li>이상반응 RR 0.19 (95% CI 0.07~0.50)</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: S. boulardii CNCM I-745 vs 대조 — 상대위험(RR, 대조군=1)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart2"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart2"), {
+                            type: "bar",
+                            data: { labels: ["총 유효율", "완치율"], datasets: [
+                              { label: "S. boulardii (RR)", data: [1.22, 1.47], backgroundColor: "#1A5276" },
+                              { label: "대조군 기준(RR=1)", data: [1.0, 1.0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: S. boulardii(CNCM I-745) 소아 급성 설사 메타분석 — 설사기간 SMD −1.63(표준화 평균차)·완치율 RR 1.47, 이상반응 증가 없음</div><ul><li>소아과·가정의학과 디테일링에서 &#x27;동일 종 S. boulardii의 급성 설사 근거&#x27;로 바이오탑 구성균(S. boulardii)의 역할을 설명하는 배경 자료로 사용(균주 상이 → 참고근거 명시).</li><li>로타바이러스 설사에서 효과가 더 컸고 연령별 용량 조정 시 단축 폭이 컸다는 하위분석을 소아 처방 시 용량 대화 소재로 활용.</li><li>모든 시험이 공개 대조·중국 단일국가라는 한계와 출판 비뚤림을 함께 제시해 과장 없이 전달한다.</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #3 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">Efficacy and safety of Saccharomyces boulardii as an adjuvant therapy for the eradication of Helicobacter pylori: a meta-analysis</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Frontiers in Cellular and Infection Microbiology</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2025-02-12</div>
+                        <button class="bd-request-btn" data-title="Efficacy and safety of Saccharomyces boulardii as an adjuvant therapy for the eradication of Helicobacter pylori: a meta-analysis" data-session="장내미생물" data-num="3" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/40012609/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">메타분석(RCT 19편)</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">H. pylori는 전 세계 인구의 약 50%가 감염된 1군 발암원으로 위염·소화성궤양·위암과 관련된다. 항생제 남용과 내성 증가로 3제·4제 제균요법의 효과가 떨어지고 복통·설사·오심 등 부작용으로 순응도가 낮아지는 문제가 있다. S. boulardii 보조 투여가 제균율과 부작용에 도움이 되는지 논란이 있어 RCT를 통합 분석했다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">PubMed·Web of Science에서 2002년 1월~2023년 1월 RCT를 검색(PROSPERO CRD42024549780). 포함기준은 H. pylori 감염 환자에서 표준 3제·4제·순차요법(± 위약) 대조군 대비 표준요법+S. boulardii 병용군을 비교한 무작위대조시험이며, S. boulardii 외 다른 프로바이오틱스 병용은 제외했다. 최종 19편 RCT, 5,036명(국내 9·해외 10편; 성인 15·소아 4편; 3제 13·4제 5·순차 1편; 7일 4편·14일 13편)이 포함되었고 S. boulardii 용량은 250mg 1일 2회·3회, 282.5mg 1일 2회, 500mg 1일 2회, 5×10^9 CFU 1일 2회 등으로 혼재했고 투여기간은 7~28일이었다(Table 1). 1차 평가변수는 제균율(ITT), 2차는 전체 이상반응·복통·설사·복부팽만·변비·오심·구토·미각장애. I²로 이질성을 평가해 고정/무작위효과 모형으로 RR(95% CI)을 산출하고 연령·지역·요법·기간별 하위분석을 시행했다(RevMan 5.4).</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">19개 RCT(5,036명)가 포함되었고 이 중 18편이 제균율을 분석했다.<br/>
+S. boulardii 병용으로 제균율이 11% 증가했다(RR 1.11, 95% CI 1.08~1.15, P&lt;0.0001, I²=23%).<br/>
+하위분석에서 소아(RR 1.14, 95% CI 1.05~1.25, P=0.002)가 성인(RR 1.09, 95% CI 1.04~1.14, P=0.0002)보다 효과가 컸고, 4제요법 병용(RR 1.12, 95% CI 1.06~1.19, P=0.0002)이 3제요법(RR 1.05, 95% CI 1.00~1.11, P=0.04)보다 컸다(단, 요법별 포함 편수가 연구 특성 기술과 Table 2 하위분석 간에 불일치).<br/>
+부작용 측면에서 전체 이상반응은 51% 감소했고(RR 0.49, 95% CI 0.37~0.66, P&lt;0.00001), 설사 64% 감소(RR 0.36, 95% CI 0.26~0.48, P&lt;0.0001), 복부팽만 51% 감소(RR 0.49, 95% CI 0.33~0.72, P=0.0004), 변비 감소(RR 0.38, 95% CI 0.26~0.57, P&lt;0.00001), 오심 50% 감소(RR 0.50, 95% CI 0.37~0.68, P&lt;0.00001)를 보였다.<br/>
+반면 복통(RR 0.78, P=0.10), 구토(RR 0.71, P=0.07), 미각장애(RR 0.82, P=0.4)는 유의한 감소가 없었다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">S. boulardii군 고유의 이상반응은 별도로 분석되지 않았다. 병용 시 제균요법 관련 전체 이상반응(9편, RR 0.49)과 설사(16편)·복부팽만(7편)·변비(6편)·오심(12편)이 감소했다. 복통(9편)·구토(8편)·미각장애(7편)는 감소 경향이었으나 통계적으로 유의하지 않았다. 전체 이상반응 분석은 이질성이 높아(I²=79%) 하위분석에서도 원인을 찾지 못했다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 기존 제균요법에 S. boulardii를 추가하면 제균율이 높아지고 전체 이상반응과 설사·복부팽만·변비·오심이 줄지만 복통·구토·미각장애는 줄지 않는다고 결론지었다. 한계(정독관 판단 — 논문에 별도 한계 단락 없음)로 검색 DB가 PubMed·Web of Science 2개뿐이고, 논문이 포함 시험의 S. boulardii 균주를 보고하지 않았으며(Table 1은 용량·기간만 제시), 대조군 설계(위약 유무)와 요법·기간이 이질적이고 전체 이상반응 이질성이 높다. 바이오탑 관점: 제균요법 중 항생제 관련 설사·위장관 부작용을 줄이는 S. boulardii 근거로, 바이오탑 구성균(S. boulardii DBVPG 6763)과 균주가 같다는 근거는 없으므로 &#x27;동일 종 근거&#x27;로 한정해 활용한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>제균율 RR 1.11 (95% CI 1.08~1.15, P&lt;0.0001)</li>
+                            <li>설사 RR 0.36 (95% CI 0.26~0.48) — 64% 감소</li>
+                            <li>전체 이상반응 RR 0.49 (95% CI 0.37~0.66) — 51% 감소</li>
+                        </ul>
+                    </div>
+                    <div class="viz-section">
+                        <h4>📊 시각화: 제균요법 + S. boulardii — 위장관 부작용 상대위험(RR, 대조군=1)</h4>
+                        <div class="chart-wrap" style="position:relative;height:260px"><canvas id="chart3"></canvas></div>
+                        <script>
+                          new Chart(document.getElementById("chart3"), {
+                            type: "bar",
+                            data: { labels: ["전체 이상반응", "설사", "복부팽만", "변비", "오심"], datasets: [
+                              { label: "S. boulardii 병용 (RR)", data: [0.49, 0.36, 0.49, 0.38, 0.5], backgroundColor: "#1A5276" },
+                              { label: "표준요법 단독 기준(RR=1)", data: [1.0, 1.0, 1.0, 1.0, 1.0], backgroundColor: "#95a5a6" }
+                            ] },
+                            options: { responsive:true, maintainAspectRatio:false,
+                              plugins:{ legend:{ position:"bottom", labels:{ font:{ size:11 } } } },
+                              scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:11 } } } } }
+                          });
+                        </script>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: H. pylori 제균요법에 S. boulardii 병용 — 제균율 RR 1.11, 설사 64%·전체 이상반응 51% 감소 (RCT 19편 메타분석)</div><ul><li>소화기내과·내과 제균 처방 시 &#x27;항생제 관련 설사·복부팽만을 줄이는 동반 처방&#x27; 대화에서 바이오탑 구성균 S. boulardii의 종 수준 근거로 활용(균주 미명시 → 참고근거).</li><li>제균 효과 상승폭은 소아·4제요법 하위분석에서 더 컸으나, 원문 내 요법별 편수가 불일치(연구 특성: 3제 13편·4제 5편 vs Table 2 하위분석: 3제 5편·4제 12편)하므로 4제 우위는 단정하지 않는다. 복통·구토·미각장애는 줄지 않았다는 점도 함께 전달해 기대치를 맞춘다.</li><li>기존 발행 H. pylori 메타분석(비스무스 4제 한정)과 달리 3제·4제·순차요법을 모두 포함한 통합 근거라는 점을 차별점으로 소개.</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ━━━ 논문 #4 (장내미생물) ━━━ -->
+            <div class="paper">
+                <div class="paper-header">
+                    <div class="paper-title">The Effect of Supplementation with Saccharomyces boulardii in Women with Polycystic Ovary Syndrome: A Double-blind, Randomized Controlled Trial</div>
+                    <div class="paper-meta">
+                        <div class="paper-meta-item"><span class="importance-badge importance-high">★★★</span></div>
+                        <div class="paper-meta-item"><span class="evidence-tag evidence-ref">참고근거</span></div>
+                        <div class="paper-meta-item"><strong>Journal:</strong> Journal of Research in Pharmacy Practice</div>
+                        <div class="paper-meta-item"><strong>Published:</strong> 2026-08-28</div>
+                        <button class="bd-request-btn" data-title="The Effect of Supplementation with Saccharomyces boulardii in Women with Polycystic Ovary Syndrome: A Double-blind, Randomized Controlled Trial" data-session="장내미생물" data-num="4" onclick="openBDModal(this)" title="이 논문으로 BD 제작 요청">📌 BD 신청</button>
+                    </div>
+                    <div><a href="https://pubmed.ncbi.nlm.nih.gov/42732334/" class="paper-url" target="_blank">PubMed Link</a></div>
+                </div>
+                <div class="paper-content">
+                    <div class="content-section ">
+                        <div class="content-section-title">연구 디자인</div>
+                        <div class="content-section-text">이중맹검 RCT</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">배경</div>
+                        <div class="content-section-text">다낭성난소증후군(PCOS)은 가임기 여성의 5~10%에서 나타나는 내분비·대사 질환으로 고안드로겐혈증·인슐린저항성·배란장애를 동반한다. 장내미생물 불균형이 만성염증·장투과성 증가를 통해 PCOS 병태에 관여한다는 가설이 제기되었고 세균성 프로바이오틱스 연구는 있었으나, 효모 프로바이오틱스인 S. boulardii의 PCOS 임상 근거는 없었다. 이에 표준치료에 S. boulardii를 추가했을 때 호르몬·대사 지표 변화를 평가했다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">대상/방법</div>
+                        <div class="content-section-text">이란 타브리즈 Al-Zahra 병원 단일기관 이중맹검 무작위 위약대조 시험(IRCT20180404039187N3, 2018.10~2019.5). Rotterdam 기준 PCOS 18~45세 여성 91명을 1:1 블록 무작위배정(S. boulardii군 46명 vs 위약군 45명)했고 최종 84명(군별 42명)이 분석되었다. 중재는 S. boulardii 캡슐(DAILYEAST) 1일 2캡슐(500mg, 2×10^10 CFU) 12주이며, 두 군 모두 표준치료로 시프로테론아세테이트+에티닐에스트라디올 경구피임제를 복용했다. 1차 평가변수는 DHEA-S·테스토스테론 변화, 2차는 BMI·공복혈당(FBS) 변화. 기저 BMI·FBS 차이로 ANCOVA 보정 평균을 군간 비교했다.</div>
+                    </div>
+                    <div class="content-section cs-key">
+                        <div class="content-section-title">핵심 결과</div>
+                        <div class="content-section-text">무작위배정 91명 중 84명이 분석되었다.<br/>
+군내 비교에서 S. boulardii군의 테스토스테론은 0.43±0.2에서 0.29±0.2 ng/dL로 유의하게 감소했으나(P=0.003) 위약군은 0.46±0.3에서 0.43±0.2로 유의하지 않았다(P=0.68).<br/>
+DHEA-S도 S. boulardii군 211.5±83.9→175.9±79.5 µg/dL(P=0.003), 위약군 208.7±68.1→198.8±50.4(P=0.25)였다.<br/>
+ANCOVA 보정 후 군간 차이는 테스토스테론(위약 0.43±0.031 vs S. boulardii 0.29±0.031, P=0.003)과 DHEA-S(199.5±8.360 vs 175.2±8.360, P=0.043)에서 유의했다.<br/>
+BMI(29.1→28.5, P&lt;0.001)와 FBS(87.2→84.7, P&lt;0.001)는 S. boulardii군 내에서만 유의하게 감소했고 보정 군간 차이는 없었다(BMI 27.64 vs 27.04, P=0.120; FBS 82.9 vs 84.3, P=0.267).</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">안전성</div>
+                        <div class="content-section-text">경도의 위장관 이상반응(복부팽만·복부 불편감)이 S. boulardii군 6명, 위약군 2명에서 보고되었다. 치료 관련 중대 이상반응은 연구 기간 내 발생하지 않았다. 이상반응으로 인한 중단 수는 본문에 별도로 제시되지 않았다.</div>
+                    </div>
+                    <div class="content-section ">
+                        <div class="content-section-title">결론 및 한계</div>
+                        <div class="content-section-text">저자들은 12주 S. boulardii 보충이 PCOS 여성의 테스토스테론·DHEA-S를 낮췄으나 체중·BMI·공복혈당에는 군간 효과가 없었다며 보조요법 가능성을 제시하고 대규모 시험이 필요하다고 했다. 한계로 단일기관·소표본·12주 단기, 배란·임신·CRP 미평가, 기저 BMI·FBS 불균형이 있으며, 초록의 DHEA-S 군간 P값(0.0031)과 본문 Table 3(P=0.043)이 일치하지 않는 등 보고 정합성 문제도 있다. 바이오탑 관점: PCOS는 바이오탑 허가 범위 밖이므로 홍보·디테일링 소재로 쓰지 않고, &#x27;장-내분비 축&#x27;에 대한 S. boulardii 학술 동향(참고근거)으로만 모니터링한다.</div>
+                    </div>
+                    <div class="key-numbers">
+                        <h4>💡 핵심 수치</h4>
+                        <ul>
+                            <li>보정 테스토스테론 0.29 vs 0.43 ng/dL (P=0.003)</li>
+                            <li>보정 DHEA-S 175.2 vs 199.5 µg/dL (P=0.043)</li>
+                            <li>BMI·FBS 군간 차이 없음 (P=0.120 / 0.267)</li>
+                        </ul>
+                    </div>
+                    <div class="usage-box">
+                        <h4>💡 활용 포인트 — 이 논문 어떻게 쓰나</h4>
+                        <div class="usage-head">🎯 핵심 주제: S. boulardii 12주 보충이 PCOS 여성의 안드로겐(테스토스테론·DHEA-S)을 낮춘 RCT — 장-내분비 축 학술 동향</div><ul><li>PCOS는 바이오탑 허가 외 영역이므로 디테일링·홍보에 사용하지 않고, 학술팀·KOL 대상 &#x27;프로바이오틱스 연구 확장 동향&#x27; 모니터링 자료로만 보관한다.</li><li>S. boulardii 12주 복용 시 중대 이상반응은 없었으나 경도 위장관 이상반응(복부팽만·복부 불편감)은 S. boulardii군 6명 vs 위약군 2명으로 더 많았다는 점을 함께 성분 안전성 참고 정보로 내부 공유(균주 미기재, 제품 DAILYEAST).</li></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+    <h4>근거 분류 기준</h4>
+    <div class="legend-row">
+      <span class="tag-direct">직접근거</span>
+      <span>바이오탑과 동일 성분·균주를 사용한 연구 (C. butyricum TO-A, S. boulardii DBVPG 6763)</span>
+    </div>
+    <div class="legend-row">
+      <span class="tag-ref">참고근거</span>
+      <span>동일 종이나 다른 균주(CBM588) 사용 — 결과가 균주 특이적일 수 있어 직접 적용 시 주의 필요</span>
+    </div>
+    <h4 style="margin-top: 14px;">중요도 등급</h4>
+    <div class="legend-row">
+      <span class="stars-high">★★★</span>
+      <span>즉시 활용: RCT, 메타분석, Phase 3-4 수준. PM팀 디테일링에 바로 반영 가능</span>
+    </div>
+    <div class="legend-row">
+      <span class="stars-mid">★★☆</span>
+      <span>참고 활용: 전임상, 기전 연구, 소규모 임상. 학술강연 소재로 적합</span>
+    </div>
+    <div class="legend-row">
+      <span class="stars-low">★☆☆</span>
+      <span>모니터링: 동향 파악 수준. 후속 연구 결과 확인 필요</span>
+    </div>
+    <h4 style="margin-top: 14px;">접근성 표시</h4>
+    <div class="legend-row">
+      <span class="tag-open">🔓 오픈액세스</span>
+      <span>원문 전체 접근 가능 (PMC, Frontiers, MDPI, PLOS 등)</span>
+    </div>
+    <div class="legend-row">
+      <span class="tag-wall">🔒 페이월</span>
+      <span>원문 접근 제한 — 초록 및 인용 수치만 확인</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var h=decodeURIComponent(location.hash.slice(1)); if(!h) return;
+  var papers=document.querySelectorAll('.paper'),found=null;
+  for(var i=0;i<papers.length;i++){var t=papers[i].querySelector('.paper-title');var txt=t?t.textContent.trim().toLowerCase():'';if(txt.indexOf(h.toLowerCase())!==-1){found=papers[i];break;}}
+  if(!found) return;
+  for(var j=0;j<papers.length;j++){if(papers[j]!==found)papers[j].style.display='none';}
+  found.style.outline='3px solid #1A5276';found.style.borderRadius='10px';found.scrollIntoView({behavior:'smooth',block:'start'});
+  var btn=document.createElement('button');btn.textContent='📋 모든 논문 보기';
+  btn.style.cssText='position:fixed;bottom:24px;right:24px;z-index:999;padding:10px 20px;background:#003366;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3);';
+  btn.onclick=function(){for(var k=0;k<papers.length;k++)papers[k].style.display='';found.style.outline='';btn.remove();window.scrollTo(0,0);};
+  document.body.appendChild(btn);
+})();
+</script>
+
+<!-- BD_REQUEST_MODAL_v2 -->
+<style>
+  #bd-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;align-items:center;justify-content:center}
+  #bd-modal{background:#fff;border-radius:8px;padding:24px;min-width:420px;max-width:520px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-family:'Malgun Gothic',sans-serif}
+  #bd-modal h3{margin:0 0 16px;color:#003366;border-bottom:2px solid #1A5276;padding-bottom:8px}
+  #bd-modal .field{margin:12px 0}
+  #bd-modal label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:4px}
+  #bd-modal input,#bd-modal textarea{width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;font-size:13px;box-sizing:border-box;font-family:inherit}
+  #bd-modal textarea{min-height:60px;resize:vertical}
+  #bd-modal .radio-row label{display:inline-block;font-weight:400;margin-right:16px;cursor:pointer}
+  #bd-modal .actions{margin-top:20px;text-align:right}
+  #bd-modal button{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:13px;margin-left:8px}
+  #bd-modal .submit{background:#003366;color:#fff;font-weight:600}#bd-modal .cancel{background:#ddd;color:#333}
+  #bd-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#003366;color:#fff;padding:12px 24px;border-radius:6px;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:9999;opacity:0;transition:opacity .3s}
+  #bd-toast.show{opacity:1}#bd-toast.error{background:#c0392b}
+</style>
+<div id="bd-modal-overlay" onclick="if(event.target.id==='bd-modal-overlay') closeBDModal()">
+  <div id="bd-modal">
+    <h3>📌 BD 제작 요청</h3>
+    <div class="field"><label>논문</label><div id="bd-modal-title" style="font-size:13px;color:#555;line-height:1.4"></div></div>
+    <div class="field"><label>세션</label><div id="bd-modal-session" style="font-size:13px;color:#555"></div></div>
+    <div class="field"><label>BD 포맷</label><div class="radio-row">
+      <label><input type="radio" name="bd-format" value="CLB" checked> CLB (학술브리프)</label>
+      <label><input type="radio" name="bd-format" value="BT"> BT (바이오톡)</label></div></div>
+    <div class="field"><label>요청자 이메일 *</label><input type="email" id="bd-modal-requester" placeholder="example@hanall.co.kr" required></div>
+    <div class="field"><label>메모 (선택)</label><textarea id="bd-modal-memo" placeholder="특별 요청사항"></textarea></div>
+    <div class="actions"><button class="cancel" onclick="closeBDModal()">취소</button><button class="submit" onclick="submitBDRequest()">요청 제출</button></div>
+  </div>
+</div>
+<div id="bd-toast"></div>
+<script>
+const BD_WEBHOOK_URL='https://script.google.com/macros/s/AKfycbynF7P1576GbRlzdIjBaxrOvjTU4HDP8F9jY4flxduhSqYR15Hr4AmhImuaS0wPJoOC/exec';let bdCurrentBtn=null;
+function openBDModal(b){bdCurrentBtn=b;document.getElementById('bd-modal-title').textContent=b.dataset.title;document.getElementById('bd-modal-session').textContent=b.dataset.session;document.getElementById('bd-modal-requester').value=localStorage.getItem('bd-requester')||'';document.getElementById('bd-modal-memo').value='';document.querySelector('input[name=bd-format][value=CLB]').checked=true;document.getElementById('bd-modal-overlay').style.display='flex';}
+function closeBDModal(){document.getElementById('bd-modal-overlay').style.display='none';bdCurrentBtn=null;}
+function showToast(m,e){var t=document.getElementById('bd-toast');t.textContent=m;t.className=e?'show error':'show';setTimeout(function(){t.className='';},3500);}
+function submitBDRequest(){if(!bdCurrentBtn)return;var title=bdCurrentBtn.dataset.title,session=bdCurrentBtn.dataset.session,format=document.querySelector('input[name=bd-format]:checked').value,requester=document.getElementById('bd-modal-requester').value.trim(),memo=document.getElementById('bd-modal-memo').value.trim();if(!requester){showToast('요청자 이메일은 필수입니다',true);return;}localStorage.setItem('bd-requester',requester);var cb='bdcb_'+Date.now();window[cb]=function(data){delete window[cb];document.head.removeChild(s);if(data.status==='ok'){showToast('✅ BD 요청 접수: '+format+' / '+title.slice(0,40)+'…');bdCurrentBtn.disabled=true;bdCurrentBtn.textContent='✓ 요청됨';closeBDModal();}else if(data.status==='duplicate'){showToast('⚠️ 동일 요청이 이미 대기 중입니다',true);closeBDModal();}else{showToast('❌ 오류: '+(data.message||'알 수 없음'),true);}};var params=new URLSearchParams({action:'requestBDQueue',title:title,session:session,format:format,requester:requester,memo:memo,callback:cb});var s=document.createElement('script');s.src=BD_WEBHOOK_URL+'?'+params.toString();s.onerror=function(){delete window[cb];showToast('❌ 네트워크 오류 — 잠시 후 다시 시도',true);};document.head.appendChild(s);}
+</script>
+
+</body>
+</html>
