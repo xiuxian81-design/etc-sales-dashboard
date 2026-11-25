@@ -518,6 +518,8 @@ body{font-family:'MaruBuri','Malgun Gothic',serif;background:var(--bg);color:var
 .rowbox + .rowbox{margin-top:8px}
 .rowbox.internal{background:var(--gray1)}   /* [v58] 업체 없음(내부 일정) 행 */
 .chk-internal{font-size:12px;color:var(--gray3);display:flex;gap:5px;align-items:center;cursor:pointer}
+.fstar{display:none;align-self:flex-start;font-size:12px;font-weight:700;color:#92400e;background:#fef3c7;border:1px solid #fcd34d;border-radius:6px;padding:2px 8px}   /* [11-25] 집중육성업체 ★ */
+.fstar.on{display:inline-block}
 .sub-hint{font-size:11px;color:var(--gray3);margin-top:-4px}
 .row-del{position:absolute;top:0;right:0;width:44px;height:44px;min-width:44px;min-height:44px;padding:0;background:none;border:none;color:var(--gray3);font-size:20px;line-height:1;cursor:pointer;border-radius:0 12px 0 12px;display:flex;align-items:center;justify-content:center}
 .row-del:hover{color:var(--bad);background:var(--bad-lt)}
@@ -1612,7 +1614,7 @@ function gbListLoad(dir){
     if(crm&&Array.isArray(crm.directors)){ const i=crm.directors.findIndex(x=>x&&x.name===dir); if(i>=0) crm.directors[i]=r.d; }
     if(gbList.dir===dir) gbList.st='ok';
   }).catch(function(){ if(gbList.dir===dir) gbList.st='fail'; })
-    .then(function(){ if(rpm===dir){ gbReset(); renderWhenIdle('c-gb',gbRender); } });
+    .then(function(){ if(rpm===dir){ gbReset(); renderWhenIdle('c-gb',gbRender); actStars('done'); actStars('todo'); } });   // [11-25] ★ 다시
 }
 /* 업체명 자동완성 마스터 = 서버 vendors(최근 활동순) ∪ 기존 CSO 업체 datalist */
 function buildVendorMaster(){
@@ -3359,13 +3361,28 @@ function gb72EmailText(){
   return b;
 }
 
+/* [11-25 박본님] 집중육성업체 ★ — 그 지부장 집중업체 목록(목표 근거 v72 focus, 폼에서 × 뺀 업체 제외·＋ 추가 업체 포함)에 든 업체(소속 또는 재위탁)면
+   한일·할일 줄에 '★ 집중육성업체' 표시, 일일결산 메일 본문에 ★[업체]. 시트로 보내는 업체명(payload)에는 넣지 않는다(집계·별칭 매칭 보호). */
+function focusKeys(){
+  const v=gb72V(), ks={}, ex={}, sv=(v.saved&&v.saved.rows)||[];
+  ((v.focus&&v.focus.rows)||[]).forEach(r=>{ const k=normVendorKey(r.name); if(k) ks[k]=1; });
+  sv.forEach(r=>{ if(String(r.항목||'').indexOf('집중')<0) return; const k=normVendorKey(r.업체); if(!k) return;
+    if(gb72Ex(r.제외)) ex[k]=1; else ks[k]=1; });
+  Object.keys(ex).forEach(k=>{ delete ks[k]; });
+  return ks;
+}
+function isFocusAct(ks,a,b){ const x=normVendorKey(a), y=normVendorKey(b); return !!((x&&ks[x])||(y&&ks[y])); }
+function actStars(kind){
+  const L=(kind==='done'?daily.한일:daily.할일)||[], ks=focusKeys();
+  L.forEach((r,i)=>{ const el=document.getElementById('fs-'+kind+'-'+i); if(el) el.classList.toggle('on', !r.내부 && isFocusAct(ks,r.업체명,r.재위탁)); });
+}
 /* ════════════ ⑤ 오늘 한일 / ⑥ 내일 할일 — 업체명 자동완성 + 상태 세그먼트 ════════════ */
 const VSTATES=['순항','관찰','부진'];
 function addDone(){ daily.한일.push({업체명:'',상태:'',내용:''}); renderDone(); saveDaily(); }
 function delDone(i){ daily.한일.splice(i,1); if(!daily.한일.length) daily.한일=[{업체명:'',상태:'',내용:''}]; renderDone(); saveDaily(); }
 function doneField(i,f,v){ daily.한일[i][f]=v; doneCount(); saveDaily(); }
 function doneState(i,s){ daily.한일[i].상태=(daily.한일[i].상태===s?'':s); renderDone(); saveDaily(); }
-function doneCount(){ const n=(daily.한일||[]).filter(r=>r.내부?String(r.내용||'').trim():String(r.업체명||'').trim()).length; /* [v58] 내부 일정은 내용이 있으면 셈 */ const el=document.getElementById('done-cnt'); if(el) el.textContent=n; }
+function doneCount(){ const n=(daily.한일||[]).filter(r=>r.내부?String(r.내용||'').trim():String(r.업체명||'').trim()).length; /* [v58] 내부 일정은 내용이 있으면 셈 */ const el=document.getElementById('done-cnt'); if(el) el.textContent=n; actStars('done'); }
 function renderDone(){
   const cont=document.getElementById('done-list'); if(!cont) return;
   cont.innerHTML=daily.한일.map((r,i)=>`<div class="rowbox${r.내부?' internal':''}">
@@ -3380,6 +3397,7 @@ function renderDone(){
           oninput="doneField(${i},'재위탁',this.value);vacSearch('donesub',${i},this.value)" onkeydown="vacKey('donesub',${i},event)" onblur="vacClose('donesub',${i})">
         <div class="vac-list" id="vac-donesub-${i}"></div>
       </div>
+      <span class="fstar" id="fs-done-${i}">★ 집중육성업체</span>
       <label class="chk-internal"><input type="checkbox" ${r.내부?'checked':''} onchange="actInternal('done',${i},this.checked)"> 업체 없음 (내근·회의·교육 등 내부 일정 — 업체 집계에서 제외)</label>
       <div class="seg st${(!r.내부&&!r.상태&&String(r.업체명||'').trim())?' need':''}">
         ${VSTATES.map(s=>`<button type="button" data-v="${s}" class="${r.상태===s?'on':''}" onclick="doneState(${i},'${s}')">${s}</button>`).join('')}
@@ -3407,7 +3425,7 @@ function subSource(kind,i){
 function addTodo(){ daily.할일.push({업체명:'',내용:''}); renderTodo(); saveDaily(); }
 function delTodo(i){ daily.할일.splice(i,1); if(!daily.할일.length) daily.할일=[{업체명:'',내용:''}]; renderTodo(); saveDaily(); }
 function todoField(i,f,v){ daily.할일[i][f]=v; todoCount(); saveDaily(); }
-function todoCount(){ const n=(daily.할일||[]).filter(r=>r.내부?String(r.내용||'').trim():String(r.업체명||'').trim()).length; /* [v58] */ const el=document.getElementById('todo-cnt'); if(el) el.textContent=n; }
+function todoCount(){ const n=(daily.할일||[]).filter(r=>r.내부?String(r.내용||'').trim():String(r.업체명||'').trim()).length; /* [v58] */ const el=document.getElementById('todo-cnt'); if(el) el.textContent=n; actStars('todo'); }
 function renderTodo(){
   const cont=document.getElementById('todo-list'); if(!cont) return;
   cont.innerHTML=daily.할일.map((r,i)=>`<div class="rowbox${r.내부?' internal':''}">
@@ -3422,6 +3440,7 @@ function renderTodo(){
           oninput="todoField(${i},'재위탁',this.value);vacSearch('todosub',${i},this.value)" onkeydown="vacKey('todosub',${i},event)" onblur="vacClose('todosub',${i})">
         <div class="vac-list" id="vac-todosub-${i}"></div>
       </div>
+      <span class="fstar" id="fs-todo-${i}">★ 집중육성업체</span>
       <label class="chk-internal"><input type="checkbox" ${r.내부?'checked':''} onchange="actInternal('todo',${i},this.checked)"> 업체 없음 (내근·회의·교육 등 내부 일정)</label>
       <input class="fi" type="text" value="${esc(r.내용||'')}" placeholder="${r.내부?'내부 일정 (한 줄)':'할 일 (한 줄)'}" oninput="todoField(${i},'내용',this.value)">
     </div>`).join('');
@@ -4262,17 +4281,20 @@ function buildDailyClosingEmail(){
   // 4. 오늘 한일 (김종훈=오늘의 인사이트)
   const doneRows=collectDoneRows();
   body+=`4. ${rpm==='김종훈'?'오늘의 인사이트':'오늘 한일'} (${doneRows.length}건)\n`;
+  const fks=focusKeys(), fst=r=>(!r.내부&&isFocusAct(fks,r.업체명,r.소속CSO))?'★':'';   // [11-25] 집중육성업체 ★
+  let fany=false;
   if(doneRows.length){
-    doneRows.forEach(r=>{ body+=`[${r.업체명}]${r.상태?` (${r.상태})`:''} ${r.내용||'-'}\n`; });
+    doneRows.forEach(r=>{ const st=fst(r); if(st) fany=true; body+=`${st}[${r.업체명}]${r.상태?` (${r.상태})`:''} ${r.내용||'-'}\n`; });
   } else { body+='  ∙ 없음\n'; }
   body+='\n';
   // 5. 내일 할일
   const todoRows=collectTodoRows();
   body+=`5. 내일 할일 (${todoRows.length}건)\n`;
   if(todoRows.length){
-    todoRows.forEach(r=>{ body+=`[${r.업체명}] ${r.내용||'-'}\n`; });
+    todoRows.forEach(r=>{ const st=fst(r); if(st) fany=true; body+=`${st}[${r.업체명}] ${r.내용||'-'}\n`; });
   } else { body+='  ∙ 없음\n'; }
   body+='\n';
+  if(fany) body+='★ = 집중육성업체\n\n';
   body+='감사합니다.\n';
   body+=`${rpm} 지부장 드림`;
   return body;
