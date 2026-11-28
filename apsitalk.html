@@ -8,7 +8,7 @@
 (function(){var GATE="https://script.google.com/macros/s/AKfycbwTXL5bRBDXXoEN06x2OSMLq1Wqh1CFJWjYAPSWjhYAZZFxJqx30bwwgdpSFT2SndDL/exec",DOC="apsitalk";
 /* D = 사례 맵 머리의 __ASK와 같은 주소(성과보드·사례 맵 문의가 쓰는 D 웹앱) — 앱시톡은 읽기·쓰기 모두 여기 */
 window.__ASK="https://script.google.com/macros/s/AKfycbyhk2el3kwGMStCvyUr-8B-PWS-6aKwcf5EVfvpryqlj3jEeLw5pnttHMEokrpQXO33dQ/exec";window.__gateT="";
-var ROUTES=/^#(home|ask|rec|case|bd|my|pm)\b/;
+var ROUTES=/^#(home|ask|rec|case|bd|my|pm|apply)\b/;
 var norm=function(t){t=String(t||"");if(/%[0-9A-Fa-f]{2}/.test(t)){try{t=decodeURIComponent(t);}catch(e){}}return t;};
 var ss=function(k,v){try{if(v===undefined)return sessionStorage.getItem(k)||"";if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){}return "";};
 var ls=function(k,v){try{if(v===undefined)return localStorage.getItem(k)||"";if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){}return "";};
@@ -35,6 +35,14 @@ window.__gateGuard=function(res,used){if(!res||res.auth!=="required")return fals
 })();</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>…</title>
+<!-- 홈 화면에 추가(11-28 박본님 '앱시톡 아이콘·오렌지 바탕') — 파일은 이 화면과 같은 폴더(Pages: apsitalk.html 옆, 로컬: dist\) -->
+<link rel="manifest" href="apsitalk.webmanifest">
+<link rel="apple-touch-icon" href="apsitalk-icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="apsitalk-icon-192.png">
+<meta name="apple-mobile-web-app-title" content="앱시톡">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#262C73">
 <!-- 화면 틀만 둔다. 자료(요약사례·답·BD 제목·동의어·특장점)는 loadData()로 받는다 — 이 파일에 자료 글자를 넣지 않는다(빌드 게이트가 검사).
      사용자가 친 글(질문·답·한 줄·이름·조건)은 전부 textContent로 그린다(U() 자리표 → put()이 채움). 기기·탭 저장소는 쓰지 않는다.
      11-27 v2(휴대폰 우선): 처음 화면 = 안내 + 조건 고르기(고르기 전에는 사례 0) + 질문하기 · 아래 고정 탭 · 사례 상세 = 상황 → 한 일 → 결과 → 처방명분 근거 → 표준대화 → BD → 질문 → 특장점 · '써 봤어요'는 사례에만(같은 사례 여러 번). -->
@@ -178,6 +186,25 @@ ul.why .wm{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px
 .vf button{flex:1;min-width:0;min-height:48px;border-radius:10px;border:1px solid rgba(255,255,255,.45);background:none;color:#fff;font-weight:800;font-size:15px}
 .vf button.f{background:#fff;color:#14172E}.vf button[disabled]{opacity:.3;cursor:default}
 .vb .err{color:#fff;opacity:.85;padding-top:30vh}
+.vt .bdn{flex:none;font-size:14px;font-weight:800;background:rgba(255,255,255,.16);border-radius:999px;padding:2px 10px;white-space:nowrap}
+/* 사례 전체 복사·내 메일로 보내기(사례 상세 제목 카드) */
+.cpm{margin-top:10px}.cpm .btn{flex:1;min-width:0;min-height:48px;padding:0 10px}
+/* 사용 신청(미등록 계정) · 신청 승인(지부장·본부장) */
+label.fl{display:block}
+.ro{background:#F6F7FB;border:1.5px dashed var(--ln);border-radius:12px;padding:10px 12px;font-weight:700;overflow-wrap:anywhere}
+.hint{font-size:14px;color:var(--mut);margin-top:4px}
+input.ln.er{border-color:var(--br);background:#FFF9EC}
+.agb{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1.5px solid var(--ln);border-radius:12px;background:#fff;min-height:52px;padding:8px 12px;font-weight:800;margin-top:18px;line-height:1.4}
+.agb .bx{flex:none;width:26px;height:26px;border:2px solid var(--nv);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:900}
+.agb[aria-checked="true"]{border-color:var(--nv);background:var(--nvl)}.agb[aria-checked="true"] .bx{background:var(--nv)}.agb[aria-checked="true"] .bx::after{content:'✓'}
+.agb.er{border-color:var(--br);background:#FFF9EC}
+.agd summary{min-height:44px;display:flex;align-items:center;cursor:pointer;color:var(--nv);font-weight:700;font-size:15px}
+.agd dl{margin:0 0 8px;font-size:15px}.agd dt{font-weight:800;color:var(--mut);font-size:13.5px;margin-top:6px}.agd dd{margin:0}.agd p{margin:6px 0 0;font-size:15px}
+dl.apd{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:10px 0 0;font-size:15.5px}dl.apd dt{color:var(--mut);font-weight:700}dl.apd dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.st.r{background:#F1E7DA;color:var(--br)}
+.btn.br{border-color:var(--br);color:var(--br)}
+.aprj{margin-top:10px}
+.it.hl{box-shadow:0 0 0 3px #B9C0E4}
 @media(min-width:760px){.wrap{padding:16px 20px 110px}}
 </style>
 </head>
@@ -197,6 +224,9 @@ let WHO_T='계정 확인 중';
 function whoText(){return WHO_T}
 function devBar(){return ''}
 let _atkN=0;window.__atkRetrying=0;
+/* v79(11-28): 열람권한에 없는 계정이 atk를 부르면 서버는 열람 거절(reason not_allowed — 허용목록 없음)을 준다 → 사용 신청 화면.
+   atkapplystat·atkapply(미등록도 됨)·atkapplylist·atkapprove(지부장·본부장)·atkmail(사례 내용 + 관련 BD PDF를 로그인 계정 메일로)은 다른 요청과 같은 JSONP·같은 rid 재전송. */
+const UNREG=/^(not_allowed|not_registered)$/;
 function gcall1(doc,params,ms,quiet){return new Promise((res,rej)=>{ // D에 JSONP 1번 — 열람 거절이면 머리의 안내·재로그인으로(quiet = 미리 받기: 안내·이동 없이 실패만)
   const tok=window.__gateTok();
   if(!tok){if(!quiet)window.__gateGo('no_token');const er=new Error('계정 확인이 필요합니다');er.gate=1;return rej(er)}
@@ -204,7 +234,9 @@ function gcall1(doc,params,ms,quiet){return new Promise((res,rej)=>{ // D에 JSO
   const end=()=>{clearTimeout(to);s.remove()};
   const to=setTimeout(()=>{end();window[fn]=function(){};rej(new Error('응답이 없습니다'))},ms||60000); // 늦게 온 옛 응답은 빈 함수가 받는다(무시)
   window[fn]=r=>{got=1;end();try{delete window[fn]}catch(e){}
-    if(r&&r.auth==='required'){if(!quiet)window.__gateGuard(r,tok);const er=new Error('열람 확인이 필요합니다');er.gate=1;return rej(er)}
+    if(r&&r.auth==='required'){
+      if(doc==='atk'&&UNREG.test(r.reason||'')){const er=new Error('미등록 계정');er.gate=1;er.apply=1;return rej(er)}   // 미등록(열람권한 없음) — 토큰은 그대로 두고 화면이 atkapplystat으로 사용 신청(v79). atkapplystat도 거절이면 아래 기존 흐름
+      if(!quiet)window.__gateGuard(r,tok);const er=new Error('열람 확인이 필요합니다');er.gate=1;return rej(er)}
     res(r)};
   s.onload=()=>{if(got)return;end();window[fn]=function(){};rej(new Error('응답이 비었습니다'))};
   s.onerror=()=>{end();window[fn]=function(){};rej(new Error('서버에 연결하지 못했습니다'))};
@@ -229,7 +261,7 @@ function gcall(doc,params,ms,quiet){
     send()})}
 /* 화면이 부르는 서버 요청 1번 — busy(서버 잠금 실패, 아무것도 안 씀)면 몇 초 뒤 같은 인자(같은 rid)로 다시 */
 async function srv(doc,params){const B=window.__atkBusy||BUSY_T;
-  for(let i=0;;i++){const r=await gcall(doc,params||{});if(r&&r.ok===0&&r.err==='busy'&&i<B.length){await new Promise(z=>setTimeout(z,B[i]));continue}return r}}
+  for(let i=0;;i++){const r=await gcall(doc,params||{});if(r&&r.ok===0&&r.err==='busy'&&!r.msg&&i<B.length){   /* 서버가 안내 문구(msg)를 준 busy(하루 신청 상한 등)는 다시 보내지 않는다 */await new Promise(z=>setTimeout(z,B[i]));continue}return r}}
 async function loadData(){
   const r=await srv('atk',{});
   if(!r||r.ok!==1||!r.d)throw new Error(r&&r.err==='no_data'?'자료가 아직 올라오지 않았습니다':r&&r.err==='bad_data'?'자료를 갱신하는 중입니다. 잠시 뒤 새로고침해 주세요':'자료를 읽지 못했습니다');
@@ -280,12 +312,14 @@ function bdPdf(a){ // PDF 받기 — 한 번에(all=1) 먼저, 너무 크면(too
   return false}
 /*[ADAPTER:END]*/
 /* ─────────────────────────────────────────────── */
-let D=null,ME={who:'',name:'',role:'',can:0},MY=null,PMD=null;
+let D=null,ME={who:'',name:'',role:'',can:0},MY=null,PMD=null,APD=null,AP=null,APTRY=0,APRE=0;   // APD = 신청 목록(승인자) · AP = 내 신청 상태(미등록 계정) · APTRY = 승인 확인 뒤 다시 불러오기 1번 · APRE = 거절 뒤 다시 신청
 /* 계정: 답할 수 있음 = 서버 canAnswer. 업체 역할은 canAnswer가 와도 PM 화면을 열지 않는다(서버도 업체에 atkpm·atkans를 막는다 — 겹 막기) */
 const roleKey=r=>String(r||'').replace(/[\s​-‍⁠﻿]/g,'');   // 서버 판정과 같게 공백·보이지 않는 글자를 지우고 비교(v78_API §0-3)
 const meOf=o=>({who:o.who||'',name:o.name||'',role:roleKey(o.role),can:o.canAnswer&&roleKey(o.role)!=='업체'?1:0});
-/* 이 화면이 열려 있는 동안만(저장소에 남기지 않음): asks 질문 기록 · pick 처음 화면에서 고른 조건 · rec 보낸 추천 기록(같은 조건 1번) · fbN 사례별 남긴 결과 수 */
-const SES={asks:{},seq:0,pick:{},rec:{},fbN:{},lastRec:''};
+const isAppr=()=>ME.role==='지부장'||ME.role==='본부장';   // 사용 신청 승인 = 지부장·본부장만(서버 atkapplylist·atkapprove도 같은 역할만 — 겹 막기)
+/* 이 화면이 열려 있는 동안만(저장소에 남기지 않음): asks 질문 기록 · pick 처음 화면에서 고른 조건 · rec 보낸 추천 기록(같은 조건 1번) · fbN 사례별 남긴 결과 수 · mailAt 사례별 메일 보낸 시각(30초 다시 못 누름) */
+const SES={asks:{},seq:0,pick:{},rec:{},fbN:{},lastRec:'',mailAt:{}};
+const MAIL_GAP=30000;
 const stack=[];
 const $=id=>document.getElementById(id);
 const E=s=>String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -302,7 +336,7 @@ function nav(h){stack.push(location.hash||'#home');location.hash=h}
 function backTo(fb){if(stack.length)history.back();else location.hash=fb||'#home'}
 function replace(h){history.replaceState(null,'',h);render()}
 addEventListener('hashchange',()=>{if(stack.length&&stack[stack.length-1]===location.hash)stack.pop();render()});
-function head(back){return `<div class="hd">${back?`<button class="bk" aria-label="뒤로" onclick="backTo('#home')">←</button>`:''}<b>${E(D.meta.title)}</b><span class="sp"></span><span class="who">${U(whoText())}</span></div>`+devBar()}
+function head(back){return `<div class="hd">${back?`<button class="bk" aria-label="뒤로" onclick="backTo('#home')">←</button>`:''}<b>${D?E(D.meta.title):'앱시톡'}</b><span class="sp"></span><span class="who">${U(!D&&AP&&AP.who?AP.who:whoText())}</span></div>`+devBar()}
 const caseOf=id=>D.cases.find(c=>c.id===id);
 const qaOf=k=>D.qa.find(x=>x.k===k);
 const notTalk=k=>{const x=qaOf(k);return !!x&&x.t!=='talk'};   // '나오는 질문' 칸에는 FAQ·현장 답만 — 표준대화는 사례 상세의 표준대화 칸에 따로 있어 두 번 보이지 않게(11-27 박본님)
@@ -336,18 +370,22 @@ function resBig(c,full){const note=c.res_note?`<div class="rn">${E(c.res_note)}<
   if(!c.res_to)return (full?`<p class="tx" id="res">${E(c.res)}</p>`:`<div class="r rs">${E(c.res)}</div>`)+note;
   return (c.res_label?`<div class="rl">${E(c.res_label)}</div>`:'')+`<div class="rb" data-res="1">${c.res_from?`<span class="rf">${E(c.res_from)}</span><span class="ra">→</span>`:''}<span class="rt">${E(c.res_to)}</span></div>`+note}
 function caseBtn(id,mt){const c=caseOf(id);if(!c)return '';return `<button class="cs" data-case="${A(id)}" onclick="nav('${mk('case',{id})}')"><b>${E(c.title)}</b><div class="r">${E(lead(c.sit))}</div>${resBig(c)}${mt||''}</button>`}
-function bdBtn(k,i){const b=D.bd[k];if(!b)return '';return `<button class="bdi" data-bd="${A(k)}" onclick="nav('${mk('bd',{k})}')"><span class="no">${i+1}</span><span class="sp">${E(b.title)}</span><span class="btn f">보기</span></button>`}
+/* BD 보기 주소에 들어온 목록(ls)을 같이 — 그 목록 안에서 [이전]·[다음]이 BD를 넘긴다(11-28 박본님 '다음을 누르면 다음 장으로') */
+const bdHref=(k,ls)=>mk('bd',{k,ls:ls&&ls.length>1&&ls.includes(k)?ls.join(','):''});
+function bdBtn(k,i,ls){const b=D.bd[k];if(!b)return '';return `<button class="bdi" data-bd="${A(k)}" onclick="nav('${A(bdHref(k,ls))}')"><span class="no">${i+1}</span><span class="sp">${E(b.title)}</span><span class="btn f">보기</span></button>`}
 function featCard(n){const f=D.feat||[];if(!f.length)return '';return `<section class="cd sx" id="feat"><h3>${n?`<i>${n}</i>`:''}<span>${E(D.meta.feat_title)}</span></h3><ul class="why">${f.map(x=>`<li><span class="ck">✓</span><div class="wb"><div class="wt">${E(x.t)}</div><div class="wm"><span class="tg">${E(x.tag)}</span>${x.bd&&D.bd[x.bd]?`<button class="btn" data-bd="${A(x.bd)}" onclick="nav('${mk('bd',{k:x.bd})}')">BD 보기</button>`:''}</div></div></li>`).join('')}</ul></section>`}
 /* 아래 고정 탭 — 사례 찾기 · 질문하기 · 내 질문(새 답 배지) · PM(답할 수 있는 계정만) */
-function tabs(cur){const nb=MY&&MY.ok===1?MY.unseen||0:0,pw=PMD&&PMD.ok===1?PMD.wait||0:0;
+function tabs(cur){const nb=MY&&MY.ok===1?MY.unseen||0:0,pw=PMD&&PMD.ok===1?PMD.wait||0:0,aw=APD&&APD.ok===1?APD.wait||0:0;
   return `<nav class="tb" id="tb"><button id="tbhome" class="${cur==='home'?'on':''}" onclick="tabGo('home')"><i>⌕</i>사례 찾기</button><button id="tbask" class="${cur==='ask'?'on':''}" onclick="tabGo('q')"><i>?</i>질문하기</button>`
   +`<button id="gomy" class="${cur==='my'?'on':''}" onclick="tabGo('my')"><i>✉</i>내 질문<span class="badge${nb?'':' z'}" id="myn">${nb||''}</span></button>`
-  +(ME.can?`<button id="gopm" class="${cur==='pm'?'on':''}" onclick="tabGo('pm')"><i>✎</i>PM 화면<span class="badge${pw?'':' z'}" id="pmn">${pw||''}</span></button>`:'')+`</nav>`}
+  +(ME.can?`<button id="gopm" class="${cur==='pm'?'on':''}" onclick="tabGo('pm')"><i>✎</i>PM 화면<span class="badge${pw?'':' z'}" id="pmn">${pw||''}</span></button>`:'')
+  +(isAppr()?`<button id="goap" class="${cur==='apply'?'on':''}" onclick="tabGo('apply')"><i>✓</i>신청<span class="badge${aw?'':' z'}" id="apn">${aw||''}</span></button>`:'')+`</nav>`}
 function badges(){const n=$('myn');if(n&&MY&&MY.ok===1){n.textContent=MY.unseen?String(MY.unseen):'';n.classList.toggle('z',!MY.unseen)}
-  const p=$('pmn');if(p&&PMD&&PMD.ok===1){p.textContent=PMD.wait?String(PMD.wait):'';p.classList.toggle('z',!PMD.wait)}}
+  const p=$('pmn');if(p&&PMD&&PMD.ok===1){p.textContent=PMD.wait?String(PMD.wait):'';p.classList.toggle('z',!PMD.wait)}
+  const a=$('apn');if(a&&APD&&APD.ok===1){a.textContent=APD.wait?String(APD.wait):'';a.classList.toggle('z',!APD.wait)}}
 function tabGo(t){const r=route();if(t==='home'){if(r.v==='home'){window.scrollTo(0,0);return}nav('#home');return}
   if(t==='q'){if(r.v==='home'){qFocus();return}nav('#home?f=q');return}
-  if(t==='my'){if(r.v!=='my')nav('#my');return}if(t==='pm'&&r.v!=='pm')nav('#pm')}
+  if(t==='my'){if(r.v!=='my')nav('#my');return}if(t==='pm'&&r.v!=='pm'){nav('#pm');return}if(t==='apply'&&r.v!=='apply')nav('#apply')}
 function qFocus(){const c=$('qcard');if(c){c.scrollIntoView({block:'start'});const q=$('q');if(q)q.focus({preventScroll:true})}}
 
 /* ── 처음 화면: 안내 + 조건 고르기(고르기 전에는 사례를 그리지 않는다) + 질문하기 ── */
@@ -364,6 +402,7 @@ function pickSet(el){const k=el.dataset.f,v=el.dataset.v;SES.pick[k]=SES.pick[k]
 function pickGo(){if(!selN(SES.pick))return;nav(mk('rec',SES.pick))}
 function homeAfter(){srv('atkmy',{}).then(r=>{if(r&&r.ok===1){MY=r;badges()}},()=>{});
   if(ME.can)srv('atkpm',{}).then(r=>{if(r&&r.ok===1){PMD=r;badges()}},()=>{});
+  if(isAppr())srv('atkapplylist',{}).then(r=>{if(r&&r.ok===1){APD=r;badges()}},()=>{});
   if(route().p.get('f')==='q')setTimeout(qFocus,0)}
 function askEx(el){$('q').value=el.textContent;askGo()}
 function askGo(){const el=$('q');if(!el)return;const q=el.value.trim().slice(0,300);if(!q)return;
@@ -377,7 +416,7 @@ function vask(){const p=route().p,q=(p.get('q')||'').slice(0,300),rec=SES.asks[p
   const r=rec.res,has=r.qa.length>0;
   const pmBox=`<div class="cd" id="pmask"><h2>${has?'찾는 답이 아니면 담당 PM에게 문의':'담당 PM에게 문의'} <small>답이 오면 '내 질문'에 표시됩니다</small></h2><textarea class="ta" id="pmq" maxlength="300"></textarea><button class="go" id="pmgo" data-s="${A(p.get('s')||'')}" onclick="pmAsk(this)">담당 PM에게 문의 보내기</button><div class="fbm" id="pmmsg"></div></div>`;
   const cs=r.cases.length?`<div class="cd" id="rcases"><h2>관련 요약사례</h2>${r.cases.map(id=>caseBtn(id)).join('')}</div>`:'';
-  const bs=r.bd.length?`<div class="cd" id="rbd"><h2>관련 BD</h2>${r.bd.map((k,i)=>bdBtn(k,i)).join('')}</div>`:'';
+  const bs=r.bd.length?`<div class="cd" id="rbd"><h2>관련 BD</h2>${r.bd.map((k,i)=>bdBtn(k,i,r.bd)).join('')}</div>`:'';
   return head(1)+`<div class="wrap" id="ask"><div class="pq"><small>질문</small>${U(q)}</div>`+(has?`<div class="cd" id="hits"><h2>답 <small>승인 자료 원문 그대로</small></h2>${r.qa.map(ansCard).join('')}</div>`+cs+bs+pmBox
     :`<div class="miss" id="miss">등록된 자료에서 답을 찾지 못했습니다.</div>`+pmBox+cs+bs)+`<button class="go s" id="askagain" onclick="tabGo('q')">다른 질문하기</button><div style="height:12px"></div>`+featCard(0)+`</div>`+tabs('ask')}
 function askAfter(){const t=$('pmq');if(t)t.value=(route().p.get('q')||'').slice(0,300)}
@@ -411,7 +450,7 @@ function vrec(){const st=rstate(),R=ranked(st),ex=R.filter(e=>e.exact),show=ex.l
   pl.forEach(c=>qs=qs.concat(c.qa||[]));qs=[...new Set(qs)].filter(notTalk).slice(0,2);
   let bs=[];qs.forEach(k=>bs=bs.concat(qaOf(k).bd||[]));pl.forEach(c=>bs=bs.concat(c.bd||[]));bs=[...new Set(bs)].filter(k=>D.bd[k]).slice(0,3);
   if(qs.length)h+=`<div class="cd" id="rqa"><h2>이 조건에서 나오는 질문 <small>눌러서 답 보기 · 승인 자료 원문 그대로</small></h2>${qs.map(accItem).join('')}</div>`;
-  if(bs.length)h+=`<div class="cd" id="rbd"><h2>관련 BD</h2>${bs.map((k,i)=>bdBtn(k,i)).join('')}</div>`;
+  if(bs.length)h+=`<div class="cd" id="rbd"><h2>관련 BD</h2>${bs.map((k,i)=>bdBtn(k,i,bs)).join('')}</div>`;
   return h+`</div>`+tabs('home')}
 function recMore(){const m=$('rmore'),b=$('rmorebtn');if(m)m.hidden=false;if(b)b.remove()}
 function recChange(){SES.pick=Object.assign({},rstate());nav('#home')}
@@ -421,25 +460,63 @@ function recLog(){if(!REC_LAST)return;const ctx=recLabel(REC_LAST.st).slice(0,80
 
 /* ── 요약사례 상세: ① 상황 ② 한 일 ③ 결과 ④ 처방명분 근거 ⑤ 표준대화 ⑥ 관련 BD ⑦ 여기서 나오는 질문 ⑧ 특장점(맨 아래) ── */
 function vcase(id){const c=caseOf(id);if(!c)return head(1)+`<div class="msg0">사례를 찾지 못했습니다.</div>`;
-  const bds=(c.bd||[]).filter(k=>D.bd[k]),cq=(c.qa||[]).filter(notTalk).slice(0,5);let n=0;const no=()=>`<i>${++n}</i>`;
+  const bds=(c.bd||[]).filter(k=>D.bd[k]),cq=caseQs(c);let n=0;const no=()=>`<i>${++n}</i>`;
   const jn=[['s-sit','상황'],['s-why','근거'],['talk','표준대화']].concat(bds.length?[['cbd','BD']]:[],cq.length?[['cqa','질문']]:[]);
+  const mw=mailWait(c.id);
   return head(1)+`<div class="wrap" id="case" data-id="${A(c.id)}"><div class="cd ct"><h2 id="ctitle">${E(c.title)}</h2><div class="chips"><span class="tag g">${E(TL(c.type))}</span><span class="tag g">${E(c.cust)}</span>${c.dept?`<span class="tag g">${E(c.dept)}</span>`:''}</div>
-  <div class="jn" id="jn">${jn.map(([i,l])=>`<button data-go="${i}" onclick="jump(this)">${l}</button>`).join('')}</div></div>
+  <div class="jn" id="jn">${jn.map(([i,l])=>`<button data-go="${i}" onclick="jump(this)">${l}</button>`).join('')}</div>
+  <div class="row cpm"><button class="btn" id="cpall" data-l="전체 복사" onclick="copyAll(this)">전체 복사</button><button class="btn f" id="mailgo" onclick="mailOpen()"${mw?' disabled':''}>${mw?'보냄 ✓':'메일로 보내기'}</button></div></div>
   <section class="cd sx" id="s-sit"><h3>${no()}<span>상황</span></h3><p class="tx" id="sit">${E(c.sit)}</p></section>
   <section class="cd sx" id="s-did"><h3>${no()}<span>한 일 <small>이 순서로 따라 해 보세요</small></span></h3><ol class="did" id="did">${(c.did||[]).map(x=>`<li>${E(x)}</li>`).join('')}</ol></section>
   <section class="cd sx" id="s-res"><h3>${no()}<span>결과</span></h3>${resBig(c,1)}</section>
-  <section class="cd sx" id="s-why"><h3>${no()}<span>처방명분 근거 <small>확인된 자료만 싣습니다 · 약가는 의약품안전나라 표시 상한금액 기준</small></span></h3><ul class="why" id="why">${(c.why||[]).map(w=>`<li><span class="ck">✓</span><div class="wb"><div class="wt">${E(w.t)}</div><div class="wm"><span class="tg">${E(w.tag)}</span>${w.bd&&D.bd[w.bd]?`<button class="btn" data-bd="${A(w.bd)}" onclick="nav('${mk('bd',{k:w.bd})}')">BD 보기</button>`:''}</div></div></li>`).join('')}</ul></section>
+  <section class="cd sx" id="s-why"><h3>${no()}<span>처방명분 근거 <small>확인된 자료만 싣습니다 · 약가는 의약품안전나라 표시 상한금액 기준</small></span></h3><ul class="why" id="why">${(c.why||[]).map(w=>`<li><span class="ck">✓</span><div class="wb"><div class="wt">${E(w.t)}</div><div class="wm"><span class="tg">${E(w.tag)}</span>${w.bd&&D.bd[w.bd]?`<button class="btn" data-bd="${A(w.bd)}" onclick="nav('${A(bdHref(w.bd,bds))}')">BD 보기</button>`:''}</div></div></li>`).join('')}</ul></section>
   <section class="cd sx" id="talk"><h3>${no()}<span>표준대화 <small>원장님께 이렇게 말씀드립니다</small></span></h3><div class="msg" id="talkt">${E(c.talk)}</div><button class="go" id="cpy" data-l="표준대화 복사" onclick="copyTalk(this)">표준대화 복사</button></section>
-  ${bds.length?`<section class="cd sx" id="cbd"><h3>${no()}<span>관련 BD <small>원장님께 보여 드릴 자료</small></span></h3>${bds.map((k,i)=>bdBtn(k,i)).join('')}</section>`:''}
+  ${bds.length?`<section class="cd sx" id="cbd"><h3>${no()}<span>관련 BD <small>원장님께 보여 드릴 자료</small></span></h3>${bds.map((k,i)=>bdBtn(k,i,bds)).join('')}</section>`:''}
   ${cq.length?`<section class="cd sx" id="cqa"><h3>${no()}<span>여기서 나오는 질문 <small>눌러서 답 보기 · 승인 자료 원문 그대로</small></span></h3>${cq.map(accItem).join('')}</section>`:''}
   ${featCard(++n)}</div>
   <div class="ab" id="ab"><button class="ab1" id="cpy2" data-l="표준대화 복사" onclick="copyTalk(this)">표준대화 복사</button><button class="ab2" id="fbgo" onclick="fbOpen()">써 봤어요<span class="badge${SES.fbN[c.id]?'':' z'}" id="fbn">${SES.fbN[c.id]||''}</span></button></div>
-  <div class="sh" id="fbs" hidden><div class="shb" onclick="fbClose()"></div><div class="shp fb" data-t="case" data-k="${A(c.id)}" role="dialog" aria-label="써 봤어요"><div class="shh"><b>써 봤어요</b><button class="x" onclick="fbClose()">닫기</button></div><div id="fbin">${fbForm(c.id)}</div></div></div>`}
+  <div class="sh" id="fbs" hidden><div class="shb" onclick="fbClose()"></div><div class="shp fb" data-t="case" data-k="${A(c.id)}" role="dialog" aria-label="써 봤어요"><div class="shh"><b>써 봤어요</b><button class="x" onclick="fbClose()">닫기</button></div><div id="fbin">${fbForm(c.id)}</div></div></div>
+  <div class="sh" id="mls" hidden><div class="shb" onclick="mailClose()"></div><div class="shp" role="dialog" aria-label="메일로 보내기"><div class="shh"><b>메일로 보내기</b><button class="x" onclick="mailClose()">닫기</button></div>
+  <label class="fl" for="mlto" style="margin-top:0">받는 메일 주소</label><input class="ln" id="mlto" type="email" inputmode="email" autocomplete="email" maxlength="120" spellcheck="false" oninput="mailMsg0()">
+  <p class="tx sm" id="mltx">본인이 받아 볼 주소를 넣어 주세요. 사례 내용과 관련 BD PDF가 첨부됩니다.</p><button class="go" id="mlsend" onclick="mailSend(this)"${mw?' disabled':''}>보내기</button><div class="fbm" id="mlmsg"></div></div></div>`}
+const caseQs=c=>(c.qa||[]).filter(notTalk).slice(0,5);   // 사례 상세 '여기서 나오는 질문' = 전체 복사의 질문과 같은 목록
 function jump(el){const t=$(el.dataset.go);if(t)t.scrollIntoView({block:'start',behavior:'smooth'})}
-function copyTalk(el){const c=caseOf(route().p.get('id'));if(!c)return;const s=c.talk,l=el.dataset.l||'표준대화 복사';
-  const ok=()=>{el.textContent='복사됨 ✓';setTimeout(()=>{el.textContent=l},1500)};
+function copyText(el,s,l){const ok=()=>{el.textContent='복사됨 ✓';setTimeout(()=>{el.textContent=l},1500)};
   const old=()=>{const ta=document.createElement('textarea');ta.value=s;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;left:-9999px;top:0';document.body.appendChild(ta);ta.select();let r=false;try{r=document.execCommand('copy')}catch(e){}ta.remove();r?ok():alert('복사하지 못했습니다. 글을 길게 눌러 직접 복사해 주세요.')};
   if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(s).then(ok,old);else old()}
+function copyTalk(el){const c=caseOf(route().p.get('id'));if(!c)return;copyText(el,c.talk,el.dataset.l||'표준대화 복사')}
+/* 사례 전체 = 제목 · [상황] · [한 일](번호) · [결과] · [처방명분 근거] · [표준대화] · [여기서 나오는 질문](Q·A) — 메신저에 붙여도 읽히게 구역 이름 줄 + 빈 줄(11-28 박본님) */
+function caseText(c){const L=[c.title,[TL(c.type),c.cust,c.dept].filter(Boolean).join(' · ')],sec=t=>L.push('','['+t+']');
+  sec('상황');L.push(c.sit);
+  sec('한 일');(c.did||[]).forEach((x,i)=>L.push((i+1)+'. '+x));
+  sec('결과');if(c.res_to)L.push((c.res_label?c.res_label+' ':'')+(c.res_from?c.res_from+' → ':'')+c.res_to);else L.push(c.res);if(c.res_note)L.push(c.res_note);
+  sec('처방명분 근거');(c.why||[]).forEach(w=>L.push('- '+w.t+' ('+w.tag+')'));
+  sec('표준대화');L.push(c.talk);
+  const cq=caseQs(c);if(cq.length){sec('여기서 나오는 질문');cq.forEach((k,i)=>{const x=qaOf(k);if(i)L.push('');L.push('Q'+(i+1)+'. '+x.q,'A. '+x.a)})}
+  return L.join('\n')}
+function copyAll(el){const c=caseOf(route().p.get('id'));if(!c)return;copyText(el,caseText(c),el.dataset.l||'전체 복사')}
+/* 메일로 보내기(11-28 박본님 변경) — 받는 주소 1개(기본값 = 로그인 계정 메일, 바꿀 수 있음) → 서버 atkmail(to)이 사례 내용 + 관련 BD PDF를 보낸다.
+   입력한 주소는 이 화면 세션 동안만 기억(SES.mailTo — 다음 사례의 기본값), 기기 저장소에는 남기지 않는다. 같은 사례는 보낸 뒤 30초 다시 못 누름 */
+const MAIL_RE=/^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+function mailMsg0(){const m=$('mlmsg');if(m&&m.classList.contains('bad')){m.className='fbm';m.textContent=''}}
+const mailWait=id=>SES.mailAt[id]&&Date.now()-SES.mailAt[id]<MAIL_GAP;
+function mailOpen(){const s=$('mls');if(!s)return;const t=$('mlto');if(t&&!t.__set){t.__set=1;t.value=SES.mailTo||ME.who||''}const m=$('mlmsg');if(m&&!m.classList.contains('ok')){m.className='fbm';m.textContent=''}s.hidden=false;document.body.style.overflow='hidden'}
+function mailClose(){const s=$('mls');if(!s)return;s.hidden=true;document.body.style.overflow=''}
+async function mailSend(el){const id=route().p.get('id'),m=$('mlmsg');if(el.disabled||!caseOf(id))return;
+  if(mailWait(id)){m.className='fbm bad';m.textContent='방금 보냈습니다. 30초 뒤 다시 누를 수 있습니다.';return}
+  const ti=$('mlto'),to=(ti?ti.value:'').trim();
+  if(/[,;\s]/.test(to)){m.className='fbm bad';m.textContent='메일 주소는 한 곳만 넣어 주세요.';return}
+  if(!MAIL_RE.test(to)||to.length>120){m.className='fbm bad';m.textContent='메일 주소를 다시 확인해 주세요.';return}
+  const sig=id+'|'+to;if(el.__id!==sig){el.__id=sig;el.__rid=newRid()}   // 응답을 못 받아 다시 누르면 같은 rid(서버가 한 번만 보냄)
+  el.disabled=true;if(ti)ti.readOnly=true;m.className='fbm';m.textContent='보내는 중…';let r=null,e=null;
+  try{r=await srv('atkmail',{rid:el.__rid,id,to})}catch(x){e=x}
+  if(ti)ti.readOnly=false;
+  if(r&&r.ok===1){el.__id=null;SES.mailTo=to;SES.mailAt[id]=Date.now();m.className='fbm ok';m.textContent='보냈습니다 — '+(r.to||to)+' (첨부 '+(+r.n||0)+'개)';
+    const g=$('mailgo');if(g){g.disabled=true;g.textContent='보냄 ✓'}
+    setTimeout(()=>{if(route().p.get('id')!==id)return;const g2=$('mailgo'),s2=$('mlsend');if(g2){g2.disabled=false;g2.textContent='메일로 보내기'}if(s2)s2.disabled=false},MAIL_GAP);return}
+  if(r&&r.ok===0)el.__id=null;   // 서버의 분명한 답(한도 등) — 다음 누름은 새 요청
+  el.disabled=false;m.className='fbm bad';
+  m.textContent=r&&r.err==='bad_to'?(r.msg||'메일 주소를 다시 확인해 주세요.'):r&&r.err==='quota'?(r.msg||'오늘 보낼 수 있는 메일 수를 넘었습니다. 내일 다시 눌러 주세요.'):r&&r.err==='no_case'?(r.msg||'사례를 찾지 못했습니다. 새로고침한 뒤 다시 눌러 주세요.'):errMsg(r,e)}
 
 /* ── 써 봤어요(사례 상세에만) — 같은 사례에 다른 거래처 결과를 여러 번(새 rid) ── */
 function fbForm(id){const n=SES.fbN[id]||0;return `<p class="tx sm" style="margin-top:0">이 사례를 거래처에 써 본 결과를 골라 주세요.${n?' (이 사례로 남긴 결과 '+n+'건)':''}</p><div class="opts">${['처방 약속 받음','검토 중','거절'].map((s,i)=>`<button class="opt" data-r="${i+1}" onclick="fbPick(this)">${s}</button>`).join('')}</div><input class="ln" maxlength="100" placeholder="한 줄(선택 · 100자)"><button class="go" id="fbsend" onclick="fbSend(this)">남기기</button><div class="fbm st0"></div>`}
@@ -460,15 +537,20 @@ function fbMore(){const w=document.querySelector('#fbs .fb');if(!w)return;w.__si
 /* ── BD 보기 — 화면 폭에 맞춰 보이고, 누르면 원본 크기(가로로 밀어서 보기) ── */
 let VB=null;
 function vbd(){const p=route().p,k=p.get('k'),b=D.bd[k];if(!b)return head(1)+`<div class="msg0">BD를 찾지 못했습니다.</div>`;
-  const n=b.pages||1,pg=Math.min(Math.max(+p.get('p')||1,1),n);VB={k,pg,n};
-  return `<div class="vw" id="viewer" data-key="${A(k)}"><div class="vt"><button class="b" aria-label="뒤로" onclick="backTo('#home')">←</button><b>${E(b.title)}</b><a class="b f" id="pdf" href="${A(bdPdfHref(k))}" download="${A(b.file||k)}.pdf" data-k="${A(k)}" onclick="return bdPdf(this)">PDF 받기</a></div>
+  const n=b.pages||1,pg=Math.min(Math.max(+p.get('p')||1,1),n);
+  const L=[...new Set((p.get('ls')||'').split(','))].filter(x=>D.bd[x]),li=L.indexOf(k),many=L.length>1&&li>=0;   // 들어온 목록(사례·질문 답·추천의 관련 BD) 안에서 몇 번째
+  VB={k,pg,n,L:many?L:[],li:many?li:0};
+  const pdis=pg<=1&&!(many&&li>0),ndis=pg>=n&&!(many&&li<L.length-1);
+  return `<div class="vw" id="viewer" data-key="${A(k)}"><div class="vt"><button class="b" aria-label="뒤로" onclick="backTo('#home')">←</button><b>${E(b.title)}</b>${many?`<span class="bdn" id="bdn">${li+1} / ${L.length}</span>`:''}<a class="b f" id="pdf" href="${A(bdPdfHref(k))}" download="${A(b.file||k)}.pdf" data-k="${A(k)}" onclick="return bdPdf(this)">PDF 받기</a></div>
   <div class="vb" id="vb"><div class="ld" id="bdld"><i></i>BD를 불러오는 중…</div><img id="bdimg" alt="${A(b.title)}" onclick="bdZoom()" onload="this.dataset.ok='1';bdDone()" onerror="bdFail(this)"></div>
-  <div class="vf"><button onclick="step(-1)"${pg<=1?' disabled':''}>← 이전</button><button class="f" id="zoom" onclick="bdZoom()">크게 보기</button><button onclick="step(1)"${pg>=n?' disabled':''}>다음 →</button></div></div>`}
+  <div class="vf"><button id="bprev" onclick="step(-1)"${pdis?' disabled':''}>← 이전</button><button class="f" id="zoom" onclick="bdZoom()">크게 보기</button><button id="bnext" onclick="step(1)"${ndis?' disabled':''}>다음 →</button></div></div>`}
 function bdZoom(){const v=$('vb'),z=$('zoom');if(!v)return;const on=!v.classList.contains('zm');v.classList.toggle('zm',on);if(z)z.textContent=on?'화면에 맞추기':'크게 보기'}
 function bdDone(){const l=$('bdld');if(l)l.remove()}
 function bdFail(el,e){if(el.dataset.ok==='0')return;el.dataset.ok='0';bdDone();el.insertAdjacentHTML('afterend','<span class="err">'+E(e&&e.stale?e.message:'이미지를 불러오지 못했습니다')+'</span>')}
 function fillBd(){const el=$('bdimg');if(!el||!VB)return;bdImg(VB.k,VB.pg).then(u=>{el.src=u},e=>bdFail(el,e))}
-function step(d){if(!VB)return;const pg=VB.pg+d;if(pg<1||pg>VB.n)return;replace(mk('bd',{k:VB.k,p:pg}))}
+/* 쪽을 먼저 넘기고, 첫·마지막 쪽에서 목록의 이전·다음 BD로(이전 BD는 마지막 쪽부터). 주소는 바꿔 쓰기(replace) — 뒤로 가기 한 번에 들어온 화면으로 */
+function step(d){if(!VB)return;const pg=VB.pg+d,ls=VB.L.join(',');if(pg>=1&&pg<=VB.n){replace(mk('bd',{k:VB.k,p:pg,ls}));return}
+  const j=VB.li+d;if(!VB.L.length||j<0||j>=VB.L.length)return;const k2=VB.L[j];replace(mk('bd',{k:k2,p:d<0?((D.bd[k2]||{}).pages||1):1,ls}))}
 
 /* ── 내 질문 ── */
 const stLab=x=>x.st==='대기'?`<span class="st w">대기</span>`:`<span class="st a">${E(x.st)}</span>`;
@@ -515,6 +597,76 @@ async function pmSend(el){if(el.disabled)return;const w=el.closest('.it'),id=w.d
   try{const it=await sendAnswer(id,text,x?x.aAt:'',x?x.a:'');delete PMSEND[id];delete PMDRAFT[id];PMOPEN=id;pmDraw();say('ok','반영됨 — '+it.st+' · '+it.aAt)}
   catch(e){delete PMSEND[id];pmDraw();say('bad',e&&e.gate?'계정 확인이 필요합니다.':'반영을 확인하지 못했습니다. 잠시 뒤 목록을 새로 열어 확인하고, 없으면 다시 보내 주세요.')}}
 
+/* ── 신청 승인(지부장·본부장만 — 아니면 atkapplylist를 부르지 않는다). 사용자 글(이름·업체명·휴대폰·지부장 이름·메모)은 전부 U() ── */
+let APOPEN='',APMSG=null;
+const apWait=x=>x.st==='대기'||x.st==='wait';
+const apStL=x=>apWait(x)?`<span class="st w">대기</span>`:x.st==='승인'||x.st==='approved'?`<span class="st a">승인</span>`:`<span class="st r">${E(x.st==='rejected'?'거절':x.st)}</span>`;
+const fmtPh=v=>{const s=String(v||'').replace(/\D/g,'');return s.length===11?s.slice(0,3)+'-'+s.slice(3,7)+'-'+s.slice(7):s.length===10?s.slice(0,3)+'-'+s.slice(3,6)+'-'+s.slice(6):String(v||'')};
+function vapply(){if(!isAppr())return head(1)+`<div class="wrap"><div class="msg0" id="noap">신청을 승인할 수 있는 계정이 아닙니다.</div></div>`+tabs('apply');
+  return head(1)+`<div class="wrap" id="apply"><div class="cd"><h2>사용 신청 <small>대기 먼저 · 승인하면 그 구글 계정으로 바로 앱시톡을 쓸 수 있습니다</small></h2><div id="aplist"><div class="msg0">불러오는 중…</div></div></div></div>`+tabs('apply')}
+function apItem(x,open){const w=apWait(x);open=open||w;
+  return `<div class="it${open?' open':''}${x.id===APOPEN?' hl':''}" data-id="${A(x.id)}"><button class="ih" onclick="apOpen(this)"><div class="iq">${apStL(x)}${x.dirOk===false?`<span class="st r nodir">담당 지부장 확인 안 됨</span>`:''}${U(x.name)} · ${U(x.org,'org')}</div><div class="im">${E(x.id)} · ${U(x.at)}</div></button>
+  ${open?`<div class="ib"><dl class="apd"><dt>이름</dt><dd>${U(x.name)}</dd><dt>업체명</dt><dd>${U(x.org)}</dd><dt>휴대폰</dt><dd>${U(fmtPh(x.phone))}</dd><dt>구글 계정</dt><dd>${U(x.email)}</dd><dt>신청 시각</dt><dd>${U(x.at)}</dd><dt>담당 지부장</dt><dd>${U(x.dir)}</dd>${w?'':`<dt>처리</dt><dd>${U([x.st,x.by,x.byAt].filter(Boolean).join(' · '))}</dd>${x.memo?`<dt>메모</dt><dd>${U(x.memo)}</dd>`:''}`}</dl>
+  ${w?`<div class="row" data-btns="1"><button class="btn f" data-ok="1" onclick="apDo(this,1)">승인</button><button class="btn br" onclick="apRej(this,1)">거절</button></div><div class="aprj" hidden><label class="fl">거절 메모(선택 · 60자)</label><input class="ln" maxlength="60" placeholder="예: 담당 거래처 확인 필요"><div class="row"><button class="btn br" data-ok="0" onclick="apDo(this,0)">거절 확정</button><button class="btn" onclick="apRej(this,0)">취소</button></div></div>`:''}
+  <div class="fbm apm"></div></div>`:''}</div>`}
+function apDraw(){const L=$('aplist');if(!L)return;if(!APD||APD.ok!==1){put(L,`<div class="msg0">${APD&&APD.err==='no_role'?'신청을 승인할 수 있는 계정이 아닙니다.':'목록을 불러오지 못했습니다.'} <button class="btn" onclick="apLoad()">다시</button></div>`);return}
+  badges();const it=(APD.items||[]).filter(apWait).concat((APD.items||[]).filter(x=>!apWait(x)));
+  if(!it.length)put(L,`<div class="msg0">받은 신청이 없습니다.</div>`);else put(L,it.map(x=>apItem(x,x.id===APOPEN)).join(''));
+  const byId=id=>[...L.querySelectorAll('.it')].find(e=>e.dataset.id===id);
+  if(APMSG){const w=byId(APMSG.id),m=w&&w.querySelector('.apm');if(m){m.className='fbm apm '+APMSG.cls;m.textContent=APMSG.t}else{L.insertAdjacentHTML('afterbegin','<div class="note" id="apdone"></div>');$('apdone').textContent=APMSG.t}}
+  const o=APOPEN&&byId(APOPEN);if(o&&route().p.get('id'))o.scrollIntoView({block:'center'});
+  else if(APOPEN&&route().p.get('id')===APOPEN&&!o)L.insertAdjacentHTML('afterbegin',`<div class="note" id="apnf">신청 ${E(APOPEN)}을 목록에서 찾지 못했습니다.</div>`)}
+function apLoad(){if(!isAppr())return Promise.resolve();return srv('atkapplylist',{}).then(r=>{APD=r},()=>{APD=null}).then(()=>{const id=route().p.get('id');if(id&&!APOPEN)APOPEN=id;apDraw()})}
+function apOpen(el){const id=el.closest('.it').dataset.id;APOPEN=APOPEN===id?'':id;APMSG=null;apDraw()}
+function apRej(el,on){const w=el.closest('.ib');w.querySelector('[data-btns]').hidden=!!on;w.querySelector('.aprj').hidden=!on;if(on){const i=w.querySelector('.aprj input');if(i)i.focus()}}
+async function apDo(el,ok){if(el.disabled)return;const it=el.closest('.it'),id=it.dataset.id,m=it.querySelector('.apm'),memo=ok?'':((it.querySelector('.aprj input')||{}).value||'').trim().slice(0,60);
+  const sig=id+'|'+ok+'|'+memo;if(it.__sig!==sig){it.__sig=sig;it.__rid=newRid()}
+  it.querySelectorAll('.ib button').forEach(b=>b.disabled=true);m.className='fbm apm';m.textContent=ok?'승인하는 중…':'거절하는 중…';
+  let r=null,e=null;try{r=await srv('atkapprove',{rid:it.__rid,id,ok:ok?'1':'0',memo})}catch(x){e=x}
+  if(r&&r.ok===1){APOPEN=id;APMSG={id,cls:'ok',t:id+' '+(r.st||(ok?'승인':'거절'))+'했습니다.'+(r.st==='승인'?' 그 구글 계정으로 바로 쓸 수 있습니다.':'')};await apLoad();return}
+  if(r&&r.err==='done'){APOPEN=id;APMSG={id,cls:'bad',t:'이미 처리된 신청입니다'+(r.st?'('+r.st+')':'')+'.'};await apLoad();return}
+  it.querySelectorAll('.ib button').forEach(b=>b.disabled=false);m.className='fbm apm bad';
+  m.textContent=r&&r.err==='blocked'?'사용이 중지된 계정이라 승인할 수 없습니다.':r&&r.err==='no_id'?'신청을 찾지 못했습니다(담당 지부장이 다른 신청일 수 있습니다).':r&&r.err==='no_role'?'신청을 승인할 수 있는 계정이 아닙니다.':errMsg(r,e)}
+
+/* ── 사용 신청(미등록 계정) — atk가 열람 거절(미등록)이면 atkapplystat으로 상태를 보고 신청·대기·거절 화면. 자료(사례·답·BD)는 하나도 받지 않았으므로 그리지 않는다 ── */
+const APV={name:[2,20,'이름을 2~20자로 적어 주세요.'],org:[2,40,'업체명을 2~40자로 적어 주세요.'],dir:[2,10,'담당 지부장 이름을 2~10자로 적어 주세요.']};   // 서버 atkapply 규칙과 같게 · 휴대폰 = 숫자 10~11자리
+function apScreen(h){D=null;const a=$('app');put(a,head()+h);window.scrollTo(0,0)}
+function applyBoot(){apScreen(`<div class="msg0" id="apchk">계정 확인 중…</div>`);
+  srv('atkapplystat',{}).then(r=>{if(!r||r.ok!==1){apFail();return}AP=r;if(r.st==='approved'&&!APTRY){APTRY=1;boot();return}apView()},e=>{if(e&&e.gate)return;apFail()})}
+function apFail(){apScreen(`<div class="wrap"><div class="msg0" id="apfail">계정 상태를 확인하지 못했습니다. <button class="btn" onclick="applyBoot()">다시</button></div></div>`)}
+function apView(){const st=AP.st;
+  if(st==='blocked')return apScreen(`<div class="wrap" id="apblock"><div class="cd"><p class="tx" id="apbt">사용이 중지된 계정입니다. 담당 지부장에게 문의해 주세요.</p></div></div>`);   // 관리자가 끊은 계정(활성 N) — 다시 신청 못 함
+  if(st==='wait')return apScreen(`<div class="wrap" id="apwait"><div class="cd"><p class="tx" id="apwt">신청이 접수되었습니다. 담당 지부장(${U(AP.dir)}) 승인을 기다리는 중입니다.</p><p class="tx sm">${AP.at?`신청 시각 ${U(AP.at)} · `:''}승인되면 [다시 확인]을 누르거나 앱시톡을 다시 열면 바로 쓸 수 있습니다.</p><button class="go" id="aprechk" onclick="apRecheck(this)">다시 확인</button><div class="fbm" id="apmsg"></div></div></div>`);
+  if(st==='rejected'&&!APRE)return apScreen(`<div class="wrap" id="aprej"><div class="cd"><p class="tx" id="aprt">신청이 승인되지 않았습니다. 담당 지부장에게 문의해 주세요.</p><button class="go" id="apagain" onclick="APRE=1;apView()">다시 신청</button></div></div>`);
+  if(st==='approved')return apScreen(`<div class="wrap" id="apok"><div class="cd"><p class="tx">승인되었습니다. 반영까지 몇 분 걸릴 수 있습니다.</p><button class="go" id="aprechk" onclick="APTRY=0;applyBoot()">다시 확인</button></div></div>`);
+  apScreen(apForm())}
+function apForm(){return `<div class="wrap" id="apform"><div class="hero" id="aphero"><b>앱시톡은 승인된 분만 사용할 수 있습니다.</b><small>아래를 적어 신청하면 담당 지부장 승인 뒤 바로 쓸 수 있습니다.</small></div>
+  <div class="cd"><div class="fl">구글 계정</div><div class="ro" id="apwho">${U(AP.who||'')}</div><div class="hint">이 구글 계정으로 등록됩니다</div>
+  <label class="fl" for="ap_name">이름</label><input class="ln" id="ap_name" maxlength="20" autocomplete="name">
+  <label class="fl" for="ap_org">업체명</label><input class="ln" id="ap_org" maxlength="40" autocomplete="organization">
+  <label class="fl" for="ap_phone">휴대폰 번호</label><input class="ln" id="ap_phone" type="tel" inputmode="numeric" maxlength="13" autocomplete="tel" placeholder="숫자만(예 01012345678)">
+  <label class="fl" for="ap_dir">담당 지부장 이름</label><input class="ln" id="ap_dir" maxlength="10">
+  <button class="agb" id="ap_agree" role="checkbox" aria-checked="false" onclick="apAgree(this)"><span class="bx"></span><span>개인정보 수집·이용에 동의합니다(필수)</span></button>
+  <details class="agd" id="ap_terms"><summary>수집·이용 내용 보기</summary><dl><dt>수집 항목</dt><dd>이름, 업체명, 구글 계정 메일, 휴대폰 번호</dd><dt>이용 목적</dt><dd>앱시톡 사용 승인과 안내</dd><dt>보유 기간</dt><dd>앱시톡 사용 종료 시까지</dd></dl><p>동의하지 않을 수 있으며, 동의하지 않으면 사용 신청을 할 수 없습니다.</p></details>
+  <button class="go" id="apgo" onclick="apSend(this)">신청하기</button><div class="fbm" id="apmsg"></div></div></div>`}
+function apAgree(el){const on=el.getAttribute('aria-checked')!=='true';el.setAttribute('aria-checked',on?'true':'false');if(on)el.classList.remove('er')}
+async function apSend(el){if(el.disabled)return;const m=$('apmsg'),v={},bad=[];
+  ['name','org','dir'].forEach(k=>{const i=$('ap_'+k),s=i.value.replace(/\s+/g,' ').trim();v[k]=s;const ok=s.length>=APV[k][0]&&s.length<=APV[k][1];i.classList.toggle('er',!ok);if(!ok)bad.push(APV[k][2])});
+  const pi=$('ap_phone');v.phone=pi.value.replace(/[\s-]/g,'');const pok=/^\d{10,11}$/.test(v.phone);pi.classList.toggle('er',!pok);if(!pok)bad.push('휴대폰 번호를 숫자 10~11자리로 적어 주세요.');
+  const ag=$('ap_agree');if(ag.getAttribute('aria-checked')!=='true'){ag.classList.add('er');bad.push('개인정보 수집·이용 동의가 필요합니다.')}
+  if(bad.length){m.className='fbm bad';m.textContent=bad[0];return}
+  const sig=JSON.stringify(v);if(el.__sig!==sig){el.__sig=sig;el.__rid=newRid()}
+  el.disabled=true;m.className='fbm';m.textContent='보내는 중…';let r=null,e=null;
+  try{r=await srv('atkapply',{rid:el.__rid,name:v.name,org:v.org,phone:v.phone,dir:v.dir,agree:'1'})}catch(x){e=x}
+  if(r&&r.ok===1){APRE=0;AP=Object.assign({},AP,{st:'wait',dir:v.dir,at:''});apView();if(r.dup){const m2=$('apmsg');if(m2){m2.className='fbm';m2.textContent='이미 접수된 신청이 있습니다('+(r.id||'')+').'}}return}
+  if(r&&r.err==='already'){APRE=0;applyBoot();return}
+  if(r&&r.err==='blocked'){AP=Object.assign({},AP,{st:'blocked'});apView();return}
+  el.disabled=false;m.className='fbm bad';m.textContent=r&&r.err==='bad_req'?(r.msg||'입력을 확인해 주세요.'):errMsg(r,e)}
+async function apRecheck(el){if(el.disabled)return;el.disabled=true;const m=$('apmsg');if(m){m.className='fbm';m.textContent='확인 중…'}let r=null,e=null;
+  try{r=await srv('atkapplystat',{})}catch(x){e=x}
+  if(r&&r.ok===1){AP=r;if(r.st==='approved'){APTRY=1;boot();return}apView();const m2=$('apmsg');if(m2&&r.st==='wait'){m2.className='fbm';m2.textContent='아직 승인 전입니다.'}return}
+  if(e&&e.gate)return;el.disabled=false;if(m){m.className='fbm bad';m.textContent=errMsg(r,e)}}
+
 function render(){
   if(!D)return;const r=route(),app=$('app');VB=null;document.body.style.overflow='';
   document.title=D.meta.title;
@@ -525,11 +677,15 @@ function render(){
   else if(r.v==='bd'){put(app,vbd());fillBd()}
   else if(r.v==='my'){MYOPEN=r.p.get('id')||MYOPEN;put(app,vmy());if(MY&&MY.ok===1)myDraw();myLoad()}
   else if(r.v==='pm'){PMOPEN=r.p.get('id')||PMOPEN;put(app,vpm());if(ME.can){if(PMD&&PMD.ok===1)pmDraw();pmLoad()}}
+  else if(r.v==='apply'){APOPEN=r.p.get('id')||APOPEN;APMSG=null;put(app,vapply());if(isAppr()){if(APD&&APD.ok===1)apDraw();apLoad()}}
   else{put(app,vhome());homeAfter()}
   window.scrollTo(0,0)}
 if(!location.hash)history.replaceState(null,'','#home');
-loadData().then(o=>{D=o.d;ME=meOf(o);SYN=(D.syn||[]).map(([p,f,v])=>[new RegExp(p,f),v]);STOP=new RegExp(D.stop||'$^','g');index();render()})
-  .catch(e=>{if(e&&e.gate)return;const a=$('app');a.textContent='';const d=document.createElement('div');d.className='msg0';d.textContent='자료를 불러오지 못했습니다 ('+(e&&e.message||'')+'). '+LOAD_HELP;a.appendChild(d)});
+/* 시작 — 미등록 계정(atk 열람 거절 중 '미등록')이면 사용 신청 화면으로. 네트워크 오류는 아래 안내, 토큰 만료·없음은 adapter가 계정 확인으로 보낸다 */
+function boot(){D=null;
+  loadData().then(o=>{D=o.d;ME=meOf(o);AP=null;APRE=0;SYN=(D.syn||[]).map(([p,f,v])=>[new RegExp(p,f),v]);STOP=new RegExp(D.stop||'$^','g');index();render()})
+  .catch(e=>{if(e&&e.apply){applyBoot();return}if(e&&e.gate)return;const a=$('app');a.textContent='';const d=document.createElement('div');d.className='msg0';d.textContent='자료를 불러오지 못했습니다 ('+(e&&e.message||'')+'). '+LOAD_HELP;a.appendChild(d)})}
+boot();
 </script>
 </body>
 </html>
