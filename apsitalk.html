@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<script>/* [열람게이트] 앱시톡 — 게이트가 #tok= 로 넘겨준 토큰을 보관한다. 자료·BD·문의·답은 전부 D ?doc=atk*(JSONP, 답 쓰기만 POST)로 받는다(이 공개 파일에는 자료가 없다).
+   기기·탭 저장소를 만지는 곳은 이 머리 한 곳뿐이다(빌드 게이트가 검사). 사례 맵 머리(사례맵\src\gate_head.html)를 본떠 이름만 새로 — 사례 맵의 cm_tok은 읽기만 한다. */
+(function(){var GATE="https://script.google.com/macros/s/AKfycbwTXL5bRBDXXoEN06x2OSMLq1Wqh1CFJWjYAPSWjhYAZZFxJqx30bwwgdpSFT2SndDL/exec",DOC="apsitalk";
+/* D = 사례 맵 머리의 __ASK와 같은 주소(성과보드·사례 맵 문의가 쓰는 D 웹앱) — 앱시톡은 읽기·쓰기 모두 여기 */
+window.__ASK="https://script.google.com/macros/s/AKfycbyhk2el3kwGMStCvyUr-8B-PWS-6aKwcf5EVfvpryqlj3jEeLw5pnttHMEokrpQXO33dQ/exec";window.__gateT="";
+var ROUTES=/^#(home|ask|rec|case|bd|my|pm)\b/;
+var norm=function(t){t=String(t||"");if(/%[0-9A-Fa-f]{2}/.test(t)){try{t=decodeURIComponent(t);}catch(e){}}return t;};
+var ss=function(k,v){try{if(v===undefined)return sessionStorage.getItem(k)||"";if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){}return "";};
+var ls=function(k,v){try{if(v===undefined)return localStorage.getItem(k)||"";if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){}return "";};
+/* 토큰 속(이메일|문서|만료) — 만료 미리 보기용. 진짜 확인은 서버(D)가 한다 */
+window.__gateInfo=function(t){try{var p=atob(String(t).split(".")[0].replace(/-/g,"+").replace(/_/g,"/")).split("|");if(p.length!==3)return null;return{email:p[0],doc:p[1],exp:+p[2]};}catch(e){return null;}};
+var bad={};   /* 이 화면에서 서버가 거절한 토큰 — 다시 쓰지 않는다(사례 맵 토큰은 지우지 않고 건너뛰기만) */
+var live=function(t){var i=window.__gateInfo(t);return !!(i&&(i.doc===DOC||i.doc==="casemap"||i.doc==="dash")&&i.exp*1000>Date.now()&&!bad[t]);};
+try{var m=location.hash.match(/[#&]tok=([^&]+)/);if(m){var t=norm(m[1]);window.__gateT=t;ss("gate_tok_atk",t);var ti=window.__gateInfo(t);if(ti&&ti.doc===DOC)ls("atk_tok",t);var nx=ss("atk_next");ss("atk_next",null);
+  history.replaceState(null,"",location.pathname+location.search+(ROUTES.test(nx)?nx:"#home"));}}catch(e){}
+/* 쓸 토큰: 이 화면이 받은 것 → 이 탭 보관 → 이 기기의 앱시톡 토큰(30일) → 이 기기의 사례 맵 토큰(읽기만) → 같은 탭의 성과보드 토큰(읽기만) */
+window.__gateTok=function(){var c=[window.__gateT,ss("gate_tok_atk"),ls("atk_tok"),ls("cm_tok"),norm(ss("gate_tok"))];for(var i=0;i<c.length;i++){if(c[i]&&live(c[i]))return c[i];}return "";};
+/* 계정 확인으로 보내기 — 가려던 화면(#pm?id=… 등)을 이 탭에 적어 두었다가 돌아오면 그 화면으로. 2분 안에 3번 넘게 반복되면 멈춘다 */
+window.__gateGo=function(reason){var n=Number(ss("atk_redir")||0);if(Date.now()-Number(ss("atk_redir_t")||0)>120000)n=0;ss("atk_redir",String(n+1));ss("atk_redir_t",String(Date.now()));
+  if(n>=3){window.__gateStop("계정 확인 화면으로 이동이 반복되고 있습니다("+(reason||"")+"). 잠시 뒤 다시 열거나 담당자에게 알려 주세요.");return;}
+  if(ROUTES.test(location.hash))ss("atk_next",location.hash);ss("gate_tok_atk",null);ls("atk_tok",null);window.__gateT="";location.replace(GATE+"?doc="+DOC);};
+window.__gateStop=function(msg){var a=document.getElementById("app");if(a){a.textContent="";var d=document.createElement("div");d.className="msg0";d.textContent=msg;a.appendChild(d);}else alert(msg);};
+/* 서버가 열람을 거절했을 때: 권한 문제는 안내만, 그 밖(만료·토큰 없음 등)은 계정 확인으로. 응답의 gate 링크는 쓰지 않는다(요청 이름으로 만들어져 있음 — v78_API §1) */
+window.__gateGuard=function(res,used){if(!res||res.auth!=="required")return false;if(used)bad[used]=1;
+  if(res.reason==="not_allowed"||res.reason==="role_denied"){ss("gate_tok_atk",null);ls("atk_tok",null);window.__gateT="";}
+  if(res.reason==="not_allowed"){window.__gateStop("이 계정은 열람 권한이 없습니다. 담당자에게 요청해 주세요.");return true;}
+  if(res.reason==="role_denied"){window.__gateStop("앱시톡만 이용할 수 있는 계정입니다(역할 제한). 필요하면 담당자에게 요청해 주세요.");return true;}
+  if(res.reason==="unknown_doc"){window.__gateStop("서버가 아직 준비되지 않았습니다. 담당자에게 알려 주세요.");return true;}
+  window.__gateGo(res.reason);return true;};
+})();</script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>…</title>
+<!-- 화면 틀만 둔다. 자료(요약사례·답·BD 제목·동의어·특장점)는 loadData()로 받는다 — 이 파일에 자료 글자를 넣지 않는다(빌드 게이트가 검사).
+     사용자가 친 글(질문·답·한 줄·이름·조건)은 전부 textContent로 그린다(U() 자리표 → put()이 채움). 기기·탭 저장소는 쓰지 않는다.
+     11-27 v2(휴대폰 우선): 처음 화면 = 안내 + 조건 고르기(고르기 전에는 사례 0) + 질문하기 · 아래 고정 탭 · 사례 상세 = 상황 → 한 일 → 결과 → 처방명분 근거 → 표준대화 → BD → 질문 → 특장점 · '써 봤어요'는 사례에만(같은 사례 여러 번). -->
+<style>
+:root{--nv:#262C73;--nv2:#1B2058;--nvl:#EEF0FA;--bg:#F3F5F9;--ln:#D5DAE3;--mut:#556070;--am:#FFE9C7;--amb:#E5B769;--amt:#5A3A00;--br:#8A4B00;--ok:#1E6B45;--okl:#E3F2EA;--tx:#1B2430}
+*{box-sizing:border-box}html,body{margin:0}
+body{font-family:'NanumSquare','나눔스퀘어','NanumSquareOTF','NanumGothic','나눔고딕','Malgun Gothic',sans-serif;color:var(--tx);background:var(--bg);font-size:16px;line-height:1.6;word-break:keep-all;overflow-wrap:anywhere;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+button,textarea,input{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer}
+.hd{position:sticky;top:0;z-index:20;background:var(--nv);color:#fff;display:flex;align-items:center;gap:8px;padding:0 12px;min-height:54px}
+.hd b{font-size:19px;white-space:nowrap}.hd .sp{flex:1;min-width:0}.hd .who{font-size:13px;opacity:.9;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.hd .bk{font-size:18px;background:rgba(255,255,255,.16);padding:0 14px;min-height:44px;min-width:48px;border-radius:10px;white-space:nowrap;border:0;color:#fff;font-weight:800}
+.dev{background:#FFF3DC;border-bottom:1px solid var(--amb);padding:6px 12px;font-size:13px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;color:var(--amt)}
+.dev button{border:1px solid var(--amb);background:#fff;border-radius:999px;padding:0 14px;min-height:44px;color:var(--amt)}.dev button.on{background:var(--amt);color:#fff}
+.wrap{max-width:720px;margin:0 auto;padding:12px 16px 104px}
+.msg0{padding:40px 16px;text-align:center;color:var(--mut)}
+.cd{background:#fff;border:1.2px solid var(--ln);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+.cd h2{margin:0 0 10px;font-size:18px;color:var(--nv);line-height:1.4}.cd h2 small,.sx h3 small{display:block;font-weight:400;color:var(--mut);font-size:13.5px;margin-top:2px}
+/* 처음 화면 */
+.hero{background:var(--nv);color:#fff;border-radius:14px;padding:18px 16px;margin-bottom:12px}
+.hero b{display:block;font-size:20px;line-height:1.45}.hero small{display:block;margin-top:8px;font-size:14px;color:#DDE1F3}
+.fl{font-size:14px;color:var(--mut);font-weight:800;margin:14px 2px 8px}.fl:first-child{margin-top:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.ch{border:1.5px solid var(--ln);border-radius:999px;padding:0 16px;min-height:44px;background:#fff;font-size:16px;font-weight:700}
+.ch.on{background:var(--nv);color:#fff;border-color:var(--nv)}
+.ch.tt{display:block;width:100%;text-align:left;border-radius:12px;padding:10px 14px}
+.ch.tt small{display:block;font-weight:400;font-size:14px;color:var(--mut);margin-top:2px;line-height:1.45}.ch.tt.on small{color:#DDE1F3}
+.go{display:block;width:100%;min-height:52px;border:0;background:var(--nv);color:#fff;font-weight:800;border-radius:12px;margin-top:14px;font-size:17px;line-height:1.3;padding:6px 12px}
+.go small{display:block;font-weight:400;font-size:13.5px;opacity:.85}
+.go.s{background:#fff;color:var(--nv);border:1.5px solid var(--nv)}
+.go[disabled]{background:#C9CED8;color:#fff;cursor:default}
+.fx{position:fixed;left:0;right:0;bottom:calc(60px + env(safe-area-inset-bottom));z-index:29;padding:8px 16px;background:linear-gradient(rgba(243,245,249,0),rgba(243,245,249,.95) 30%)}.fx[hidden]{display:none}
+.fx .go{margin:0 auto;max-width:688px;box-shadow:0 4px 14px rgba(27,32,88,.25)}
+#home.fxon{padding-bottom:180px}
+textarea.q,textarea.ta{width:100%;min-height:76px;border:1.5px solid var(--ln);border-radius:12px;padding:12px;resize:vertical;font-size:16px;background:#fff}
+input.ln{width:100%;min-height:48px;border:1.5px solid var(--ln);border-radius:12px;padding:8px 12px;font-size:16px}
+.ex{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.ex button{border:1px dashed #9AA5B4;background:#fff;border-radius:999px;padding:0 14px;min-height:44px;color:#44505E;font-size:15px}
+/* 아래 고정 탭 */
+.tb{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-top:1px solid var(--ln);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+.tb button{flex:1;min-width:0;min-height:60px;border:0;background:none;font-size:15px;font-weight:800;color:var(--mut);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;position:relative}
+.tb button i{font-style:normal;font-size:19px;line-height:1}
+.tb button.on{color:var(--nv)}.tb button.on::before{content:'';position:absolute;top:0;left:22%;right:22%;height:3px;border-radius:0 0 3px 3px;background:var(--nv)}
+.badge{display:inline-block;min-width:22px;text-align:center;background:#C7791A;color:#fff;border-radius:999px;padding:0 7px;font-weight:800;font-size:13px;line-height:22px}
+.badge.z{display:none}
+.tb .badge{position:absolute;top:6px;left:calc(50% + 10px)}
+/* 추천 결과 */
+.tag{display:inline-block;background:var(--am);border:1px solid var(--amb);color:var(--amt);border-radius:999px;padding:2px 12px;font-weight:700;font-size:14px}
+.tag.g{background:var(--nvl);border-color:#B9C0E4;color:var(--nv)}
+.note{background:#FFF9EC;border-left:4px solid #C7791A;border-radius:8px;padding:10px 14px;font-size:15px;margin-bottom:12px}
+.sec{font-size:15px;font-weight:800;color:var(--mut);margin:16px 2px 8px}
+.cs{display:block;width:100%;text-align:left;border:1.2px solid var(--ln);border-radius:14px;background:#fff;padding:14px 16px;margin-bottom:10px;color:var(--tx);min-height:56px}
+.cs b{display:block;font-size:17px;color:var(--nv);line-height:1.45}.cs .r{font-size:15px;color:#2E3946;margin-top:6px}
+.cs .rb{margin-top:10px}
+.chips.mts{margin-top:10px;gap:6px}
+.mt{display:inline-block;border-radius:6px;padding:1px 8px;font-size:13px;font-weight:800}
+.mt.y{background:var(--okl);color:var(--ok);border:1px solid #9CCFB3}.mt.n{background:#F4F5F7;color:#6A7382;border:1px solid #D5DAE3}
+/* 결과 크게 */
+.rb{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 10px}
+.rb .rf{font-size:20px;font-weight:800;color:#6A7382}.rb .ra{font-size:20px;color:var(--mut);font-weight:800}.rb .rt{font-size:26px;font-weight:900;color:var(--ok)}
+.rn{font-size:14px;color:var(--mut);margin-top:2px}
+.rl{font-size:13px;font-weight:700;color:var(--mut);margin-bottom:2px}.cs .rl{margin-top:10px}.cs .rl+.rb{margin-top:0}
+.cs .rs{font-weight:800;color:var(--nv)}
+.cs .rb .rf{font-size:17px}.cs .rb .ra{font-size:17px}.cs .rb .rt{font-size:21px}
+/* 사례 상세 */
+.ct h2{font-size:19px}
+.jn{display:flex;gap:6px;overflow-x:auto;margin:12px -4px 0;padding:0 4px 2px;scrollbar-width:none}.jn::-webkit-scrollbar{display:none}
+.jn button{flex:none;border:1.5px solid var(--nv);color:var(--nv);background:#fff;border-radius:999px;min-height:44px;padding:0 14px;font-weight:800;font-size:15px}
+.sx{scroll-margin-top:64px}
+.sx h3{margin:0 0 10px;font-size:18px;color:var(--nv);display:flex;align-items:flex-start;gap:8px;line-height:1.4;flex-wrap:wrap}
+.sx h3 i{font-style:normal;flex:none;width:26px;height:26px;border-radius:50%;background:var(--nv);color:#fff;font-size:14px;line-height:26px;text-align:center;margin-top:1px}
+.sx h3 span{flex:1;min-width:0}
+.tx{margin:0;font-size:16.5px;line-height:1.7}.tx.sm{font-size:15px;color:#2E3946;margin-top:8px}
+ol.did{margin:0;padding:0;list-style:none;counter-reset:d}
+ol.did li{counter-increment:d;position:relative;padding:10px 0 10px 40px;border-top:1px solid #E6E9EF;font-size:16.5px;line-height:1.65}ol.did li:first-child{border-top:0;padding-top:2px}
+ol.did li::before{content:counter(d);position:absolute;left:0;top:9px;width:28px;height:28px;border-radius:8px;background:var(--nvl);color:var(--nv);font-weight:900;text-align:center;line-height:28px;font-size:15px}
+ol.did li:first-child::before{top:1px}
+ul.why{margin:0;padding:0;list-style:none}
+ul.why li{display:flex;gap:10px;padding:10px 0;border-top:1px solid #E6E9EF}ul.why li:first-child{border-top:0;padding-top:2px}
+ul.why .ck{flex:none;width:26px;height:26px;border-radius:50%;background:var(--okl);color:var(--ok);font-weight:900;text-align:center;line-height:26px;margin-top:1px}
+ul.why .wb{flex:1;min-width:0}ul.why .wt{font-size:16.5px;line-height:1.65}
+ul.why .wm{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}
+.tg{display:inline-block;border:1px solid #9AA5B4;border-radius:6px;padding:1px 8px;font-size:13px;font-weight:700;color:#44505E;background:#fff}
+.msg{white-space:pre-wrap;background:#F6F7FB;border-radius:12px;padding:14px;font-size:16.5px;line-height:1.75}
+.btn{border:1.5px solid var(--nv);color:var(--nv);border-radius:10px;padding:0 16px;min-height:44px;background:#fff;white-space:nowrap;font-weight:800;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.btn.f{background:var(--nv);color:#fff}.btn[disabled]{opacity:.5;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.bdi{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1.2px solid var(--ln);border-radius:12px;background:#fff;padding:8px 12px;margin-bottom:8px;min-height:56px;color:var(--tx)}
+.bdi .no{width:28px;height:28px;border-radius:8px;background:var(--nv);color:#fff;text-align:center;line-height:28px;font-size:14px;font-weight:800;flex:none}.bdi .sp{flex:1;min-width:0;font-weight:700;font-size:15.5px;line-height:1.45}
+.bdi .btn{min-height:40px;padding:0 12px}
+/* 접이식 질문 */
+.acc{border-top:1px solid #E6E9EF}.acc:first-of-type{border-top:0}
+.acq{display:flex;align-items:flex-start;gap:8px;width:100%;text-align:left;border:0;background:none;padding:12px 0;min-height:48px;font-size:16px;font-weight:800;line-height:1.5;color:var(--tx)}
+.acq .aqt{flex:1;min-width:0}.acq .chev{flex:none;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ln);text-align:center;line-height:22px;color:var(--nv);font-weight:900}
+.acc.open .acq .chev{background:var(--nv);color:#fff;border-color:var(--nv)}
+.aca{white-space:pre-wrap;background:#F6F7FB;border-radius:10px;padding:12px;margin:0 0 12px;font-size:16px;line-height:1.7}
+.lbl{display:inline-block;flex:none;border:1px solid #9AA5B4;border-radius:6px;padding:0 6px;font-size:12.5px;font-weight:700;color:#44505E;background:#fff;margin-top:2px}
+/* 질문 결과 */
+.pq{background:#E8EBF2;border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:16px}.pq small{display:block;color:var(--mut);font-size:13px}
+.an{border-top:1px solid var(--ln);padding:12px 0}.an:first-of-type{border-top:0;padding-top:2px}
+.an .aq{font-weight:800;font-size:16px;display:flex;gap:8px;align-items:flex-start}.an .aa{margin-top:6px;white-space:pre-wrap;font-size:16px;line-height:1.7;color:#2E3946}
+.miss{font-weight:800;font-size:16.5px;color:var(--br);margin:2px 0 12px}
+/* 아래 고정 줄(사례 상세) */
+.ab{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-top:1px solid var(--ln);display:flex;gap:8px;padding:8px 12px calc(8px + env(safe-area-inset-bottom))}
+.ab button{flex:1;min-width:0;min-height:52px;border-radius:12px;font-weight:800;font-size:16.5px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.ab .ab1{background:#fff;color:var(--nv);border:1.5px solid var(--nv)}.ab .ab2{background:var(--nv);color:#fff;border:0}
+.ab .badge{background:#fff;color:var(--nv)}
+/* 써 봤어요 */
+.sh{position:fixed;inset:0;z-index:40}.sh[hidden]{display:none}
+.shb{position:absolute;inset:0;background:rgba(14,18,40,.45)}
+.shp{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:18px 18px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom));max-height:88vh;overflow-y:auto;max-width:720px;margin:0 auto}
+.shh{display:flex;align-items:center;gap:8px;margin-bottom:8px}.shh b{flex:1;font-size:18px;color:var(--nv)}
+.shh .x{border:1.5px solid var(--ln);background:#fff;border-radius:10px;min-height:44px;padding:0 14px;font-weight:700}
+.opts{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.opt{border:1.5px solid var(--ln);border-radius:12px;background:#fff;padding:0 16px;min-height:52px;font-weight:800;font-size:16.5px;text-align:left}.opt.on{border-color:var(--nv);background:var(--nvl);color:var(--nv)}
+.opt.on::before{content:'✓ '}
+.fbm{font-size:15px;margin-top:8px}.fbm.ok{color:var(--ok);font-weight:800}.fbm.bad{color:var(--br);font-weight:800}
+.done{color:var(--ok);font-weight:900;font-size:18px;margin:6px 0}
+/* 내 질문 · PM */
+.it{border:1.2px solid var(--ln);border-radius:12px;background:#fff;margin-bottom:10px}
+.it>.ih{display:block;width:100%;text-align:left;border:0;background:none;padding:12px 14px;min-height:56px;color:var(--tx)}
+.it .iq{font-weight:800;font-size:16px}.it .im{font-size:13.5px;color:var(--mut);margin-top:2px}
+.it .ib{padding:0 14px 14px;border-top:1px solid var(--ln)}
+.it .ans{white-space:pre-wrap;background:#F6F7FB;border-radius:10px;padding:12px;margin-top:10px;font-size:16px}
+.it.open{border-color:var(--nv)}
+.st{display:inline-block;border-radius:6px;padding:0 7px;font-size:13px;font-weight:800;margin-right:6px}
+.st.w{background:#FFF3DC;color:var(--amt)}.st.a{background:var(--okl);color:var(--ok)}
+.fbl{border-top:1px solid var(--ln);padding:10px 0;font-size:15px}.fbl:first-of-type{border-top:0}.fbl .im{font-size:13.5px;color:var(--mut)}
+/* BD 보기 */
+.vw{background:#14172E;min-height:100vh;display:flex;flex-direction:column;color:#fff;max-width:100vw;overflow:hidden}
+.vt{display:flex;align-items:center;gap:8px;padding:6px 10px;background:#0D1024;flex:none}
+.vt b{font-size:15px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vt .b{border:1px solid rgba(255,255,255,.5);border-radius:10px;padding:0 14px;min-height:44px;font-size:15px;white-space:nowrap;color:#fff;text-decoration:none;background:none;display:inline-flex;align-items:center;font-weight:700}.vt .b.f{background:#fff;color:#14172E;font-weight:800}
+.vb{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:10px 8px;overflow:auto;-webkit-overflow-scrolling:touch;min-height:0}
+.vb img{display:block;width:100%;max-width:900px;height:auto;background:#fff;border-radius:4px;cursor:zoom-in}
+.vb.zm{justify-content:flex-start}.vb.zm img{width:auto;max-width:none;cursor:zoom-out}
+#bdimg:not([data-ok="1"]){display:none}
+.vb .ld{flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;font-weight:700;text-align:center;padding-top:30vh}
+.vb .ld i{width:34px;height:34px;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spn .9s linear infinite}
+@keyframes spn{to{transform:rotate(360deg)}}
+.vf{flex:none;display:flex;gap:8px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:#0D1024}
+.vf button{flex:1;min-width:0;min-height:48px;border-radius:10px;border:1px solid rgba(255,255,255,.45);background:none;color:#fff;font-weight:800;font-size:15px}
+.vf button.f{background:#fff;color:#14172E}.vf button[disabled]{opacity:.3;cursor:default}
+.vb .err{color:#fff;opacity:.85;padding-top:30vh}
+@media(min-width:760px){.wrap{padding:16px 20px 110px}}
+</style>
+</head>
+<body>
+<div id="app"><div class="msg0">불러오는 중…</div></div>
+<script>
+'use strict';
+/* ── 서버·자료를 다루는 곳은 이 구간뿐(열람 게이트판) — 열람 게이트판은 빌더가 [ADAPTER] 구간을 src/adapter_gate.js로 갈아 끼운다 ── */
+/*[ADAPTER:BEGIN] 열람 게이트판 */
+/* 서버를 다루는 곳 — 열람 게이트판(빌더가 src/index.html의 [ADAPTER] 구간 자리에 넣는다). 토큰·계정 확인은 머리(gate_head.html)의 __gateTok·__gateGo·__gateGuard.
+   전부 D(window.__ASK) ?doc=atk*(JSONP). 사례 맵 adapter_gate.js의 gcall1·gcall(다시 보내기·겹쳐 보내기)·BD 묶음·PDF 받기·sha 대조를 본떴다.
+   ★사례 맵과 다른 점: 쓰기(atkq·atkask·atkseen·atkfb·atkrec)도 응답이 없으면 같은 rid로 다시 보낸다(서버가 같은 rid를 한 번만 처리 — v78_API §1). busy면 몇 초 뒤 같은 rid로.
+   11-27 v2 계약(서버 v78 수정분): atkfb의 t = 'case'만(그 밖은 {ok:0,err:'bad_req'}) · k = 사례 id(자료 cases[].id 그대로 'c12' 형식, /^c[1-9]\d{0,3}$/) · 같은 사례도 rid가 다르면 새 줄 /
+   atkrec = 추천 기록(GET JSONP) rid · ks(보여 준 사례 id 'c12' 형식을 쉼표로, 앞에서부터 최대 10개 — 하나라도 형식이 틀리면 bad_req) · ctx(고른 조건 라벨 80자) → {ok:1}. 화면이 같은 조건은 세션에 1번만 부르고, 실패는 조용히 넘긴다. */
+const LOAD_HELP='새로고침해도 같으면 담당자에게 알려 주세요.';
+let WHO_T='계정 확인 중';
+function whoText(){return WHO_T}
+function devBar(){return ''}
+let _atkN=0;window.__atkRetrying=0;
+function gcall1(doc,params,ms,quiet){return new Promise((res,rej)=>{ // D에 JSONP 1번 — 열람 거절이면 머리의 안내·재로그인으로(quiet = 미리 받기: 안내·이동 없이 실패만)
+  const tok=window.__gateTok();
+  if(!tok){if(!quiet)window.__gateGo('no_token');const er=new Error('계정 확인이 필요합니다');er.gate=1;return rej(er)}
+  const fn='__atk'+(++_atkN)+'_'+Date.now().toString(36),s=document.createElement('script');let got=0;
+  const end=()=>{clearTimeout(to);s.remove()};
+  const to=setTimeout(()=>{end();window[fn]=function(){};rej(new Error('응답이 없습니다'))},ms||60000); // 늦게 온 옛 응답은 빈 함수가 받는다(무시)
+  window[fn]=r=>{got=1;end();try{delete window[fn]}catch(e){}
+    if(r&&r.auth==='required'){if(!quiet)window.__gateGuard(r,tok);const er=new Error('열람 확인이 필요합니다');er.gate=1;return rej(er)}
+    res(r)};
+  s.onload=()=>{if(got)return;end();window[fn]=function(){};rej(new Error('응답이 비었습니다'))};
+  s.onerror=()=>{end();window[fn]=function(){};rej(new Error('서버에 연결하지 못했습니다'))};
+  s.src=window.__ASK+'?doc='+doc+'&callback='+fn+Object.keys(params||{}).map(k=>'&'+k+'='+encodeURIComponent(params[k])).join('')+'&_='+Date.now()+'&tok='+encodeURIComponent(tok);
+  document.head.appendChild(s)})}
+/* D는 요청의 7~20%에 응답하지 않는다(사례 맵 11-22 실측) → 시간이 넘으면 새 callback 이름·같은 인자(쓰기는 같은 rid)로 다시(모두 4번, 20·20·30·45초, 사이 1·2·3초).
+   첫 요청이 9초 안에 안 오면 첫 요청은 둔 채 두 번째를 겹쳐 보내고 먼저 온 답을 쓴다(쓰기도 — 같은 rid라 서버는 한 번만 처리하고 두 번째에는 처음 응답을 그대로 준다).
+   열람 거절·서버의 분명한 답(no_file·bad_req 등)은 다시 보내지 않는다. __atkRT·__atkHedge·__atkBusy = 시험용 기다림(verify_apsitalk_gate.py) */
+const RETRY_T=[20000,20000,30000,45000],RETRY_GAP=[1000,2000,3000],HEDGE=9000,BUSY_T=[3000,5000,8000];
+function atkTick(){document.querySelectorAll('[data-busy]').forEach(e=>e.__show&&e.__show())}
+function gcall(doc,params,ms,quiet){
+  const T=window.__atkRT||RETRY_T,H=quiet?0:(window.__atkHedge||HEDGE),want=typeof quiet==='function'?quiet:()=>true;
+  return new Promise((res,rej)=>{let k=0,live=0,done=0,rt=0,ht=0;
+    const fin=(f,v)=>{if(done)return;done=1;clearTimeout(ht);if(rt){rt=0;window.__atkRetrying--;atkTick()}f(v)};
+    const send=()=>{if(k>0&&!want())return fin(rej,new Error('미리 받기 멈춤'));const i=k++;live++;
+      if(i>0&&!rt&&!quiet){rt=1;window.__atkRetrying++;atkTick()}
+      gcall1(doc,params,T[i],!!quiet).then(r=>fin(res,r),e=>{live--;if(done)return;
+        if(e.gate)return fin(rej,e);
+        if(k>=T.length){if(!live)fin(rej,e);return}
+        if(!live){clearTimeout(ht);setTimeout(()=>{if(!done)send()},RETRY_GAP[k-1]||3000)}});
+      if(i===0&&H)ht=setTimeout(()=>{if(!done&&k===1)send()},H)};
+    send()})}
+/* 화면이 부르는 서버 요청 1번 — busy(서버 잠금 실패, 아무것도 안 씀)면 몇 초 뒤 같은 인자(같은 rid)로 다시 */
+async function srv(doc,params){const B=window.__atkBusy||BUSY_T;
+  for(let i=0;;i++){const r=await gcall(doc,params||{});if(r&&r.ok===0&&r.err==='busy'&&i<B.length){await new Promise(z=>setTimeout(z,B[i]));continue}return r}}
+async function loadData(){
+  const r=await srv('atk',{});
+  if(!r||r.ok!==1||!r.d)throw new Error(r&&r.err==='no_data'?'자료가 아직 올라오지 않았습니다':r&&r.err==='bad_data'?'자료를 갱신하는 중입니다. 잠시 뒤 새로고침해 주세요':'자료를 읽지 못했습니다');
+  WHO_T=r.name||r.who||'';return{d:r.d,who:r.who||'',name:r.name||'',role:r.role||'',canAnswer:r.canAnswer?1:0}}
+/* PM 답 쓰기 — POST(no-cors라 응답을 못 읽는다). 반영 확인·재전송은 화면(sendAnswer)이 atkpm으로 한다 */
+function ansPost(b){const tok=window.__gateTok();if(!tok){window.__gateGo('no_token');const er=new Error('계정 확인이 필요합니다');er.gate=1;return Promise.reject(er)}
+  return fetch(window.__ASK,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify({__act:'atkans',__tok:tok,rid:b.rid,id:b.id,a:b.a})}).then(()=>1,()=>0)}
+function b64bytes(b){const s=atob(b),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u}
+const STALE='자료가 막 갱신되었거나 갱신 중입니다. 화면을 새로고침한 뒤 다시 받아 주세요';
+const _bdC=new Map();const BD_N=4;
+function stale(){const er=new Error(STALE);er.stale=1;return er}
+function bdImg(key,page){return bdImgs([[key,page]])[0]}
+function bdImgs(list,quiet){const out=[],need=[];
+  list.forEach(([key,page])=>{const id=key+'|'+page,c=_bdC.get(id);if(c){out.push(c);return}
+    const d={key,page};d.pr=new Promise((a,b)=>{d.ok=a;d.no=b});_bdC.set(id,d.pr);d.pr.catch(()=>{if(_bdC.get(id)===d.pr)_bdC.delete(id)});out.push(d.pr);need.push(d)});
+  for(let i=0;i<need.length;i+=BD_N)bdBatch(need.slice(i,i+BD_N),quiet);
+  return out}
+function bdBatch(g,quiet){const fid=d=>((D&&D.bd[d.key])||{}).fid||'';
+  return gcall('atkbd',Object.assign({ks:g.map(d=>fid(d)+':'+d.page).join(',')},quiet?{pf:1}:{}),0,quiet).then(r=>{
+    if(r&&r.err==='no_file')throw stale();
+    if(!r||r.ok!==1||!Array.isArray(r.items))throw new Error('이미지 없음');
+    const got={};r.items.forEach(x=>{got[x.k+':'+x.p]=x});const rest=[];
+    g.forEach(d=>{const x=got[fid(d)+':'+d.page];if(!x)return rest.push(d);
+      if(x.err==='no_file')d.no(stale());else if(!x.b64)d.no(new Error('이미지 없음'));else d.ok(URL.createObjectURL(new Blob([b64bytes(x.b64)],{type:x.mime||'image/png'})))});
+    if(rest.length===g.length)throw new Error('이미지 없음');
+    if(rest.length)return bdBatch(rest,quiet)}).catch(e=>{g.forEach(d=>d.no(e))})}
+function bdPdfHref(key){return '#'}
+const _pdfC=new Map();
+function pdfSave(u,name){const x=document.createElement('a');x.href=u;x.download=name;document.body.appendChild(x);x.click();setTimeout(()=>x.remove(),1000)}
+function bdPdf(a){ // PDF 받기 — 한 번에(all=1) 먼저, 너무 크면(too_big) 조각을 3개씩. 이어 붙인 것을 자료의 size·sha256과 대조(다르면 저장하지 않고 새로고침 안내)
+  if(a.dataset.busy)return false;
+  const key=a.dataset.k,b=(D&&D.bd[key])||{},n=b.pdfn||0,parts=new Array(n),name=(b.file||key)+'.pdf';
+  if(!n||!b.fid){alert('이 자료는 PDF가 없습니다.');return false}
+  if(_pdfC.has(b.fid)){pdfSave(_pdfC.get(b.fid),name);if(a.dataset.label){a.textContent=a.dataset.label;delete a.dataset.label}return false}
+  const label=a.textContent;a.dataset.busy='1';let next=0,done=0,wait=0;
+  a.__show=()=>{a.textContent=(window.__atkRetrying?'다시 받는 중 ':'받는 중 ')+done+'/'+n};a.__show();
+  const one=i=>gcall('atkpdf',{k:b.fid,i:i}).then(r=>{if(r&&r.err==='no_file')throw new Error(STALE);if(!r||r.ok!==1||!r.b64)throw new Error('조각 '+(i+1)+' 없음');parts[i]=b64bytes(r.b64);done++;a.__show()});
+  const work=()=>next<n?one(next++).then(work):Promise.resolve();
+  const all=()=>gcall('atkpdf',{k:b.fid,all:1}).then(r=>{if(r&&r.err==='no_file')throw new Error(STALE);
+    if(r&&r.err==='too_big')return Promise.all([work(),work(),work()]);
+    if(!r||r.ok!==1||!r.b64)throw new Error('PDF 없음');parts.length=1;parts[0]=b64bytes(r.b64);done=n;a.__show()});
+  const check=()=>{let len=0;parts.forEach(p=>len+=p.length);if(b.size&&len!==b.size)return Promise.reject(new Error(STALE));
+    if(!b.sha||!(window.crypto&&crypto.subtle))return Promise.resolve();const al=new Uint8Array(len);let o=0;parts.forEach(p=>{al.set(p,o);o+=p.length});
+    return crypto.subtle.digest('SHA-256',al).then(h=>{const hx=Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join('');if(hx!==b.sha)throw new Error(STALE)})};
+  all().then(check).then(()=>{const u=URL.createObjectURL(new Blob(parts,{type:'application/pdf'}));_pdfC.set(b.fid,u);
+    if(navigator.userActivation&&!navigator.userActivation.isActive)wait=1;else pdfSave(u,name)
+  }).catch(e=>alert(e.message===STALE?STALE+'.':'PDF를 받지 못했습니다 ('+e.message+'). 잠시 뒤 다시 눌러 주세요.')).then(()=>{delete a.dataset.busy;a.__show=null;if(wait){a.dataset.label=label;a.textContent='눌러서 저장'}else a.textContent=label});
+  return false}
+/*[ADAPTER:END]*/
+/* ─────────────────────────────────────────────── */
+let D=null,ME={who:'',name:'',role:'',can:0},MY=null,PMD=null;
+/* 계정: 답할 수 있음 = 서버 canAnswer. 업체 역할은 canAnswer가 와도 PM 화면을 열지 않는다(서버도 업체에 atkpm·atkans를 막는다 — 겹 막기) */
+const roleKey=r=>String(r||'').replace(/[\s​-‍⁠﻿]/g,'');   // 서버 판정과 같게 공백·보이지 않는 글자를 지우고 비교(v78_API §0-3)
+const meOf=o=>({who:o.who||'',name:o.name||'',role:roleKey(o.role),can:o.canAnswer&&roleKey(o.role)!=='업체'?1:0});
+/* 이 화면이 열려 있는 동안만(저장소에 남기지 않음): asks 질문 기록 · pick 처음 화면에서 고른 조건 · rec 보낸 추천 기록(같은 조건 1번) · fbN 사례별 남긴 결과 수 */
+const SES={asks:{},seq:0,pick:{},rec:{},fbN:{},lastRec:''};
+const stack=[];
+const $=id=>document.getElementById(id);
+const E=s=>String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const A=E;
+/* 사용자 글 자리표 — innerHTML에 넣지 않고 put()이 textContent로 채운다 */
+let UT=[];
+const U=(s,cls)=>{UT.push(String(s==null?'':s));return `<span class="u${cls?' '+cls:''}" data-u="${UT.length-1}"></span>`};
+function put(el,h){const v=UT;UT=[];el.innerHTML=h;el.querySelectorAll('[data-u]').forEach(x=>{x.textContent=v[+x.dataset.u];x.removeAttribute('data-u')})}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function newRid(){return (Date.now().toString(36)+Math.random().toString(36).slice(2,10)).slice(0,20).replace(/[^0-9a-z]/g,'0').padEnd(10,'0')}
+function route(){const h=location.hash.slice(1)||'home';const i=h.indexOf('?');return{v:i<0?h:h.slice(0,i),p:new URLSearchParams(i<0?'':h.slice(i+1))}}
+function mk(v,o){const p=new URLSearchParams();Object.keys(o||{}).forEach(k=>{if(o[k]!==''&&o[k]!=null)p.set(k,o[k])});const s=p.toString();return '#'+v+(s?'?'+s:'')}
+function nav(h){stack.push(location.hash||'#home');location.hash=h}
+function backTo(fb){if(stack.length)history.back();else location.hash=fb||'#home'}
+function replace(h){history.replaceState(null,'',h);render()}
+addEventListener('hashchange',()=>{if(stack.length&&stack[stack.length-1]===location.hash)stack.pop();render()});
+function head(back){return `<div class="hd">${back?`<button class="bk" aria-label="뒤로" onclick="backTo('#home')">←</button>`:''}<b>${E(D.meta.title)}</b><span class="sp"></span><span class="who">${U(whoText())}</span></div>`+devBar()}
+const caseOf=id=>D.cases.find(c=>c.id===id);
+const qaOf=k=>D.qa.find(x=>x.k===k);
+const notTalk=k=>{const x=qaOf(k);return !!x&&x.t!=='talk'};   // '나오는 질문' 칸에는 FAQ·현장 답만 — 표준대화는 사례 상세의 표준대화 칸에 따로 있어 두 번 보이지 않게(11-27 박본님)
+const KIND={faq:'FAQ',talk:'표준대화',qa:'현장 답'};
+const TL=t=>((D&&D.type_label)||{})[t]||t;   // 유형 화면 표기(자료 type_label) — 필터 값·자료 type은 그대로
+const selN=st=>D.filters.filter(f=>st[f.key]).length;
+function ctxNow(){const r=route();if(r.v==='rec')return ('추천 '+recLabel(rstate())).slice(0,80);if(r.v==='case')return ('요약사례 '+(r.p.get('id')||'')+(SES.lastRec?' · 추천 '+SES.lastRec:'')).slice(0,80);if(r.v==='my')return '내 질문';if(r.v==='ask')return ('질문하기'+(SES.lastRec?' · 추천 '+SES.lastRec:'')).slice(0,80);return '처음 화면'}
+function errMsg(r,e){if(r&&r.msg)return r.msg;if(r&&r.err==='busy')return '서버가 바쁩니다. 잠시 뒤 다시 눌러 주세요.';if(e&&e.gate)return '계정 확인이 필요합니다.';return '보내지 못했습니다. 잠시 뒤 다시 눌러 주세요.'}
+
+/* ── 질문 찾기 — 사례 맵 match()의 방식(동의어·어미 지우기·두 글자 조각 점수)을 답·요약사례·BD로 넓힘. 동의어·어미 표는 자료(D.syn·D.stop) ── */
+let SYN=[],STOP=null;
+const nz=s=>{s=String(s).toLowerCase().replace(/\s/g,'');SYN.forEach(([r,v])=>s=s.replace(r,v));return s.replace(STOP,'').replace(/[^0-9a-z가-힣]/g,'')};
+const bg=s=>{const o=new Set();for(let i=0;i<s.length-1;i++)o.add(s.slice(i,i+2));return o};
+let IX=null;
+function index(){IX={qa:D.qa.map(x=>({x,Q:bg(nz(x.q)),A:bg(nz(x.a))})),cases:D.cases.map(c=>({x:c,Q:bg(nz(c.title)),A:bg(nz([c.sit,(c.did||[]).join(' '),c.res,c.type,c.dept].join(' ')))})),   // 사례 색인 = 제목 + 상황·한 일·결과
+  bd:Object.keys(D.bd).map(k=>({x:k,Q:bg(nz(D.bd[k].title)),A:bg(nz(D.bd[k].ref||''))}))}}
+function hits(B,list){return list.map(e=>{let a=0,b=0;B.forEach(t=>{if(e.Q.has(t))a++;else if(e.A.has(t))b++});return{x:e.x,s:(a+b*0.4)/B.size,a}}).filter(h=>h.s>=0.34&&h.a>=2).sort((p,q)=>q.s-p.s)}
+function search(q){const B=bg(nz(q));if(B.size<2)return{qa:[],cases:[],bd:[]};
+  const hq=hits(B,IX.qa).slice(0,2).map(h=>h.x),hc=hits(B,IX.cases).map(h=>h.x),hb=hits(B,IX.bd).map(h=>h.x);
+  const cs=[...new Set(hc.map(c=>c.id).concat(...hq.map(x=>x.cases||[])))].filter(caseOf).slice(0,3);
+  const bs=[...new Set([].concat(...hq.map(x=>x.bd||[]),...hc.map(c=>c.bd||[]),hb))].filter(k=>D.bd[k]).slice(0,3);
+  return{qa:hq.map(x=>x.k),cases:cs,bd:bs}}
+
+/* ── 공통 조각 ── */
+function ansCard(k){const x=qaOf(k);if(!x)return '';return `<div class="an" data-qa="${A(k)}"><div class="aq"><span class="lbl">${E(KIND[x.t]||x.t)}</span><span>${E(x.q)}</span></div><div class="aa">${E(x.a)}</div></div>`}
+function accItem(k){const x=qaOf(k);if(!x)return '';return `<div class="acc" data-qa="${A(k)}"><button class="acq" aria-expanded="false" onclick="accT(this)"><span class="lbl">${E(KIND[x.t]||x.t)}</span><span class="aqt">${E(x.q)}</span><span class="chev">+</span></button><div class="aca" hidden>${E(x.a)}</div></div>`}
+function accT(el){const w=el.closest('.acc'),o=!w.classList.contains('open');w.classList.toggle('open',o);el.setAttribute('aria-expanded',o?'true':'false');w.querySelector('.aca').hidden=!o;el.querySelector('.chev').textContent=o?'−':'+'}
+const lead=s=>{s=String(s||'');const m=s.match(/^.*?[.!?](?=\s|$)/);return m?m[0]:s};   // 상황 첫 문장(목록용)
+/* 결과: 큰 숫자는 이후 값이 실적일 때만('이전 → 이후' 또는 이후 값 단독). 이후 값이 없으면(예측이라 비운 사례 등) 큰 숫자 없이 결과 글(원본 사실) + 설명 한 줄 — 이전 값이 성과처럼 크게 보이지 않게(11-27) */
+function resBig(c,full){const note=c.res_note?`<div class="rn">${E(c.res_note)}</div>`:'';
+  if(!c.res_to)return (full?`<p class="tx" id="res">${E(c.res)}</p>`:`<div class="r rs">${E(c.res)}</div>`)+note;
+  return (c.res_label?`<div class="rl">${E(c.res_label)}</div>`:'')+`<div class="rb" data-res="1">${c.res_from?`<span class="rf">${E(c.res_from)}</span><span class="ra">→</span>`:''}<span class="rt">${E(c.res_to)}</span></div>`+note}
+function caseBtn(id,mt){const c=caseOf(id);if(!c)return '';return `<button class="cs" data-case="${A(id)}" onclick="nav('${mk('case',{id})}')"><b>${E(c.title)}</b><div class="r">${E(lead(c.sit))}</div>${resBig(c)}${mt||''}</button>`}
+function bdBtn(k,i){const b=D.bd[k];if(!b)return '';return `<button class="bdi" data-bd="${A(k)}" onclick="nav('${mk('bd',{k})}')"><span class="no">${i+1}</span><span class="sp">${E(b.title)}</span><span class="btn f">보기</span></button>`}
+function featCard(n){const f=D.feat||[];if(!f.length)return '';return `<section class="cd sx" id="feat"><h3>${n?`<i>${n}</i>`:''}<span>${E(D.meta.feat_title)}</span></h3><ul class="why">${f.map(x=>`<li><span class="ck">✓</span><div class="wb"><div class="wt">${E(x.t)}</div><div class="wm"><span class="tg">${E(x.tag)}</span>${x.bd&&D.bd[x.bd]?`<button class="btn" data-bd="${A(x.bd)}" onclick="nav('${mk('bd',{k:x.bd})}')">BD 보기</button>`:''}</div></div></li>`).join('')}</ul></section>`}
+/* 아래 고정 탭 — 사례 찾기 · 질문하기 · 내 질문(새 답 배지) · PM(답할 수 있는 계정만) */
+function tabs(cur){const nb=MY&&MY.ok===1?MY.unseen||0:0,pw=PMD&&PMD.ok===1?PMD.wait||0:0;
+  return `<nav class="tb" id="tb"><button id="tbhome" class="${cur==='home'?'on':''}" onclick="tabGo('home')"><i>⌕</i>사례 찾기</button><button id="tbask" class="${cur==='ask'?'on':''}" onclick="tabGo('q')"><i>?</i>질문하기</button>`
+  +`<button id="gomy" class="${cur==='my'?'on':''}" onclick="tabGo('my')"><i>✉</i>내 질문<span class="badge${nb?'':' z'}" id="myn">${nb||''}</span></button>`
+  +(ME.can?`<button id="gopm" class="${cur==='pm'?'on':''}" onclick="tabGo('pm')"><i>✎</i>PM 화면<span class="badge${pw?'':' z'}" id="pmn">${pw||''}</span></button>`:'')+`</nav>`}
+function badges(){const n=$('myn');if(n&&MY&&MY.ok===1){n.textContent=MY.unseen?String(MY.unseen):'';n.classList.toggle('z',!MY.unseen)}
+  const p=$('pmn');if(p&&PMD&&PMD.ok===1){p.textContent=PMD.wait?String(PMD.wait):'';p.classList.toggle('z',!PMD.wait)}}
+function tabGo(t){const r=route();if(t==='home'){if(r.v==='home'){window.scrollTo(0,0);return}nav('#home');return}
+  if(t==='q'){if(r.v==='home'){qFocus();return}nav('#home?f=q');return}
+  if(t==='my'){if(r.v!=='my')nav('#my');return}if(t==='pm'&&r.v!=='pm')nav('#pm')}
+function qFocus(){const c=$('qcard');if(c){c.scrollIntoView({block:'start'});const q=$('q');if(q)q.focus({preventScroll:true})}}
+
+/* ── 처음 화면: 안내 + 조건 고르기(고르기 전에는 사례를 그리지 않는다) + 질문하기 ── */
+function vhome(){const p=SES.pick,n=selN(p);
+  return head()+`<div class="wrap${n?' fxon':''}" id="home"><div class="hero" id="hero"><b>담당 거래처에 해당하는 조건을 고르면 맞는 사례를 추천해 드립니다</b><small>아는 조건만 골라도 됩니다. 딱 맞는 사례가 없으면 가까운 사례부터 보여 드립니다.</small></div>
+  <div class="cd" id="pick">`+D.filters.map(f=>`<div class="fl">${E(f.label)}</div><div class="chips" data-g="${A(f.key)}">`+f.opts.map(o=>`<button class="ch${f.key==='t'?' tt':''}${p[f.key]===o?' on':''}" data-f="${A(f.key)}" data-v="${A(o)}" aria-pressed="${p[f.key]===o?'true':'false'}" onclick="pickSet(this)">${E(f.key==='t'?TL(o):o)}${f.key==='t'&&D.types[o]?`<small>${E(D.types[o])}</small>`:''}</button>`).join('')+`</div>`).join('')
+  +`<button class="go" id="gorec" onclick="pickGo()"${n?'':' disabled'}>맞는 사례 보기<small id="gorecn">${n?'고른 조건 '+n+'개':'조건을 1개 이상 골라 주세요'}</small></button></div>
+  <div class="cd" id="qcard"><h2>질문하기 <small>승인 자료에서 찾아 그대로 보여 드립니다. 없으면 담당 PM에게 문의할 수 있습니다</small></h2><textarea class="q" id="q" maxlength="300" placeholder="궁금한 점을 적어 주세요"></textarea><button class="go" id="qgo" onclick="askGo()">찾기</button><div class="ex">${(D.examples||[]).map(x=>`<button onclick="askEx(this)">${E(x)}</button>`).join('')}</div></div></div>
+  <div class="fx" id="gofix"${n?'':' hidden'}><button class="go" id="gorec2" onclick="pickGo()">맞는 사례 보기<small id="gorecn2">${n?'고른 조건 '+n+'개':''}</small></button></div>`+tabs('home')}
+function pickSet(el){const k=el.dataset.f,v=el.dataset.v;SES.pick[k]=SES.pick[k]===v?'':v;
+  document.querySelectorAll(`#pick .ch[data-f="${k}"]`).forEach(b=>{const on=b.dataset.v===SES.pick[k];b.classList.toggle('on',on);b.setAttribute('aria-pressed',on?'true':'false')});
+  const n=selN(SES.pick),g=$('gorec');g.disabled=!n;$('gorecn').textContent=n?'고른 조건 '+n+'개':'조건을 1개 이상 골라 주세요';
+  $('gofix').hidden=!n;$('gorecn2').textContent=n?'고른 조건 '+n+'개':'';$('home').classList.toggle('fxon',!!n)}   // 조건이 1개 이상이면 아래 탭 바로 위에 같은 단추를 고정(스크롤 없이 누름)
+function pickGo(){if(!selN(SES.pick))return;nav(mk('rec',SES.pick))}
+function homeAfter(){srv('atkmy',{}).then(r=>{if(r&&r.ok===1){MY=r;badges()}},()=>{});
+  if(ME.can)srv('atkpm',{}).then(r=>{if(r&&r.ok===1){PMD=r;badges()}},()=>{});
+  if(route().p.get('f')==='q')setTimeout(qFocus,0)}
+function askEx(el){$('q').value=el.textContent;askGo()}
+function askGo(){const el=$('q');if(!el)return;const q=el.value.trim().slice(0,300);if(!q)return;
+  const res=search(q),s=++SES.seq,keys=res.qa.map(k=>'qa:'+k).concat(res.cases.map(k=>'case:'+k),res.bd.map(k=>'bd:'+k));
+  const rec={q,res,qid:'',ctx:ctxNow()};SES.asks[s]=rec;
+  rec.qp=srv('atkq',{rid:newRid(),q,n:res.qa.length,sh:keys.join(',').slice(0,200),ctx:rec.ctx}).then(r=>{if(r&&r.ok===1)rec.qid=r.qid;return rec.qid},()=>'');   // 질문 확정 1번 = 기록 1번
+  nav(mk('ask',{q,s}))}
+
+/* ── 질문 결과(질문을 했으므로 관련 요약사례를 보여도 된다) — 맨 끝에 특장점 ── */
+function vask(){const p=route().p,q=(p.get('q')||'').slice(0,300),rec=SES.asks[p.get('s')]&&SES.asks[p.get('s')].q===q?SES.asks[p.get('s')]:{q,res:search(q),qid:'',ctx:'질문하기'};
+  const r=rec.res,has=r.qa.length>0;
+  const pmBox=`<div class="cd" id="pmask"><h2>${has?'찾는 답이 아니면 담당 PM에게 문의':'담당 PM에게 문의'} <small>답이 오면 '내 질문'에 표시됩니다</small></h2><textarea class="ta" id="pmq" maxlength="300"></textarea><button class="go" id="pmgo" data-s="${A(p.get('s')||'')}" onclick="pmAsk(this)">담당 PM에게 문의 보내기</button><div class="fbm" id="pmmsg"></div></div>`;
+  const cs=r.cases.length?`<div class="cd" id="rcases"><h2>관련 요약사례</h2>${r.cases.map(id=>caseBtn(id)).join('')}</div>`:'';
+  const bs=r.bd.length?`<div class="cd" id="rbd"><h2>관련 BD</h2>${r.bd.map((k,i)=>bdBtn(k,i)).join('')}</div>`:'';
+  return head(1)+`<div class="wrap" id="ask"><div class="pq"><small>질문</small>${U(q)}</div>`+(has?`<div class="cd" id="hits"><h2>답 <small>승인 자료 원문 그대로</small></h2>${r.qa.map(ansCard).join('')}</div>`+cs+bs+pmBox
+    :`<div class="miss" id="miss">등록된 자료에서 답을 찾지 못했습니다.</div>`+pmBox+cs+bs)+`<button class="go s" id="askagain" onclick="tabGo('q')">다른 질문하기</button><div style="height:12px"></div>`+featCard(0)+`</div>`+tabs('ask')}
+function askAfter(){const t=$('pmq');if(t)t.value=(route().p.get('q')||'').slice(0,300)}
+async function pmAsk(el){if(el.disabled)return;const s=el.dataset.s,rec=SES.asks[s],q=$('pmq').value.trim().slice(0,300),m=$('pmmsg');
+  if(q.length<2){m.className='fbm bad';m.textContent='질문을 적어 주세요.';return}
+  el.disabled=true;m.className='fbm';m.textContent='보내는 중…';
+  let qid='',n=null;if(rec){qid=await Promise.race([rec.qp,sleep(15000).then(()=>rec.qid)]);n=rec.res.qa.length}   // 이 질문 기록 번호(qid)를 같이 — 판정이 '답 부족'/'답 없음'으로
+  const p={q,ctx:rec?rec.ctx:ctxNow()};if(qid)p.qid=qid;if(n!=null)p.n=n;
+  const sig=JSON.stringify(p);if(el.__sig!==sig){el.__sig=sig;el.__rid=newRid()}
+  let r=null,e=null;try{r=await srv('atkask',Object.assign({rid:el.__rid},p))}catch(x){e=x}
+  if(r&&r.ok===1){MY=null;m.className='fbm ok';m.textContent=(r.dup?'이미 접수된 질문입니다':'접수됨')+' — 문의 '+(r.id||'')+(r.mailfail?' · '+(r.msg||''):'')+" · 답이 오면 '내 질문'에 표시됩니다.";el.textContent='보냈습니다';return}
+  el.disabled=false;m.className='fbm bad';m.textContent=errMsg(r,e)}
+
+/* ── 추천 결과(조건을 1개 이상 고른 때만 — 없으면 처음 화면으로) ── */
+function rstate(){const p=route().p,st={};D.filters.forEach(f=>{const v=p.get(f.key)||'';st[f.key]=f.opts.includes(v)?v:''});return st}
+function recLabel(st){return D.filters.map(f=>st[f.key]).filter(Boolean).join('·')||'조건 없음'}
+function minfo(c,st){const m=[],x=[];let s=0;D.filters.forEach(f=>{if(!st[f.key])return;if((c.f[f.key]||[]).includes(st[f.key])){m.push(f.key);s+=(D.weights[f.key]||1)}else x.push(f.key)});return{m,x,s}}
+function ranked(st){const sel=selN(st);return D.cases.map((c,i)=>Object.assign({c,i},minfo(c,st))).sort((a,b)=>b.s-a.s||a.i-b.i).map(e=>Object.assign(e,{exact:sel>0&&e.x.length===0}))}
+let REC_LAST=null;
+const NEAR_N=(ex)=>ex?3:5;   // 가까운 사례는 처음에 딱 맞는 사례가 있으면 3건, 없으면 5건만 — 나머지는 [가까운 사례 더 보기]
+function vrec(){const st=rstate(),R=ranked(st),ex=R.filter(e=>e.exact),show=ex.length+NEAR_N(ex.length);SES.lastRec=recLabel(st);REC_LAST={st,ids:R.slice(0,show).map(e=>e.c.id)};   // atkrec ks = 처음 화면에 보인 사례만
+  const lab=k=>(D.filters.find(f=>f.key===k)||{}).label||k;
+  const mt=e=>`<div class="chips mts" data-m="${A(e.m.join(','))}" data-x="${A(e.x.join(','))}">${e.m.map(k=>`<span class="mt y">✓ ${E(lab(k))}</span>`).join('')}${e.x.map(k=>`<span class="mt n">✕ ${E(lab(k))}</span>`).join('')}</div>`;
+  let h=head(1)+`<div class="wrap" id="rec"><div class="cd" id="rsum"><div class="fl">고른 조건</div><div class="chips">${D.filters.filter(f=>st[f.key]).map(f=>`<span class="tag g" data-f="${A(f.key)}">${E(f.label)} · ${E(f.key==='t'?TL(st[f.key]):st[f.key])}</span>`).join('')}</div><button class="go s" id="chg" onclick="recChange()">조건 바꾸기</button></div>`;
+  if(ex.length)h+=`<div class="note" id="rnote">조건에 딱 맞는 사례 ${ex.length}건${ex.length<R.length?' · 그 아래는 가까운 사례':''}</div>`;
+  else h+=`<div class="note" id="rnote" data-near="1">딱 맞는 사례는 없습니다 — 가까운 사례부터(${D.filters.filter(f=>f.key!=='t').sort((a,b)=>(D.weights[b.key]||0)-(D.weights[a.key]||0)).map(f=>E(f.label)+' 일치').join(' > ')})</div>`;
+  const card=(e,j)=>(ex.length&&j===ex.length?`<div class="sec" id="rnear">가까운 사례</div>`:'')+caseBtn(e.c.id,mt(e));
+  h+=`<div id="rlist">`+R.slice(0,show).map(card).join('')+(R.length>show?`<div id="rmore" hidden>${R.slice(show).map((e,j)=>card(e,j+show)).join('')}</div><button class="go s" id="rmorebtn" onclick="recMore()">가까운 사례 더 보기 (${R.length-show}건)</button>`:'')+`</div>`;
+  const pool=R.filter(e=>e.s>0).slice(0,3).map(e=>e.c),pl=pool.length?pool:R.slice(0,1).map(e=>e.c);
+  let qs=st.cp?D.qa.filter(x=>(x.fam||[]).includes(st.cp)).map(x=>x.k):[];
+  pl.forEach(c=>qs=qs.concat(c.qa||[]));qs=[...new Set(qs)].filter(notTalk).slice(0,2);
+  let bs=[];qs.forEach(k=>bs=bs.concat(qaOf(k).bd||[]));pl.forEach(c=>bs=bs.concat(c.bd||[]));bs=[...new Set(bs)].filter(k=>D.bd[k]).slice(0,3);
+  if(qs.length)h+=`<div class="cd" id="rqa"><h2>이 조건에서 나오는 질문 <small>눌러서 답 보기 · 승인 자료 원문 그대로</small></h2>${qs.map(accItem).join('')}</div>`;
+  if(bs.length)h+=`<div class="cd" id="rbd"><h2>관련 BD</h2>${bs.map((k,i)=>bdBtn(k,i)).join('')}</div>`;
+  return h+`</div>`+tabs('home')}
+function recMore(){const m=$('rmore'),b=$('rmorebtn');if(m)m.hidden=false;if(b)b.remove()}
+function recChange(){SES.pick=Object.assign({},rstate());nav('#home')}
+/* 추천 기록(atkrec) — 추천 결과가 그려질 때 1번, 이 화면 세션에서 같은 조건이면 다시 보내지 않는다. 실패해도 화면은 그대로 */
+function recLog(){if(!REC_LAST)return;const ctx=recLabel(REC_LAST.st).slice(0,80);if(SES.rec[ctx])return;SES.rec[ctx]=1;
+  try{Promise.resolve(srv('atkrec',{rid:newRid(),ks:REC_LAST.ids.slice(0,10).join(','),ctx})).catch(()=>{})}catch(e){}}
+
+/* ── 요약사례 상세: ① 상황 ② 한 일 ③ 결과 ④ 처방명분 근거 ⑤ 표준대화 ⑥ 관련 BD ⑦ 여기서 나오는 질문 ⑧ 특장점(맨 아래) ── */
+function vcase(id){const c=caseOf(id);if(!c)return head(1)+`<div class="msg0">사례를 찾지 못했습니다.</div>`;
+  const bds=(c.bd||[]).filter(k=>D.bd[k]),cq=(c.qa||[]).filter(notTalk).slice(0,5);let n=0;const no=()=>`<i>${++n}</i>`;
+  const jn=[['s-sit','상황'],['s-why','근거'],['talk','표준대화']].concat(bds.length?[['cbd','BD']]:[],cq.length?[['cqa','질문']]:[]);
+  return head(1)+`<div class="wrap" id="case" data-id="${A(c.id)}"><div class="cd ct"><h2 id="ctitle">${E(c.title)}</h2><div class="chips"><span class="tag g">${E(TL(c.type))}</span><span class="tag g">${E(c.cust)}</span>${c.dept?`<span class="tag g">${E(c.dept)}</span>`:''}</div>
+  <div class="jn" id="jn">${jn.map(([i,l])=>`<button data-go="${i}" onclick="jump(this)">${l}</button>`).join('')}</div></div>
+  <section class="cd sx" id="s-sit"><h3>${no()}<span>상황</span></h3><p class="tx" id="sit">${E(c.sit)}</p></section>
+  <section class="cd sx" id="s-did"><h3>${no()}<span>한 일 <small>이 순서로 따라 해 보세요</small></span></h3><ol class="did" id="did">${(c.did||[]).map(x=>`<li>${E(x)}</li>`).join('')}</ol></section>
+  <section class="cd sx" id="s-res"><h3>${no()}<span>결과</span></h3>${resBig(c,1)}</section>
+  <section class="cd sx" id="s-why"><h3>${no()}<span>처방명분 근거 <small>확인된 자료만 싣습니다 · 약가는 의약품안전나라 표시 상한금액 기준</small></span></h3><ul class="why" id="why">${(c.why||[]).map(w=>`<li><span class="ck">✓</span><div class="wb"><div class="wt">${E(w.t)}</div><div class="wm"><span class="tg">${E(w.tag)}</span>${w.bd&&D.bd[w.bd]?`<button class="btn" data-bd="${A(w.bd)}" onclick="nav('${mk('bd',{k:w.bd})}')">BD 보기</button>`:''}</div></div></li>`).join('')}</ul></section>
+  <section class="cd sx" id="talk"><h3>${no()}<span>표준대화 <small>원장님께 이렇게 말씀드립니다</small></span></h3><div class="msg" id="talkt">${E(c.talk)}</div><button class="go" id="cpy" data-l="표준대화 복사" onclick="copyTalk(this)">표준대화 복사</button></section>
+  ${bds.length?`<section class="cd sx" id="cbd"><h3>${no()}<span>관련 BD <small>원장님께 보여 드릴 자료</small></span></h3>${bds.map((k,i)=>bdBtn(k,i)).join('')}</section>`:''}
+  ${cq.length?`<section class="cd sx" id="cqa"><h3>${no()}<span>여기서 나오는 질문 <small>눌러서 답 보기 · 승인 자료 원문 그대로</small></span></h3>${cq.map(accItem).join('')}</section>`:''}
+  ${featCard(++n)}</div>
+  <div class="ab" id="ab"><button class="ab1" id="cpy2" data-l="표준대화 복사" onclick="copyTalk(this)">표준대화 복사</button><button class="ab2" id="fbgo" onclick="fbOpen()">써 봤어요<span class="badge${SES.fbN[c.id]?'':' z'}" id="fbn">${SES.fbN[c.id]||''}</span></button></div>
+  <div class="sh" id="fbs" hidden><div class="shb" onclick="fbClose()"></div><div class="shp fb" data-t="case" data-k="${A(c.id)}" role="dialog" aria-label="써 봤어요"><div class="shh"><b>써 봤어요</b><button class="x" onclick="fbClose()">닫기</button></div><div id="fbin">${fbForm(c.id)}</div></div></div>`}
+function jump(el){const t=$(el.dataset.go);if(t)t.scrollIntoView({block:'start',behavior:'smooth'})}
+function copyTalk(el){const c=caseOf(route().p.get('id'));if(!c)return;const s=c.talk,l=el.dataset.l||'표준대화 복사';
+  const ok=()=>{el.textContent='복사됨 ✓';setTimeout(()=>{el.textContent=l},1500)};
+  const old=()=>{const ta=document.createElement('textarea');ta.value=s;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;left:-9999px;top:0';document.body.appendChild(ta);ta.select();let r=false;try{r=document.execCommand('copy')}catch(e){}ta.remove();r?ok():alert('복사하지 못했습니다. 글을 길게 눌러 직접 복사해 주세요.')};
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(s).then(ok,old);else old()}
+
+/* ── 써 봤어요(사례 상세에만) — 같은 사례에 다른 거래처 결과를 여러 번(새 rid) ── */
+function fbForm(id){const n=SES.fbN[id]||0;return `<p class="tx sm" style="margin-top:0">이 사례를 거래처에 써 본 결과를 골라 주세요.${n?' (이 사례로 남긴 결과 '+n+'건)':''}</p><div class="opts">${['처방 약속 받음','검토 중','거절'].map((s,i)=>`<button class="opt" data-r="${i+1}" onclick="fbPick(this)">${s}</button>`).join('')}</div><input class="ln" maxlength="100" placeholder="한 줄(선택 · 100자)"><button class="go" id="fbsend" onclick="fbSend(this)">남기기</button><div class="fbm st0"></div>`}
+function fbOpen(){const s=$('fbs');if(!s)return;s.hidden=false;document.body.style.overflow='hidden'}
+function fbClose(){const s=$('fbs');if(!s)return;s.hidden=true;document.body.style.overflow=''}
+function fbPick(el){el.parentNode.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on',x===el));const w=el.closest('.fb'),m=w&&w.querySelector('.st0');if(m&&m.classList.contains('bad')){m.className='fbm st0';m.textContent=''}}   // 고르면 '결과를 골라 주세요' 지움
+async function fbSend(el){const w=el.closest('.fb'),o=w.querySelector('.opt.on'),m=w.querySelector('.st0');if(el.disabled)return;if(!o){m.className='fbm st0 bad';m.textContent='결과를 골라 주세요.';return}
+  const p={t:w.dataset.t,k:w.dataset.k,r:+o.dataset.r,m:w.querySelector('input').value.trim().slice(0,100),ctx:ctxNow()};
+  const sig=JSON.stringify(p);if(w.__sig!==sig){w.__sig=sig;w.__rid=newRid()}   // 같은 내용으로 다시 누르면 같은 요청(rid 그대로 — 서버가 한 번만 처리)
+  el.disabled=true;m.className='fbm st0';m.textContent='보내는 중…';let r=null,e=null;
+  try{r=await srv('atkfb',Object.assign({rid:w.__rid},p))}catch(x){e=x}
+  if(r&&r.ok===1){const n=SES.fbN[p.k]=(SES.fbN[p.k]||0)+1;w.__sig=null;w.__rid=null;
+    const b=$('fbn');if(b){b.textContent=String(n);b.classList.remove('z')}
+    put($('fbin'),`<div class="done" id="fbdone">결과를 남겼습니다 ✓</div><p class="tx sm">이 사례로 남긴 결과 ${n}건 · 다른 거래처에서 써 보셨다면 한 번 더 남길 수 있습니다.</p><button class="go s" id="fbmore" onclick="fbMore()">다른 거래처 결과 더 남기기</button><button class="go" onclick="fbClose()">닫기</button>`);return}
+  el.disabled=false;m.className='fbm st0 bad';m.textContent=errMsg(r,e)}
+function fbMore(){const w=document.querySelector('#fbs .fb');if(!w)return;w.__sig=null;w.__rid=null;put($('fbin'),fbForm(w.dataset.k))}
+
+/* ── BD 보기 — 화면 폭에 맞춰 보이고, 누르면 원본 크기(가로로 밀어서 보기) ── */
+let VB=null;
+function vbd(){const p=route().p,k=p.get('k'),b=D.bd[k];if(!b)return head(1)+`<div class="msg0">BD를 찾지 못했습니다.</div>`;
+  const n=b.pages||1,pg=Math.min(Math.max(+p.get('p')||1,1),n);VB={k,pg,n};
+  return `<div class="vw" id="viewer" data-key="${A(k)}"><div class="vt"><button class="b" aria-label="뒤로" onclick="backTo('#home')">←</button><b>${E(b.title)}</b><a class="b f" id="pdf" href="${A(bdPdfHref(k))}" download="${A(b.file||k)}.pdf" data-k="${A(k)}" onclick="return bdPdf(this)">PDF 받기</a></div>
+  <div class="vb" id="vb"><div class="ld" id="bdld"><i></i>BD를 불러오는 중…</div><img id="bdimg" alt="${A(b.title)}" onclick="bdZoom()" onload="this.dataset.ok='1';bdDone()" onerror="bdFail(this)"></div>
+  <div class="vf"><button onclick="step(-1)"${pg<=1?' disabled':''}>← 이전</button><button class="f" id="zoom" onclick="bdZoom()">크게 보기</button><button onclick="step(1)"${pg>=n?' disabled':''}>다음 →</button></div></div>`}
+function bdZoom(){const v=$('vb'),z=$('zoom');if(!v)return;const on=!v.classList.contains('zm');v.classList.toggle('zm',on);if(z)z.textContent=on?'화면에 맞추기':'크게 보기'}
+function bdDone(){const l=$('bdld');if(l)l.remove()}
+function bdFail(el,e){if(el.dataset.ok==='0')return;el.dataset.ok='0';bdDone();el.insertAdjacentHTML('afterend','<span class="err">'+E(e&&e.stale?e.message:'이미지를 불러오지 못했습니다')+'</span>')}
+function fillBd(){const el=$('bdimg');if(!el||!VB)return;bdImg(VB.k,VB.pg).then(u=>{el.src=u},e=>bdFail(el,e))}
+function step(d){if(!VB)return;const pg=VB.pg+d;if(pg<1||pg>VB.n)return;replace(mk('bd',{k:VB.k,p:pg}))}
+
+/* ── 내 질문 ── */
+const stLab=x=>x.st==='대기'?`<span class="st w">대기</span>`:`<span class="st a">${E(x.st)}</span>`;
+function vmy(){return head(1)+`<div class="wrap" id="my"><div class="cd"><h2>내 질문 <small>담당 PM에게 문의한 것과 받은 답</small></h2><div id="mylist"><div class="msg0">불러오는 중…</div></div></div></div>`+tabs('my')}
+function myItem(x,open){const nw=x.a&&!x.seen;
+  return `<div class="it${open?' open':''}" data-id="${A(x.id)}"><button class="ih" onclick="myOpen(this)"><div class="iq">${stLab(x)}${nw?`<span class="badge">새 답</span> `:''}${U(x.q)}</div><div class="im">${E(x.id)} · ${U(x.at)}</div></button>
+  ${open?`<div class="ib">${x.a?`<div class="ans">${U(x.a)}</div><div class="im">답: ${U(x.by)} · ${U(x.aAt)}</div>`:`<div class="im" style="margin-top:8px">아직 답이 없습니다. 답이 오면 여기에 표시됩니다.</div>`}</div>`:''}</div>`}
+let MYOPEN='';
+function myDraw(){const L=$('mylist');if(!L)return;if(!MY||MY.ok!==1){put(L,`<div class="msg0">내 질문을 불러오지 못했습니다. <button class="btn" onclick="myLoad()">다시</button></div>`);return}
+  badges();
+  if(!MY.items.length){put(L,`<div class="msg0">아직 문의한 질문이 없습니다.</div>`);return}
+  put(L,MY.items.map(x=>myItem(x,x.id===MYOPEN)).join(''));const o=L.querySelector('.it.open');if(o&&route().p.get('id'))o.scrollIntoView({block:'center'})}
+function myLoad(){return srv('atkmy',{}).then(r=>{MY=r},()=>{MY=null}).then(()=>{const id=route().p.get('id');if(id&&!MYOPEN)MYOPEN=id;myDraw();const x=MY&&MY.items&&MY.items.find(y=>y.id===MYOPEN);if(x)mySeen(x)})}
+function myOpen(el){if(!MY||!MY.items)return;const id=el.closest('.it').dataset.id;MYOPEN=MYOPEN===id?'':id;myDraw();const x=MY.items.find(y=>y.id===MYOPEN);if(x)mySeen(x)}
+function mySeen(x){if(!x.a||x.seen||x.__seeing)return;x.__seeing=1;srv('atkseen',{rid:newRid(),id:x.id}).then(r=>{if(r&&r.ok===1){x.seen=1;x.seenAt=r.seenAt;if(MY)MY.unseen=Math.max(0,(MY.unseen||0)-1);myDraw()}},()=>{}).then(()=>{x.__seeing=0})}
+
+/* ── PM 화면(답할 수 있는 계정만 — 아니면 atkpm을 부르지 않는다) ── */
+let PMOPEN='';
+function vpm(){if(!ME.can)return head(1)+`<div class="wrap"><div class="msg0" id="nopm">답할 수 있는 계정이 아닙니다.</div></div>`+tabs('pm');
+  return head(1)+`<div class="wrap" id="pm"><div class="cd"><h2>받은 문의 <small>대기 먼저</small></h2><div id="pmlist"><div class="msg0">불러오는 중…</div></div></div><div class="cd"><h2>들어온 결과 <small>사례별 '써 봤어요'</small></h2><div id="fblist"></div></div></div>`+tabs('pm')}
+function pmItem(x,open){return `<div class="it${open?' open':''}" data-id="${A(x.id)}"><button class="ih" onclick="pmOpen(this)"><div class="iq">${stLab(x)}${U(x.q)}</div><div class="im">${E(x.id)} · ${U(x.name||x.email)}${x.org?' · '+U(x.org,'org'):''} · ${U(x.at)}${x.ctx?' · '+U(x.ctx):''}</div></button>
+  ${open?`<div class="ib">${roleKey(x.role)==='업체'?`<div class="note vq">업체 질문 — 답이 그대로 업체 화면에 보입니다</div>`:''}${x.a?`<div class="ans">${U(x.a)}</div><div class="im">답: ${U(x.by)} · ${U(x.aAt)}</div>`:''}<textarea class="ta" maxlength="2000" placeholder="답을 적어 주세요(질문자 화면에 그대로 보입니다 — 사내 정보·사람 이름은 적지 않습니다)"${PMSEND[x.id]?' readonly':''}></textarea><div class="row"><button class="btn f" onclick="pmSend(this)"${PMSEND[x.id]?' disabled':''}>${x.a?'답 고치기':'답 보내기'}</button></div><div class="fbm pmm">${PMSEND[x.id]?'보내는 중… 반영을 확인하고 있습니다':''}</div></div>`:''}</div>`}
+/* 목록을 다시 그려도(늦게 온 atkpm 등) 쓰던 답 글·보내는 중 상태는 그대로 — PMDRAFT[문의 번호] = 쓰던 글, PMSEND[문의 번호] = 보내는 중 */
+const PMDRAFT={},PMSEND={};
+function pmDraw(){const L=$('pmlist'),F=$('fblist');if(!L)return;L.querySelectorAll('.it.open textarea').forEach(t=>{const id=t.closest('.it').dataset.id;if(id&&!t.readOnly)PMDRAFT[id]=t.value});if(!PMD||PMD.ok!==1){put(L,`<div class="msg0">${PMD&&PMD.err==='no_role'?'답할 수 있는 계정이 아닙니다.':'목록을 불러오지 못했습니다.'} <button class="btn" onclick="pmLoad()">다시</button></div>`);return}
+  badges();
+  if(!PMD.items.length)put(L,`<div class="msg0">받은 문의가 없습니다.</div>`);else put(L,PMD.items.map(x=>pmItem(x,x.id===PMOPEN)).join(''));
+  const o=L.querySelector('.it.open');if(o){const t=o.querySelector('textarea'),x=PMD.items.find(y=>y.id===PMOPEN);if(t&&x)t.value=PMDRAFT[x.id]!=null?PMDRAFT[x.id]:(x.a||'');if(route().p.get('id'))o.scrollIntoView({block:'center'})}
+  else if(PMOPEN&&route().p.get('id')===PMOPEN)L.insertAdjacentHTML('afterbegin',`<div class="note" id="pmnf">문의 ${E(PMOPEN)}를 목록에서 찾지 못했습니다.</div>`);
+  if(F)put(F,(PMD.fb||[]).length?PMD.fb.map(f=>{const c=f.t==='case'?caseOf(f.k):null;return `<div class="fbl" data-k="${A(f.k)}"><b>${U(f.rl)}</b> · ${c?E(c.title):U(f.t+' '+f.k)}${f.m?' — '+U(f.m):''}<div class="im">${U(f.name||f.email)}${f.org?' · '+U(f.org,'org'):''} · ${U(f.at)}${f.ctx?' · '+U(f.ctx):''}</div></div>`}).join(''):`<div class="msg0">아직 없습니다.</div>`)}
+function pmLoad(){if(!ME.can)return Promise.resolve();return srv('atkpm',{}).then(r=>{PMD=r},()=>{PMD=null}).then(()=>{const id=route().p.get('id');if(id&&!PMOPEN)PMOPEN=id;pmDraw()})}
+function pmOpen(el){const id=el.closest('.it').dataset.id;PMOPEN=PMOPEN===id?'':id;pmDraw()}
+const cleanA=v=>String(v==null?'':v).replace(/\r\n?/g,'\n').replace(/[\x00-\x09\x0b-\x1f\x7f]+/g,' ').replace(/\n{3,}/g,'\n\n').trim().slice(0,2000);   // 서버(atkAnsText_)와 같은 정리
+/* 답 쓰기: POST(응답은 못 읽는다고 보고) → atkpm을 2·6·15초에 다시 불러 aAt가 바뀌고 답이 같으면 반영. 안 되면 같은 rid로 다시 POST(서버가 두 번 쓰지 않음). 모두 3번 */
+async function sendAnswer(id,text,before,prevA){const rid=newRid(),want=cleanA(text),W=window.__atkWait||[2000,6000,15000],chg=cleanA(prevA)!==want;   // 답 글이 바뀐 경우는 글이 같아지면 반영(답한 시각이 같은 초여도), 같은 글을 다시 보낸 경우는 답한 시각이 바뀌어야 반영
+  for(let k=0;k<3;k++){try{await ansPost({rid,id,a:text})}catch(e){if(e&&e.gate)throw e}
+    for(const w of W){await sleep(w);let r=null;try{r=await srv('atkpm',{})}catch(e){if(e&&e.gate)throw e;continue}
+      if(!r||r.ok!==1)continue;const it=r.items.find(x=>x.id===id);if(it&&it.aAt&&cleanA(it.a)===want&&(chg||it.aAt!==before)){PMD=r;return it}}}
+  throw new Error('반영을 확인하지 못했습니다')}
+async function pmSend(el){if(el.disabled)return;const w=el.closest('.it'),id=w.dataset.id,t=w.querySelector('textarea'),m=w.querySelector('.pmm'),x=PMD.items.find(y=>y.id===id);
+  const a=cleanA(t.value);if(a.length<2){m.className='fbm pmm bad';m.textContent='답을 2자 이상 적어 주세요.';return}
+  const text=t.value;PMDRAFT[id]=text;PMSEND[id]=1;el.disabled=true;t.readOnly=true;m.className='fbm pmm';m.textContent='보내는 중… 반영을 확인하고 있습니다';
+  const say=(cls,msg)=>{const w2=document.querySelector(`#pmlist .it[data-id="${id}"] .pmm`);if(w2){w2.className='fbm pmm '+cls;w2.textContent=msg}};   // 보내는 동안 목록이 다시 그려졌어도 지금 화면의 그 문의에
+  try{const it=await sendAnswer(id,text,x?x.aAt:'',x?x.a:'');delete PMSEND[id];delete PMDRAFT[id];PMOPEN=id;pmDraw();say('ok','반영됨 — '+it.st+' · '+it.aAt)}
+  catch(e){delete PMSEND[id];pmDraw();say('bad',e&&e.gate?'계정 확인이 필요합니다.':'반영을 확인하지 못했습니다. 잠시 뒤 목록을 새로 열어 확인하고, 없으면 다시 보내 주세요.')}}
+
+function render(){
+  if(!D)return;const r=route(),app=$('app');VB=null;document.body.style.overflow='';
+  document.title=D.meta.title;
+  if(r.v==='rec'&&!selN(rstate())){replace('#home');return}   // 조건 없이 추천 화면으로 오면 처음 화면(사례를 미리 보여 주지 않는다)
+  if(r.v==='ask'){put(app,vask());askAfter()}
+  else if(r.v==='rec'){put(app,vrec());recLog()}
+  else if(r.v==='case')put(app,vcase(r.p.get('id')));
+  else if(r.v==='bd'){put(app,vbd());fillBd()}
+  else if(r.v==='my'){MYOPEN=r.p.get('id')||MYOPEN;put(app,vmy());if(MY&&MY.ok===1)myDraw();myLoad()}
+  else if(r.v==='pm'){PMOPEN=r.p.get('id')||PMOPEN;put(app,vpm());if(ME.can){if(PMD&&PMD.ok===1)pmDraw();pmLoad()}}
+  else{put(app,vhome());homeAfter()}
+  window.scrollTo(0,0)}
+if(!location.hash)history.replaceState(null,'','#home');
+loadData().then(o=>{D=o.d;ME=meOf(o);SYN=(D.syn||[]).map(([p,f,v])=>[new RegExp(p,f),v]);STOP=new RegExp(D.stop||'$^','g');index();render()})
+  .catch(e=>{if(e&&e.gate)return;const a=$('app');a.textContent='';const d=document.createElement('div');d.className='msg0';d.textContent='자료를 불러오지 못했습니다 ('+(e&&e.message||'')+'). '+LOAD_HELP;a.appendChild(d)});
+</script>
+</body>
+</html>
